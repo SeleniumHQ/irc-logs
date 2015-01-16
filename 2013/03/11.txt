@@ -1,0 +1,529 @@
+[IRC logfile - Started Mon Mar 11 00:04:29 2013]
+[00:04:29] andreastt has joined #selenium
+[00:42:11] diminoten has joined #selenium
+[00:55:04] selenium497 has joined #selenium
+[00:59:13] selenium497: Hi! I have this Python string "Title\nBody\nFooter" and when I use it inside driver.execute_script() nothing happens. But if I remove \n, it works. How can I make it understand \n in string?
+[IRC logfile - Started Mon Mar 11 01:03:45 2013]
+[01:03:45] bperry: use \\n
+[01:04:25] intchanter: selenium497: As bperry said, you'll have to quote the \ character.
+[01:04:52] selenium497: Thanks a lot guys, just tried it and it works!
+[01:10:30] intchanter: selenium497: Since you're passing it to another language that handles \ escapes, you can also use raw strings:
+[01:10:42] intchanter: r'Title\nBody\nFooter'
+[01:11:09] intchanter: That suppresses Python's interpretation of the escapes, leaving the string as you wrote it for Javascript to play with.
+[01:11:13] phishy has joined #selenium
+[01:16:51] selenium497: intchanter: thanks a lot for that one. i was just replacing all of the \n s in my code but this is gonna save me some time :)
+[01:18:48] intchanter: Yeah, raw strings are amazing.  :-)
+[01:22:38] mreedell has joined #selenium
+[01:34:30] stackedsax has joined #selenium
+[01:44:47] awilson820 has joined #selenium
+[IRC logfile - Started Mon Mar 11 02:02:52 2013]
+[02:02:52] kallisti_ has joined #selenium
+[IRC logfile - Started Mon Mar 11 03:43:15 2013]
+[03:43:15] rananda has joined #selenium
+[IRC logfile - Started Mon Mar 11 04:13:09 2013]
+[04:13:09] nirvdrum has joined #selenium
+[04:47:20] tim13o has joined #selenium
+[04:48:35] nirvdrum has joined #selenium
+[IRC logfile - Started Mon Mar 11 05:06:39 2013]
+[05:06:39] girija has joined #selenium
+[05:14:39] rananda has joined #selenium
+[05:35:14] Selenium-Git has joined #selenium
+[05:35:14] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06jruby-update at 14ecb6aa3: 02http://git.io/tqbnfQ
+[05:35:14] Selenium-Git has left #selenium
+[05:50:56] dawagner has joined #selenium
+[IRC logfile - Started Mon Mar 11 06:03:21 2013]
+[06:03:21] Manoj has joined #selenium
+[06:12:37] girija has joined #selenium
+[06:13:50] admc has joined #selenium
+[06:23:19] rananda_ has joined #selenium
+[IRC logfile - Started Mon Mar 11 07:00:18 2013]
+[07:00:18] rananda has joined #selenium
+[07:19:58] ThePeach has joined #selenium
+[07:35:11] papegaaij has joined #selenium
+[IRC logfile - Started Mon Mar 11 08:05:53 2013]
+[08:05:53] zeljkof has joined #selenium
+[08:10:53] sentinal8473 has joined #selenium
+[08:19:59] sburjan has joined #selenium
+[08:46:38] SamuraiJack has joined #selenium
+[08:49:04] vila has joined #selenium
+[IRC logfile - Started Mon Mar 11 09:09:01 2013]
+[09:09:01] stan has joined #selenium
+[09:12:57] zeljkof has joined #selenium
+[09:16:29] Bebe_sel has joined #selenium
+[09:26:42] annette has joined #selenium
+[09:30:12] annette has left #selenium
+[09:33:21] freynaud has joined #selenium
+[09:35:08] SamuraiJack has joined #selenium
+[09:40:48] Phil37 has joined #selenium
+[09:42:04] barancev has joined #selenium
+[09:45:17] zeljkof has joined #selenium
+[09:48:48] teodosia_sel has joined #selenium
+[09:54:42] rbalent has joined #selenium
+[09:54:42] rbalent has joined #selenium
+[09:57:20] Selenium-Git has joined #selenium
+[09:57:20] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 9 new commits to 06master: 02http://git.io/tpQsJQ
+[09:57:20] Selenium-Git: 13selenium/06master 141b3749d 15Simon Stewart: Remove webbit and jee as direct dependencies of server_very_core: it makes no sense to depend on both
+[09:57:20] Selenium-Git: 13selenium/06master 141fa3eee 15Simon Stewart: The Apache httpclient is not a dependency of anything in the common library
+[09:57:20] Selenium-Git: 13selenium/06master 143f4622c 15Simon Stewart: Minimize the number of third party libraries used by the very heart of the remote webdriver server.
+[09:57:20] Selenium-Git has left #selenium
+[IRC logfile - Started Mon Mar 11 10:02:52 2013]
+[10:02:52] jamesoram has joined #selenium
+[10:04:04] Hronom has joined #selenium
+[10:06:29] Bebe_sel has joined #selenium
+[10:09:40] Manoj has joined #selenium
+[10:26:57] freynaud_ has joined #selenium
+[10:30:32] zac_sel has joined #selenium
+[10:35:57] alkemist has joined #selenium
+[10:46:29] ThePeach has joined #selenium
+[IRC logfile - Started Mon Mar 11 11:02:43 2013]
+[11:02:43] zeljkof has joined #selenium
+[11:04:24] andreastt: barancev: So I've been looking at your proposal for adding namespaces.
+[11:04:49] andreastt: barancev: Basically the idea is to take that list of namespaces and create a namespace resolver for document.evaluate() right?
+[11:10:04] stan has joined #selenium
+[11:11:04] davehunt has joined #selenium
+[11:11:58] samphippen has joined #selenium
+[11:18:43] girija has joined #selenium
+[11:27:43] barancev: andreastt: right
+[11:30:27] barancev: andreastt: atm we have an over simplified default resolver {svg: 'http://www.w3.org/2000/svg'}
+[11:31:39] barancev: and ability to build a custom resolver from document.documentElement if the list of namespaces is collected in the topmost element
+[11:32:54] barancev: we can either scan the DOM and collect all namespaces automatically (is it ever possible? and what's preformance impact?)
+[11:33:18] barancev: or allow a user to register namespaces via API
+[11:39:27] freynaud has joined #selenium
+[11:44:39] andreastt: Yes, that's exactly why I was asking actually.  Could we do it transparently somehow?
+[11:45:33] andreastt: Unless I'm mistaken I don't think a listing of xmlns:CUSTOMNAMESPACE would be very expensive, but I might be wrong.
+[11:45:49] andreastt: Sorry, I mean parsing the last part of xmlns' value.
+[11:46:00] andreastt: Or possibly a combination of the both.
+[11:46:32] andreastt: Yes, there would need to be an algorithm for saying first look for the last part of the value's path, then override witht he custom name space part of the tag.
+[11:46:38] andreastt: s/tag/attribute/
+[11:47:18] andreastt: barancev: I think I'll just go ahead and write a tentative reply to your email.
+[11:47:48] andreastt: tl:dr; I'm not opposed of the idea of doing what you say, but my preference would a transparent solution.
+[11:49:10] samphippen has joined #selenium
+[11:52:53] girija: hi all can somebody help me for this https://gist.github.com/girijabrahme/5133747
+[11:52:56] testingb0t has joined #selenium
+[11:56:27] aweiteka has joined #selenium
+[IRC logfile - Started Mon Mar 11 12:06:05 2013]
+[12:06:05] testingb0t1 has joined #selenium
+[12:07:21] girija: hi all can somebody help me for this https://gist.github.com/girijabrahme/5133747
+[12:09:21] zeljkof has joined #selenium
+[12:13:25] EdwardIII has joined #selenium
+[12:18:31] freynaud has joined #selenium
+[12:29:03] RossPatterson has joined #selenium
+[12:29:03] ChanServ has altered RossPatterson's mode: +o
+[12:30:53] freynaud has joined #selenium
+[12:42:53] itatitat has joined #selenium
+[12:44:37] mreedell-work has joined #selenium
+[12:46:28] llaskin has joined #selenium
+[12:55:41] rbalent has joined #selenium
+[12:55:41] rbalent has joined #selenium
+[12:57:19] omaciel has joined #selenium
+[IRC logfile - Started Mon Mar 11 13:00:37 2013]
+[13:00:37] phishy has joined #selenium
+[13:02:13] farlan has joined #selenium
+[13:04:07] gdennis has joined #selenium
+[13:08:46] Phil37 has joined #selenium
+[13:09:20] mreedell-work has joined #selenium
+[13:09:51] freynaud has joined #selenium
+[13:14:11] aweiteka has joined #selenium
+[13:17:06] millenium has joined #selenium
+[13:21:44] jibay has joined #selenium
+[13:22:57] bluescreen10 has joined #selenium
+[13:23:26] adamgoucher has joined #selenium
+[13:24:14] freynaud has joined #selenium
+[13:27:54] riv_ has joined #selenium
+[13:28:54] qaguy has joined #selenium
+[13:36:24] millenium: When I use IE driver and iterate one test for example 15 times the each next iteration become slower and slower, is there issue about it or I do somethingwrong?
+[13:38:23] ryanpetrello has joined #selenium
+[13:38:49] freynaud has joined #selenium
+[13:38:51] icio has joined #selenium
+[13:40:27] samphippen has joined #selenium
+[13:41:48] garndt: millenium: Is it possible that your test is leaking memory?  Are you reusing the same IE driver for all of the iterations or spawning a new one for each iteration? 
+[13:44:25] millenium: gates: I'm use .Net and nunit - in make new driver on the constructor of my TestFixture class then in the [test] method i make simple For loop and after that I quit the driver in the destructor
+[13:44:54] millenium: the ieserver is in my local env. %path%
+[13:44:59] nirvdrum has joined #selenium
+[13:44:59] llaskin: any java folks here?
+[13:45:56] nirvdrum: adamgoucher loves to add commentary to my posts in his smattering :-P
+[13:47:47] millenium: llaskin you need to specify your questions here to get answer, this way no one will answer you
+[13:48:33] alkemist has joined #selenium
+[13:50:16] nirvdrum: llaskin: I'm close enough where I might be helpful.
+[13:51:14] garndt: millenium: if it were me with this issue, I would monitor task manager while these tests ran and see if the process running the script or the IEDriverServer.exe process are taking up more CPU/memory each iteration.  You could also take the creation of the driver out of the test class constructor and move it into the for loop so a new one is created each
+[13:51:14] garndt: iteration.
+[13:51:55] garndt: to me when things start running slower each time they run, it points to something leaking
+[13:51:57] garndt: but that's just my guess
+[13:52:04] garndt: I'm quite possibly wrong
+[13:53:58] llaskin: i'm just trying to decide which IDE to use for Java
+[13:54:01] mfrost503 has joined #selenium
+[13:54:04] llaskin: not selenium related at all
+[13:54:06] llaskin: i know about : ask
+[13:55:37] barancev: llaskin: Eclipse, IDEA, NetBeans -- any one of these three is a good choice
+[13:55:47] llaskin: ok
+[13:55:52] llaskin: i was thinking Netbeans cuz $free
+[13:56:01] garndt: I believe IDEA has a community version that is free
+[13:56:04] barancev: all three are free
+[13:56:27] barancev: IDEA Community edition is free
+[13:56:55] nirvdrum: llaskin: IDEA is the way to go.
+[13:57:14] barancev: llaskin: Eclipse is the way to go too :)
+[13:57:41] nirvdrum: barancev: Are the Eclipse project files maintained nowadays?  For a while, they weren't.
+[13:57:51] barancev: nirvdrum: they are
+[13:58:34] nirvdrum: I'd still say IDEA just because that's a majority of what the committers use, so if you run into a problem, you're more likely to get help.
+[13:59:31] barancev: yes, I'd say -- use whatever most people around you do
+[IRC logfile - Started Mon Mar 11 14:00:03 2013]
+[14:00:03] barancev: I use Eclipse, personally, I dislike IDEA
+[14:01:20] barancev: (at the same time I use RubyMine for ruby, because it's the best ruby IDE, imho)
+[14:03:02] teodosia_sel has left #selenium
+[14:03:30] nirvdrum: barancev: I should give Eclipse another try.  Although I find the download process very confusing.
+[14:03:40] nirvdrum: I never know what I should be looking for.
+[14:04:21] adamgoucher: nirvdrum: its not just you … and thats a long standing soapbox :)
+[14:04:50] nirvdrum: adamgoucher: I know.  In my case, I can't control what other people use, so I don't have much of a choice.
+[14:05:14] nirvdrum: adamgoucher: Although I will say that it takes far longer than 3 hours to get an SSL cert signed.  The process is nutty.
+[14:06:13] adamgoucher: nirvdrum: i suppose it depends on who you use, but yes, there is a lot of offline stuff to establish 'trust' (all of which is easily forge-able)
+[14:08:11] knorrium has joined #selenium
+[14:08:57] teodosia_sel has joined #selenium
+[14:09:49] nirvdrum: Oh sure, but they insert delays to make it look like they're doing something.
+[14:10:15] nirvdrum: My favorite is when it took a week to get a cert approved because someone on their end made a typo and thus the names didn't match.
+[14:16:46] jimevans has joined #selenium
+[14:16:58] freynaud has joined #selenium
+[14:18:53] teodosia_sel has left #selenium
+[14:23:23] riv_ has joined #selenium
+[14:24:08] llaskin has joined #selenium
+[14:24:46] supercom32 has joined #selenium
+[14:25:19] cgoldberg has joined #selenium
+[14:25:28] hugs has joined #selenium
+[14:25:37] krosenvold__ has joined #selenium
+[14:26:19] djinni has joined #selenium
+[14:26:30] eranm has joined #selenium
+[14:29:02] ryanpetrello has joined #selenium
+[14:34:38] supercom32: So this isn't really directly related to Selenium, but I figure someone here might know this. If I went "//div[@class='table'][2]", would that allow me to search the whole document for tables, and just return the 2nd instance it finds? I'm guessing it doesn't work that way.
+[14:35:07] boob00: hi guys
+[14:35:32] llaskin: yes supercom32 correct.
+[14:35:42] llaskin: it does work that way
+[14:36:28] supercom32: @llaskin: Thanks. I wonder why it's not picking that up then. Interesting.
+[14:36:42] boob00: I have error like that on the selenium server stand alone side: "No enum constant org.openqa.selenium.Platform.WINNT" , any idea how to solve this?
+[14:36:53] simonstewart has joined #selenium
+[14:37:00] llaskin: :gist us a sample pls boob00
+[14:37:01] selbot2: Please paste >3 lines of text to https://gist.github.com
+[14:37:03] simonstewart: Uh… back
+[14:37:16] llaskin: supercom32: that should work AFAIK
+[14:37:22] nirvdrum: supercom32: Well, that doesn't search for tables.  It searches for divs with the class of 'table'.
+[14:38:02] llaskin: nirvdrum: good catch
+[14:38:06] boob00: its http error 500... wnat me paste the exception?
+[14:38:36] llaskin: paste exception, your code, and a snippet of the code you are testing against
+[14:39:35] supercom32: @nirvdrum: Yep, I realize the mistake I made :-) 
+[14:40:29] supercom32: @nirvdrum: Intresting bit, if I change my xpath to use [1] instead, it still returns 2 webElements. 
+[14:41:37] supercom32: @nirvdrum: Not just the first instance of it.
+[14:41:59] nirvdrum: supercom32: What API call are you using?
+[14:42:20] supercom32: findElements. Nothing to fancy I thought.
+[14:42:37] supercom32: For Selenium that is, of course.
+[14:43:48] nirvdrum: supercom32: Well, yeah, that finds all elements that match that selector.  If you want just the first one, use findElement()
+[14:43:49] fatguylaughing has joined #selenium
+[14:45:10] supercom32: nirvdrum: Hrm... I thought the api would look for more than one element if it found one, but since I restricted it in my xPath, it would only return one element. Well at least in the case of me putting [2]. For [1] I can assume it would be like not putting an index at all, which would return all items.
+[14:45:14] nirvdrum: supercom32: Or, root your selector at something other than the root of the document.
+[14:45:59] supercom32: @nirvdrum: That's also a possible solution.
+[14:46:27] nirvdrum: supercom32: I'm not an XPath expert, but I'm pretty sure if you have different ancestors, it'll keep searching. I.e., it searches for unique paths.
+[14:46:58] nirvdrum: Ostensibly your found elements have different parents.
+[14:47:25] supercom32: Right, that makes sense now that I think about it. (>_<)!
+[14:49:23] freynaud has joined #selenium
+[IRC logfile - Started Mon Mar 11 15:03:25 2013]
+[15:03:25] barancev: anybody to rewrite :wiki CheckOut ?
+[15:03:26] selbot2: 1: 03CheckOut: Getting hold of the source in order to build WebDriver - https://code.google.com/p/selenium/wiki/CheckOut
+[15:03:31] barancev: it's about subversion
+[15:03:51] barancev: git gurus?
+[15:04:27] barancev: or may be I can do this myself...
+[15:05:24] softmanpetro has joined #selenium
+[15:09:12] intchanter-work has joined #selenium
+[15:14:37] AutomatedTester: detronizator: yo
+[15:15:02] AutomatedTester: andreastt: simonstewart and anyone else going to GTAC, which hotel are you guys staying at?
+[15:15:10] simonstewart: None yet.
+[15:15:39] detronizator: AutomatedTester: was yesterday. But yo!
+[15:15:48] detronizator: you guys all in USA for GTAC?
+[15:16:21] simonstewart: I will be
+[15:17:10] girija has joined #selenium
+[15:17:12] AutomatedTester: detronizator: end of April yes
+[15:18:17] detronizator: ah!... I wish I could make it...
+[15:18:31] AutomatedTester: simonstewart: how was the US of A?
+[15:19:54] supercom32 has joined #selenium
+[15:21:01] plightbo_work has joined #selenium
+[15:21:01] intchanter-work: :note girija Your gist will require someone with experience with the Ruby bindings.  Please try your query again when there are more people, and mention Ruby outside the gist.
+[15:21:01] selbot2: ok!
+[15:21:21] llaskin: girija: what was your question?
+[15:21:40] intchanter-work: Oh, he's back?  His gist was: https://gist.github.com/girijabrahme/5133747
+[15:22:00] intchanter-work: EOF while handling a request in the server.
+[15:23:03] llaskin: hrm someone with a mac should test that...I don't have access to one ATM
+[15:23:20] girija: intchanter, when I lock gemfile to 2.27.0 it works fine, 
+[15:23:21] selbot2: girija: note from intchanter-work 2 minutes ago: Your gist will require someone with experience with the Ruby bindings.  Please try your query again when there are more people, and mention Ruby outside the gist. 
+[15:23:48] intchanter-work: Sorry for the misplaced note.  The nick wasn't autocompleting for me.
+[15:26:25] girija: llaskin, intchanter, when I lock gemfile to 2.27.0 it works fine,  here is my stacktrace when I useselenium > 2.27.2https://gist.github.com/girijabrahme/5133747
+[15:26:33] KaibutsuX has joined #selenium
+[15:26:57] llaskin: what version of Safari?
+[15:28:35] girija: llaskin, safari 5
+[15:28:37] andreastt: AutomatedTester: Haven't booked yet
+[15:28:44] llaskin: good debugging stuff
+[15:28:53] llaskin: I don't have a mac sadly
+[15:28:59] llaskin: luke might be able to help
+[15:29:27] llaskin: :note lukeis luke, do you have a Mac with Safari5 on it?  username girija ias having an issue loading 2.31.0 with safari5.  His gist is here: https://gist.github.com/girijabrahme/5133747
+[15:29:27] selbot2: ok!
+[15:29:40] girija: llaskin, also I tried update safari extension to 2.32.0 did not worked 
+[15:30:38] girija: http://selenium.googlecode.com/git/rb/CHANGES shows there is websocket instead libwebsocket not sure if something related to that
+[15:31:08] qaguy has joined #selenium
+[15:31:58] smccarthy has joined #selenium
+[15:32:44] alkemist has joined #selenium
+[15:33:15] llaskin: possibly
+[15:36:51] aweiteka has joined #selenium
+[15:41:46] florinv has joined #selenium
+[15:42:01] zeljkof_ has joined #selenium
+[15:42:14] florinv: hello
+[15:42:23] llaskin: hi florinv
+[15:42:33] florinv: does anyone know how to build the selenium-server-standalone-2.xx.jar file from source?
+[15:42:48] llaskin: have you followed the instructions to use go.bat?
+[15:42:48] florinv: as explained here: http://stackoverflow.com/questions/15342518/build-selenium-server-standalone-executable-jar
+[15:43:09] llaskin: so what is the output when you build?
+[15:43:18] florinv: i did this
+[15:43:20] florinv: go //java/server/src/org/openqa/selenium/remote/server:server:uber //java/client/src/org/openqa/selenium:client-combined:uber
+[15:43:26] florinv: to build the "uber" jar
+[15:43:50] barancev: run 'go release'
+[15:43:56] barancev: that's all
+[15:44:12] barancev: and this goal will skip tests :)
+[15:45:04] florinv: my last line from running the go "uber" jar is:
+[15:45:06] florinv: Uber-jar: //java/client/src/org/openqa/selenium:client-combined as build\java\client\src\org\openqa\selenium\client-combined-standalone.jar
+[15:45:18] florinv: i'm running now go release to see what happens :)
+[15:45:30] RossPatterson: supercom32: You want "(//div[@class='table'])[2]" - the second element that matches the expression inside the parens.  "//div[@class='table'][2]" means "all <div class='table'> elements that are the second such element within their parent element."  Very different results.  Which is why "//div[@class='table'][1]" also didn't do what you expect - it returned any that were the first within ...
+[15:45:45] Selenium-Git has joined #selenium
+[15:45:45] Selenium-Git: [13selenium] 15jayakumarc opened pull request #26: [Python] Adding ability to pass service args to PhantomJS. Fixes issue #... (06master...06patch-9)  02http://git.io/L0FbLA
+[15:45:45] Selenium-Git has left #selenium
+[15:45:51] barancev: florinv: and them go to build/dist/
+[15:45:57] barancev: s/them/then/
+[15:46:20] Phil37: selenium/webdriver cannot interact with modal dialogs, is this correct?
+[15:46:52] florinv: barancev: it seems it build something :)
+[15:47:14] llaskin: Phil37: it can.
+[15:47:21] llaskin: it can't interact with dialogs that are not part of the DOM
+[15:47:28] florinv: barancev: yup, it works :)
+[15:47:31] llaskin: so it can't work with the "Save File" or "Open File" dialog that windows pops up
+[15:47:43] florinv: thanks barancev, llaskin !
+[15:48:05] llaskin has left #selenium
+[15:48:08] llaskin has joined #selenium
+[15:48:29] Phil37: would that also be true just for a dialog that had a textfield and ok/cancel buttons?
+[15:48:38] llaskin: yes, it would work just fine
+[15:49:10] barancev: Phil37: what JS function was used to create this dialog?
+[15:49:58] barancev: prompt? or showModalDialog?
+[15:50:11] riv_ has joined #selenium
+[15:50:13] Phil37: sec, digging up that info now 
+[15:53:21] llaskin: Phil37: better yet, can you :gist what you are trying and the code you are trying it against(snippet is fine).  And what is actually happening?
+[15:53:22] selbot2: Please paste >3 lines of text to https://gist.github.com
+[15:53:53] Phil37: it looks like an internal popup within the application
+[15:54:03] Phil37: but when automated it looks like a windows modal dialog
+[15:54:30] Phil37: looking for the JS that creates it
+[15:55:51] barancev: so it's just a regular node, craft an appropriate locator for findElement and you win
+[15:56:53] llaskin: what do you mean when automated it looks like a windows modal dialog?
+[15:57:07] llaskin: can you find the dialog in the dom using Firebug?
+[IRC logfile - Started Mon Mar 11 16:05:22 2013]
+[16:05:22] llaskin has joined #selenium
+[16:06:35] llaskin: adamgoucher:  u here?
+[16:09:10] adamgoucher: sorta
+[16:09:57] llaskin: pm
+[16:19:08] Andrei_Khveras has joined #selenium
+[16:19:15] manoj_ has joined #selenium
+[16:24:18] plightbo_work has joined #selenium
+[16:28:28] zeljkof has joined #selenium
+[16:30:13] girija has joined #selenium
+[16:32:04] icio has joined #selenium
+[16:32:16] tinygeo has joined #selenium
+[16:32:24] tinygeo has left #selenium
+[16:34:28] SamuraiJack has joined #selenium
+[16:34:47] ssims has joined #selenium
+[16:35:37] llaskin1 has joined #selenium
+[16:36:02] ssims: Hi All. In the ruby bindings, I want to insert a counter to store how many pages a test has loaded.  Is there an easy way to do this?
+[16:36:32] ssims: I am already counting clicks and send_keys.   It has provided interesting data. 
+[16:37:53] nirvdrum: ssims: I guess you could get the URL and if it's different, increment a count.
+[16:38:31] ssims: I thought about that. But when would I check the url?  on what event?
+[16:38:50] ssims: maybe every click
+[16:39:02] nirvdrum: Most likely.
+[16:39:19] nirvdrum: You could just write a wrapper that does it on every action.  Might be a bit slow though.
+[16:39:30] ryanpetr_ has joined #selenium
+[16:39:36] jimevans: ssims: true, but remember that clicks are asynchronous, so you might have a race condition there.
+[16:40:03] nirvdrum: I have something like: safe_webdriver { driver.find_element(:xpath => 'blah' } for my tests to check for and handle pop-ups.
+[16:40:27] nirvdrum: (Insert missing right parenthesis)
+[16:40:34] llaskin1: every click makes sense
+[16:40:37] llaskin1: override the click method
+[16:40:59] ssims: Ok thanks!
+[16:41:05] nirvdrum: Form submit, too.
+[16:41:26] leonardoro has joined #selenium
+[16:44:19] admc has joined #selenium
+[16:45:00] tim13o has joined #selenium
+[16:45:09] plightbo_work has joined #selenium
+[16:47:24] AutomatedTester: detronizator: are there arguments that can be passed to phantomjs on startup?
+[16:47:38] detronizator: of course
+[16:50:29] Dude-X_ has joined #selenium
+[16:50:53] detronizator: AutomatedTester: ^
+[16:50:56] markalanevans has joined #selenium
+[16:51:02] AutomatedTester: detronizator: thanks
+[16:51:40] Selenium-Git has joined #selenium
+[16:51:40] Selenium-Git: [13selenium] 15paroga opened pull request #27: Fix support of SVG documents in Firefox (06master...06firefox_svg)  02http://git.io/W57Bug
+[16:51:40] Selenium-Git has left #selenium
+[16:53:48] sfbrian has joined #selenium
+[16:54:02] manoj_ has joined #selenium
+[16:54:43] nirvdrum: 27 pull requests already?
+[16:54:46] nirvdrum: Nice.
+[16:55:00] knorrium has joined #selenium
+[16:57:55] ryanpetrello has joined #selenium
+[IRC logfile - Started Mon Mar 11 17:01:24 2013]
+[17:01:24] jleyba has joined #selenium
+[17:06:15] linguini has joined #selenium
+[17:06:43] girija: :ruby https://gist.github.com/girijabrahme/5133747 issue for safari at time initialization 
+[17:07:32] llaskin1: girija: yep noone has been here since last to look at it, sorry.
+[17:10:27] tim13o has joined #selenium
+[17:12:16] girija: llaskin1, ah ok, I just did it with ruby note as you suggested before
+[17:14:07] girija has left #selenium
+[17:14:30] girija has joined #selenium
+[17:21:55] bluescreen100 has joined #selenium
+[17:26:11] samphippen has joined #selenium
+[17:26:38] simonstewart: Cheerio, chaps
+[17:26:39] simonstewart has left #selenium
+[17:26:56] supercom32 has joined #selenium
+[17:27:03] jarib: girija: can you run that with $DEBUG = true and add the output to the gist?
+[17:27:28] jarib: also, from what revision did you install the extension?
+[17:28:35] jarib: the java release bundles the extension, i haven't found time to add that to the ruby gem
+[17:29:03] qaguy has joined #selenium
+[17:34:36] jcarr has joined #selenium
+[17:36:02] girija: jarib, I was having older version (let me check exact )with which it failed, I tried with 2.32.0 for safari extension
+[17:36:49] jarib: i see. this problem will be obsolete when the extension is shipped with the gem
+[17:36:57] jarib: so just need to get that done
+[17:36:57] riv_ has joined #selenium
+[17:39:59] tim13o1 has joined #selenium
+[17:46:29] girija: jarib, here is updated https://gist.github.com/girijabrahme/5133747 with debug flag
+[17:49:10] riv_ has joined #selenium
+[17:50:03] freynaud has joined #selenium
+[17:57:38] awilson820 has joined #selenium
+[IRC logfile - Started Mon Mar 11 18:01:49 2013]
+[18:01:49] ssims has joined #selenium
+[18:06:22] ssims has left #selenium
+[18:06:34] admc has joined #selenium
+[18:09:42] markalanevans_ has joined #selenium
+[18:12:10] jrendell has joined #selenium
+[18:12:15] riv_ has joined #selenium
+[18:17:11] santiycr has joined #selenium
+[18:17:11] selbot2: santiycr: note from dawagner 2 days ago: (+lukeis, eranm) Let's do SF Monday night? Any suggestions for where? 
+[18:17:37] jimevans: oh, dear lord, please let m-day come soon.
+[18:17:37] selbot2: M-Day: day in the future when Marionette is made available for non-debug builds
+[18:22:50] jamesoram has joined #selenium
+[18:24:21] plightbo_work has joined #selenium
+[18:25:11] lukeis has joined #selenium
+[18:25:11] selbot2: lukeis: note from dawagner 2 days ago: (+santiycr, eranm) Let's do SF Monday night? Any suggestions for where? 
+[18:25:11] selbot2: lukeis: note from llaskin about 3 hours ago: luke, do you have a Mac with Safari5 on it?  username girija ias having an issue loading 2.31.0 with safari5.  His gist is here: https://gist.github.com/girijabrahme/5133747 
+[18:26:03] lukeis: girija / llaskin1: nope, i only have safari6
+[18:30:40] zeljkof has joined #selenium
+[18:33:38] markalanevans has joined #selenium
+[18:44:57] totic has joined #selenium
+[18:45:09] totic: Hi where should I put the IE driver for windows 8?
+[18:45:29] garndt: anywhere that's in your path
+[18:45:35] totic: I put it in C:/Windows/System32/ and it didnt work
+[18:45:43] totic: (I am not a windows user) 
+[18:45:52] garndt: I would refrain from putting anything into the Windows directory
+[18:46:14] totic: garndt: I added it there for XP, win 7 and they both work
+[18:47:21] garndt: I didn't say it wouldn't work, just saying I would refrain from it.  Why would you want to put things in the Windows directory or subdirectories that is not related to the actual windows installation? Either way, it doesn't matter to me, so... what's the error that you get when attempting to use it?
+[18:47:53] garndt: does it just say that the file couldn't be found?
+[18:48:39] plightbo_work has joined #selenium
+[18:48:57] totic: 'The path to the driver executable must be set by the webdriver.ie.driver system property; for more information, see http://code.google.com/p/selenium/wiki/InternetExplorerDriver. The latest version can be downloaded from http://c\
+[18:48:57] totic: ode.google.com/p/selenium/downloads/list\' ; Stacktrace: Method checkState threw an error in Preconditions.java
+[18:51:30] garndt: just curious, is this a 64 bit version of windows?
+[18:53:32] totic: let me check
+[18:53:40] totic: garndt: yes
+[18:54:32] garndt: is system32 in your path?  Might be C:\Windows\SysWow64
+[18:54:57] garndt: I don't have a Windows 8 machine currently so I'm of limited help (read: I'm just guessing)
+[18:54:59] *lukeis doesn't use win8 but is there a 'cmd' prompt available? if so, what paths does `echo %PATH%` show?
+[18:55:50] totic has joined #selenium
+[18:56:44] totic: lukeis: http://cl.ly/image/0q383t3Z2z0n
+[18:56:50] totic: sorry cant copy past from the vm
+[18:56:54] totic: through vnc
+[18:57:10] totic: so it appears in the PATH
+[18:57:35] totic: and I even tried doing it in two different places and no luck
+[18:57:56] lukeis: can you run the IEDriverServer from the command prompt?
+[18:58:53] totic: let me check
+[IRC logfile - Started Mon Mar 11 19:01:14 2013]
+[19:01:14] totic: lukeis: yes I can
+[19:01:29] barancev: santiycr: hi! any ideas why cookie-related tests stated to fail recently?
+[19:01:36] lukeis: totic: ok, then i'm not sure what is going on
+[19:02:00] santiycr: barancev: I know jimevans was working on them for IE10
+[19:02:13] santiycr: I haven't really been able to do anything from the sauce end yet
+[19:02:21] barancev: santiycr: all browsers are failing, e.g. http://ci.seleniumhq.org:8080/job/Firefox%2019%20XP%20Native%20Java%20Tests/
+[19:02:37] barancev: ok, then dawagner should know
+[19:02:47] santiycr: oh, that to me says code fail
+[19:02:57] santiycr: on the atoms
+[19:04:12] barancev: santiycr: all browsers on Windows platforms fail, Linux is OK
+[19:04:14] jimevans: santiycr, barancev: my IE10 issues were related to the CI environment. can't repro the failures outside it, and suspect permissions issues for browser setup.
+[19:05:10] jimevans: totic: what happens if you explicitly point your java code to the location of the IEDriverServer.exe (move it out of any of the Windows system folders first)?
+[19:05:31] totic: I am using selenium grid, and python 
+[19:05:57] totic: so far have it working with 19 different browsers
+[19:06:00] totic: in 6 vms
+[19:06:11] totic: WIN8 is the only annoying one right now
+[19:06:20] jimevans: then what happens if you explicitly start your grid node pointing it to IEDriverServer in a folder not in a windows system folder?
+[19:07:13] jimevans: i don't have a windows 8 environment at the moment, so i can't tell you whether IEDriverServer.exe will work when placed in the Windows directory or its subdirectories.
+[19:07:34] jimevans: i can tell you that i would **STRONGLY** encourage you to get it out of the system folders.
+[19:08:43] totic: jimevans: this is how I am starting it "C:\Program Files (x86)\Java\jre7\bin\java.exe" -jar C:\Users\federico\Downloads\selenium-server-standalone-2.31.0.jar  -role node -hub 
+[19:08:43] totic: http://10.0.1.58:4444/grid/register -browser "browserName=internet explorer,version=10, platform=WINDOWS" -host 10.0.1.72
+[19:08:45] jimevans: i say this because the trend from Microsoft has been to further and further restrict what's possible in the "special folders" of the windows operating system.
+[19:09:08] totic: so how do I tell it where the driver is?
+[19:09:14] bluescreen10 has joined #selenium
+[19:09:24] totic: sorry I am a linux user, hadn't touched windows in 10 years
+[19:10:10] jimevans: totic: what i'm suggesting is that you add a '-Dwebdriver.ie.driver="C:\Path\To\IEDriverServer.exe"' onto that command line.
+[19:10:43] jimevans: this sets the 'webdriver.ie.driver' system property to the location of the IEDriverServer.exe. which is, incidentally, exactly what the exception tells you to do.
+[19:11:22] totic: cool ill do that
+[19:14:44] nirvdrum: jimevans: Is it possible to specify the path in the desired capabilities?
+[19:15:11] jimevans: nirvdrum: no, and i'm not sure how that would work.
+[19:15:18] jimevans: before you respond, listen to my logic.
+[19:15:29] nirvdrum: Heh.
+[19:16:38] totic: That seems to have fixed it
+[19:16:46] totic: thanks
+[19:16:53] jimevans: if you're running locally, you don't have a server that can understand desired capabilities until you start IEDriverServer.exe. if you're running remote using grid (or even just the raw remote java server), then the *server* needs to know the location; the client language bindings can't do anything about it.
+[19:17:11] jimevans: nirvdrum: ^^
+[19:17:18] jimevans: totic: np. glad to help.
+[19:18:20] nirvdrum: jimevans: Well, if I as the client know the location (e.g., in a managed grid), couldn't that location just be appended to the PATH at process execution time?  It'd work basically the same way as the defaulte IEDriverServer lookup works right now.
+[19:18:45] nirvdrum: If that's idiotic, feel free to yell at me.
+[19:20:42] jimevans: nirvdrum: i don't necessarily think that's idiotic, but it seems to me to couple the client to the server (or "local end" to the "remote end", in the language of the W3C spec) in an unhealthy way. also seems like it would cause all kinds of complexity there.
+[19:21:31] nirvdrum: jimevans: Well, in a grid set up it's valuable to have dumb nodes and smarter clients.
+[19:21:36] jimevans: but i'm not a big "grid/remote server" guy (despite the fact that I have an independent remote implementation of my own)
+[19:21:46] nirvdrum: Heh.
+[19:22:35] lukeis: seems to me the node should know more about itself than the remote client.. *should*
+[19:22:48] nirvdrum: jimevans: Really where the value for me would be is I could have two different IEDriver server versions installed and switch between them for a seemless upgrade without having to worry about Windows refusing me from overwriting the existing exe if it's in use.
+[19:25:42] jimevans: that's an interesting use case i hadn't considered. i still think it might be more appropriate for the node to have a management api exposed so you could set that, but i'll admit i haven't thought the implications of that all the way through.
+[19:26:38] detroniz_ has joined #selenium
+[19:27:40] nirvdrum: jimevans: Yeah.  Right now if I want to upgrade a node, I basically have take it out of commission to guarantee the overwrite would happen.  And, if there turns out to be a problem, rolling back is harder than it should be because the old files are gone.
+[19:28:02] nirvdrum: Whereas if I could version the binaries and switch via capabilities or whatever, things would get a lot simpler.
+[19:30:40] riv_ has joined #selenium
+[19:31:00] barancev: nirvdrum: a client has no information wchich node will serve a request to open a session
+[19:31:22] barancev: how can a client manage nodes in a heterogeneous grid?
+[19:31:50] barancev: we can introduce an "architecture" capability matcher
+[19:37:06] stackedsax has joined #selenium
+[19:37:08] nirvdrum: barancev: Well, assuming the nodes are homogenous.  A client can know whether to request IEDriverServer 2.31.0 or 2.32.3.  But I see your general point.
+[19:37:35] nirvdrum: barancev: Keep in mind that a grid plugin can also add its own capabilities.  I've done this to manage proxy connections.
+[19:37:54] nirvdrum: In this case, it's still coming from the client, but it's an prorammatic addition.
+[19:38:08] barancev: I'd suggest to add more custom matchers
+[19:38:27] nirvdrum: How do you mean?
+[19:39:20] barancev: you set a custom capability e.g. "iedriver.version" and a capability matcher detects whether a node can serve such a request
+[19:39:50] dhpe has joined #selenium
+[19:40:37] barancev: but...
+[19:40:39] nirvdrum: barancev: But that would require the node to re-register to update the hub with its capabilities.
+[19:40:54] barancev: we have no ability to add a "custom session starter"
+[19:41:08] nirvdrum: And it still wouldn't solve the problem of having multiple versions installed.  I'd have to manage the PATH somehow.
+[19:41:48] barancev: yes, yes, a "session starter" custom servlet could tune the environment
+[19:42:01] nirvdrum: The core issue is I'd like to point to a new IEDriverServer installation without having to shut the current node down.
+[19:42:13] nirvdrum: Okay.
+[19:42:38] rbalent has joined #selenium
+[19:44:47] barancev: why do we have in IDE two Ruby formatters that are almost 100% copy-paste?
+[19:46:27] barancev: is it possible to create a shared component for the two formatters?
+[19:49:06] rmascarenhas has joined #selenium
+[19:56:12] O_O has joined #selenium
+[IRC logfile - Started Mon Mar 11 20:02:23 2013]
+[20:02:23] Guest74455: I am attempting to build Selenium for .NET. I have done a git clone, and then I run go clean //dotnet:release. Towards the end it seems to ask me for the Google Username & password. Is there a way to disable this?
+[20:03:15] Guest74455: I don't know Ruby, but in the Rakefile there seems to be task :push_release - I dont want this to run
+[20:04:36] plightbo_work has joined #selenium
+[20:14:39] plightbo_work has joined #selenium
+[20:15:12] jimevans: Guest74455: ctrl+c out of that. or enter null values. if the authentication fails, nothing will be pushed.
+[20:15:55] jimevans: alternatively, you can just run "go //dotnet" which builds the .NET 4.0 version of WebDriver.dll.
+[20:18:06] jimevans: "go //dotnet:dotnet-package" will build the assembly, and the *sigh* nuget package, but will not upload the package without the API key for nuget.org.
+[20:21:35] santiycr has joined #selenium
+[20:21:43] Guest74455: Thank You Jim. I am trying that right away.
+[20:22:40] jimevans: Guest74455: once you get to the point where you're being prompted for google code credentials, it's trying to upload the completed .zip file of all of the .NET assemblies.
+[20:23:32] jimevans: back in a bit.
+[20:26:06] santiycr has joined #selenium
+[20:26:14] jrendell has joined #selenium
+[20:27:47] AutomatedTester: laters all
+[20:28:12] intchanter-work: AutomatedTester: Have a great one!

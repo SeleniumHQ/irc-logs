@@ -1,0 +1,253 @@
+2011-04-09T00:06:25  *** reddeviL is now known as reddevil
+2011-04-09T01:39:17  *** csanchez has joined #selenium
+2011-04-09T02:58:08  *** CO19_KUL_CARI_CO has joined #selenium
+2011-04-09T02:58:08  *** CO19_KUL_CARI_CO has left #selenium
+2011-04-09T03:22:07  *** reddevil is now known as reddeviL
+2011-04-09T03:25:07  *** reddeviL is now known as reddevil
+2011-04-09T03:27:32  *** reddevil is now known as reddeviL
+2011-04-09T03:30:02  *** reddeviL is now known as reddevil
+2011-04-09T03:34:39  *** reddevil has left #selenium
+2011-04-09T03:48:41  *** csanchez has quit IRC
+2011-04-09T03:54:19  *** csanchez has joined #selenium
+2011-04-09T04:44:25  *** toseter has joined #selenium
+2011-04-09T04:51:10  *** csanchez has quit IRC
+2011-04-09T04:53:57  *** pnitin has quit IRC
+2011-04-09T04:59:18  *** pnitin has joined #selenium
+2011-04-09T05:32:51  *** kylls1 has joined #selenium
+2011-04-09T05:43:57  *** kylls has joined #selenium
+2011-04-09T05:43:57  *** kylls has joined #selenium
+2011-04-09T05:46:33  *** kylls1 has quit IRC
+2011-04-09T05:54:50  <jarib> krosenvold: would help a lot if we got a fresh VM for every build
+2011-04-09T05:55:09  <jarib> so that previous hangs/crashes doesn't affect the next build
+2011-04-09T05:55:37  *** aculich has quit IRC
+2011-04-09T05:57:14  <selbot2> jari.bakken half a minute ago - JariBakken: Allow users to overwrite the max script timeout in Firefox, mirroring r11923. - http://code.google.com/p/selenium/source/detail?r=11939
+2011-04-09T05:58:59  *** aculich has joined #selenium
+2011-04-09T06:01:40  *** kylls1 has joined #selenium
+2011-04-09T06:04:33  *** kylls has quit IRC
+2011-04-09T06:08:18  *** kylls has joined #selenium
+2011-04-09T06:09:37  *** aculich has quit IRC
+2011-04-09T06:11:35  *** kylls1 has quit IRC
+2011-04-09T06:14:28  *** aculich has joined #selenium
+2011-04-09T06:20:30  *** kylls1 has joined #selenium
+2011-04-09T06:23:41  *** kylls has quit IRC
+2011-04-09T06:49:42  <krosenvold> jarib: i'm not sure i understand
+2011-04-09T06:50:00  <krosenvold> we run 24/7 stable se2 builds
+2011-04-09T06:50:24  <krosenvold> with twice weekly boots of the browser bots
+2011-04-09T06:50:44  <krosenvold> Other than that its rock solid
+2011-04-09T06:51:27  <krosenvold> But we stay clear of virtualization
+2011-04-09T06:51:56  <krosenvold> But those boxes run 4 browsers each non-stop
+2011-04-09T06:53:11  <krosenvold> I think the problem might be that 'go' should run hourly om Xserve
+2011-04-09T06:53:34  <krosenvold> gives a much clearer picture of overall test stability
+2011-04-09T06:54:07  <jarib> krosenvold: just from my experience with our bamboo instance, and the types of failures that clog things up; clean VMs would help
+2011-04-09T06:54:15  <krosenvold> I'll setup that on my own bamboo to evaluate
+2011-04-09T06:54:16  <jarib> reducing it to just run go would probably help as well
+2011-04-09T06:54:47  <krosenvold> but why/what clogs it?
+2011-04-09T06:54:57  <krosenvold> hanging browsers?
+2011-04-09T06:55:29  <jarib> yeah
+2011-04-09T06:55:39  <krosenvold> Firefox?
+2011-04-09T06:55:57  <jarib> or IE - e.g. a crash in the native code will bring up the windows crash dialog
+2011-04-09T06:56:47  <krosenvold> never been able to get any stability with IE
+2011-04-09T06:57:08  <jarib> it's getting there with jim's contributions.
+2011-04-09T06:57:22  <jarib> krosenvold: btw, tried the new chrome driver?
+2011-04-09T06:57:28  <krosenvold> Could we use some kind of process wrapper around go?
+2011-04-09T06:58:24  <krosenvold> the dev channel 64 bit deb is still too old
+2011-04-09T06:58:43  <krosenvold> the process wrapper could killall Firefox
+2011-04-09T06:58:46  <krosenvold> and ir
+2011-04-09T06:58:54  <krosenvold> s/ir/IE
+2011-04-09T06:58:54  <jarib> right
+2011-04-09T06:58:58  <jarib> that'd definitely help
+2011-04-09T06:59:02  <krosenvold> On timeout?
+2011-04-09T06:59:23  <jarib> probably
+2011-04-09T06:59:31  <jarib> there's already a go wrapper somewhere in the tree
+2011-04-09T06:59:36  <jarib> (in java)
+2011-04-09T07:00:02  <jarib> there are others issues as well though - the VMs should be configured to not run auto-updates etc.
+2011-04-09T07:00:13  <krosenvold> But i dont Think theres anything Java that works in Windows
+2011-04-09T07:00:38  <krosenvold> for process trees
+2011-04-09T07:00:49  <jarib> right
+2011-04-09T07:01:04  <jarib> this is where a clean VM would come in handy :)
+2011-04-09T07:01:05  <krosenvold> Gry
+2011-04-09T07:01:05  <krosenvold> gtg
+2011-04-09T07:01:12  <jarib> aye, ttyl
+2011-04-09T07:06:05  *** ssims has joined #selenium
+2011-04-09T07:14:52  *** ian_mac_ has quit IRC
+2011-04-09T07:15:17  *** kylls has joined #selenium
+2011-04-09T07:15:17  *** kylls has joined #selenium
+2011-04-09T07:15:44  *** ian_mac_ has joined #selenium
+2011-04-09T07:17:59  *** ssims has quit IRC
+2011-04-09T07:18:14  *** kylls1 has quit IRC
+2011-04-09T07:19:14  *** ian_mac has quit IRC
+2011-04-09T07:19:22  *** ian_mac has joined #selenium
+2011-04-09T07:27:58  *** nirvdrum has joined #selenium
+2011-04-09T07:28:13  *** erwan has quit IRC
+2011-04-09T07:42:56  *** nirvdrum has quit IRC
+2011-04-09T07:44:07  *** nirvdrum has joined #selenium
+2011-04-09T07:59:14  <selbot2> PaulHammant half a minute ago - more words - http://code.google.com/p/selenium/source/detail?r=11940
+2011-04-09T07:59:44  <selbot2> PaulHammant less than 10 seconds ago - aid debugging by remove inner class names from stack traces - http://code.google.com/p/selenium/source/detail?r=11941
+2011-04-09T08:01:28  *** kylls1 has joined #selenium
+2011-04-09T08:03:24  <selbot2> jari.bakken less than a minute ago - JariBakken: Use interfaces for exceptions for now, making this a valid WebIDL file. - http://code.google.com/p/selenium/source/detail?r=11942
+2011-04-09T08:04:20  *** kylls has quit IRC
+2011-04-09T08:10:22  *** kylls1 has quit IRC
+2011-04-09T08:10:37  *** ssims has joined #selenium
+2011-04-09T08:17:49  *** freynaud has joined #selenium
+2011-04-09T08:23:32  *** kylls1 has joined #selenium
+2011-04-09T08:26:08  *** erwan has joined #selenium
+2011-04-09T08:29:37  *** kylls has joined #selenium
+2011-04-09T08:29:37  *** kylls has joined #selenium
+2011-04-09T08:29:48  *** AutomatedTester has joined #selenium
+2011-04-09T08:32:02  *** kylls1 has quit IRC
+2011-04-09T08:34:28  *** nirvdrum has quit IRC
+2011-04-09T08:39:44  *** erwan has quit IRC
+2011-04-09T08:47:00  *** seangrove has joined #selenium
+2011-04-09T08:51:50  *** kylls has quit IRC
+2011-04-09T09:11:32  *** dmachi has joined #selenium
+2011-04-09T09:11:32  *** dmachi1 has quit IRC
+2011-04-09T09:51:54  *** nirvdrum has joined #selenium
+2011-04-09T09:52:34  *** AutomatedTester has quit IRC
+2011-04-09T09:59:13  *** santiycr has joined #selenium
+2011-04-09T10:10:14  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: removing extra import breaking compilation. - http://code.google.com/p/selenium/source/detail?r=11943
+2011-04-09T10:11:45  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: exposing the OS names to be able to use that in the grid matching process - http://code.google.com/p/selenium/source/detail?r=11944
+2011-04-09T10:11:57  *** ian_mac has quit IRC
+2011-04-09T10:12:08  *** Rajan has quit IRC
+2011-04-09T10:13:14  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: changing the logic of the default matcher in grid to a more generic one + updating the tests. - http://code.google.com/p/selenium/source/detail?r=11945
+2011-04-09T10:14:18  <selbot2> francois.reynaud less than 20 seconds ago - FrancoisReynaud: tests in subpackages were ignored - http://code.google.com/p/selenium/source/detail?r=11946
+2011-04-09T10:18:19  *** freynaud has quit IRC
+2011-04-09T10:21:05  *** kylls has joined #selenium
+2011-04-09T10:21:40  *** freynaud has joined #selenium
+2011-04-09T10:27:34  *** kylls has quit IRC
+2011-04-09T10:42:05  *** kylls has joined #selenium
+2011-04-09T10:42:10  *** kylls has joined #selenium
+2011-04-09T10:56:01  *** toseter1 has joined #selenium
+2011-04-09T10:56:49  *** toseter has quit IRC
+2011-04-09T10:59:44  *** kylls has quit IRC
+2011-04-09T11:00:29  *** toseter1 has quit IRC
+2011-04-09T11:04:07  *** toseter has joined #selenium
+2011-04-09T11:07:55  *** Rajan has joined #selenium
+2011-04-09T11:29:02  *** seangrove has quit IRC
+2011-04-09T11:36:44  <selbot2> pgrandje half a minute ago - latest edits - http://code.google.com/p/selenium/source/detail?r=11947
+2011-04-09T11:45:07  *** santiycr has quit IRC
+2011-04-09T11:51:43  <selbot2> pgrandje less than 10 seconds ago - Edited the UI Map subsection - http://code.google.com/p/selenium/source/detail?r=11948
+2011-04-09T11:56:17  <selbot> New news from builds: S2PY-FFLX-4 has FAILED : Manual build by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/S2PY-FFLX-4>
+2011-04-09T12:00:19  <selbot> New news from builds: S2RB-WDUNIT-88 was SUCCESSFUL (with 43 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-88>
+2011-04-09T12:08:16  *** nirvdrum has quit IRC
+2011-04-09T12:17:36  *** ian_mac has joined #selenium
+2011-04-09T12:17:39  <selbot> New news from builds: S2RB-RCUNIT-67 has FAILED : Dependant of S2RB-WDUNIT-88 <http://xserve.openqa.org:8085/browse/S2RB-RCUNIT-67>
+2011-04-09T12:18:10  *** csanchez has joined #selenium
+2011-04-09T12:25:14  *** strtok has quit IRC
+2011-04-09T12:26:03  *** santiycr has joined #selenium
+2011-04-09T12:26:06  <selbot> New news from builds: S2RB-REMLX-61 has FAILED (79 tests failed) : Dependant of S2RB-WDUNIT-88 <http://xserve.openqa.org:8085/browse/S2RB-REMLX-61>
+2011-04-09T12:26:11  <santiycr> krosenvold: so I have these problems with bamboo
+2011-04-09T12:26:25  <santiycr> I'm hoping you'll be able to solve them
+2011-04-09T12:27:06  <santiycr> 1) When builds hung, bamboo is able to detect it, but after spending over 15 minutes, I can't find a configuration that will allow me to set bamboo to kill them
+2011-04-09T12:29:01  <santiycr> 2) I'm willing to set Bamboo to send emails, so that we know when things break. It doesn't have it's own SMTP server and we have to set one ourselves, which is annoying considering that CI servers rely so much in email notifications  that they should have figured this out already
+2011-04-09T12:29:16  *** Archdude has quit IRC
+2011-04-09T12:29:37  *** Archdude has joined #selenium
+2011-04-09T12:29:47  <santiycr> 3) tried setting my own gmail as the smtp server so that bamboo can just use it. It not just fails but shows me the most cryptic error message I've seen in a while
+2011-04-09T12:30:07  <santiycr> this is the message:
+2011-04-09T12:30:08  <santiycr> An unexpected error has occurred: The mail settings you entered were not valid. Error thrown was: com.sun.mail.smtp.SMTPSendFailedException: 530 5.7.0 Must issue a STARTTLS command first. g28sm2822287qck.39 .
+2011-04-09T12:30:25  <santiycr> please tell me if you find something useful in it
+2011-04-09T12:30:35  <santiycr> 4) Having failed in email
+2011-04-09T12:30:40  *** Archdude has quit IRC
+2011-04-09T12:30:48  <santiycr> I decided to try to set an IRC bot to notify us
+2011-04-09T12:31:23  *** Archdude has joined #selenium
+2011-04-09T12:31:24  <santiycr> I've failed on that too, as there's no easy way to get new plugins from within bamboo itself
+2011-04-09T12:32:53  <santiycr> having those 4 points, I declare bamboo is the worst CI tool I've used so far. Right bellow Buildbot, which I take as acceptable under the premise that buildbot's goal is to give users a basic tool that they will extend themselves
+2011-04-09T12:36:27  <selbot> New news from builds: S2RB-FXLX-71 has FAILED (83 tests failed) : Dependant of S2RB-WDUNIT-88 <http://xserve.openqa.org:8085/browse/S2RB-FXLX-71>
+2011-04-09T12:45:42  *** towski has joined #selenium
+2011-04-09T12:51:13  *** Rajan has quit IRC
+2011-04-09T12:53:57  *** foobarbaz has joined #selenium
+2011-04-09T12:55:13  *** ian_mac has quit IRC
+2011-04-09T12:56:13  <selbot2> pgrandje less than 10 seconds ago - much editing of the page object chapter - http://code.google.com/p/selenium/source/detail?r=11949
+2011-04-09T12:58:06  <foobarbaz> is the source i get with get_page_source (python bindings for selenium 2) the original source or the current dom state?
+2011-04-09T12:58:43  <selbot2> pgrandje less than 10 seconds ago - removed the Error Recovery subsction--we never wrote this and we're still not sure what to put there so let's just remove it. - http://code.google.com/p/selenium/source/detail?r=11950
+2011-04-09T13:09:35  *** towski has quit IRC
+2011-04-09T13:11:25  *** toseter has quit IRC
+2011-04-09T13:12:17  *** charleyb has quit IRC
+2011-04-09T13:12:28  *** toseter has joined #selenium
+2011-04-09T13:27:05  *** ner0x has joined #selenium
+2011-04-09T13:43:12  *** santiycr has quit IRC
+2011-04-09T13:46:45  *** Rajan has joined #selenium
+2011-04-09T13:48:07  *** nirvdrum has joined #selenium
+2011-04-09T13:54:14  <selbot2> nirvdrum half a minute ago - KevinMenard: Grid 2.0 hub can now load Grid 1.0 hub configuration YAML file. - http://code.google.com/p/selenium/source/detail?r=11951
+2011-04-09T13:58:44  <selbot> New news from builds: S2J-FXLX-158 has FAILED : Updated by Kevin Menard <http://xserve.openqa.org:8085/browse/S2J-FXLX-158>
+2011-04-09T14:00:01  *** Rajan has quit IRC
+2011-04-09T14:17:59  *** toseter has quit IRC
+2011-04-09T14:40:09  *** ssims has quit IRC
+2011-04-09T14:40:13  *** freynaud has quit IRC
+2011-04-09T14:45:41  *** freynaud has joined #selenium
+2011-04-09T14:50:48  *** dmachi1 has joined #selenium
+2011-04-09T14:50:48  *** dmachi has quit IRC
+2011-04-09T14:57:30  *** pnitin has quit IRC
+2011-04-09T14:58:00  *** freynaud has quit IRC
+2011-04-09T15:05:20  *** xirkus has quit IRC
+2011-04-09T15:07:27  *** nirvdrum has quit IRC
+2011-04-09T16:01:43  <selbot2> pgrandje half a minute ago - edited the data-driven testing and data-validation subsections - http://code.google.com/p/selenium/source/detail?r=11952
+2011-04-09T16:04:55  *** nirvdrum has joined #selenium
+2011-04-09T16:10:41  *** larrys has quit IRC
+2011-04-09T16:11:37  *** larrys has joined #selenium
+2011-04-09T16:12:55  *** esteele is now known as esteele|away
+2011-04-09T16:18:07  *** Archdude has quit IRC
+2011-04-09T16:18:52  *** Archdude has joined #selenium
+2011-04-09T16:19:26  *** Archdude has quit IRC
+2011-04-09T16:20:10  *** Archdude has joined #selenium
+2011-04-09T16:27:13  <selbot2> nirvdrum less than 20 seconds ago - KevinMenard: Grid 1.0 nodes can now re-register themselves with a Grid 2.0 hub if they somehow become unregistered.  I.e., the node heartbeat ping actually does something of value now. - http://code.google.com/p/selenium/source/detail?r=11953
+2011-04-09T17:03:44  <selbot2> nirvdrum half a minute ago - KevinMenard: Refactored Grid 1.0 environment => browser name munging.  Also fixed grid console display for old-style environment names. - http://code.google.com/p/selenium/source/detail?r=11954
+2011-04-09T17:05:42  *** nirvdrum has quit IRC
+2011-04-09T17:05:42  *** esteele|away is now known as esteele
+2011-04-09T17:17:23  *** charleyb has joined #selenium
+2011-04-09T17:20:47  *** ner0x has quit IRC
+2011-04-09T17:40:42  *** |izzie has joined #selenium
+2011-04-09T17:45:20  *** nirvdrum has joined #selenium
+2011-04-09T17:45:34  *** towski has joined #selenium
+2011-04-09T17:47:42  *** Rajan has joined #selenium
+2011-04-09T17:58:21  *** foobarbaz has quit IRC
+2011-04-09T18:12:17  *** Rajan has quit IRC
+2011-04-09T18:15:18  *** nirvdrum has quit IRC
+2011-04-09T18:19:09  *** brettporter has joined #selenium
+2011-04-09T19:04:45  *** ssims has joined #selenium
+2011-04-09T19:35:08  *** esteele is now known as esteele|away
+2011-04-09T20:12:34  *** AutomatedTester has joined #selenium
+2011-04-09T21:07:38  *** kylls has joined #selenium
+2011-04-09T21:40:01  *** kylls has quit IRC
+2011-04-09T22:10:14  <selbot2> theautomatedtester half a minute ago - DavidBurns centralising port searching - http://code.google.com/p/selenium/source/detail?r=11955
+2011-04-09T22:15:10  *** nirvdrum has joined #selenium
+2011-04-09T22:17:45  <selbot2> theautomatedtester half a minute ago - DavidBurns Corrected whitespace - http://code.google.com/p/selenium/source/detail?r=11956
+2011-04-09T22:27:01  <AutomatedTester> nirvdrum: nice one!
+2011-04-09T22:27:11  <nirvdrum> Thanks.
+2011-04-09T22:27:17  <nirvdrum> Got some more testing to do.
+2011-04-09T22:27:19  <nirvdrum> But looking good.
+2011-04-09T22:27:25  <AutomatedTester> cool
+2011-04-09T22:28:05  <AutomatedTester> we are looking forward to being guinea pigs at Moz
+2011-04-09T22:28:48  <nirvdrum> It should be usable now.
+2011-04-09T22:28:57  <nirvdrum> I've been waiting for the other Dave to hop online.
+2011-04-09T22:29:17  <nirvdrum> Francois got a big usability patch in.
+2011-04-09T22:29:27  <nirvdrum> And I've been keen on getting backwards-compat in.
+2011-04-09T22:29:56  <AutomatedTester> other Dave is somewhere over the Atlantic atm
+2011-04-09T22:30:57  <nirvdrum> Ahh.
+2011-04-09T22:31:02  <nirvdrum> I fly back no Monday.
+2011-04-09T22:31:08  <nirvdrum> s/no/on/
+2011-04-09T22:31:19  <nirvdrum> Are you still in MV?  Or did you fly back already?
+2011-04-09T22:31:24  <AutomatedTester> still in SF?
+2011-04-09T22:31:28  <AutomatedTester> MV
+2011-04-09T22:31:34  <AutomatedTester> here till Wednesday
+2011-04-09T22:32:41  <nirvdrum> Yeah.  I've now moved down to embarcardero for GitHub's CodeConf.
+2011-04-09T22:33:43  <AutomatedTester> ahh cool
+2011-04-09T22:33:57  <AutomatedTester> is that a good conf?
+2011-04-09T22:34:07  <nirvdrum> So far, so good.
+2011-04-09T22:34:18  <nirvdrum> Drinking is much more aggressive, too.
+2011-04-09T22:34:26  <nirvdrum> I bailed on the open bar.
+2011-04-09T22:34:27  <AutomatedTester> hehe
+2011-04-09T22:34:40  <nirvdrum> After 5 whiskies I was ready to head back.  I got my fill at SeleniumConf.
+2011-04-09T22:35:34  <nirvdrum> My biggest complaint is the conference room has no power at all.
+2011-04-09T22:35:50  <nirvdrum> On the one hand, it's good to pay attention.
+2011-04-09T22:36:05  <nirvdrum> On the other, "./go release" takes so damn long that I'm not missing out on most of the talks anyway.
+2011-04-09T22:40:33  *** brettporter has quit IRC
+2011-04-09T22:43:36  <AutomatedTester> whats the type of things being discussed at codeconf?
+2011-04-09T22:52:44  <selbot2> theautomatedtester half a minute ago - DavidBurns centralising more code around ports - http://code.google.com/p/selenium/source/detail?r=11957
+2011-04-09T23:00:43  <selbot2> theautomatedtester less than 20 seconds ago - DavidBurns fixing the connectable code for IE - http://code.google.com/p/selenium/source/detail?r=11958
+2011-04-09T23:03:42  *** nirvdrum has quit IRC
+2011-04-09T23:08:11  *** udesh_ has joined #selenium
+2011-04-09T23:22:13  <selbot2> theautomatedtester half a minute ago - DavidBurns Cleaning up imports - http://code.google.com/p/selenium/source/detail?r=11959
+2011-04-09T23:22:27  *** towski has quit IRC
+2011-04-09T23:27:32  *** erwan has joined #selenium
+2011-04-09T23:44:43  <selbot2> theautomatedtester half a minute ago - DavidBurns adding cookie tests to remote - http://code.google.com/p/selenium/source/detail?r=11960
+2011-04-09T23:46:56  *** AutomatedTester has quit IRC

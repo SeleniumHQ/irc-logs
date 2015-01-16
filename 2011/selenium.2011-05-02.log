@@ -1,0 +1,891 @@
+2011-05-02T00:15:21  *** zmijunkie has joined #selenium
+2011-05-02T00:19:49  *** AutomatedTester has quit IRC
+2011-05-02T00:21:51  *** vrockai has joined #selenium
+2011-05-02T00:25:20  *** AutomatedTester has joined #selenium
+2011-05-02T00:31:08  *** sburjan has joined #selenium
+2011-05-02T00:33:54  *** reddeviL is now known as reddevil^
+2011-05-02T00:51:10  *** lfryc has joined #selenium
+2011-05-02T01:04:54  <AutomatedTester> jarib: yo
+2011-05-02T01:19:08  *** jks has joined #selenium
+2011-05-02T01:24:28  *** robinsmidsrod has quit IRC
+2011-05-02T01:25:11  *** frohoff1 has quit IRC
+2011-05-02T01:26:21  *** robins has joined #selenium
+2011-05-02T01:29:20  *** anatoli_ has quit IRC
+2011-05-02T01:33:35  *** anatoli_ has joined #selenium
+2011-05-02T01:38:01  *** denizt has joined #selenium
+2011-05-02T01:55:27  *** csanchez has quit IRC
+2011-05-02T01:56:42  *** robins is now known as robinsmidsrod
+2011-05-02T01:59:35  *** eghm has quit IRC
+2011-05-02T02:01:14  *** eghm has joined #selenium
+2011-05-02T02:15:19  <jarib> AutomatedTester: hi
+2011-05-02T02:15:41  <AutomatedTester> hey, anything interesting happened in the last 2 weeks?
+2011-05-02T02:16:00  <jarib> nope
+2011-05-02T02:16:03  <jarib> heh
+2011-05-02T02:16:08  <AutomatedTester> fair enough
+2011-05-02T02:16:18  <AutomatedTester> do you know if Chrome supports screenshots?
+2011-05-02T02:16:55  <jarib> i think it does but it's not exposed yet
+2011-05-02T02:17:06  <jarib> there's mention of screenshots in the C++ code, but the REST endpoints don't work
+2011-05-02T02:17:12  <jarib> (last i tried)
+2011-05-02T02:18:04  <AutomatedTester> cool
+2011-05-02T02:33:10  *** brettporter has quit IRC
+2011-05-02T02:33:55  <selbot2_> theautomatedtester half a minute ago - DavidBurns adding save_screenshot to Chrome. Will error till exposed - http://code.google.com/p/selenium/source/detail?r=12095
+2011-05-02T02:40:18  *** brettporter has joined #selenium
+2011-05-02T02:44:26  *** vmassol has joined #selenium
+2011-05-02T02:45:24  <vmassol> hi guys. Got a problem upgrading to se 2.0 beta3. Some test that was working before and failing now.
+2011-05-02T02:46:15  <vmassol> Basically I now get a StaleElementReferenceException on getText() in this snippet: http://pastebin.com/unSEdznT
+2011-05-02T02:46:34  <vmassol> I'm a bit at a lack to understand how that could be....
+2011-05-02T02:48:08  <jarib> that's weird. can we see the stacktrace? what version did you upgrade from?
+2011-05-02T02:48:29  <vmassol> jarib: we had 2.0b1 before
+2011-05-02T02:48:32  <vmassol> let me paste the stack
+2011-05-02T02:48:58  *** freynaud has joined #selenium
+2011-05-02T02:49:03  *** freynaud has left #selenium
+2011-05-02T02:49:18  *** brettporter has quit IRC
+2011-05-02T02:49:43  <vmassol> jarib: http://pastebin.com/xgCZLBMP
+2011-05-02T02:50:42  <vmassol> org.xwiki.test.ui.framework.elements.editor.wysiwyg.RichTextAreaElement.getContent(RichTextAreaElement.java:57) corresponds to the first snippet I pasted
+2011-05-02T02:50:49  <jarib> vmassol: does it fail consistently?
+2011-05-02T02:50:52  <vmassol> yes
+2011-05-02T02:50:58  <jarib> hm
+2011-05-02T02:54:29  <vmassol> jarib: if I do         System.out.println(getDriver().getPageSource()); just before the getText() I can see the correct content
+2011-05-02T02:54:56  *** anatol___ has joined #selenium
+2011-05-02T02:55:05  *** anatoli_ has quit IRC
+2011-05-02T02:55:30  *** anatoli_ has joined #selenium
+2011-05-02T02:59:18  *** anatol___ has quit IRC
+2011-05-02T03:30:13  <vmassol> jarib: any idea how I could progress on this issue?
+2011-05-02T03:41:58  <jarib> vmassol: not really. if it's consistent, probably not a timing issue, but you could try adding a Thread.sleep before the getText() call to see if that changes anything
+2011-05-02T03:42:06  <jarib> (as a debugging aid, not as a real solution)
+2011-05-02T03:42:22  <vmassol> jarib: ok testing now
+2011-05-02T03:43:51  *** stepheneb has joined #selenium
+2011-05-02T03:46:24  <vmassol> jarib: no luck, I get the same error even with a sleep of 5 seconds
+2011-05-02T03:46:25  *** cheezy has quit IRC
+2011-05-02T03:49:11  <vmassol> jarib: hmm actually after testing several times I also got this error with a timeout > 10 seconds: http://pastebin.com/LCf17k43
+2011-05-02T03:49:17  <barancev> vmassol: What driver do you use?
+2011-05-02T03:49:25  <vmassol> barancev: the firefox one
+2011-05-02T03:50:26  <vmassol> (FirefoxDriver())
+2011-05-02T04:04:07  <vmassol> jarib: basically if I put a breakpoint in the code just before the findElement (or if I use a sleep with a large enough value) I get: org.openqa.selenium.WebDriverException: this.getWindow() is null
+2011-05-02T04:04:21  <vmassol> trying to trace it in the selenium code but the codebase is new to me
+2011-05-02T04:06:19  <vmassol> I traced it till HttpCommandExecutor when it calls: fallbackExecute
+2011-05-02T04:06:30  <vmassol> and the Http Response returned has a status line of "HTTP/1.1 500 Internal Server Error"
+2011-05-02T04:08:53  *** rbalent has joined #selenium
+2011-05-02T04:09:27  <vmassol> I don't understand how that's possible, the remote server is http://127.0.0.1:7055/hub so I'd need to put my breakpoint on the server side… not sure where that is
+2011-05-02T04:10:30  <vmassol> any idea in which class I need to put my breakpoint?
+2011-05-02T04:13:45  *** freynaud has joined #selenium
+2011-05-02T04:16:41  *** csanchez has joined #selenium
+2011-05-02T04:21:42  *** kylls1 has joined #selenium
+2011-05-02T04:28:44  *** bebef_1987 has joined #selenium
+2011-05-02T04:33:52  *** kylls has joined #selenium
+2011-05-02T04:35:22  *** vmassol1 has joined #selenium
+2011-05-02T04:36:26  <selbot2_> adam_goucher@hotmail.com half a minute ago - AdamGoucher - adding play framework formatter to download list - http://code.google.com/p/selenium/source/detail?r=12096
+2011-05-02T04:36:43  *** vmassol has quit IRC
+2011-05-02T04:38:15  <selbot> New news from builds: WEB-SEHQ-100 was SUCCESSFUL : Updated by adam_goucher@hotmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-100>
+2011-05-02T04:38:18  *** stepheneb has quit IRC
+2011-05-02T04:38:50  *** AutomatedTester_ has joined #selenium
+2011-05-02T04:39:14  *** AutomatedTester has quit IRC
+2011-05-02T04:39:15  *** AutomatedTester_ is now known as AutomatedTester
+2011-05-02T04:42:13  *** brettporter has joined #selenium
+2011-05-02T04:42:45  *** pnitin has quit IRC
+2011-05-02T04:49:38  *** miker2 has joined #selenium
+2011-05-02T05:03:35  *** csanchez has quit IRC
+2011-05-02T05:06:25  *** esteele has joined #selenium
+2011-05-02T05:08:52  *** rbalent has quit IRC
+2011-05-02T05:09:04  *** esteele is now known as esteele|away
+2011-05-02T05:10:19  *** RossPatterson has joined #selenium
+2011-05-02T05:15:05  *** rbalent has joined #selenium
+2011-05-02T05:17:36  *** rbalent has quit IRC
+2011-05-02T05:18:18  *** mbeierl has joined #selenium
+2011-05-02T05:18:53  *** rbalent has joined #selenium
+2011-05-02T05:32:33  *** mbeierl has quit IRC
+2011-05-02T05:32:48  *** mbeierl has joined #selenium
+2011-05-02T05:33:57  *** sburjan has quit IRC
+2011-05-02T05:34:29  *** sburjan has joined #selenium
+2011-05-02T05:37:30  *** pythonirc101 has quit IRC
+2011-05-02T05:38:58  *** bebef_1987 has quit IRC
+2011-05-02T05:45:48  *** sjmikem has quit IRC
+2011-05-02T05:46:22  *** mbeierl has quit IRC
+2011-05-02T05:46:38  *** mbeierl has joined #selenium
+2011-05-02T05:53:03  *** DarkRift has joined #selenium
+2011-05-02T05:53:24  *** SL-BWood has joined #selenium
+2011-05-02T05:53:38  <DarkRift> is it possible with a command from the selenium grid to execute an external command instead of an in browser command ?
+2011-05-02T05:53:49  <DarkRift> on the slaves
+2011-05-02T05:54:14  <AutomatedTester> control something other than a browser?
+2011-05-02T05:54:54  <DarkRift> well just be able to execute another executable
+2011-05-02T05:54:58  <DarkRift> welll what I'm trying to do is
+2011-05-02T05:55:37  <AutomatedTester> freynaud: will be the best person to answer but I think in theory you can with Grid2
+2011-05-02T05:55:59  <DarkRift> since the screenshot capture is not functionnal for iexplorer HTA, it could probably be done through the call of the Robot java class
+2011-05-02T05:56:08  <DarkRift> so I wondered if that could be done
+2011-05-02T05:56:22  <DarkRift> but since the grid only sends the "selenium commands" to the slaves ...
+2011-05-02T05:57:37  <DarkRift> hummm 2 second I might have found a way
+2011-05-02T05:58:52  *** cgoldberg has joined #selenium
+2011-05-02T05:59:01  *** brettporter has quit IRC
+2011-05-02T05:59:05  <AutomatedTester> well if you could set up a REST point then you can do it
+2011-05-02T05:59:35  <DarkRift> hum ?
+2011-05-02T06:00:15  <AutomatedTester> since grid is just a multiplexer for rest commands
+2011-05-02T06:01:44  <DarkRift> ok
+2011-05-02T06:03:12  *** cburroughs has joined #selenium
+2011-05-02T06:07:23  *** esteele|away is now known as esteele
+2011-05-02T06:08:42  *** lfryc has quit IRC
+2011-05-02T06:08:59  *** ian_mac has quit IRC
+2011-05-02T06:11:30  *** mbeierl has quit IRC
+2011-05-02T06:11:48  *** lfryc has joined #selenium
+2011-05-02T06:15:47  *** larrys has joined #selenium
+2011-05-02T06:16:49  <jarib> vmassol1: the getWindow() is null error is a known bug in firefox 4
+2011-05-02T06:17:05  <jarib> #1438
+2011-05-02T06:17:06  <selbot2_>  open/accepted WebDriver + Firefox 4: this.getWindow() is null - http://code.google.com/p/selenium/issues/detail?id=1438
+2011-05-02T06:17:15  <vmassol1> jarib: I'm using FF 3.6
+2011-05-02T06:17:44  <jarib> oh, interesting
+2011-05-02T06:17:46  <vmassol1> in the issue it says "Note this same test works fine in FF 3.6."
+2011-05-02T06:19:24  *** vmassol1 is now known as vmassol
+2011-05-02T06:23:02  *** stepheneb has joined #selenium
+2011-05-02T06:35:53  <freynaud> DarkRift: did you find what you needed already ?
+2011-05-02T06:38:16  <DarkRift> well almost
+2011-05-02T06:39:00  <DarkRift> I'm trying to capture the screenshot of the whole browser with captureEntirePageScreenshotToString
+2011-05-02T06:39:25  <DarkRift> but the company I'm working for will need to have the screenshot of IE6 to IE8
+2011-05-02T06:39:41  <DarkRift> it works damn fine for firefox, but I can't seem to make it works with the IEs
+2011-05-02T06:39:52  <DarkRift> I'm getting
+2011-05-02T06:39:53  <DarkRift>      [java] com.thoughtworks.selenium.SeleniumException: ERROR: java.io.FileNotFoundException: C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\customProfileDir20169040b2c04cb3b5c91ba7f2173efb\screenshots\page-screenshot-20169040b2c04cb3b5c91ba7f2173efb.png (The system cannot find the file specified)
+2011-05-02T06:40:45  <DarkRift> well, normal since the screenshots folder doesn't exist ...
+2011-05-02T06:40:45  *** krosenvold has quit IRC
+2011-05-02T06:41:29  *** miker2 has quit IRC
+2011-05-02T06:41:32  <DarkRift> any ideas ?
+2011-05-02T06:42:20  <DarkRift> is it possible to specify in which folder to setup the temporary screenshots ?
+2011-05-02T06:42:21  *** miker2 has joined #selenium
+2011-05-02T06:44:21  *** krosenvold has joined #selenium
+2011-05-02T06:44:28  <DarkRift> freynaud ?
+2011-05-02T06:45:34  <freynaud> the best would be to use selenium2, IE screenshot are working there now I beieve
+2011-05-02T06:46:09  <freynaud> otherwise, you can use snapsie. It requires some steps to setup but it works ok
+2011-05-02T06:46:41  <DarkRift> I'm using selenium-grid 1.0.8
+2011-05-02T06:47:28  <DarkRift> with childs being run from selenium-server-standalone-2.0b3
+2011-05-02T06:47:33  <freynaud> the screenshot thing isn't in grid, it's in the remote control server. That's where you need to do the setup
+2011-05-02T06:48:16  <DarkRift> shouldn't selenium-server-standalone-2.0b3 able to take those screenshots ?
+2011-05-02T06:48:22  <DarkRift> be *
+2011-05-02T06:48:43  <freynaud> if you use web driver api, it should I think
+2011-05-02T06:48:55  <freynaud> with legacy selenium, I don't think it will work
+2011-05-02T06:49:05  <DarkRift> I'm pretty new to this stuff, started reading about it last week
+2011-05-02T06:49:42  <DarkRift> I started from the WebTestInvolvingMultiEnvironments demo
+2011-05-02T06:50:03  <DarkRift> copied the target and just changed my class, did no change in the slaves, do I need to ?
+2011-05-02T06:50:50  <freynaud> WebTestInvolvingMultiEnvironments
+2011-05-02T06:50:55  <freynaud> what is that ?
+2011-05-02T06:51:12  <DarkRift> it's a demo class coming with selenium grid
+2011-05-02T06:51:12  <DarkRift> https://github.com/ph7/selenium-grid/blob/master/demo/src/main/java/com/thoughtworks/selenium/grid/demo/WebTestInvolvingMultiEnvironments.java
+2011-05-02T06:51:47  <freynaud> you're starting selenium from scratch ?
+2011-05-02T06:51:52  <DarkRift> yes
+2011-05-02T06:52:04  <DarkRift> is it possible to make a distributed environment without selenium grid ? I mean, having multiple VMs for the different OS/browsers version
+2011-05-02T06:52:27  <DarkRift> I'm totally new to selenium
+2011-05-02T06:53:27  <DarkRift> I wanted to give the company I'm working for a new testing tool to ease the web testing ... but if I can't make screenshots, that's pretty bad actually because we can't rely on the only hope the assertions are good as we want to see the design as well
+2011-05-02T06:53:45  <DarkRift> hence a manual is still needed but the execution will be autoamted
+2011-05-02T06:53:50  <DarkRift> manual validation *
+2011-05-02T06:55:44  <DarkRift> so I thought using grid would ease the configuration as you only need to add a new slave to be able to test a new browser configuration
+2011-05-02T06:56:07  <freynaud> this channel is not the best place for beginner questions btw
+2011-05-02T06:56:15  <DarkRift> hummm
+2011-05-02T07:00:25  <AutomatedTester> freynaud: why isnt this a good place for beginner questions?
+2011-05-02T07:00:36  *** adamgoucher has joined #selenium
+2011-05-02T07:01:44  *** pnitin has joined #selenium
+2011-05-02T07:02:26  *** AutomatedTester has quit IRC
+2011-05-02T07:02:54  *** AutomatedTester has joined #selenium
+2011-05-02T07:03:19  *** rbalent has quit IRC
+2011-05-02T07:06:33  <freynaud> i thought it wasn't :p
+2011-05-02T07:08:36  <RossPatterson> DarkRift: Selenium 1.0 can't take IE snapshots on its own.  There's a helper you need to install, called "SnapsIE" (https://github.com/nirvdrum/SnapsIE).  Once you install it on the machine where the browser will run, the existing capture*ScreenShot* functions should work.
+2011-05-02T07:14:34  *** AutomatedTester_ has joined #selenium
+2011-05-02T07:14:34  *** AutomatedTester has quit IRC
+2011-05-02T07:14:34  *** AutomatedTester_ is now known as AutomatedTester
+2011-05-02T07:16:41  *** dwight has joined #selenium
+2011-05-02T07:16:52  <dwight> dwight77
+2011-05-02T07:16:58  <dwight> Hi room
+2011-05-02T07:17:01  <dwight> need somne help
+2011-05-02T07:17:13  <dwight> is any one there
+2011-05-02T07:17:28  *** rbalent has joined #selenium
+2011-05-02T07:17:28  <DarkRift> looking at it now
+2011-05-02T07:17:30  <DarkRift> thanks robinsmidsrod
+2011-05-02T07:17:31  <AutomatedTester> ask your question and see if you get a response
+2011-05-02T07:17:32  <DarkRift> RossPatterson
+2011-05-02T07:20:00  *** rbalent has quit IRC
+2011-05-02T07:21:10  <dwight> ok, i have created some test cases using the selenium ide tool and exporeted these test cases in to selenium rc in java junit, i have setup everything correctly and started the selenium proxy server, problem is when i run my text it only lasts for about 5 secs when i excute it from selenium rc it should be much longer, any ideas how i can get the whole test case to play? any help would be helpful
+2011-05-02T07:21:28  *** rbalent has joined #selenium
+2011-05-02T07:21:48  <AutomatedTester> dwight: do you get a stacktrace
+2011-05-02T07:22:05  <dwight> not sure what that is where do i locate this
+2011-05-02T07:22:50  <RossPatterson> dwight: What makes you think the test didn't run to completion?  RC can runs test very quickly.
+2011-05-02T07:23:36  <dwight> well the test is much longer it ends half way through the first test case
+2011-05-02T07:24:48  <dwight> i have the code to hand if this helps
+2011-05-02T07:24:53  <RossPatterson> OK, that's a good measure :-)
+2011-05-02T07:25:37  <dwight> ok let me get it
+2011-05-02T07:26:14  <RossPatterson> Sorry, what I meant was "it ends half way through the first test case" is a good measure of whether the test completed.
+2011-05-02T07:29:08  <dwight> yes but i dont see the test run the other test parts i have recoreded
+2011-05-02T07:29:53  *** sjmikem has joined #selenium
+2011-05-02T07:31:23  <RossPatterson> I'd expect the test to result in some sort of Exception if it terminates early - either an Assert.SomethingOrOther that JUnit catches and reports on or a Java run-time exception.  Either way, whatever UI you're using for JUnit should have displayed it for you.
+2011-05-02T07:31:48  <dwight> im usuing eclipse
+2011-05-02T07:32:29  <dwight> would you like to see my code
+2011-05-02T07:33:03  *** krosenvold has quit IRC
+2011-05-02T07:33:08  <RossPatterson> Not really - I'm not much of a Java person.
+2011-05-02T07:33:29  <RossPatterson> I assume the Selenium RC server is up for the full test duration?
+2011-05-02T07:33:31  <AutomatedTester> dwight: is there a error or stacktrace?
+2011-05-02T07:34:33  <dwight> there is an error statck trace it says this
+2011-05-02T07:34:35  <dwight> com.thoughtworks.selenium.SeleniumException: XHR ERROR: URL = http://int-shop.mrmpweb.co.uk/en_uk/consumer/products Response_Code = 404 Error_Message = Not Found
+2011-05-02T07:35:17  <dwight> im using slenium version 1
+2011-05-02T07:35:48  <AutomatedTester> ok...and that site exists?
+2011-05-02T07:36:01  <dwight> yes it does
+2011-05-02T07:36:12  <dwight> its a site im testing on
+2011-05-02T07:36:40  <dwight> it is using flash also
+2011-05-02T07:36:51  *** krosenvold has joined #selenium
+2011-05-02T07:37:29  <dwight> also with flash it does not record some of the actions
+2011-05-02T07:37:34  <ato> krosenvold: Did you see my email from a while back regarding dates for the meetup?
+2011-05-02T07:38:31  <AutomatedTester> dwight: selenium doesnt work with flash
+2011-05-02T07:39:24  <dwight> yea i relised that but  i started to do recording not using the flash functionality on the site
+2011-05-02T07:39:43  <dwight> any ideas wht my error statck trace means
+2011-05-02T07:40:01  *** mbeierl has joined #selenium
+2011-05-02T07:40:24  <AutomatedTester> Selenium thinks the site doesnt exist
+2011-05-02T07:41:06  <dwight> Thats right but the site does exist
+2011-05-02T07:42:16  *** rbalent has quit IRC
+2011-05-02T07:42:32  <dwight> any suggestions
+2011-05-02T07:42:57  *** nirvdrum has joined #selenium
+2011-05-02T07:43:04  <AutomatedTester> can I see your code quickly?
+2011-05-02T07:43:17  <dwight> ok
+2011-05-02T07:43:22  <AutomatedTester> use a pastebin
+2011-05-02T07:43:57  <dwight> package com.eviltester.seleniumtutorials;
+2011-05-02T07:44:08  <dwight> trying to copy code
+2011-05-02T07:44:14  <ato> gist.github.com
+2011-05-02T07:44:21  <AutomatedTester> use a pastebin
+2011-05-02T07:44:22  <ato> Or whatever.
+2011-05-02T07:45:06  <ato> AutomatedTester: Romania treating you well?
+2011-05-02T07:45:21  <AutomatedTester> its quite nice
+2011-05-02T07:45:26  <AutomatedTester> I like eastern europe
+2011-05-02T07:45:34  <ato> Staying for long?
+2011-05-02T07:45:37  <AutomatedTester> the people are always really friendly
+2011-05-02T07:45:45  <AutomatedTester> till wednesday morning
+2011-05-02T07:45:56  <ato> I've never been, going first time next month to Croatia to talk at viaqa.
+2011-05-02T07:46:06  *** rbalent has joined #selenium
+2011-05-02T07:46:16  *** krosenvold has quit IRC
+2011-05-02T07:46:20  <dwight> sorry how do i use the paste bin
+2011-05-02T07:46:34  <AutomatedTester> google pastebin
+2011-05-02T07:46:35  <selbot> http://pastebin.com/
+2011-05-02T07:46:40  <AutomatedTester> use that ^
+2011-05-02T07:50:32  <dwight> HI HERE it is
+2011-05-02T07:50:34  <dwight> http://pastebin.com/jVxgmEft
+2011-05-02T07:50:39  *** krosenvold has joined #selenium
+2011-05-02T07:50:45  *** sburjan has quit IRC
+2011-05-02T07:51:10  <AutomatedTester> this is junit4
+2011-05-02T07:51:12  <AutomatedTester> ?
+2011-05-02T07:51:12  *** krosenvold has quit IRC
+2011-05-02T07:51:19  <dwight> yea
+2011-05-02T07:51:40  <dwight> unit java
+2011-05-02T07:51:45  <AutomatedTester> delete the redundent setup and teardowns
+2011-05-02T07:51:50  <dwight> junit java
+2011-05-02T07:51:52  <AutomatedTester> only 1 of each per file
+2011-05-02T07:54:53  *** krosenvold has joined #selenium
+2011-05-02T07:55:01  *** sjmikem has quit IRC
+2011-05-02T07:55:37  *** AutomatedTester has quit IRC
+2011-05-02T07:56:00  *** bebef_1987 has joined #selenium
+2011-05-02T07:56:18  *** krosenvold has quit IRC
+2011-05-02T07:57:09  *** bebef_1987 has quit IRC
+2011-05-02T08:02:23  *** krosenvold has joined #selenium
+2011-05-02T08:05:31  <dwight> ok am doin that
+2011-05-02T08:06:25  *** krosenvold has quit IRC
+2011-05-02T08:09:53  *** krosenvold has joined #selenium
+2011-05-02T08:10:07  *** stankley1001 has joined #selenium
+2011-05-02T08:11:13  *** csanchez has joined #selenium
+2011-05-02T08:12:25  *** MadMerlin|work_ is now known as MadMerlin|work
+2011-05-02T08:13:32  *** frohoff has joined #selenium
+2011-05-02T08:13:51  *** zmijunkie has quit IRC
+2011-05-02T08:15:15  *** stankley1001 has quit IRC
+2011-05-02T08:16:38  *** krosenvold has quit IRC
+2011-05-02T08:19:55  *** krosenvold has joined #selenium
+2011-05-02T08:19:58  <dwight> i removed the teardowns but i encountered to many errors so reverted back to my original code
+2011-05-02T08:20:17  *** sjmikem has joined #selenium
+2011-05-02T08:21:25  *** csanchez has quit IRC
+2011-05-02T08:32:53  *** stepheneb has quit IRC
+2011-05-02T08:33:08  *** stepheneb has joined #selenium
+2011-05-02T08:34:15  <DarkRift> ok, so I've tried to install snapsie, yet it still doesn't work ...
+2011-05-02T08:34:25  <DarkRift> is selenium 2 retro compatible with sel 1 ?
+2011-05-02T08:37:37  <adamgoucher> yes, no, and maybe depending on who you ask and in what context
+2011-05-02T08:38:25  <cgoldberg> adamgoucher, good answer :)
+2011-05-02T08:38:43  * adamgoucher is a consultant...
+2011-05-02T08:39:17  <adamgoucher> can you take your existing se-rc scripts and use it against a 2.x server? yes. and you should
+2011-05-02T08:39:40  <adamgoucher> can you magically take your existing se-rc scripts and have them use webdriver goodness? no
+2011-05-02T08:40:11  <DarkRift> and youjust answered the thing I didn't want to hear
+2011-05-02T08:40:15  *** Rajan has joined #selenium
+2011-05-02T08:40:27  <adamgoucher> but is there a bridge to get you from rc to webdriver? if you are java or .net, then there exists a migration path
+2011-05-02T08:40:57  <DarkRift> let me explain the complexity of my need
+2011-05-02T08:40:57  <adamgoucher> ruby and python will be coming shortly (but there are some archicture changes behind the scenes that will happen first)
+2011-05-02T08:41:23  <cgoldberg> DarkRift, depending on the complexity and size of your framework, porting to webdriver might not be so bad... I just ported a framework from sel 1 to webdriver
+2011-05-02T08:41:56  <DarkRift> I didn't start anything yet other than a special IDE format
+2011-05-02T08:41:59  <adamgoucher> of course, if you arent using an abstraction layer like cgoldberg's framework or page objects then there is more work
+2011-05-02T08:42:09  <DarkRift> but then I just heard selenium IDE is for sel 1 and not 2
+2011-05-02T08:42:28  <adamgoucher> se-ide will be growing webdriver export capability in the next month or two
+2011-05-02T08:42:32  <dwight> still need some help
+2011-05-02T08:42:48  <adamgoucher> but even then, it will be very functional programming style, not page objects
+2011-05-02T08:42:50  *** mbeierl has quit IRC
+2011-05-02T08:42:51  <cgoldberg> dwight, what language are you using?
+2011-05-02T08:43:14  <dwight> junit 4
+2011-05-02T08:43:28  *** mbeierl has joined #selenium
+2011-05-02T08:43:49  <dwight> java
+2011-05-02T08:45:07  *** esteele is now known as esteele|away
+2011-05-02T08:45:16  <cgoldberg> dwight, ah.. i don't have experience with webdriver in java... sorry I can't be of more help.    I've been using the Python bindings and really liking webdriver.
+2011-05-02T08:45:47  <dwight> well im still using selemium version 1.3
+2011-05-02T08:46:30  *** krosenvold has quit IRC
+2011-05-02T08:48:32  *** frohoff has quit IRC
+2011-05-02T08:49:24  *** towski has quit IRC
+2011-05-02T08:49:55  <dwight> its hard to find help
+2011-05-02T08:49:55  *** krosenvold has joined #selenium
+2011-05-02T08:51:31  *** reddevil^ is now known as reddeviL
+2011-05-02T08:54:12  *** jimevans has joined #selenium
+2011-05-02T08:54:48  *** nirvdrum has quit IRC
+2011-05-02T08:55:05  *** nirvdrum has joined #selenium
+2011-05-02T08:56:32  *** krosenvold has quit IRC
+2011-05-02T08:59:56  *** krosenvold has joined #selenium
+2011-05-02T09:01:16  *** marlena_ has joined #selenium
+2011-05-02T09:02:19  *** frohoff has joined #selenium
+2011-05-02T09:04:06  *** admc1 has joined #selenium
+2011-05-02T09:06:00  *** frohoff has quit IRC
+2011-05-02T09:06:34  *** krosenvold has quit IRC
+2011-05-02T09:10:05  *** Rajan has quit IRC
+2011-05-02T09:10:26  *** krosenvold has joined #selenium
+2011-05-02T09:11:59  *** frohoff has joined #selenium
+2011-05-02T09:12:59  *** Spanktar has joined #selenium
+2011-05-02T09:13:04  *** Rajan has joined #selenium
+2011-05-02T09:15:42  *** reddeviL is now known as reddevil^
+2011-05-02T09:15:43  *** admc1 has quit IRC
+2011-05-02T09:16:21  *** XCulver has joined #selenium
+2011-05-02T09:16:55  *** krosenvold has quit IRC
+2011-05-02T09:20:16  *** towski has joined #selenium
+2011-05-02T09:20:26  *** krosenvold has joined #selenium
+2011-05-02T09:26:50  *** krosenvold has quit IRC
+2011-05-02T09:26:52  *** dwight has quit IRC
+2011-05-02T09:30:27  *** krosenvold has joined #selenium
+2011-05-02T09:31:23  *** sfbrian has joined #selenium
+2011-05-02T09:32:01  *** victorp_ is now known as phDaemon
+2011-05-02T09:39:22  <vmassol> idea for selenium devs: optionally display the page content when findElement() fails to find the element
+2011-05-02T09:39:42  <vmassol> that would help a lot to diagnose problems
+2011-05-02T09:41:46  <adamgoucher> or catch the elementnotfound exception and do it in your specific context at the approriate places
+2011-05-02T09:41:46  *** frohoff has quit IRC
+2011-05-02T09:42:11  <vmassol> sure this means replacing all calls of getDrvier().findElement() everywhere by our custom findElement
+2011-05-02T09:42:18  <vmassol> and everyone has this need I believe
+2011-05-02T09:42:42  <vmassol> IMO it's always good for a library to provide as much debug info as possible ;)
+2011-05-02T09:42:52  *** csanchez has joined #selenium
+2011-05-02T09:42:56  <vmassol> the problem with the exception strategy
+2011-05-02T09:43:08  <vmassol> is that you have to get the page source *after*
+2011-05-02T09:43:17  <vmassol> which won't work since time will have elapsed in betwee
+2011-05-02T09:43:19  <vmassol> between
+2011-05-02T09:43:53  *** frohoff has joined #selenium
+2011-05-02T09:44:26  <vmassol> (and thus the element might be present in your log when the findElement operated on a different content where the element wasn't there)
+2011-05-02T09:44:42  <jimevans> vmassol: the internal workings of the library will fall prey to the same potential race condition.
+2011-05-02T09:44:42  *** frohoff has quit IRC
+2011-05-02T09:45:23  <vmassol> jimevans: you could get the source before findElement executes so if it fails you know for sure that the element wasn't there and you get more info to debug
+2011-05-02T09:45:41  <vmassol> I think it works better than getting the source after
+2011-05-02T09:45:47  <vmassol> (safer)
+2011-05-02T09:45:59  <jimevans> okay, but it's still possible that you're getting different page source than when you're executing findElement.
+2011-05-02T09:46:05  <vmassol> yes
+2011-05-02T09:46:05  <vmassol> agreed
+2011-05-02T09:46:55  *** krosenvold has quit IRC
+2011-05-02T09:47:20  *** frohoff has joined #selenium
+2011-05-02T09:48:03  <freynaud> vmassol: the debug stuff is very much linked to how you work. As adamgoucher said, catch the exception, and get the source if you want
+2011-05-02T09:48:16  <freynaud> other teams may need to get a screenshot for intance
+2011-05-02T09:48:18  <freynaud> or both
+2011-05-02T09:48:29  <freynaud> or something more fancy based on the test or so.
+2011-05-02T09:48:55  <vmassol> freynaud: yes, this would be useful, it would be great if the exception contained the source before the find
+2011-05-02T09:49:04  *** frohoff has left #selenium
+2011-05-02T09:49:10  <jimevans> or, if you think getting the page source before calling findElement is more reliable, structure your test library appropriately.
+2011-05-02T09:49:43  <freynaud> getting the source isn't free. That's pulling extra info that not everybody uses
+2011-05-02T09:50:06  <vmassol> ok was wondering about how much it costs
+2011-05-02T09:50:12  <freynaud> if you're using a remotewebdriver
+2011-05-02T09:50:18  <vmassol> I thought maybe you already had it cached
+2011-05-02T09:50:32  <vmassol> (in a variable)
+2011-05-02T09:50:40  <freynaud> with the client and the server not on the same network, you will have the sources sent over the internet :)
+2011-05-02T09:50:56  <freynaud> in a world of infinite bandwith, that's not a problem
+2011-05-02T09:51:16  <jimevans> the driver does not cache such things. the driver fetches the value on-demand.
+2011-05-02T09:51:22  <vmassol> ok
+2011-05-02T09:51:27  *** krosenvold has joined #selenium
+2011-05-02T09:52:04  <vmassol> so I guess I have to create a custom JUnit Test Runner to catch the exception....
+2011-05-02T09:52:14  <jimevans> even if getting the page source were "free", sending that much data back down the wire would still be expensive.
+2011-05-02T09:52:31  <jimevans> Even if the "wire" is only on the same machine.
+2011-05-02T09:53:05  <freynaud> i'm not familiar with JUnit, more with testNG
+2011-05-02T09:53:07  <vmassol> you could provide one though ;)
+2011-05-02T09:53:17  <vmassol> a @RunWith(SeleniumRunner.class)
+2011-05-02T09:53:20  <jimevans> if you're calling selenium/webdriver methods directly from your tests, you might want to look at adding a layer of abstaction using the PageObject pattern or similar.
+2011-05-02T09:53:24  <freynaud> but i assume you're using some before and after method to start and close the driver
+2011-05-02T09:53:33  <vmassol> I do use PO pattern
+2011-05-02T09:53:34  <freynaud> when closing , check if there was an exception
+2011-05-02T09:53:59  <freynaud> and in case that was a nosuchelement one, get the extra info you want, like url, source etc
+2011-05-02T09:54:06  <vmassol> the exception is raised when it happens, not when closing right?
+2011-05-02T09:54:21  <freynaud> correct. You'd do that before closing
+2011-05-02T09:54:28  <freynaud> so that the browser is still open
+2011-05-02T09:54:38  <vmassol> so the only solution I can see with junit4 is a custom runner
+2011-05-02T09:54:58  <vmassol> it's not hard to write
+2011-05-02T09:55:14  <vmassol> I can write it and contribute it if you find it useful
+2011-05-02T09:55:17  <jimevans> i think you're overcomplicating this. at some point in your page objects, you have to call findElement() to locate the element.
+2011-05-02T09:55:25  <vmassol> yep
+2011-05-02T09:55:28  <freynaud> i don't know. I use testNG, and it has the exception attached in the afterInvocationListner.
+2011-05-02T09:55:38  <freynaud> so I get it from there without writing custom stuff
+2011-05-02T09:55:40  <vmassol> but I don't want to use try/catch everywehre
+2011-05-02T09:55:46  <vmassol> I want that in one place only
+2011-05-02T09:56:07  <vmassol> so that wherever it happens in any of the tests
+2011-05-02T09:56:07  <jimevans> instead of directly calling findElement, create a new method "findElementWithSource()" in your library or something.
+2011-05-02T09:56:10  <vmassol> I get the lgos
+2011-05-02T09:56:18  <jimevans> simple find/replace.
+2011-05-02T09:56:24  <vmassol> yes that's another soltuion which means rewriting thousands of tests
+2011-05-02T09:56:34  <vmassol> I think a transpaernt solutiuon is better
+2011-05-02T09:56:41  <vmassol> and you could provide it as a helper for your users
+2011-05-02T09:56:41  *** krosenvold has quit IRC
+2011-05-02T09:56:45  <vmassol> it's clean
+2011-05-02T09:56:49  *** lfryc has quit IRC
+2011-05-02T09:56:50  <jimevans> if you're using the page object pattern, it shouldn't mean rewriting tests at all.
+2011-05-02T09:56:56  <jimevans> that's what the pattern is supposed to do.
+2011-05-02T09:57:01  <vmassol> yes sure
+2011-05-02T09:57:06  <vmassol> but it has a lot of limitations
+2011-05-02T09:57:10  *** AutomatedTester has joined #selenium
+2011-05-02T09:57:20  <vmassol> which is why the code is littered with exceptions
+2011-05-02T09:57:25  <jimevans> i don't see that to be true at all, but you're welcome to disagree.
+2011-05-02T09:57:52  <vmassol> I'd love to know how to use the PO without having to write findElements
+2011-05-02T09:57:58  <vmassol> in some cases we have
+2011-05-02T09:58:09  <vmassol> I'll dig them
+2011-05-02T09:58:50  <vmassol> basically it's when the condition is not known before the test executes I think
+2011-05-02T09:59:15  <freynaud> you should really try http://testng.org/doc/documentation-main.html#invokedmethodlistener
+2011-05-02T09:59:32  <freynaud> the testResult contains everything about your test
+2011-05-02T09:59:45  <freynaud> including the exception if there was any, in result.getThrowable
+2011-05-02T09:59:56  <freynaud> so you don't need to propagate anything
+2011-05-02T10:00:05  <freynaud> or handle the exception yourself
+2011-05-02T10:00:11  <vmassol> hmm I can do the same in junit4.8 I think with the new Rule system
+2011-05-02T10:00:20  <vmassol> that's a  possibility indeed
+2011-05-02T10:00:34  <jimevans> guys, i'm sorry, that still seems really overcomplicated to me.
+2011-05-02T10:00:57  *** krosenvold has joined #selenium
+2011-05-02T10:00:59  <vmassol> what part?
+2011-05-02T10:01:28  <vmassol> jimevans: I think I'm missing your point
+2011-05-02T10:01:30  <jimevans> custom test runners, or relying on the rule system of junit.
+2011-05-02T10:01:44  <vmassol> ok let's say I have full PO
+2011-05-02T10:01:47  <jimevans> sure.
+2011-05-02T10:02:07  <jimevans> where every page subclasses from some base page object.
+2011-05-02T10:02:09  <vmassol> when do the WebElement objects get filled with the values?
+2011-05-02T10:02:18  <vmassol> for ex
+2011-05-02T10:02:19  <vmassol>     @FindBy(id = "update")
+2011-05-02T10:02:19  <vmassol>     private WebElement objectForm;
+2011-05-02T10:02:41  <vmassol> ok I remember
+2011-05-02T10:02:43  <vmassol>         ElementLocatorFactory finder = new AjaxElementLocatorFactory(this.getDriver(), getUtil().getTimeout());
+2011-05-02T10:02:44  <vmassol>         PageFactory.initElements(finder, this);
+2011-05-02T10:02:47  <jimevans> ah, you're using the Page Factory, then.
+2011-05-02T10:03:03  <jimevans> (which isn't required to implement Page Objects).
+2011-05-02T10:03:03  <vmassol> yes
+2011-05-02T10:03:08  <vmassol> (ok)
+2011-05-02T10:03:17  <jimevans> this is exactly why I wouldn't rely on it.
+2011-05-02T10:03:45  <jarib> couldn't you write your own ElementLocatorFactory that does fetch the source?
+2011-05-02T10:04:00  *** XCulver has quit IRC
+2011-05-02T10:04:00  *** Spanktar has quit IRC
+2011-05-02T10:04:00  *** RossPatterson has quit IRC
+2011-05-02T10:04:00  *** trishk has quit IRC
+2011-05-02T10:04:01  *** xirkus has quit IRC
+2011-05-02T10:04:02  *** reddevil^ has quit IRC
+2011-05-02T10:04:02  *** dawagner has quit IRC
+2011-05-02T10:04:13  <vmassol> jarib: maybe, need to look at the sources, sounds like a good idea
+2011-05-02T10:04:17  <jimevans> i'm sure it works for the vast majority of cases, but if i were that concerned with getting the page source on a find, i'd customize it.
+2011-05-02T10:04:48  *** XCulver has joined #selenium
+2011-05-02T10:04:49  *** Spanktar has joined #selenium
+2011-05-02T10:04:49  *** RossPatterson has joined #selenium
+2011-05-02T10:04:49  *** trishk has joined #selenium
+2011-05-02T10:04:49  *** xirkus has joined #selenium
+2011-05-02T10:04:49  *** reddevil^ has joined #selenium
+2011-05-02T10:04:49  *** dawagner has joined #selenium
+2011-05-02T10:05:02  <vmassol> jimevans: I'm really a newbie with se2, I'm not fully understanding what you mean
+2011-05-02T10:05:08  <vmassol> you'd customize what?
+2011-05-02T10:05:17  <jimevans> jarib stole my thunder.
+2011-05-02T10:05:22  <vmassol> hehe
+2011-05-02T10:05:56  <jarib> vmassol: also EventFiringWebDriver could be useful
+2011-05-02T10:06:05  <jarib> you could listen for beforeFindBy and fetch the source there
+2011-05-02T10:06:14  <vmassol> oh great didn't know about that
+2011-05-02T10:06:24  *** AutomatedTester has quit IRC
+2011-05-02T10:06:35  <vmassol> can the drivers be chained?
+2011-05-02T10:07:02  <jimevans> drivers or finders?
+2011-05-02T10:07:16  *** sjmikem has quit IRC
+2011-05-02T10:07:18  <jimevans> oh, nvm.
+2011-05-02T10:07:21  <jimevans> i see what you mean.
+2011-05-02T10:07:22  <vmassol> :)
+2011-05-02T10:07:25  <jarib> you wrap the driver in an EventFiringWebDriver and register a listener
+2011-05-02T10:07:34  <jimevans> yeah, what he said.
+2011-05-02T10:07:34  <vmassol> ok
+2011-05-02T10:07:47  <vmassol> got some reading to do now, cool
+2011-05-02T10:07:54  <vmassol> thnaks
+2011-05-02T10:08:19  *** sjmikem has joined #selenium
+2011-05-02T10:11:53  <selbot2_> francois.reynaud half a minute ago - FrancoisReynaud: adding a disabled test showing issue1586. - http://code.google.com/p/selenium/source/detail?r=12097
+2011-05-02T10:12:28  *** skiphuffman__ has joined #selenium
+2011-05-02T10:12:46  *** Spanktar has quit IRC
+2011-05-02T10:13:04  <jarib> #1586
+2011-05-02T10:13:05  <selbot2_> francois.reynaud open/new Grid 2 inconsistent failures - http://code.google.com/p/selenium/issues/detail?id=1586
+2011-05-02T10:24:57  *** sjmikem has quit IRC
+2011-05-02T10:26:43  *** pnitin has quit IRC
+2011-05-02T10:27:24  *** pnitin has joined #selenium
+2011-05-02T10:27:46  *** esteele|away is now known as esteele
+2011-05-02T10:29:56  *** skiphuffman__ has quit IRC
+2011-05-02T10:30:03  *** Spanktar has joined #selenium
+2011-05-02T10:32:00  *** rbalent has quit IRC
+2011-05-02T10:33:17  <freynaud> anyone familiar with jetty's internal here ? I could use some help with issue 1586
+2011-05-02T10:35:03  *** jleyba has joined #selenium
+2011-05-02T10:39:40  <jarib> jleyba: are you about to try out the opacity fix for firefox, or should I?
+2011-05-02T10:40:15  <jleyba> jarib: I'll get around to it at some point today
+2011-05-02T10:40:24  <jarib> ok, cool
+2011-05-02T10:41:28  *** andytinkham has joined #selenium
+2011-05-02T10:51:48  *** esteele is now known as esteele|away
+2011-05-02T10:52:39  *** vrockai has quit IRC
+2011-05-02T10:55:00  *** stepheneb_ has joined #selenium
+2011-05-02T10:55:18  *** andytinkham has quit IRC
+2011-05-02T10:57:18  *** stepheneb has quit IRC
+2011-05-02T10:58:48  *** ahal has joined #selenium
+2011-05-02T11:02:54  *** krosenvold has quit IRC
+2011-05-02T11:04:29  *** stepheneb has joined #selenium
+2011-05-02T11:06:12  *** QAguy has joined #selenium
+2011-05-02T11:06:28  *** krosenvold has joined #selenium
+2011-05-02T11:10:40  *** esteele|away is now known as esteele
+2011-05-02T11:11:33  <barancev> how to run tests in chrome?
+2011-05-02T11:11:49  <barancev> 'The path to the chromedriver executable must be set by the webdriver.chrome.driver system property'
+2011-05-02T11:12:15  <barancev> I mean -- how to run 'go test_chrome' -- where to set this property?
+2011-05-02T11:13:33  <barancev> I don't think it is a good idea to change ChromeDriverTestSuite source code
+2011-05-02T11:14:44  <jimevans> :wiki chromedriver
+2011-05-02T11:14:45  <selbot2_> 1: FrequentlyAskedQuestions: WebDriver FAQs - http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions
+2011-05-02T11:14:45  <selbot2_> 2: ChromeDriver: Information about the Chrome Driver - http://code.google.com/p/selenium/wiki/ChromeDriver
+2011-05-02T11:14:45  <selbot2_> 3: ReleasingSelenium: The release process for a new selenium - http://code.google.com/p/selenium/wiki/ReleasingSelenium
+2011-05-02T11:14:45  <selbot2_> (+ 6 more)
+2011-05-02T11:15:08  *** andytinkham has joined #selenium
+2011-05-02T11:15:15  <jimevans> barancev: result 2 gives you more information
+2011-05-02T11:16:46  <barancev> jimevans: do you mean .usingChromeDriverExecutable(new File("path/to/my/chromedriver")) ?
+2011-05-02T11:17:39  *** marlena_ has quit IRC
+2011-05-02T11:18:16  <jimevans> no, i mean that you must be running Chrome 12.0.712.0 or higher, you must have the ChromeDriver executable downloaded, and it must be on your path.
+2011-05-02T11:19:07  <jimevans> the wiki page is pretty clear.
+2011-05-02T11:19:53  <jimevans> if the ChromeDriver.exe is on your path, you only need to call WebDriver driver = new ChromeDriver();
+2011-05-02T11:20:16  <DarkRift> brb
+2011-05-02T11:20:59  *** DarkRift has quit IRC
+2011-05-02T11:22:51  <barancev> jimevans: I'm on dev channel, chrome is in path, but when I run 'go test_chrome' - I get this message in test_logs
+2011-05-02T11:22:57  <adamgoucher> anyone scripting against jquery sliders?
+2011-05-02T11:23:26  <jimevans> barancev: no, chrome is not what needs to be on your path. chromedriver.exe needs to be on your path.
+2011-05-02T11:23:48  <barancev> aha! ChromeDriver.exe... going to find it...
+2011-05-02T11:23:55  <jimevans> you download chromedriver.exe from http://code.google.com/p/selenium/downloads/list
+2011-05-02T11:29:14  <barancev> works well! but the exe name is the same as Java class ChromeDriver, that's confusing
+2011-05-02T11:30:11  <adamgoucher> apparently davehunt has; http://stackoverflow.com/questions/1357979/how-to-test-the-jquery-ui-slider-widget-with-selenium-ide
+2011-05-02T11:30:24  <selbot2_> jmleyba half a minute ago - JasonLeyba: Throw the correct type of exception. - http://code.google.com/p/selenium/source/detail?r=12098
+2011-05-02T11:32:24  <selbot2_> jmleyba half a minute ago - JasonLeyba: Pass desiredCapabilities to the Selenium RC as BrowserConfigurationOptions. - http://code.google.com/p/selenium/source/detail?r=12099
+2011-05-02T11:34:24  <selbot2_> jmleyba half a minute ago - JasonLeyba: Protect against a NPE. - http://code.google.com/p/selenium/source/detail?r=12100
+2011-05-02T11:35:26  *** admc1 has joined #selenium
+2011-05-02T11:40:01  *** gronky has joined #selenium
+2011-05-02T11:47:53  *** stepheneb has quit IRC
+2011-05-02T11:51:23  <selbot2_> francois.reynaud half a minute ago - FrancoisReynaud: all nodes where removed instead of just the dupped one when a node registers again after a crash. - http://code.google.com/p/selenium/source/detail?r=12101
+2011-05-02T11:53:01  *** DarkRift has joined #selenium
+2011-05-02T11:54:23  <selbot2_> francois.reynaud less than 20 seconds ago - FrancoisReynaud: fixing #1586 by changing the Http client connection manager + enabling the test. - http://code.google.com/p/selenium/source/detail?r=12102
+2011-05-02T12:01:37  *** csanchez has quit IRC
+2011-05-02T12:04:07  *** csanchez has joined #selenium
+2011-05-02T12:05:21  *** admc1 has quit IRC
+2011-05-02T12:06:01  *** adamgoucher has quit IRC
+2011-05-02T12:06:43  *** nirvdrum has quit IRC
+2011-05-02T12:06:53  <jarib> jleyba: can we use http://codereview.appspot.com/ for selenium reviews? or are there limitations on who can do that
+2011-05-02T12:07:15  <jarib> freynaud: ^
+2011-05-02T12:10:42  <jarib> looks like that should be possible
+2011-05-02T12:14:15  <krosenvold> freynaud: r12102 should be fixing quite a few resource leaks in grid
+2011-05-02T12:14:17  <selbot2_> francois.reynaud 20 minutes ago - FrancoisReynaud: fixing #1586 by changing the Http client connection manager + enabling the test.  - http://code.google.com/p/selenium/source/detail?r=12102
+2011-05-02T12:14:49  * krosenvold pats selbot2_
+2011-05-02T12:15:05  <freynaud> can someone with some experience with apache httpclient check http://code.google.com/p/selenium/source/detail?r=12102
+2011-05-02T12:15:15  <krosenvold> freynaud: I just did
+2011-05-02T12:16:13  <krosenvold> I played around with this for the java client too, but we didn't need it
+2011-05-02T12:16:28  <krosenvold> Does it work ;) ?
+2011-05-02T12:16:39  <freynaud> i don't know
+2011-05-02T12:16:51  <krosenvold> More as in "does it seem to run better" ?
+2011-05-02T12:17:19  <freynaud> the test that previously failed for http://code.google.com/p/selenium/issues/detail?id=1586 now passes
+2011-05-02T12:17:28  <freynaud> and the other tests are still green
+2011-05-02T12:17:53  <krosenvold> Cool. The code looks just like something I have in github that I played around with for RemoteWebDriver
+2011-05-02T12:18:07  <krosenvold> But we did not need it because we force a single client thread
+2011-05-02T12:18:16  <freynaud> the part i don't get
+2011-05-02T12:18:22  <freynaud> is how the previous code failed
+2011-05-02T12:18:42  <krosenvold> You're coming in on different threads for each request
+2011-05-02T12:18:52  <freynaud> the connection manager reusing the httpclient and returning some dirty connection seems like a bug to me
+2011-05-02T12:19:23  <krosenvold> No, because it explicitly does not support different threads using the same connection
+2011-05-02T12:19:29  <krosenvold> it's in the FM
+2011-05-02T12:19:48  <jarib> FM?
+2011-05-02T12:19:53  <krosenvold> RTFM
+2011-05-02T12:20:00  <jarib> ah :)
+2011-05-02T12:20:04  <RossPatterson> "Fine Manual"
+2011-05-02T12:20:57  <freynaud> are you saying  ThreadSafeClientConnManager isn't thread safe if I have more than 1 thread ?
+2011-05-02T12:20:58  <DarkRift> fabulous manual
+2011-05-02T12:21:11  <krosenvold> No TSCCM is thread safe
+2011-05-02T12:21:17  <krosenvold> The old one is not
+2011-05-02T12:21:35  <krosenvold> I think your new code looks wonderful. Especially if it works ;)
+2011-05-02T12:22:16  <freynaud> http://code.google.com/p/selenium/source/diff?spec=svn12102&r=12102&format=side&path=/trunk/java/server/src/org/openqa/grid/internal/TestSession.java
+2011-05-02T12:22:21  <freynaud> both use the threadsafe
+2011-05-02T12:22:26  <freynaud> just with different param
+2011-05-02T12:23:10  <krosenvold> Oops. Then we probably have a different problem. Let me load the source
+2011-05-02T12:24:53  <freynaud> thx !
+2011-05-02T12:26:07  <krosenvold> My gut reaction is that you've just wobbled the problem a little bit so it went away. Kind of like an antennae cable with a bad connection
+2011-05-02T12:26:16  <krosenvold> Typical threading problem behaviour
+2011-05-02T12:27:34  *** esteele has quit IRC
+2011-05-02T12:28:31  <krosenvold> freynaud: Sorry. Your fix is good. I can explain why
+2011-05-02T12:28:46  <freynaud> ha, cool
+2011-05-02T12:28:48  <freynaud> why ?
+2011-05-02T12:29:00  <krosenvold> The bug in the old client is when you ned DefaultHttpClient()
+2011-05-02T12:29:03  <krosenvold> s/ned/new
+2011-05-02T12:29:36  <krosenvold> That's where you do thread-unsafe operations, the first one
+2011-05-02T12:29:49  <freynaud> to get the params ?
+2011-05-02T12:29:54  <krosenvold> Yes
+2011-05-02T12:30:16  <krosenvold> Those suckers may seem like value objects but they're definitely not
+2011-05-02T12:30:25  <freynaud> how is DefaultHttpClient client = new DefaultHttpClient(); not thread  safe ?
+2011-05-02T12:30:44  <krosenvold> Again, from the manual
+2011-05-02T12:30:56  <krosenvold>  new DefaultHttpClient(connManager,params); *is* threadsafe
+2011-05-02T12:31:08  <krosenvold> as long as connManager is a TSCCM
+2011-05-02T12:31:22  <freynaud> right, and it default to single
+2011-05-02T12:31:23  <freynaud> pff
+2011-05-02T12:31:30  <krosenvold> pff
+2011-05-02T12:31:34  <freynaud> i thought i was covered by the syncro block
+2011-05-02T12:31:56  <krosenvold> Oh, didnt see that
+2011-05-02T12:32:08  <krosenvold> You may not be
+2011-05-02T12:32:20  <krosenvold> This gets real murky
+2011-05-02T12:32:57  <freynaud> i was using a defaulthttpclient to get the params
+2011-05-02T12:33:07  <freynaud> when new BasicHttpparam does the same thing
+2011-05-02T12:33:12  <freynaud> the later is cleaner
+2011-05-02T12:34:10  <krosenvold> I *think* the synchronized itself is not enough, because the thread-unsafe version does not capture lifecylce events that happen later. If so the copy of params is probably not being accessed properly later in the code. Wild guess
+2011-05-02T12:34:18  <freynaud> maybe some of the params were 'corrupted' and contained some values linked to SingleClientConnManager
+2011-05-02T12:34:51  <krosenvold> That'd be my guess too
+2011-05-02T12:35:05  <freynaud> ok, now try to explain that :)
+2011-05-02T12:35:25  <freynaud> on line 216
+2011-05-02T12:35:26  <freynaud> DefaultHttpClient client = new DefaultHttpClient(connManager,params);
+2011-05-02T12:35:33  <freynaud> if you get rid of the param completly
+2011-05-02T12:35:48  <freynaud> so default to singleclient manager
+2011-05-02T12:35:53  <freynaud> then it works :)
+2011-05-02T12:35:55  *** RossPatterson has quit IRC
+2011-05-02T12:36:27  <krosenvold> Doesn't that back up the idea that the params you're getting in the first version of the code is tainted ?
+2011-05-02T12:36:50  <freynaud> i agree with the tainted param
+2011-05-02T12:37:00  <freynaud> but if i don't use any param for the client
+2011-05-02T12:37:14  <freynaud> then it should default to singleClientConnMgr
+2011-05-02T12:37:17  <krosenvold> It will do it correctly by itself
+2011-05-02T12:37:28  <freynaud> and that should crash for grid
+2011-05-02T12:37:33  <freynaud> but it doesn't
+2011-05-02T12:37:53  <krosenvold> What's the first servlet in grid ? I need to trace the request ?
+2011-05-02T12:38:44  <freynaud> org.openqa.grid.web.servlet.DriverServlet
+2011-05-02T12:39:04  <freynaud> what was happening with issue 1586
+2011-05-02T12:39:10  <krosenvold> Oh, we have 2 driverservlets ;)
+2011-05-02T12:39:21  <freynaud> good naming convention always help :)
+2011-05-02T12:39:57  <freynaud> so you recieve a POST with the content body {ID , '8'} for instance
+2011-05-02T12:40:02  <freynaud> that goes through properly
+2011-05-02T12:40:19  *** adamgoucher has joined #selenium
+2011-05-02T12:40:38  <freynaud> then next request is a GET url for instance. Grid receive the  correct info, request.getMethod = GET
+2011-05-02T12:41:04  <freynaud> but defaultClient will forward {id,'8'}GET
+2011-05-02T12:41:16  *** erwandf has quit IRC
+2011-05-02T12:41:25  <freynaud> there is some left over from the previous request sent with the new one
+2011-05-02T12:41:39  <krosenvold> THis all sounds like httpclient problems
+2011-05-02T12:42:11  <krosenvold> I think your fix looks good.
+2011-05-02T12:42:15  <freynaud> my first guess was that I had some bg with some stream not closed
+2011-05-02T12:42:19  <freynaud> but it dosn't seem like it
+2011-05-02T12:42:42  <krosenvold> You're using httpclient 4.x right ?
+2011-05-02T12:43:11  <freynaud> 4,0,2
+2011-05-02T12:43:45  <krosenvold> The only bad thing I know is if you forget to consume all the content from the entities in the error handler
+2011-05-02T12:43:55  <krosenvold> s/error handler/error handling(
+2011-05-02T12:44:12  <krosenvold> Then r-e-a-l-l-y bad things will happen
+2011-05-02T12:46:05  <krosenvold> You *must* call entity.consumeContent or abort if things go bad
+2011-05-02T12:46:47  <ato> krosenvold: Did you see my follow-up email about the meetup?
+2011-05-02T12:47:32  *** adamgoucher has quit IRC
+2011-05-02T12:48:21  <krosenvold> ato: Yes. May is a bit of a pain point ATM
+2011-05-02T12:48:39  <ato> Okay.  It's much up to you, we are free to move it.
+2011-05-02T12:49:10  <krosenvold> ato: I'll look at calendar tomorrow
+2011-05-02T12:49:20  <ato> Great, thanks. (-:
+2011-05-02T12:49:36  <freynaud> krosenvold: TestSession.java  forward method
+2011-05-02T12:49:58  *** mbeierl has quit IRC
+2011-05-02T12:50:16  <freynaud> i should put all that in a try catch and responseBody.consumeContent() in the catch ?
+2011-05-02T12:51:08  <krosenvold> Line 311
+2011-05-02T12:51:48  * krosenvold is looking at HttpCommandExecutor
+2011-05-02T12:52:36  <freynaud> commandExecutor uses SingleClientConnManager btw
+2011-05-02T12:52:37  <krosenvold> I think what I did there was to make sure we just called "getContent" before any other nasty things could happen
+2011-05-02T12:52:53  <krosenvold> Yes, it's being called on a single thread
+2011-05-02T12:54:07  <freynaud> i had an issue around here, maybe you can help me
+2011-05-02T12:54:07  <jleyba> jarib: Yes, you can use http://codereview.appspot.com for reviews
+2011-05-02T12:54:51  <krosenvold> freynaud: The way I did that can be seen in HttpCommandExecutor line 348
+2011-05-02T12:55:16  <krosenvold> I just slurp the entire content of the stream as fast as I can to avoid chances of explosions
+2011-05-02T12:55:36  <krosenvold> You have the same potential problem in grid.
+2011-05-02T12:56:13  <krosenvold> TestSession line 308-351
+2011-05-02T12:56:33  <krosenvold> Anything bad happens in there and you're in trouble
+2011-05-02T12:57:29  <krosenvold> And other streams will be seeing your content
+2011-05-02T12:57:41  <krosenvold> gtg. My tz says zz
+2011-05-02T12:57:57  <krosenvold> Kids kept me awake all last night
+2011-05-02T13:03:01  *** gronky has quit IRC
+2011-05-02T13:04:50  <DarkRift> freynaud, what is the go command to create the grid package ?
+2011-05-02T13:05:08  <freynaud> ./go release will create it
+2011-05-02T13:05:26  <DarkRift> ok
+2011-05-02T13:05:30  <freynaud> from trunk, that shoud be selenium-server-standalone-2.0rc1.jar
+2011-05-02T13:05:37  <DarkRift> need to install xulrunner-dev firts tho
+2011-05-02T13:05:55  <freynaud> launch it with -role hub for the hub for instnace
+2011-05-02T13:06:27  <DarkRift> is there any demo with it ?
+2011-05-02T13:06:32  <freynaud> -role smthWrong will display an error msg with all the possible param
+2011-05-02T13:06:38  <DarkRift> ok
+2011-05-02T13:08:46  *** gronky has joined #selenium
+2011-05-02T13:11:58  *** brettporter has joined #selenium
+2011-05-02T13:12:28  *** admc1 has joined #selenium
+2011-05-02T13:13:55  *** cburroughs has quit IRC
+2011-05-02T13:17:34  <jarib> DarkRift: you don't need xulrunner-dev to build grid
+2011-05-02T13:17:52  <jarib> that's just a warning
+2011-05-02T13:18:08  <jarib> which we should get rid of
+2011-05-02T13:20:15  *** marlena has joined #selenium
+2011-05-02T13:21:49  *** adamgoucher has joined #selenium
+2011-05-02T13:23:26  <DarkRift> well it doesn't seem to be able to do anything without it
+2011-05-02T13:23:40  <DarkRift> I just did a ./go clean to clean up the folder
+2011-05-02T13:23:52  <DarkRift> let's see if it compiles now
+2011-05-02T13:24:17  *** nirvdrum has joined #selenium
+2011-05-02T13:24:49  *** miker2 has quit IRC
+2011-05-02T13:26:59  *** mashiara has joined #selenium
+2011-05-02T13:32:58  *** meder has joined #selenium
+2011-05-02T13:33:14  <meder> does anyone know how to specify command line args in python selenium?
+2011-05-02T13:34:48  <barancev> I can't pass 'go test_chrome' -- is it normal for the current state of the chrome driver?
+2011-05-02T13:35:07  <barancev> I get errors like this: http://pastie.org/1858119 java.net.SocketException: Software caused connection abort: recv failed
+2011-05-02T13:35:45  *** reddevil^ is now known as reddeviL
+2011-05-02T13:43:40  *** sdimkov has joined #selenium
+2011-05-02T13:45:52  <DarkRift> what's the difference for selenium grid to be run as remotecontrol or webdriver, remotecontrol being selenium 1 ?
+2011-05-02T13:51:03  *** kylls has quit IRC
+2011-05-02T13:51:03  *** kylls1 has quit IRC
+2011-05-02T13:51:44  <mashiara> At least the stand-alone seleniumRC jar handles both old RC and new webdriver APIs fine
+2011-05-02T13:52:25  <meder> hm
+2011-05-02T13:52:32  <mashiara> I have no idea how the grid works internally but I would suppose you can use either API with it too
+2011-05-02T13:52:41  <meder> seems like there's something on http://www.synchtube.com/r/Y4Wh which makes it not work entirely
+2011-05-02T13:52:51  <meder> 'cause i cant access certain elements
+2011-05-02T13:52:58  *** adamgoucher has quit IRC
+2011-05-02T13:53:00  <meder> it probably requires the flash socket or something
+2011-05-02T13:53:06  *** adamgoucher has joined #selenium
+2011-05-02T13:53:18  <meder> does selenium 2 beta 3 support flash natively?
+2011-05-02T13:53:44  <mashiara> I have no idea, I'm just a user (and a new one at that)
+2011-05-02T13:53:54  <DarkRift> no idea
+2011-05-02T13:54:23  <selbot2_> jari.bakken less than 20 seconds ago - JariBakken: Bump the connect timeout in SocketPoller's select() call. - http://code.google.com/p/selenium/source/detail?r=12103
+2011-05-02T13:54:23  <selbot2_> jari.bakken less than 10 seconds ago - JariBakken: Build some atoms useful for Watir implementations. - http://code.google.com/p/selenium/source/detail?r=12104
+2011-05-02T13:54:59  <jarib> ato: that last one may interest you ^
+2011-05-02T13:55:09  <ato> Interesting.
+2011-05-02T13:55:39  <ato> I will check it out tomorrow morning.
+2011-05-02T13:58:32  <DarkRift> freynaud: any example config with demo scripts for selenium grid 2 ?
+2011-05-02T13:58:52  <DarkRift> it's started, just wondering if there was a demo I could try
+2011-05-02T13:58:57  *** esteele has joined #selenium
+2011-05-02T13:59:33  <XCulver> jimevans: are you still moving forward with moving to VS2010 for b4?
+2011-05-02T13:59:54  *** adamgoucher has quit IRC
+2011-05-02T13:59:55  *** adamgouchertoo has joined #selenium
+2011-05-02T14:00:10  <jimevans> XCulver: I had enough push back from people that I haven't done it yet.
+2011-05-02T14:00:49  <XCulver> ah ok i've been fighting putting vs2008 on my home box
+2011-05-02T14:00:56  <jimevans> i'll probably do it right after 2.0b4.
+2011-05-02T14:01:34  *** esteele is now known as esteele|away
+2011-05-02T14:01:42  <XCulver> i'll check then, thanks for the info
+2011-05-02T14:01:44  *** AutomatedTester has joined #selenium
+2011-05-02T14:02:21  <DarkRift> brb
+2011-05-02T14:02:24  *** DarkRift has quit IRC
+2011-05-02T14:08:09  *** adamgouchertoo has quit IRC
+2011-05-02T14:08:45  *** vmassol has quit IRC
+2011-05-02T14:12:56  *** DarkRift has joined #selenium
+2011-05-02T14:21:59  *** admc1 has quit IRC
+2011-05-02T14:22:30  *** AutomatedTester has quit IRC
+2011-05-02T14:33:28  *** gronky has quit IRC
+2011-05-02T14:47:10  <sdimkov> how do you press the back button in selenium-webdriver
+2011-05-02T14:49:16  *** mbeierl has joined #selenium
+2011-05-02T14:49:16  <jarib> sdimkov: what language?
+2011-05-02T14:49:42  <sdimkov> hi jarib. With your ruby module
+2011-05-02T14:49:50  <jarib> driver.navigate.back
+2011-05-02T14:49:56  <sdimkov> thanks
+2011-05-02T14:50:21  <sdimkov> where can I find most detailed wiki/docs about the ruby api
+2011-05-02T14:50:37  <jarib> :apidocs
+2011-05-02T14:50:37  <selbot2_> http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html (java), http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html (ruby)
+2011-05-02T14:50:46  <sdimkov> thanks again :)
+2011-05-02T14:50:50  <sdimkov> one more question
+2011-05-02T14:50:50  <jarib> or e.g. rubydoc.info
+2011-05-02T14:50:55  <jarib> yep
+2011-05-02T14:51:24  <selbot2_> james.h.evans.jr 1 minute ago - JimEvans: Modifying .NET WebDriverBackedSelenium to use selenium-atoms targets in build. This mimics Java's architecture. - http://code.google.com/p/selenium/source/detail?r=12105
+2011-05-02T14:51:32  <sdimkov> you make the ruby exts for both selenium-webdriver and watir webdriver. which is more mature? which would you advice me to use
+2011-05-02T14:51:53  <selbot2_> james.h.evans.jr less than 20 seconds ago - JimEvans: Deleting unused code - http://code.google.com/p/selenium/source/detail?r=12106
+2011-05-02T14:51:54  <jarib> they both build on the same tech (webdriver)
+2011-05-02T14:52:00  *** jimevans has quit IRC
+2011-05-02T14:52:08  <jarib> so their browser support/functionality is roughly equivalent
+2011-05-02T14:52:24  <jarib> which means it's more a matter of personal taste, API-wise
+2011-05-02T14:53:07  <sdimkov> so if I understand right, selenium webdriver gives direct webdriver api, while watir adds another layer i.e. watir's api
+2011-05-02T14:53:15  <jarib> correct
+2011-05-02T14:53:29  <jarib> watir-webdriver is using selenium-webdriver under the hood.
+2011-05-02T14:53:37  *** admc has joined #selenium
+2011-05-02T14:55:44  <sdimkov> I see. another question - Comparing ruby's bindings and java's bindings for selenium 2 are there any big differences. I mean java is the main platform selenium project. are there any features missing in ruby's bindgs.
+2011-05-02T14:56:13  <jarib> not a lot
+2011-05-02T14:56:37  <jarib> most of the org.openqa.selenium.support package is missing in ruby though
+2011-05-02T14:57:02  <sdimkov> what does that package do? excuse if sound stupid :)
+2011-05-02T14:57:28  <jarib> sdimkov: you can read the API docs at the java link above
+2011-05-02T14:57:55  <sdimkov> oks will do. thanks.
+2011-05-02T14:58:35  <sdimkov> I'm just starting to examine selenium for a gsoc project. Can I bother you on email some time in future with questions?
+2011-05-02T14:58:46  <jarib> sure, no problem
+2011-05-02T14:58:59  <jarib> what's the project?
+2011-05-02T14:59:12  <sdimkov> it's one of OpenSUSE's 16 projs
+2011-05-02T14:59:21  <sdimkov> testsuite for OBS web interface
+2011-05-02T14:59:23  <jarib> a web app?
+2011-05-02T14:59:24  <jarib> ah
+2011-05-02T14:59:28  <jarib> i see
+2011-05-02T15:00:10  <sdimkov> it has lots of ajax so selenium1 or functional testing won't be enough
+2011-05-02T15:00:23  <sdimkov> so webdriver seems right choice
+2011-05-02T15:01:04  <sdimkov> anyways thanks for the time :)
+2011-05-02T15:01:19  <jarib> np
+2011-05-02T15:05:58  *** SL-BWood has quit IRC
+2011-05-02T15:18:24  <XCulver> l8r all
+2011-05-02T15:18:28  *** XCulver has quit IRC
+2011-05-02T15:32:41  *** andytinkham has quit IRC
+2011-05-02T15:33:05  *** DarkRift has quit IRC
+2011-05-02T15:35:21  *** esteele|away has left #selenium
+2011-05-02T15:35:24  *** QAguy has quit IRC
+2011-05-02T15:40:29  *** adamgoucher has joined #selenium
+2011-05-02T15:43:11  *** cgoldberg has quit IRC
+2011-05-02T15:43:32  *** admc has quit IRC
+2011-05-02T15:54:06  *** csanchez has quit IRC
+2011-05-02T15:54:34  *** nawk has joined #selenium
+2011-05-02T15:55:54  *** fission6 has joined #selenium
+2011-05-02T15:56:12  <fission6> do i have to use the rc server if i am using the python binding or can i run locally?
+2011-05-02T16:06:36  <eghm> i don't use the python binding, but i'm pretty sure you still need rc server running
+2011-05-02T16:09:06  <fission6> yea seems so
+2011-05-02T16:22:18  *** marlena has quit IRC
+2011-05-02T16:22:35  *** sjmikem has joined #selenium
+2011-05-02T16:24:37  *** marlena_ has joined #selenium
+2011-05-02T16:28:54  *** freynaud has left #selenium
+2011-05-02T16:32:24  *** sfbrian has quit IRC
+2011-05-02T16:32:37  *** sfbrian has joined #selenium
+2011-05-02T16:35:27  *** marlena_ has quit IRC
+2011-05-02T16:39:16  *** nawk has quit IRC
+2011-05-02T16:39:16  *** nawk has joined #selenium
+2011-05-02T16:39:53  <adamgoucher> eghm: if you are using the webdriver part of the python bindings, then no, you dont need the server. but if you are doing rc or remote-webdriver, then yes
+2011-05-02T16:40:26  *** ner0x has joined #selenium
+2011-05-02T16:45:47  *** mbeierl has quit IRC
+2011-05-02T16:49:25  *** jleyba has quit IRC
+2011-05-02T16:50:07  *** marlena has joined #selenium
+2011-05-02T16:55:22  *** cburroughs has joined #selenium
+2011-05-02T16:56:14  <eghm> really, wow, i gotta get updated one of these days
+2011-05-02T17:00:01  *** mbeierl has joined #selenium
+2011-05-02T17:01:55  <eghm> wait, is that the same as always?  I forget about one of the se setups, cuz i never use it
+2011-05-02T17:06:33  <adamgoucher> yup. webdriver doesnt need a server, unless you do it remote
+2011-05-02T17:12:09  *** sfbrian_ has joined #selenium
+2011-05-02T17:15:15  *** sfbrian has quit IRC
+2011-05-02T17:16:43  *** Spanktar has quit IRC
+2011-05-02T17:17:06  *** adamgoucher has quit IRC
+2011-05-02T17:17:16  *** Spanktar has joined #selenium
+2011-05-02T17:47:12  *** Spanktar has quit IRC
+2011-05-02T17:49:13  *** towski has quit IRC
+2011-05-02T17:51:16  *** miker2 has joined #selenium
+2011-05-02T17:51:35  *** ChaosBringer has quit IRC
+2011-05-02T17:51:40  *** marlena has left #selenium
+2011-05-02T18:00:18  *** ahal has quit IRC
+2011-05-02T18:00:45  *** ahal has joined #selenium
+2011-05-02T18:02:27  *** jonathanrwallace has quit IRC
+2011-05-02T18:04:06  *** ChaosBringer has joined #selenium
+2011-05-02T18:04:06  *** kylls1 has joined #selenium
+2011-05-02T18:04:43  *** kylls has joined #selenium
+2011-05-02T18:06:16  *** jonathanrwallace has joined #selenium
+2011-05-02T18:36:22  *** miker has joined #selenium
+2011-05-02T18:37:20  *** sdimkov has quit IRC
+2011-05-02T18:37:24  *** miker2 has quit IRC
+2011-05-02T18:59:30  *** admc has joined #selenium
+2011-05-02T18:59:41  *** ahal has quit IRC
+2011-05-02T19:03:31  *** admc has quit IRC
+2011-05-02T19:04:07  *** nirvdrum has quit IRC
+2011-05-02T19:13:20  *** nitin_ has joined #selenium
+2011-05-02T19:15:54  *** pnitin has quit IRC
+2011-05-02T19:21:16  *** cburroughs has quit IRC
+2011-05-02T19:23:18  *** ner0x has quit IRC
+2011-05-02T19:23:23  *** nitin__ has joined #selenium
+2011-05-02T19:24:04  *** nitin_ has quit IRC
+2011-05-02T19:29:57  *** kylls1 has quit IRC
+2011-05-02T19:30:04  *** kylls has quit IRC
+2011-05-02T19:42:29  *** miker has quit IRC
+2011-05-02T19:45:42  *** miker2 has joined #selenium
+2011-05-02T19:46:35  *** miker2 has quit IRC
+2011-05-02T20:06:20  *** nitin__ has quit IRC
+2011-05-02T20:35:03  *** towski has joined #selenium
+2011-05-02T21:40:49  *** trishk has quit IRC
+2011-05-02T21:42:17  *** trishk has joined #selenium
+2011-05-02T22:03:44  *** reddeviL is now known as reddevil^
+2011-05-02T22:07:56  *** vmassol has joined #selenium
+2011-05-02T22:18:14  *** pnitin has joined #selenium
+2011-05-02T22:20:25  *** erwandf has joined #selenium
+2011-05-02T22:35:53  *** erwan has joined #selenium
+2011-05-02T22:48:40  *** towski has quit IRC
+2011-05-02T22:57:26  *** towski has joined #selenium
+2011-05-02T23:28:53  *** csanchez has joined #selenium
+2011-05-02T23:44:50  *** bebef_1987 has joined #selenium
+2011-05-02T23:54:36  <selbot> New news from builds: WEB-SEHQ-100 was SUCCESSFUL : Updated by adam_goucher@hotmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-100> || WEB-SEHQ-99 was SUCCESSFUL : Updated by Patrick Lightbody, Paul Grandjean, Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-99>

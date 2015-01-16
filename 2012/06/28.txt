@@ -1,0 +1,848 @@
+[IRC logfile - Started Thu Jun 28 13:43:02 2012]
+[13:43:12] selloggingbot has joined #selenium
+[13:43:15] dawagner: RossPatterson: Thanks :)
+[13:43:31] RossPatterson: Ah, so selbot2 has a baby brother?
+[13:44:13] dawagner: There are a few more bots than perhaps are necessary...
+[13:47:11] simonstewart has joined #selenium
+[13:48:54] dawagner: Down side of not being in the office: Need to make food.
+[13:50:46] mreedell has joined #selenium
+[13:52:39] cgoldberg has joined #selenium
+[13:57:31] eanxgeek has joined #selenium
+[13:59:03] dawagner has joined #selenium
+[13:59:43] mdgreenfield has joined #selenium
+[13:59:55] mdgreenfield has left #selenium
+[IRC logfile - Started Thu Jun 28 14:01:08 2012]
+[14:01:08] dawagner: Just found something in my freezer which claims to go off on "July 2".  Not sure whether this year or last year.
+[14:02:42] firearrow: A few days ago I found chicken fillets that was put there sometime 2007. They tasted good
+[14:02:56] firearrow: in my freezer that is
+[14:03:24] dawagner: Technology is magic :)
+[14:03:44] firearrow: indeed
+[14:06:19] Parabola: its crazy how much more stable grid2 hub is when its not running on windows.
+[14:06:34] Parabola: I moved it from winxp to a centOS vm. havent had an issue since
+[14:06:47] cgoldberg: s/grid2hub/allsoftware
+[14:06:52] Parabola: dawagner: most likelikey last year
+[14:06:55] Parabola: cgoldberg: true
+[14:07:06] cgoldberg: :)
+[14:07:09] Parabola: :)
+[14:07:20] Parabola: I was saving time, i already had the windows VMs for ie testing, so i just used it :P
+[14:09:54] arnlaugsson has left #selenium
+[14:13:54] Parabola: RossPatterson: ping
+[14:15:43] Parabola: RossPatterson: In regards to our earlier conversation regarding HTTP status codes. Interesting I found this in the javadocs: org.openqa.selenium.net.UrlChecker
+[14:15:53] Parabola: checks a URL until a 200 status code is given
+[14:16:42] rdk has left #selenium
+[14:17:31] dawagner: OH MY GOD, Curious George is on TV
+[14:19:07] RossPatterson: Parabola: Interesting.  That was added as part of r11884
+[14:19:09] selbot2: 03jmleyba about 1 year ago - JasonLeyba: Updating the Java bindings to work with the new ChromeDriver. | https://code.google.com/p/selenium/source/detail?r=11884 | http://seleniumhq.org/ci.jsp?r=11884
+[14:19:28] RossPatterson: Which seems like an odd place for it to come from.
+[14:19:52] RossPatterson: dawagner: Cartoon or live-action?
+[14:19:53] Parabola: Yeah that does seem like an odd place
+[14:20:03] dawagner: Cartoon :)
+[14:20:14] Parabola: unless of course its some hack to allow ChromeDriver to work properly
+[14:20:19] dawagner: What seems like an odd place for it?
+[14:20:36] dawagner: The ChromeDriver starts an HTTP server, UrlChecker is used to check whether that HTTP server has started up yet
+[14:20:45] Parabola: there you go
+[14:21:00] Parabola: seems kind of "dirty" to me
+[14:21:08] Parabola: (not saying I have a better way of doing it)
+[14:22:07] RossPatterson: Ah, so it
+[14:22:38] RossPatterson: Ah, so it's not a more-general "Check if object <x> can be retrieved via HTTP" service.
+[14:23:45] RossPatterson: :yt Curious George Goes Sledding
+[14:23:46] selbot2: Curious George Goes Sledding (Old Cartoon 1980s) - http://www.youtube.com/watch?v=74-jpae-G78&feature=youtube_gdata
+[14:23:55] dawagner: RossPatterson: Well, it *will* do that, but it's independent of Selenium, so won't do things like use your session's cookies
+[14:25:30] ian_mac has joined #selenium
+[14:25:58] jimevans has joined #selenium
+[14:27:58] dawagner: <3 Curious George :D
+[14:28:28] arnlaugsson has joined #selenium
+[14:28:46] arnlaugsson has left #selenium
+[14:35:17] bluescreen10 has joined #selenium
+[14:37:54] Zack1 has joined #selenium
+[14:40:30] Parabola: There must be a better way to detect this, anyone have any ideas? "if (driver.getCurrentUrl().toString().contains("+") && (!driver.getCurrentUrl().toString().contains("%20"))) {"
+[14:40:50] Parabola: A change was implemented to replace spaces in URLs with +'s
+[14:41:13] Parabola: I suppose I could simply ensure %20 isnt present
+[14:45:49] plightbo has joined #selenium
+[14:47:09] Dude-X_: Parabola, java.util.URLEncoder
+[14:47:48] Dude-X_: you may take the string you expect and encode it, then all get URL
+[14:47:52] Dude-X_: then do the comparison elsewhere
+[14:48:16] Parabola: that seems more complicated than what I've currently got. may I ask why you recommend that way?
+[14:49:39] Dude-X_: say that you're looking for "A boy and his dog" with URLEncoder, you'll get "A+boy+and+his+dog", and then you can do something like driver.getCurrentUrl().contains() or .endswith()
+[14:49:52] Dude-X_: but on the other hand I don't know what you're testing
+[14:50:37] Parabola: Oh I gotcha
+[14:51:17] eanxgeek has joined #selenium
+[14:51:52] Dude-X_: also reduce the calls to getCurrentUrl, that's "slow", get it once store it in a string variable, then do all the comparisons you like
+[14:54:01] Parabola: and appears to not be very reliable on firefox 
+[14:54:03] Parabola: firefox 3*
+[14:54:10] nacho has joined #selenium
+[14:54:13] eanxgeek has joined #selenium
+[14:55:44] stephend has joined #selenium
+[14:59:24] rpereir__ has joined #selenium
+[14:59:59] Parabola: hm, so on chrome, it works, ie and firefox it flips out
+[IRC logfile - Started Thu Jun 28 15:00:32 2012]
+[15:00:32] Dude-X_: maybe it's getting a null string
+[15:00:48] arnlaugsson has joined #selenium
+[15:00:56] Dude-X_: for 2.23/2.24, I had to write a web driver wait class for getCurrentURL
+[15:01:10] arnlaugsson has left #selenium
+[15:01:37] Parabola: I'm writing out the URL to my logs, its giving me the previous URL (before a driver.click) yet the screenshots show the correct page
+[15:01:42] Parabola: that seems like a bugh
+[15:01:56] Dude-X_: i'd get null strings
+[15:01:57] Dude-X_: yeah
+[15:02:03] Parabola: may I show you
+[15:02:53] Dude-X_: yeah sure
+[15:03:04] Dude-X_: i have time, took a sick day; cause i have a gnarly stomachache
+[15:04:17] Parabola: :( sorry to hear that buddy
+[15:04:20] Parabola: https://gist.github.com/df73a26912b9ef9f744e
+[15:04:20] jimevans: do we happen to have any *sigh* nuget users on the channel at the moment?
+[15:04:52] Parabola: Dude-X_: so the URL being reported on IE and FF is the initial BRANDS_PAGE url, but the screenshot shows the page you get after you click the EMI Yoshi link
+[15:05:05] Parabola: on chrome (18 and 20) it works as expected
+[15:07:05] mdgreenfield has joined #selenium
+[15:07:12] dawagner: benadderson: Are you guys using nuget these days? ^^
+[15:07:18] mdgreenfield has left #selenium
+[15:07:32] Dude-X_: Parabola, it is usually my pattern that after a click, I have a wait for new page to load method
+[15:08:06] Dude-X_: or wait for some element to appear or some javascript (usually jQuery.active) to equal a value
+[15:08:55] Parabola: Dude-X_: may I see said method? I have an implicit wait on all drivers, and i added a thread.sleep that didnt work
+[15:09:26] Dude-X_: i don't use implicit waits
+[15:09:42] Dude-X_: i only use explicit waits, buuuut most of my calls are wrapped with web driver waits anyway
+[15:10:41] Dude-X_: web driver wait internally uses a thread.sleep; 
+[15:10:58] Dude-X_: usually if a sleep doesn't work, it means you have to try a different element to wait on
+[15:13:41] Parabola: alright
+[15:13:49] Parabola: do you think the issue could be the try block?
+[15:15:29] benadderson: dawagner: yes we are, why?
+[15:16:02] Dude-X_: Parabola, no the try block seems fine
+[15:16:05] dawagner: jimevans: benadderson is a *sigh* nuget user :)
+[15:16:18] Dude-X_: though like i said, i would call getCurrnetURL once in that if comparison
+[15:16:18] jimevans: dawagner: thanks. :)
+[15:16:27] jimevans: hi benadderson
+[15:16:35] benadderson: hi jimevans
+[15:16:57] Parabola: Dude-X_: thank you sir :)
+[15:16:57] jimevans: can you do a quick test for me?
+[15:17:03] benadderson: sure thing
+[15:17:04] Parabola: i'll let you know if i figure it out
+[15:17:14] opapo has joined #selenium
+[15:17:27] Dude-X_: Parabola, there are times when you want to repeat driver calls, say that clicking on a password box changes the very element itself, then i would do driver.findElement again 
+[15:17:34] jimevans: benadderson: i'm assuming your projects that use webdriver don't also use json.net.
+[15:18:37] benadderson: jimevans: I'm pretty sure they don't, but let me just double check
+[15:20:56] farlan has joined #selenium
+[15:21:24] benadderson: jimevans: nope, grepping the solution for json simply returns the Newtonsoft.json entry in the packages.config
+[15:24:07] jimevans: not using nuget myself, how difficult would it be to set up a quick-and-dirty project that uses nuget, has dependencies on Selenium.WebDriver and Json.NET, which attempts to run a simple google test? I suspect this will fail spectacularly, but i want to see what the error message is.
+[15:24:31] benadderson: should only take a few minutes
+[15:24:35] benadderson: I'll give it a bash now
+[15:24:49] jimevans: thanks, mate.
+[15:27:23] Bebe has joined #selenium
+[15:29:30] benadderson: jimevans: The NuGet package manager in VS prevents me from adding the latest versions of Selenium.WebDriver and Newtonsoft.Json
+[15:29:44] benadderson: Was that the stage at which you expected the error?
+[15:30:19] benadderson: whichever way round I attempt to add them, I get an error
+[15:31:05] sirrobert has joined #selenium
+[15:31:10] jimevans: really. I would've expected a compile time error perhaps, but not at add-reference time.
+[15:32:21] jimevans: i'm going to have to break down and install the *sigh* nuget integration i suppose and try to see for myself if i can replicate the experience others are having.
+[15:32:49] brokenthumbs has joined #selenium
+[15:32:52] benadderson: So if I add WebDriver first (and hence Newtonsoft.json 4.5.1), the action of adding Newtonsoft.Json latest attempts to upgrade the existing reference. It then complains that "Unable to find a version of Selenium.WebDriver that is compatible with Newtonsoft.Json 4.5.7"
+[15:32:54] robbim02 has joined #selenium
+[15:33:19] dawagner: You you not set up nuget deps in a text file? I would have thought there would be a raw XML option...
+[15:33:24] dawagner: (Yay XML)
+[15:33:37] sirrobert: I'm sendind a post to /session with { "browserName":"firefox", "platform":"ANY" }.  I get the error, "Driver info: driver.version: unknown"  Any pointers to resolve this?
+[15:33:41] benadderson: If I add Json first, adding WebDriver errors with "Already referencing a newer version of Newtonsoft.Json"
+[15:34:09] dawagner: sirrobert: :gist a full stack trace
+[15:34:09] selbot2: Please paste >3 lines of text to https://gist.github.com
+[15:34:13] jimevans: so the tool doesn't do the assembly binding redirects like they claim they should do.
+[15:34:16] jimevans: interesting.
+[15:34:44] jimevans: see, we have a fundamental issue with webdriver and nuget.
+[15:35:06] Parabola: Dude-X_: made some headway, now it just fails on firefox :)
+[15:35:17] sirrobert: dawagner: https://gist.github.com/3011715
+[15:35:23] jimevans: and it all boils down to assemblies with strong names.
+[15:35:24] dawagner: jimevans: We could remove JSON from the JSON Wire Protocol, and create our own encoding which couldn't conflict with anything else!
+[15:35:26] Dude-X_: Parabola, maybe add a pause
+[15:35:41] jimevans: dawagner: gaah!
+[15:36:35] dawagner: I vote we call it Jason, and shorten it to Json when writing, so we don't have to update our language
+[15:36:45] Parabola: haha
+[15:36:51] jimevans: dawagner: i know! we could encode everything as xml! :-P
+[15:37:24] jimevans: or even better! soap!
+[15:37:39] dawagner: It IS simple!
+[15:37:43] dawagner: The name says so!
+[15:37:48] jimevans: lol
+[15:37:49] sirrobert: json over xml:   <bracket>{</bracket><token>"name"</token><delimit>:</delimit>...
+[15:38:08] sirrobert: to avoid ambiguity ;)
+[15:38:22] jimevans: i think i just threw up in my mouth.
+[15:38:39] sirrobert: heh
+[15:38:51] hourback has joined #selenium
+[15:39:34] sirrobert: any pointers on resolving the "Driver info: driver.version: unknown" issue? (https://gist.github.com/3011715)
+[15:39:38] jimevans: i don't have a problem with json. it's even a good solution for our purposes, i think. this is purely a packaging issue
+[15:39:50] jimevans: and only a problem in .NET.
+[15:39:53] dawagner: sirrobert: I'm just having a look through the code at your revision :)
+[15:40:00] sirrobert: ok, thanks =)
+[15:40:27] sirrobert: I'm also very ok changing to some other revision or any other structural change =)
+[15:41:09] sirrobert: just trying to write a language binding.
+[15:41:31] dawagner: What language?
+[15:41:34] sirrobert: perl6
+[15:41:39] dawagner: Can you dump out the exact HTTP request you're issuing?
+[15:41:43] dawagner: :wiki jsonwireprotocol
+[15:41:43] selbot2: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[15:42:02] dawagner: Specifically, the exact POST body
+[15:42:16] sirrobert: let me see if I can get at that... one min.
+[15:44:23] dawagner: (Incidentally, is perl6 ever going to be, you know, released?)
+[15:44:42] dawagner: Your POST body should read:
+[15:44:50] sirrobert: "released" means something different for a spec language than for a non-spec language =)
+[15:44:55] dawagner: {"desiredCapabilities":{"platform":"ANY","browserName":"firefox"}}
+[15:44:55] sirrobert: It's already released
+[15:44:58] dawagner: I believe it may currently read:
+[15:45:03] sirrobert: ohhh
+[15:45:06] dawagner: {"platform":"ANY","browserName":"firefox"}
+[15:45:09] sirrobert: you're right
+[15:45:12] sirrobert: let me fix that, one sec
+[15:45:57] sirrobert: great, that fixed it. 
+[15:46:06] rbalent has joined #selenium
+[15:46:06] rbalent has joined #selenium
+[15:46:17] sirrobert: Is there somewhere that has examples of those kinds of things?
+[15:46:31] sirrobert: example JSON, say (for those of us writing language bindings ;)
+[15:46:41] dawagner: You can get it pretty easily
+[15:46:50] dawagner: If you grab the java source
+[15:47:01] sirrobert: ah, ok
+[15:47:03] dawagner: And add a logging line around line 290
+[15:47:09] dawagner: And execute your command in java
+[15:47:19] sirrobert: excellent, thanks
+[15:48:24] dawagner: If you wanted to create a patch for https://code.google.com/p/selenium/wiki/JsonWireProtocol which added sample JSON, I'm sure we'd be happy to commit it :)
+[15:48:37] dawagner: (Note that that file is generated by $TRUNK/wire.py)
+[15:48:41] sirrobert: fair enough =)
+[15:51:19] benadderson: jimevans: If I don't use NuGet to add the reference to Newtonsoft.Json 4.5.7, the "Google for cheese" test compiles and runs just fine
+[15:52:48] jimevans: benadderson: i'd expect that. the problem people are experiencing is when they have a (version unbounded) nuget reference to the Newtonsoft json library and a nuget reference to webdriver.
+[15:52:57] jimevans: i don't know how they get into that state, but they do.
+[15:53:09] barancev: dawagner: it view of the fact that we move all initialization to capabilities, what do you think about ChromeDriver -- why ChromeDriver(Capabilities capabilities) constructor is deprecated?
+[15:53:42] barancev: the recommended way to init ChromeDriver is the use of ChromeOptions atm
+[15:54:54] dawagner: r15195
+[15:54:56] selbot2: 03jmleyba 6 months ago - JasonLeyba on behalf of KenKania: Update ChromeDriver bindings to support the new "chromeOptions" capability type. This requires the latest version of chromedriver (17.0.963.0) from http://code.google.com/p/chromium/downloads/list. | https://code.google.com/p/selenium/source/detail?r=15195 | http://seleniumhq.org/ci.jsp?r=15195
+[15:55:40] dawagner: barancev: We should have that discussion with Jason and Ken :) I think both should be supported, and they should interoperate smoothly
+[15:56:00] benadderson: jimevans: It certainly seems like the tooling should be preventing that from occurring, given my experience just now
+[15:56:05] barancev: ok
+[15:58:31] jimevans: benadderson: maybe. there's definitely a problem if you need multiple versions of the json assembly.
+[IRC logfile - Started Thu Jun 28 16:00:15 2012]
+[16:00:15] barancev: dawagner: I'd just undeprecate these constructors that accept Capabilities parameter
+[16:01:40] Parabola has left #selenium
+[16:02:01] barancev: they should already interoperate, because the constructor that accepts ChromeOptions object converts it to the Capabilities anyway
+[16:02:01] dawagner: barancev: I agree, but I'd have to talk to Ken before doing so :)
+[16:02:12] barancev: ok, I agree
+[16:02:35] jimevans: svn up
+[16:02:39] jimevans: oops.
+[16:02:41] jimevans: wrong window.
+[16:03:35] Parabola has joined #selenium
+[16:04:03] jimevans: fwiw, i *like* having a ChromeOptions class that lets me set strongly-typed options for the chrome driver, rather than a loosely-typed, can-put-anything-into-it map that is capabilities.
+[16:04:17] Chuckleteeth has joined #selenium
+[16:04:50] jimevans: but that's just me
+[16:04:56] Chuckleteeth: hey jim
+[16:05:05] jimevans: Chuckleteeth: s'up.
+[16:05:12] Chuckleteeth: remember that IE scroll top/bottom thing from last week?
+[16:05:21] jimevans: yes. what about it?
+[16:05:29] Chuckleteeth: whats the possibility of something like that getting into the firefox driver
+[16:05:41] Chuckleteeth: firefox is starting to do the same behaviour for some elements
+[16:05:47] jimevans: dawagner: ^^
+[16:06:00] Chuckleteeth: I'm not sure, i thought someone mentioned it was smart enough to check occlusion
+[16:06:21] dawagner: jimevans: What if DesiredCapabilities were given a bunch of specific property setters?
+[16:06:39] dawagner: Like it has for setPlatform
+[16:06:44] bluescreen10 has joined #selenium
+[16:06:46] barancev: can anybody run javascript tests in FF on Linux 64-bit to check #3642? 
+[16:06:47] selbot2: 03 open/new /javascript/atoms/test/select_test.html fails in Firefox on Linux amd64 and MacOS - https://code.google.com/p/selenium/issues/detail?id=3642 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox]
+[16:07:26] jimevans: dawagner: that's fine, i suppose, but different capabilities for different browser-specific drivers becomes a bit of an issue.
+[16:07:30] simonstewart: I'm trying to remove those property setters
+[16:07:59] jimevans: hi, simonstewart! didn't see you were in the channel
+[16:08:05] simonstewart: I lurk. 
+[16:08:18] jimevans: and do so very stylishly, i might add. :)
+[16:08:21] simonstewart: I've been beating my head against some tedious stuff in the Day Job
+[16:08:48] Chuckleteeth: heh, ditto
+[16:09:03] simonstewart: More tedious than the normal tedious stuff though
+[16:09:04] Chuckleteeth: Click() is a bloody menace 
+[16:09:07] simonstewart: I've been having a shit week
+[16:09:39] Chuckleteeth: ok so what would be the plan for the scroll thing?
+[16:10:30] jimevans: so someone who has better knowledge of the internals of the firefox driver, have a look at r17213
+[16:10:33] selbot2: 03james.h.evans.jr@gmail.com 8 days ago - JimEvans: Adds elementScrollBehavior capability to allow users to specify how elements scroll into the viewport for interaction. Default behavior is unchanged (the capability is set to 0), but can be set to scroll to align to the bottom of the viewport by setting the capability to 1. This commit includes an addition to the InternetExplorerOptions of the .NET bindings. | ...
+[16:10:33] selbot2: ... https://code.google.com/p/selenium/source/detail?r=17213 | http://seleniumhq.org/ci.jsp?r=17213
+[16:13:01] barancev: dawagner: today we told with eranm about WindowTest methods testCanMaximizeTheWindowFromFrame and testCanMaximizeTheWindowFromIframe that are failing on linux
+[16:13:08] jimevans: the particularly interesting bit is in Element.cpp where we call the javascript element.scrollIntoView(). we now give the user a choice whether to pass true or false into that function call. firefox driver gives the user no such option.
+[16:13:11] barancev: they are skipped in sauce env with the comment // This test requires a window manager on Linux, and Sauce currently doesn't have one
+[16:13:46] barancev: what is this "window manager"?
+[16:14:52] stephend has joined #selenium
+[16:15:13] Chuckleteeth: i assume the true/false is the top/bottom flag from IE?
+[16:15:30] jimevans: barancev: http://en.wikipedia.org/wiki/Window_manager
+[16:15:48] jimevans: Chuckleteeth: exactly.
+[16:17:48] dawagner: jimevans: Why the new capability?
+[16:19:11] jimevans: path of least resistance. websites often have absolute-positioned elements at the top or bottom, bot not usually both. for clicking elements that might be scrolled underneath the absolute-positioned elements, i wanted to give the user the choice which scrolling model to use.
+[16:19:14] lukeis has joined #selenium
+[16:19:14] selbot2: lukeis: note from jarib about 8 hours ago: iWebDriver appears to redirect to "Location: http://(null):(null)/wd/hub/session/10.10.10.55:3001:1003/\r\n" (on iPad only). known? 
+[16:19:14] selbot2: lukeis: note from jarib about 8 hours ago: on the iPhone it returns "Location: http://10.10.10.136:3001/wd/hub/session/10.10.10.136:3001:1002/\r\n" 
+[16:19:51] barancev: jimevans: dawagner: my ubuntu runs Xfce, is it "window manager" in this sense?
+[16:20:04] jimevans: barancev: exactly so.
+[16:20:41] barancev: so, these tests are failing in presence of a window manager too
+[16:21:40] lukeis: :note jarib  hmmm, not known to me, i haven't seen that yet on ipad. Real device or simulator or both?  (btw the session id does contain the IP address + port + incrementing number starting at 1001 ~ it was my way to make it unique without figuring out how to do UUID in iOS)
+[16:21:41] selbot2: ok!
+[16:22:14] dawagner: jimevans: I have a patch sitting on my machine which does the full computation of where on the screen is hidden by floating elements, and does proper scrolling accordingly
+[16:22:28] dawagner: Unfortunately, the checks are pretty expensive, because they involve iterating over the whole DOM
+[16:22:55] jimevans: i'd guess they would be expensive.
+[16:23:29] jimevans: i'm guessing the scroll behavior switch solves the 80% case, which is why i implemented it.
+[16:23:34] nhirata has joined #selenium
+[16:24:02] dawagner: I should check how the ChromeDriver does its check
+[16:24:24] dawagner: It may have a handy trick :) (or it may do it at a point where we can't)
+[16:24:31] jimevans: indeed.
+[16:24:35] jimevans: that might be instructive.
+[16:24:49] jimevans: need moar coffee!
+[16:26:18] jfunk has joined #selenium
+[16:27:26] klrmn has joined #selenium
+[16:27:30] Chuckleteeth: hey thats pretty cool dawagner
+[16:32:46] ImthePC has joined #selenium
+[16:40:25] adamgouchertoo has joined #selenium
+[16:41:45] AutomatedTester has joined #selenium
+[16:44:22] jimevans: can i use css selectors to select an element with a specific style attribute?
+[16:44:43] lukeis: only if that style is defined in the markup
+[16:44:49] Dude-X_: yeah that^
+[16:45:24] jimevans: "defined in the markup" meaning what, exactly?
+[16:45:30] lukeis: in the html source
+[16:45:53] lukeis: <div style="display:inline-block; color:red">jim's cool</div>
+[16:46:10] lukeis: "div[style$='color:red']"
+[16:46:23] lukeis: or if it's in the middle us * instead of $
+[16:46:27] jimevans: there you go. that's what i'm looking for. thanks.
+[16:46:27] jeichar has joined #selenium
+[16:47:48] kallisti: lukeis: no computed styles?
+[16:48:32] lukeis: that would infer a css definition and thus a selector in the css file that hopefully you could re-use in some way
+[16:48:50] AutomatedTester: lukeis: you free for lunch today?
+[16:48:55] lukeis: AutomatedTester: that i am
+[16:49:01] AutomatedTester: cool
+[16:49:14] AutomatedTester: you, me, admc, and possibly 2 others
+[16:49:16] lukeis: kallisti: the only way to really do a computed style is to use the Javascript Executor
+[16:49:20] AutomatedTester: and santi
+[16:49:22] lukeis: cool :)
+[16:49:35] kallisti: hm, I see. that's odd.
+[16:49:40] kallisti: everything else seems to work with the current DOM.
+[16:49:56] *lukeis would need to test it out if that were true
+[16:50:03] *lukeis can do a simple check
+[16:50:23] Dude-X_: what does element.getCSSProperty() do
+[16:50:36] AutomatedTester: Dude-X_: it returns a css property
+[16:50:39] AutomatedTester: :apidocs
+[16:50:40] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[16:51:32] Dude-X_: which is not a computed style?
+[16:51:51] Dude-X_: ah right, i think i know the difference
+[16:52:26] lukeis: kallisti: doesn't appear that it works from my simple test
+[16:53:00] kallisti: perhaps I misunderstand what "computed style" means?
+[16:53:47] kallisti: or I haven't had a situation occur where I need to check CSS properties and the computed style differs from the static style.
+[16:54:19] kallisti: lukeis: also, what browser?
+[16:54:26] kallisti: IIRC IE doesn't do computed styles at all.
+[16:55:13] dawagner: It should resolve the current effective/computed style of the element
+[IRC logfile - Started Thu Jun 28 17:10:46 2012]
+[17:10:46] arnlaugsson has joined #selenium
+[17:13:18] arnlaugsson has left #selenium
+[17:15:46] Eleccy has joined #selenium
+[17:21:07] klrmn: good morning. on the seleniumhq download page, i clicked on 32 bit IE driver, but the download page then told me that the file has been depreciated? is this just because 64 bit is preferred?
+[17:22:46] klrmn: nope, 64 bit version has the same depreciated message…i guess googlecode is trying to say that seleniumhq's links are out of date
+[17:23:44] klrmn: another argument for latest version permalinks
+[17:27:57] nirvdrum: *deprecated
+[17:34:00] teodosia has left #selenium
+[17:37:07] klrmn: nirvdrum: yes, i'm good at misspelling that particular word
+[17:37:24] nirvdrum: A lot of people are.  It's intriguing.
+[17:37:34] nirvdrum: My demon word is "rapport."
+[17:37:58] kallisti: I'm bad at misspelling incompatibility.
+[17:38:22] kallisti: or, I suppose, bad at spelling
+[17:39:02] nirvdrum: Heh.
+[17:41:40] klrmn: i suspect i had already gone one round with the spell-checker on that word, changing it from depretiated to depreciated, and then failed to notice that it should have been deprecated. hm. interesting. the spell checker says depreciated is a good word.
+[17:42:01] nirvdrum: It is.  It means reducing the value of something over time.
+[17:42:22] nirvdrum: E.g., you need to depreciate capital equipment on US taxes if you're a business.
+[17:42:59] eanxgeek has joined #selenium
+[17:47:04] klrmn: i wonder why software development figured it needed a new word 
+[17:48:07] kallisti: https://en.wikipedia.org/wiki/Deprecation#Etymology
+[17:50:02] klrmn: wikipedia has answers for just about anything =)
+[17:51:27] sfbrian has joined #selenium
+[17:59:23] lfryc has joined #selenium
+[17:59:43] dawagner: simonstewart, AutomatedTester: Interesting thing for reference: <a name="foo"><h2>Foo</h2></a> will not create a new numbered subsection (and also probably isn't valid HTML); <h2><a name="foo">Foo</a></h2> will
+[IRC logfile - Started Thu Jun 28 18:00:16 2012]
+[18:00:16] AutomatedTester: dawagner: all browsers or just Firefox?
+[18:02:07] dawagner: AutomatedTester: Sorry, should have given some context, this is the w3 spec parsing styling magic thing
+[18:02:16] AutomatedTester: oooo
+[18:02:18] simonstewart: Novel
+[18:02:48] dawagner: If you have a look in section 11, half of the items are numbered, and half aren't, right now
+[18:02:54] simonstewart: Ha!
+[18:03:16] simonstewart: I'm going to spend some time writing tomorrow
+[18:03:22] simonstewart: I'm sick of doing stuff I don't care about
+[18:03:29] simonstewart: And I want to push the spec forward
+[18:03:33] dawagner: What's the easiest way for me to send you a pull request with the stuff I've been doing?
+[18:03:48] stephend: AutomatedTester: https://bugzilla.mozilla.org/show_bug.cgi?id=702605 -- do we need help from the rest of the project on that?
+[18:03:49] dawagner: (I figured lying in bed watching TV, I might as well address some of the less thinky action items)
+[18:03:55] stephend: davehunt: ^^^, found the bug
+[18:04:01] stephend: focus manager
+[18:04:08] simonstewart: dawagner: create a patch and ping it over to me
+[18:04:14] dawagner: Will do :)
+[18:04:20] AutomatedTester: stephend: in regard to?
+[18:04:30] davehunt: stephend: cool
+[18:04:36] stephend: "I will need to try this out but I think it probably has been tried before by the Selenium project but I cant see any obvious attempt at it."
+[18:04:39] AutomatedTester: stephend: what is the focus manager issue you are having?
+[18:04:42] davehunt: AutomatedTester: It's not enabled, and I don't know the details
+[18:04:56] stephend: AutomatedTester: we can't run -n 12 with native events
+[18:04:58] davehunt: It was reverted last minute because of a Linux issue I think
+[18:05:01] simonstewart: stephend, AutomatedTester, davehunt: it's not been tried by us on Firefox
+[18:05:03] dawagner: Oh wow, I miss git's "we'll dump things in to less to make it easier for you" in hg :(
+[18:05:06] stephend: that focusmanager test-mode was disabled
+[18:05:07] simonstewart: We've punted it over to you guys
+[18:05:26] AutomatedTester: stephend: its not a trivial fix
+[18:05:28] simonstewart: The native events stuff is implemented in chromium and opera though
+[18:05:30] AutomatedTester: far from it
+[18:05:42] stephend: AutomatedTester: is there anyone who can help?
+[18:05:44] simonstewart: And on that bombshell: g'night all
+[18:05:52] simonstewart: I'm going home to see The Boy and The Wife
+[18:05:53] stephend: a dev?  I can try to talk to smaug and his manger
+[18:05:57] simonstewart has left #selenium
+[18:06:12] AutomatedTester: stephend: smaug can try but he will have to implement it in Selenium code to see
+[18:06:16] stephend: know you're busy, so am trying to find the best way to help
+[18:06:24] stephend: hrm
+[18:06:28] davehunt: ++ we need this fixed really
+[18:06:58] davehunt: although I think it will only solve multiple browser instances for some suites
+[18:06:59] stephend: AutomatedTester: it's more urgent now that we've hit a wall with our Grid capacity, essentially
+[18:07:20] stephend: we can scale horizontally, but at a cost
+[18:07:21] davehunt: like input, which needed it due to events queueing. I think the hover/drag stuff is different
+[18:09:21] AutomatedTester has joined #selenium
+[18:11:07] AutomatedTester: stephend: we need time to prove that nsIDOMWindowUtils works the way we expect
+[18:11:23] stephend: AutomatedTester: is this something Softvision can help with?
+[18:11:30] stephend: like bebe?
+[18:11:34] AutomatedTester: stephend: do they do development on Selenium?
+[18:11:53] stephend: no, but am hoping they can poke around Java
+[18:12:02] dawagner has joined #selenium
+[18:12:18] AutomatedTester: stephend: its JavaScript
+[18:12:34] stephend: oh, that's our code, I see
+[18:13:21] AutomatedTester: stephend: I will have a look at it now and will drop other things
+[18:13:44] stephend: sorry AutomatedTester, not trying to rush you :-(
+[18:14:00] AutomatedTester: stephend: like I said earlier, its not a trivial thing
+[18:14:12] stephend: I understand
+[18:14:48] AutomatedTester: stephend: I need to do it for marionette so might as well do that now
+[18:15:35] stephend: AutomatedTester: <3
+[18:15:48] stephend: should I come up and swish-swish you?
+[18:16:02] AutomatedTester: ooo
+[18:16:06] stephend: :-)
+[18:16:12] AutomatedTester: bridery will get you far
+[18:16:24] *AutomatedTester can see why you are a manager :)
+[18:16:55] stephend: heh
+[18:17:42] detronizator has joined #selenium
+[18:18:02] stephend: AutomatedTester: still in town tomorrow?
+[18:18:11] barancev: huh, another angry user that *demands* us to fix his issue #2863
+[18:18:13] selbot2: 03dawagner@gmail.com open/accepted UnhandledWebDriverError: Permission denied for <http://www.facebook.com> to get property Window.frameElement - https://code.google.com/p/selenium/issues/detail?id=2863 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox]
+[18:18:25] AutomatedTester: barancev: I am writing a reply now
+[18:18:34] detronizator: This seems to be getting pretty steamy: http://code.google.com/p/selenium/issues/detail?id=2863
+[18:18:40] dawagner: Woo, Chrome for iPhone just got announced :)
+[18:18:48] stephend: srsly??
+[18:18:49] AutomatedTester: detronizator: I am writing a reply now
+[18:18:54] stephend: it's not April 1st, is it?
+[18:19:01] dawagner: http://www.youtube.com/watch?v=ANiY0uQHQVg&feature=player_embedded
+[18:19:01] detronizator: AutomatedTester: I read that. Just saying. No worries.
+[18:19:10] stephend: dios mio, you're not lying
+[18:19:22] stephend: dawagner: oh, so, we have a logcat from our crash on Android
+[18:19:27] barancev: AutomatedTester: btw, will this be fixed in FF? which version?
+[18:19:37] dawagner: Ooh, anything useful stand out?
+[18:19:45] AutomatedTester: barancev: the new FirefoxDriver doesnt have it
+[18:19:46] stephend: what I've heard is that Android just likes to terminate stuff when it wants to
+[18:19:49] AutomatedTester: its a addon issue
+[18:20:25] barancev: AutomatedTester: do you mean it is fixed? in trunk? or 2.24?
+[18:21:02] AutomatedTester: barancev: let me rephrase, its not an issue with marionette
+[18:21:02] stephend: dawagner: here's a snippet: http://www.pastie.org/4166729
+[18:21:12] AutomatedTester: marionette === new firefoxdriver
+[18:21:13] stephend: F/Looper  ( 1656): Could not create epoll instance.  errno=24
+[18:21:19] stephend: so, that's fatal
+[18:21:30] stephend: wonder how we troubleshoot that
+[18:21:45] stephend: epoll is a *nix thing
+[18:21:48] *stephend googles errno 24
+[18:22:09] barancev: marionette, mmm... wait, wait, wait....
+[18:22:11] stephend: looks like "too many open files"?
+[18:22:19] evilempire1 has joined #selenium
+[18:23:35] TomasHertus has joined #selenium
+[18:23:53] TomasHertus: Hi
+[18:24:04] TomasHertus: is someone here?
+[18:24:07] evilempire1: yes
+[18:24:14] evilempire1: however i mostly have no clue  :)
+[18:24:16] dawagner: stephend: That's nice.
+[18:24:23] stephend: heh
+[18:24:24] dawagner: I guess we can add a retry loop around that
+[18:24:29] TomasHertus: Hi I have really stupid questin
+[18:24:42] dawagner: AutomatedTester: Apparently we don't have a section on getting CSS values of elements, are we meant to?
+[18:24:47] dawagner: TomasHertus: Try us :)
+[18:24:48] TomasHertus: question, and sry for my english I'm from Czech:)
+[18:25:29] evilempire1: I will use Selenium with PHP and i'm considering whter i should use phpunit selenium extension or one of the others (the facebook; adam gouchers....)
+[18:26:01] evilempire1: not sure about the up and downsides the PHP unit selenium extension manuals talks about "incomplete" webdriver support but doest elaborate any further.....
+[18:26:14] AutomatedTester: ok, I have thrown the cat amongs the pigeons, lets see how he replys
+[18:26:36] davehunt: AutomatedTester: well said
+[18:26:41] evilempire1: the pigeons eat the cat :) 
+[18:26:51] evilempire1: due to wrong specifications
+[18:27:20] evilempire1: well can anyone recommend a good selnium forum ?
+[18:27:21] TomasHertus: OK, I'm writting Rails APP and we have here some integration tests, in Rails you have method delete( - deleting a object from DB), which is generaly accepted as a javascript popup in webbrowser, so I'm using Selenium to test this beahviour, and its working great. Nevertheless, the Selenium Web Broswer shows everytime I run my tests and I wanna hide it....
+[18:27:44] AutomatedTester: dawagner: yes we should
+[18:27:52] detronizator: AutomatedTester: LOL - a rather "polite" answer
+[18:28:02] TomasHertus: and I don't no how...
+[18:28:28] dawagner: TomasHertus: What operating system?
+[18:28:32] dawagner: And which browser?
+[18:28:53] AutomatedTester: detronizator: the guy deleted his original comment
+[18:28:55] TomasHertus: Ubuntu and my colleagues have OS X
+[18:29:08] davehunt: have a great weekend!
+[18:29:10] TomasHertus: its Firefox and Safari
+[18:29:47] TomasHertus: you know, I need to make it somehow clean to don't show it everywhere...
+[18:30:02] TomasHertus: I thought that there is some setup for hide it or something like that...
+[18:30:56] TomasHertus: I already tried to google it, but nothing seemed useful...
+[18:31:33] evilempire1: darn the offical forum needs a 
+[18:31:40] evilempire1: google login 
+[18:31:46] evilempire1: i dislike that somehow
+[18:32:56] dawagner: TomasHertus: install xvfb, and replace `which firefox` with a shell script which calls something like `xvfb-run -a firefox $@`
+[18:33:38] TomasHertus: ok thank you, gonna look on it now...
+[18:33:39] TomasHertus: thanks
+[18:33:51] AutomatedTester: jimevans: do you get the activities emails for bugs and commits?
+[18:37:51] awilson820 has joined #selenium
+[18:44:04] nhirata has joined #selenium
+[18:45:20] dawagner: And now Google's IaaS paltform is announced :) (which is where the CI stuff is sitting :))
+[18:47:28] dawagner: "So this is what happens when you add 10,000 cores to your application"
+[18:47:55] AutomatedTester: dawagner: link?
+[18:48:24] Chuckleteeth: so whats the word then? dawagner are you the firefox driver guy?
+[18:48:27] dawagner: http://www.youtube.com/watch?v=ANiY0uQHQVg&feature=player_embedded live stream
+[18:48:40] dawagner: Chuckleteeth: AutomatedTester and stephend work for Mozilla...
+[18:48:53] Chuckleteeth: oh, interesting...
+[18:49:09] stephend: heya
+[18:49:16] Chuckleteeth: well was a conclusion made about the scroll to top/bottom? 
+[18:49:35] dawagner: I'm sure http://cloud.google.com/ will be updated shortly
+[18:49:58] Chuckleteeth: just trying to determine if i should spend much effort on a workaround 
+[18:50:15] AutomatedTester: dawagner: does that mean GAE will drop its prices to be competitive?
+[18:50:24] stackedsax has joined #selenium
+[18:51:41] dawagner: I have no idea what's going to happen with pricing :) But they're different level services...
+[18:51:50] MadMerlin|work_ has joined #selenium
+[18:54:39] toabctl has joined #selenium
+[18:55:08] CAPS0 has joined #selenium
+[18:55:15] CAPS0 has left #selenium
+[18:58:25] bmulholland has joined #selenium
+[IRC logfile - Started Thu Jun 28 19:00:34 2012]
+[19:00:34] AutomatedTester: Chuckleteeth: what was the question?
+[19:01:13] Chuckleteeth: Ok so last week jimevans added functionality to ie driver so you can specify when it scrolls to the element to bind to the top or the bottom of the page
+[19:01:40] Chuckleteeth: I need this same functionality in firefox, i dont think jim wants to do it as the firefox driver is not his thing
+[19:01:57] AutomatedTester: revision number?
+[19:02:00] Chuckleteeth: So i was just wondering if anyone is planning to do it? or did we decide something else
+[19:02:11] AutomatedTester: Chuckleteeth: I wasnt aware of it
+[19:02:15] Chuckleteeth:  r17213
+[19:02:17] selbot2: 03james.h.evans.jr@gmail.com 8 days ago - JimEvans: Adds elementScrollBehavior capability to allow users to specify how elements scroll into the viewport for interaction. Default behavior is unchanged (the capability is set to 0), but can be set to scroll to align to the bottom of the viewport by setting the capability to 1. This commit includes an addition to the InternetExplorerOptions of the .NET bindings. | ...
+[19:02:18] selbot2: ... https://code.google.com/p/selenium/source/detail?r=17213 | http://seleniumhq.org/ci.jsp?r=17213
+[19:02:19] AutomatedTester: and I dont understand the need
+[19:02:40] Chuckleteeth: the need is because alot of sites have fixed navbars on either the top or the bottom
+[19:03:07] AutomatedTester: ok, how does your site work on Mobile?
+[19:03:13] Chuckleteeth: in my case, the default is to bind to top, so every single link not immediately visible will scroll such that the navbar covers it up
+[19:03:36] Chuckleteeth: this is a new product, the mobile version is mostly unfinished
+[19:03:55] Chuckleteeth: i mean it mostly works, but i dont think much effort was put into making it work well on mobile
+[19:04:03] AutomatedTester: Chuckleteeth: I dont have time to implement it for a while but if you do a patch i am happy to review
+[19:04:49] Chuckleteeth: ive never done a patch :/ but i'll see if i can get some time to do it
+[19:07:27] dmachi1 has joined #selenium
+[19:08:16] Chuckleteeth: AutomatedTester: can this be fixed on the visual studio solution or does it involve java? (i dont have any java experience nor an ide for it)
+[19:08:33] AutomatedTester: Chuckleteeth: it needs to be done in JavaScript
+[19:12:27] ieamcam has joined #selenium
+[19:12:45] AutomatedTester: dawagner: who is on the I/O video now?
+[19:12:47] AutomatedTester: Sergey?
+[19:14:30] lukeis: there's too many buildings in the way for me to see ;)
+[19:14:46] AutomatedTester: its good to see that being rich doesnt mean you have style
+[19:14:53] AutomatedTester: wtf is he wearing Crocs
+[19:15:52] Bebe_home has joined #selenium
+[19:16:29] dmachi has joined #selenium
+[19:18:20] lukeis: i saw the balloon go by...
+[19:21:12] dawagner: AutomatedTester: Yeah, Sergey.  Did you see the demo yesterday?
+[19:21:16] evilempire1: Hi according to my research I can either
+[19:21:16] evilempire1: use the PHPunit Extension  (http://www.phpunit.de/manual/3.1/en/selenium.html )
+[19:21:16] evilempire1: or one of the options offered at  the selenium website. https://github.com/Element-34/php-webdriver 
+[19:21:16] evilempire1: Not sure of the up and downsides.  The phpunit extension allows me directly to use the exports from the IDE. 
+[19:21:16] evilempire1: However Documentaiton talks of "incomplete" support for Webdriver but doesnt specify this any further
+[19:21:16] evilempire1: Adam Goucher's Element-34 indicates that it allows nearly complete  support though I had problems getting the IDE exports to run at all and  if i understood it correclty i need to modify the IDE exports.
+[19:21:30] AutomatedTester: dawagner: no was in VelocityConf
+[19:21:32] dawagner: Be happy he's wearing something on his feet! He normally doesn't...
+[19:21:45] eanxgeek has joined #selenium
+[19:21:49] dawagner: He basically ran on stage to stop a Google+ announcement to show some guys jumping out of a plane :)
+[19:21:59] dawagner: I think CNet put a video cap of it on youtube
+[19:23:23] AutomatedTester: dawagner: I bet it wasnt planned...
+[19:23:28] AutomatedTester: oh wait :P
+[19:24:52] evilempire1: chuckle
+[19:24:55] evilempire1: u can also use php
+[19:25:09] evilempire1: no need for an IDE either
+[19:25:15] evilempire1: phpunit+selenium
+[19:25:18] eanxgeek has joined #selenium
+[19:26:04] detronizator: AutomatedTester: dawagner: what was the point of the second Glass+Hangout thing?
+[19:26:27] AutomatedTester: detronizator: *shrug* Google doing "OMG WE ARE SO COOL"
+[19:26:34] Chuckleteeth: geez how were you able to pull off native events from javascript for firefox
+[19:26:34] detronizator: Someone should tell the "Brackets" people that Cloud9 hs burned them big time
+[19:26:54] Chuckleteeth: i didn't know firefox exposed that sorta thing
+[19:27:00] detronizator: AutomatedTester: yep - that I guess it's the main idea
+[19:27:01] detronizator: :)
+[19:27:48] AutomatedTester: Chuckleteeth: a lot of Firefox is pure JS
+[19:28:24] Chuckleteeth: i hate js : (
+[19:29:21] AutomatedTester: Chuckleteeth: it is the language of the web
+[19:29:30] Chuckleteeth: an unfortunate truth
+[19:30:04] AutomatedTester: what is to hate? I personally like it as a language
+[19:30:37] andreastt: It has its oddities.
+[19:30:47] Chuckleteeth: well maybe i need a proper ide or something but there is no intellisense since everything is so dynamic
+[19:31:02] Chuckleteeth: ive had so many problems just because of a type in a varaible i was using
+[19:31:04] eanxgeek has joined #selenium
+[19:31:12] Chuckleteeth: thats probably my main gripe
+[19:31:32] lukeis: it all depends on what engine is running it... to know what is available <- what I always struggle with :)
+[19:31:34] santiycr has joined #selenium
+[19:32:26] Chuckleteeth: yeah... i mean it can't know everything...its okay when you are debugging it because then there is context...but just coding it out is aweful for me
+[19:33:00] lukeis: and documentation is horrid... most people only know things cause someone else blogged about it... and they know about it because they cracked open said engine to inspect what was available
+[19:33:58] Chuckleteeth: this is gonna take a long time for me to figure out
+[19:34:00] danielwh has joined #selenium
+[19:34:50] lukeis: the basics are typically all you need... and shouldn't take too long :-D
+[19:37:28] santiycr: good morning everyone!
+[19:37:45] *santiycr pretty excited about all the google awesomeness going on this week
+[19:37:47] Chuckleteeth: hurray i found the code culprit
+[19:46:01] drnikki has joined #selenium
+[19:46:08] evilempire1: Hi according to my research I can either
+[19:46:08] evilempire1: use the PHPunit Extension  (http://www.phpunit.de/manual/3.1/en/selenium.html )
+[19:46:08] evilempire1: or one of the options offered at  the selenium website. https://github.com/Element-34/php-webdriver 
+[19:46:08] evilempire1: Not sure of the up and downsides.  The phpunit extension allows me directly to use the exports from the IDE. 
+[19:46:08] evilempire1: However Documentaiton talks of "incomplete" support for Webdriver but doesnt specify this any further
+[19:46:08] evilempire1: Adam Goucher's Element-34 indicates that it allows nearly complete  support though I had problems getting the IDE exports to run at all and  if i understood it correclty i need to modify the IDE exports.
+[19:46:08] evilempire1: Any further Insights would be welcom thanks.
+[19:47:06] ian_mac has joined #selenium
+[19:47:13] AutomatedTester: how do I tell grep to ignore directories?
+[19:47:52] Chuckleteeth: AutomatedTester: so you are using google closure library to scroll the min amount into view for a container
+[19:48:03] Chuckleteeth: it has an option to 'center' the element in the container
+[19:48:15] Chuckleteeth: this would be a differant behaviour then the ieDriver bind to top and bottom
+[19:48:28] AutomatedTester: Chuckleteeth: Possibly
+[19:48:49] *AutomatedTester hasnt looked at that code in awhile
+[19:48:56] andreastt: AutomatedTester: That's a bit hard if you want to recurse.
+[19:49:27] AutomatedTester: andreastt: I want to grep with recurse but ignore .svn directories
+[19:49:29] freeone3000 has joined #selenium
+[19:49:30] andreastt: At least if you want to ignore all directories.
+[19:49:37] andreastt: Ah, that's easy.
+[19:49:40] andreastt: Use ack. (-;
+[19:49:52] AutomatedTester: ok, how do I ack
+[19:50:14] andreastt: grep -rI --exclude-dir="\.svn" says the internet
+[19:50:22] andreastt: `sudo aptitude install ack-grep`
+[19:50:28] andreastt: `ack something`
+[19:50:32] andreastt: As it ignores .svn by default.
+[19:51:18] AutomatedTester: omg... ack where have you been all my life
+[19:51:41] andreastt: .svn is soo annoying.
+[19:51:44] RossPatterson: Subversion ditched the .svn-subdirs-everywhere model in 1.7, now there's just /.svn
+[19:52:13] andreastt: RossPatterson: I'm using the latest Ubuntu, and that only has 1.6.17.
+[19:52:47] RossPatterson: You REALLY want to upgrade.  The time to "svn update
+[19:53:06] RossPatterson: ..." a big workspace has decreased immeasurably.
+[19:53:20] andreastt: I really want to upgrade when it's considered stable by a distro. (-:
+[19:53:49] andreastt: Debian is on 1.6.12, it seems.
+[19:54:14] RossPatterson: Ah.  Well, it'll happen some day.
+[19:54:16] freeone3000: andreastt: Debian stable tends to lag a few years behind. It's "stable" in the same sense that CentOS is, not in any reasonable person's definition.
+[19:54:40] andreastt: freeone3000: That's usually fine by me. (-:
+[19:54:43] RossPatterson: "Fudd's Law: If you push something hard enough, it will fall over."
+[19:55:20] freeone3000: So. This bit me before: Where can I see versions of current browsers supported by a given version of selenium webdriver?
+[19:55:42] andreastt: It varies from implementation to implementation.
+[19:55:56] andreastt: I'd suggest looking at the documentation for that particular version.
+[19:56:13] AutomatedTester: o.m.g. why google are you pushing eclipse
+[19:56:28] detronizator: AutomatedTester: so, u went to velocity not to google io?
+[19:56:35] AutomatedTester: detronizator: yea
+[19:56:42] andreastt: It _would_ be useful with a matrix of supported browsers, though.
+[19:56:54] andreastt: lukeis was working on one a long time ago, I think.
+[19:56:57] detronizator: AutomatedTester: I'm sure velocity was good, but all the freebie are "succulenti"
+[19:57:10] AutomatedTester: detronizator: maybe next year
+[19:57:30] AutomatedTester: problem is I/O doesnt fit in with my role so its a harder sell :)
+[19:57:39] detronizator: AutomatedTester: next year I'll pay myself for the flight - all that stuff makes up for the price
+[19:57:47] detronizator: me too
+[19:58:03] lukeis: andreastt: i'll need to get back on that... the current page http://seleniumhq.org/about/platforms.html#browsers  is utter crap in my opinion
+[19:58:03] detronizator: personally I don't really deal with google services - not for work at least
+[19:58:40] detronizator: even though I'll have to look if the new Google VMs thing can be used to automate PhantomJS build, for free
+[19:58:45] freeone3000: Yeah. It also seems out of date - I know that 2.23.1 added support for firefox 12.
+[19:59:00] andreastt: lukeis: I was just imagining a matrix in my head, then when looking at your link I realized how many different components there actually were. d-:
+[19:59:08] detronizator: AutomatedTester: usually google does have free quota for their stuff
+[19:59:13] freeone3000: The issue is that someone on my team has filed a bug report with firefox 13, and I need to write a regression test with it... and I can't prove it without having selenium running firefox 13, too.
+[19:59:15] detronizator: and it's not 1yy max like Amazon EC2
+[19:59:34] lukeis: andreastt: we'll end up needing multiple matrixes :)
+[IRC logfile - Started Thu Jun 28 20:00:29 2012]
+[20:00:29] AutomatedTester: freeone3000: the latest version of Selenium supports Firefox 13
+[20:00:29] farlan has joined #selenium
+[20:00:48] freeone3000: AutomatedTester: And that'd be 2.24.1, right?
+[20:00:54] freeone3000: Right, it's in the /topic. Thanks.
+[20:00:55] AutomatedTester: I believe so
+[20:01:33] Chuckleteeth: what is the best practices for javascript multiple optional arguments
+[20:01:42] Chuckleteeth: just add them all to the end?
+[20:02:26] AutomatedTester: Chuckleteeth: yea
+[20:02:40] Zack1: I've recently switched over from Selenium IDE to Webdriver using java and I was wondering if anyone knew valid techniques for searching for xpath //a elements in a div?  I used XpathCount in IDE previously.
+[20:03:16] AutomatedTester: Zack1: do findElements(By.xpath('//a')).size()
+[20:03:22] AutomatedTester: or getSize()
+[20:03:28] AutomatedTester: I dont remember
+[20:03:41] Zack1: AutomatedTester: thanks I'll try it out
+[20:04:31] Chuckleteeth: is _ at the end of a method the standard way in the code to refer to a method as private?
+[20:04:39] Chuckleteeth: in javascript
+[20:05:00] AutomatedTester: I tend to put it at the beginning
+[20:05:12] Chuckleteeth: like if i have to modify prepareToInteractWith_
+[20:05:21] Chuckleteeth: whats an easy way to find everyting that calls it
+[20:05:30] Chuckleteeth: besides a regex string search through the entire solution
+[20:06:21] freeone3000: Chuckleteeth: Welcome to dynamic languages.
+[20:06:50] Chuckleteeth: dread.
+[20:07:23] danielwh: Chuckleteeth: In our javascript, trailing _, and a @private annotation in jsdoc means private
+[20:07:40] Chuckleteeth: ok excellent
+[20:07:41] danielwh: And grep.  Very much grep.
+[20:07:51] Chuckleteeth: grep?
+[20:08:00] danielwh: To find callers of a javascript function
+[20:11:20] danielwh: http://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-an-unsorted-array << beautiful answer :)
+[20:11:50] Zack1: AutomatedTester: Worked perfectly .size() thank you
+[20:15:25] hxmws has joined #selenium
+[20:16:21] Chuckleteeth: where is an example of a firefox specific compatibility setting being used inside the javascript?
+[20:20:55] Archdude: Which language does google mostly use for their automated tests?
+[20:21:01] Archdude: or is it a variety of languages
+[20:25:45] evilempire1: a lecturer said they like phython though I think someone pullled  a prank on him :)
+[20:27:15] Chuckleteeth: AutomatedTester: are you still here?
+[20:27:24] lukeis: if i had to guess, i'd say most were Java and there seems to be at least a couple teams doing python
+[20:27:51] lukeis: danielwh: any public comment you can make? ^  ;)
+[20:27:55] AutomatedTester: Chuckleteeth: to a specific version of Firefox?
+[20:27:56] evilempire1: Does anyone have experience with Selenium  with PHP not sure whether i should use it the phpunit selenium extension
+[20:28:07] evilempire1: or with another extension ("the facebook , adam goucher")
+[20:28:57] Chuckleteeth: well no, im just looking through the code,if im going to make an option to center elements, should i trickle the option down much like the current WebDriverServer.enableNativeEvents 
+[20:29:17] Chuckleteeth: thats probably gonna require alot more diff in alot more files
+[20:29:58] evilempire1: whiel being at it do you use a file version management tool (not the right word)
+[20:30:28] evilempire1: ( collaborative revision control seems to be one word)
+[20:30:46] freeone3000: evilempire1: PHPUnit's selenium extension doesn't allow you to use their database extension simultaniously. This may matter.
+[20:31:19] freeone3000: evilempire1: Selenium's only binding (that Selenium knows of) to PHP is through JSON. Get a third-party PHP binding to save yourself a ton of mucking about with curl. The facebook one's okay.
+[20:33:28] dawagner has joined #selenium
+[20:34:35] Chuckleteeth: k well i guess i'll just do it that way
+[20:53:07] hourback has joined #selenium
+[20:53:56] jimevans: yay! new blog post!
+[20:54:25] farlan has joined #selenium
+[20:57:27] Chuckleteeth: what is the deal with this line 
+[20:57:27] Chuckleteeth: this.mouse = Utils.newInstance("@googlecode.com/webdriver/syntheticmouse;1", "wdIMouse");
+[20:59:24] Chuckleteeth: why do we use this to instantiate a SyntheticMouse instead of just using new SyntheticMouse()
+[IRC logfile - Started Thu Jun 28 21:12:12 2012]
+[21:12:12] Chuckleteeth: AutomatedTester: still there?
+[21:21:56] bmulholland has joined #selenium
+[21:23:38] evilempire1 has left #selenium
+[21:23:56] nirvdrum has joined #selenium
+[21:37:47] Swadq has joined #selenium
+[21:43:55] Chuckleteeth: what is the go.bat command for building standalone server?
+[21:44:57] Chuckleteeth: nm i think i got it
+[21:55:37] mdgreenfield has joined #selenium
+[21:57:59] barancev: jimevans: do you know what's the purpose of InternetExplorerElement class in Java binding?
+[21:58:20] barancev: what's difference from RemoteWebElement?
+[21:59:04] jimevans: barancev: i don't know what the purpose is, no.
+[21:59:31] mdgreenfield has left #selenium
+[21:59:57] jimevans: the .net bindings have such a class too, and there's no extension of RemoteWebElement being done there, but for symmetry, it's nice to see it.
+[IRC logfile - Started Thu Jun 28 22:01:02 2012]
+[22:01:02] barancev: there is InternetExplorerElement and FirefoxWebElement, but there is no similar class for Chrome -- what's the difference?
+[22:01:27] Dude-X_: i've only seen people use FirefoxWebElement to override the commands
+[22:01:41] jimevans: historically, there were differences. now that the wire protocol has been unified, there isn't any difference.
+[22:01:53] Chuckleteeth: this javascript annotation stuff
+[22:02:00] Chuckleteeth: how does it work
+[22:02:08] Dude-X_: my project used to override click in FirefoxWebElement so that it can do a isDisplayed check
+[22:02:09] Chuckleteeth: in the curly brackets is the type
+[22:02:15] Chuckleteeth: what does the ! mean or type= mean
+[22:02:28] jimevans: Chuckleteeth: it's used by the closure compiler.
+[22:02:35] barancev: FirefoxWebElement overrides only constructor atm
+[22:02:35] jimevans: i believe
+[22:02:49] Chuckleteeth: so if i had an optional bool param, do i use {boolean=}?
+[22:03:03] jimevans: i honestly don't know. i don't know what the markup syntax is.
+[22:03:43] Chuckleteeth: now i understand why you didn't want to do this jim lol
+[22:03:53] barancev: InternetExplorerElement overrides findElement method, and I can't understand what for
+[22:04:30] jimevans: Chuckleteeth: https://developers.google.com/closure/compiler/docs/js-for-compiler
+[22:05:56] Chuckleteeth: ok thanks
+[22:14:07] barancev: another question: why only InternetExplorerDriver(Capabilities capabilities) constructor prepares WindowsProxyManager for the driver? other constructors don't do that?
+[22:15:01] barancev: what's right -- to prepare WindowsProxyManager or to not prepare?
+[22:15:20] jimevans: barancev: i know next to nothing about the internals of the java bindings. the proxy stuff for IE is an open question.
+[22:15:57] jimevans: though it probably should be handled by the native code, since no other bindings attempt to set the proxy for the IE driver.
+[22:16:20] barancev: ah, I remember this comment by dawagner in an issue
+[22:17:15] barancev: and nirvdrum added a comment that it can be implemented without registry modification
+[22:18:06] barancev: ok, I'll keep this as it
+[22:18:25] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Updating version of NuGet used by build process. | https://code.google.com/p/selenium/source/detail?r=17296 | http://seleniumhq.org/ci.jsp?r=17296
+[22:18:53] testingb0t1 has joined #selenium
+[22:19:25] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Removing unused reference from .NET unit test project | https://code.google.com/p/selenium/source/detail?r=17297 | http://seleniumhq.org/ci.jsp?r=17297
+[22:19:37] nirvdrum: barancev: I'm going to try to look at it again this weekend.
+[22:19:55] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Updating FxCop/StyleCop global warning suppressions file. | https://code.google.com/p/selenium/source/detail?r=17298 | http://seleniumhq.org/ci.jsp?r=17298
+[22:19:58] nirvdrum: I spent a lot of time trying to do multiple proxy values.  But I should probably start with just one that affects all IE processes.
+[22:20:21] jimevans: nirvdrum: that's what i'd do.
+[22:23:19] barancev: so we will be able to clean WindowsProxyManager out of the Java binding?
+[22:29:54] jarib has joined #selenium
+[22:29:54] selbot2: jarib: note from lukeis about 6 hours ago:  hmmm, not known to me, i haven't seen that yet on ipad. Real device or simulator or both?  (btw the session id does contain the IP address + port + incrementing number starting at 1001 ~ it was my way to make it unique without figuring out how to do UUID in iOS) 
+[22:36:56] nacho has joined #selenium
+[22:41:39] kallisti has joined #selenium
+[22:44:55] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Cleaning up some minor IEDriver native code logging. | https://code.google.com/p/selenium/source/detail?r=17299 | http://seleniumhq.org/ci.jsp?r=17299
+[22:45:41] bluescreen10 has joined #selenium
+[22:48:18] dmachi1 has joined #selenium
+[22:55:47] stephend: is there a debug mode for nodes?  we know about --debug for Hub/Grid
+[22:56:28] stephend: er, -debug, rather
+[22:57:15] stephend: oh, nvm
+[22:57:23] stephend: there's -role node -debug
+[22:57:25] stephend: :-P
+[22:59:01] jimevans: detronizator: yt?
+[IRC logfile - Started Thu Jun 28 23:04:24 2012]
+[23:04:24] Zack1 has left #selenium
+[23:04:43] bmulholland_ has joined #selenium
+[23:09:32] detronizator: jimevans: what's up?
+[23:10:00] jimevans: just wanted to check in on the ghostdriver status. is the implementation spreadsheet up to date?
+[23:10:12] detronizator: yes
+[23:10:15] detronizator: updated few days ago
+[23:10:19] jimevans: excellent
+[23:10:19] detronizator: like 2 days ago
+[23:10:40] detronizator: I got a massive backlog at work, so I'm being slow down by my manager ;(
+[23:10:43] jimevans: do you have tests already even for the things not yet covered?
+[23:10:52] detronizator: jimevans: no
+[23:11:00] detronizator: jimevans: building test as we add features
+[23:11:06] jimevans: ok fair enough.
+[23:11:44] jimevans: just thought if the tests already existed, it'd be easy enough to see if i got the implementation right if i decided to take a crack at helping out. :)
+[23:12:04] jimevans: but i'm not above writing tests either. :)
+[23:12:48] detronizator: jimevans: I tried very briefly to see if I could cut&paste tests from within the selenium codebase
+[23:13:03] detronizator: and failed, lost in the mystic fog of the CrazyFunBuild
+[23:13:11] jimevans: heh. that's very easy to do.
+[23:13:51] jimevans: when it gets more complete, i'll be writing a c# ghostdriver binding, which should be able to leverage the .net integration tests.
+[23:14:07] jimevans: in the meantime, i'll take a look at what you've got already.
+[23:14:53] detronizator: jimevans: cool
+[23:17:14] *lukeis has moderated about 20 messages in the last few days that had nothing to do with Selenium but other specific testing tools. Stay relevant to the topic people! ;)
+[23:17:29] rottenrec1 has joined #selenium
+[23:18:48] rottenrec1: i'm completely new to selenium and i'm sorta confused about the Internet Explorer Driver Server
+[23:18:59] rottenrec1: the seleniumhq.org download page says it's recommended
+[23:19:00] jimevans: rottenrec1: what's confusing about it?
+[23:19:12] rottenrec1: and it links to 2.24.1, which appears to be the latest version
+[23:19:21] rottenrec1: but both the 32-bit and x64 versions are marked deprecated
+[23:19:27] rottenrec1: and i can't find any reasons why or any alternatives
+[23:19:55] jimevans: i released a new version today (2.24.2), but forgot to update seleniumhq.
+[23:19:59] jimevans: mea culpa.
+[23:20:01] rottenrec1: ah
+[23:20:22] jimevans: i never use seleniumhq.org, rather i go straight to http://code.google.com/p/selenium/downloads/list.
+[23:20:29] lukeis: bad jim ;)
+[23:20:34] jimevans: yeah, yeah.
+[23:20:36] rottenrec1: alright, i'll do that from now on
+[23:20:37] jimevans: :-P
+[23:20:53] lukeis: want me to update it?
+[23:21:11] jimevans: if you have the time. :) it's about time for me to get outta here.
+[23:21:46] lukeis: k, can do... takes all of 2 secs
+[23:25:51] nhirata has joined #selenium
+[23:28:00] dawagner has joined #selenium
+[23:29:36] dawagner: AutomatedTester: I find it hard to take someone seriously when they rant about how my team of volunteers should dedicate 100% of our dev and QA teams to a problem to "do whatever necessary to at least provide a work-around" when I've already provided a workaround... :p
+[23:31:54] Maior: must try to make the time and willpower to improve that plugin, sigh
+[23:34:24] dawagner: Maior: By "that plugin" do you mean a bot that posts rants directed at me on the bug tracker?
+[23:34:50] dawagner: (Also, Katy Perry Sunday? ;))
+[23:36:24] rottenrec1: "In an era of highly interactive and responsive software processes where many organizations are using some form of Agile methodology, test automation is frequently becoming a requirement for software projects.  Test automation is often the answer."
+[23:36:26] rottenrec1: good writing
+[23:36:31] rottenrec1: =P
+[23:36:47] jimevans: :yt lisa marie presley dirty laundry
+[23:36:48] selbot2: Lisa Marie Presley - Dirty Laundry - http://www.youtube.com/watch?v=boWIJM9i8D0&feature=youtube_gdata
+[23:37:43] dawagner has joined #selenium
+[23:38:48] lukeis: dawagner: you're my hero :)
+[23:39:16] *lukeis loves applying that tag to issues... i've only done it once before
+[23:39:45] dawagner: lukeis: thanks :p
+[23:39:46] Maior: dawagner: lol is that how the bug goes?
+[23:39:49] Maior: *bugs go
+[23:39:59] Maior: dawagner: but yes, the IRC bot plugin
+[23:40:18] Maior: dawagner: meanwhile maybe re KP, need to sort a few things (sorry!)
+[23:40:51] dawagner: By "sort a few things" you mean "listen to every Katy Perry song on loop", right? ;)
+[23:42:02] lukeis: you'll be the first to that katy perry movie dawagner, won't you (i have no clue if it is out already)
+[23:42:49] dawagner: <3 Katy Perry
+[23:43:13] dawagner: I didn't know it was a thing, and then I saw someone mention it was viewable in 3D, and now I'm sad I'm late to the game
+[23:43:39] jimevans: detronizator: quick question: building phantomjs, looks like it's looking for the webkit sources, but they're not in the git repo. suggestions?
+[23:44:10] detronizator: mmm
+[23:44:20] detronizator: which OS are you on?
+[23:44:43] detronizator: jimevans: which OS are you on?
+[23:44:45] jimevans: "cp: cannot stat `src/3rdparty/webkit/Source/JavaScriptCore/release*': No such file or directory
+[23:44:51] jimevans: on linux. ubuntu
+[23:45:16] jimevans: nvm
+[23:45:24] jimevans: i may not have all prereqs.
+[23:45:42] stackedsax has joined #selenium
+[23:45:55] selbot2: 03luke.semerau@gmail.com less than 20 seconds ago - LukeIS: IE driver server is now 2.24.2, updating downloads page | https://code.google.com/p/selenium/source/detail?r=17300 | http://seleniumhq.org/ci.jsp?r=17300
+[23:46:00] lukeis: almost forgot to do that ;)
+[23:46:06] lukeis: later everybody
+[23:46:38] detronizator: jimevans: wait, how are you building it?
+[23:46:42] detronizator: there is a script: ./build.sh
+[23:46:48] detronizator: that builds Qt and than builds PhantomJS
+[23:46:50] jimevans: yep. there we go.
+[23:47:02] jimevans: i was using build.sh, but didn't have all the prereqs.
+[23:47:30] detronizator: mmm, well - all the prereq is Qt, and it's included in the code itself
+[23:47:32] jimevans: it's building now. :)
+[23:47:34] detronizator: you shouldn't need anything else
+[23:52:54] rottenrec1: is the documentation on seleniumhq in the SVN repo?
+[23:53:02] dawagner: rottenrec1: Yep
+[23:53:10] dawagner: https://selenium.googlecode.com/svn/websites I believe
+[23:53:10] rottenrec1: cool, thanks
+[23:53:20] rottenrec1: ah, there it is
+[23:53:22] jimevans: right. later gang.
+[23:53:23] jimevans has left #selenium
+[23:58:41] stackedsax has joined #selenium
+[23:59:27] Dude-X_: :changelogs
+[23:59:30] Dude-X_: :changelog
+[23:59:30] selbot2: .NET: http://goo.gl/SL88L | Java: http://goo.gl/50JPE | Ruby: http://goo.gl/K9ayk | Python: http://goo.gl/Ikm8u | IDE: http://goo.gl/tm4FM

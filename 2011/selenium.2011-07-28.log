@@ -1,0 +1,755 @@
+2011-07-28T00:05:00  *** jeffery has quit IRC
+2011-07-28T00:10:19  *** lfryc has joined #selenium
+2011-07-28T00:17:48  *** Mayank has quit IRC
+2011-07-28T00:17:52  *** donald650 has quit IRC
+2011-07-28T00:22:56  *** hexa has joined #selenium
+2011-07-28T00:24:29  *** mcr_mfc has joined #selenium
+2011-07-28T00:28:59  *** zmijunkie has joined #selenium
+2011-07-28T00:36:15  *** rbalent has joined #selenium
+2011-07-28T00:36:15  *** rbalent has joined #selenium
+2011-07-28T00:43:31  *** ammar01 has joined #selenium
+2011-07-28T00:46:14  *** Mayank has joined #selenium
+2011-07-28T00:59:57  *** zmijunkie_ has joined #selenium
+2011-07-28T01:02:13  *** zmijunkie has quit IRC
+2011-07-28T01:02:14  *** zmijunkie_ is now known as zmijunkie
+2011-07-28T01:04:03  *** dave_miles has quit IRC
+2011-07-28T01:21:49  *** denzil has quit IRC
+2011-07-28T01:25:49  *** Mayank has quit IRC
+2011-07-28T01:26:10  *** Mayank has joined #selenium
+2011-07-28T01:28:50  *** Mayank1 has joined #selenium
+2011-07-28T01:30:02  <eranm> morning.
+2011-07-28T01:30:39  *** Mayank has quit IRC
+2011-07-28T01:57:43  *** andialbrecht is now known as andialbrecht_
+2011-07-28T01:59:27  *** hansjd has joined #selenium
+2011-07-28T02:00:04  *** dave_miles has joined #selenium
+2011-07-28T02:00:19  *** ovnimancer has quit IRC
+2011-07-28T02:00:24  *** zmijunkie has quit IRC
+2011-07-28T02:04:54  *** jimevans has joined #selenium
+2011-07-28T02:05:36  <jimevans> Anybody know where the latest CLA is?
+2011-07-28T02:07:18  *** jimevans has left #selenium
+2011-07-28T02:07:45  *** Yaroon has joined #selenium
+2011-07-28T02:08:51  <Yaroon> Is it possible to have Selenium open new browser windows when it starts? Instead of always starting a new browser session?
+2011-07-28T02:09:32  <Yaroon> Let's say your browser's already running. Starting a test always starts a new browser session. But I'd like it to use the already running browser session.
+2011-07-28T02:11:19  <jarib> not possible atm
+2011-07-28T02:11:31  <jarib> there's #18
+2011-07-28T02:11:32  <selbot2> simon.m.stewart open/new Allow webdriver to attach to a running browser - http://code.google.com/p/selenium/issues/detail?id=18
+2011-07-28T02:11:42  <Yaroon> You could guess I'm an OS X Lion user...
+2011-07-28T02:12:19  <Yaroon> And now after running some tests... when starting Safari again... it re-opens allll those selenium test windows.
+2011-07-28T02:12:33  <Yaroon> jarib: thanks.
+2011-07-28T02:23:05  *** vrockai_ has joined #selenium
+2011-07-28T02:24:56  *** DocD2 has joined #selenium
+2011-07-28T02:25:33  <DocD2> Hi guys,
+2011-07-28T02:26:01  <DocD2> I was just wondering how bug reporting works.  I reported one.  DO I need to follow it up somewhere?
+2011-07-28T02:26:20  <DocD2> http://code.google.com/p/selenium/issues/detail?id=2039&sort=-id&colspec=ID%20Stars%20Type%20Status%20Priority%20Milestone%20Owner%20Summary <_- prob didn't help I misspelt selenium :)
+2011-07-28T02:35:44  *** dawagner has joined #selenium
+2011-07-28T02:37:40  <jarib> DocD2: could you clarify what you mean by "multiline text box" - is that a <textarea> ?
+2011-07-28T02:38:49  *** rajan has joined #selenium
+2011-07-28T02:40:43  <jarib> DocD2: showing the code you're using to enter text would help as well
+2011-07-28T02:51:40  *** cheezy has joined #selenium
+2011-07-28T02:52:48  *** mcr_mfc1 has joined #selenium
+2011-07-28T02:53:26  *** mcr_mfc has quit IRC
+2011-07-28T02:58:26  *** dlam has quit IRC
+2011-07-28T03:04:56  *** Ajay has joined #selenium
+2011-07-28T03:05:57  *** mcr_mfc1 has quit IRC
+2011-07-28T03:16:57  *** andreashaas has joined #selenium
+2011-07-28T03:29:03  <selbot2> eran.mes@gmail.com half a minute ago - Edited wiki page TipsAndTricks through web user interface. - http://code.google.com/p/selenium/source/detail?r=13112
+2011-07-28T03:29:54  *** Samit|away has joined #selenium
+2011-07-28T03:32:40  *** cerber0s has joined #selenium
+2011-07-28T03:33:22  <andreashaas> Hi, when I get the code from the repository and I start 'go.bat test_ie' on Windows 7, already the first test fails with a NoSuchElementException. I think it is because WebDriver.get(page) does not wait until the page is loaded. What can I do to make the tests work?
+2011-07-28T03:34:20  *** rbalent has quit IRC
+2011-07-28T03:34:21  <eranm> andreashaas, have a look at TestWaiter.waitFor
+2011-07-28T03:34:40  <eranm> grep through the code for sample usage
+2011-07-28T03:35:25  <eranm> But note that if the element in question is part of a static content that would otherwise be present when get() returns, it means IE is returning from get() prematurely.
+2011-07-28T03:35:33  *** cerberos has quit IRC
+2011-07-28T03:36:41  <eranm> (which is an undesired behaviour, if I wasn't clear)
+2011-07-28T03:37:52  *** dave_miles has quit IRC
+2011-07-28T03:39:50  <andreashaas> it is a website with static content, and it is searching for the body tag
+2011-07-28T03:41:37  <andreashaas> what can I do when get() returns prematurely?
+2011-07-28T03:44:31  *** kW_ has joined #selenium
+2011-07-28T03:48:02  *** cheezy has quit IRC
+2011-07-28T03:53:03  <selbot2> PaulHammant less than 10 seconds ago - add page on hiring selenium devs - http://code.google.com/p/selenium/source/detail?r=13113
+2011-07-28T03:57:52  *** nirvdrum has joined #selenium
+2011-07-28T04:01:20  <selbot> New news from builds: WEB-SEHQ-181 was SUCCESSFUL : Updated by PaulHammant <http://xserve.openqa.org:8085/browse/WEB-SEHQ-181>
+2011-07-28T04:02:15  <Stuk> does anyone know if it's possible to run an individual test from the Selenium java test suite?
+2011-07-28T04:08:31  *** jeffery has joined #selenium
+2011-07-28T04:11:51  <Ajay> #2149
+2011-07-28T04:11:52  <selbot2>  open/new http://code.google.com/p/selenium/wiki/AndroidDriver  has invalid path to adb - http://code.google.com/p/selenium/issues/detail?id=2149
+2011-07-28T04:13:45  <Ajay> Attached the patch
+2011-07-28T04:20:43  *** zmijunkie has joined #selenium
+2011-07-28T04:20:52  *** jeffery has quit IRC
+2011-07-28T04:23:48  *** nirvdrum has quit IRC
+2011-07-28T04:27:08  *** jonathanrwallace has joined #selenium
+2011-07-28T04:27:17  *** jeffery has joined #selenium
+2011-07-28T04:29:41  *** mcr_mfc has joined #selenium
+2011-07-28T04:33:15  *** ksinkar has joined #selenium
+2011-07-28T04:35:35  <ksinkar> hi
+2011-07-28T04:37:25  <ksinkar> i have installed the selenium highlighting plugin, but the button does not show up in my selenium 1.1.0 IDE, firefox 3.6.18
+2011-07-28T04:37:37  <ksinkar> any ideas as to enable the highlighting button
+2011-07-28T04:39:11  *** pnitin has quit IRC
+2011-07-28T04:42:22  <adamgoucher> ksinkar: ping Samit|away when he un-aways
+2011-07-28T04:43:42  *** Samit|away is now known as Samit
+2011-07-28T04:43:57  <Samit> Hi all
+2011-07-28T04:46:08  <ksinkar> Samit: hi
+2011-07-28T04:46:36  <Samit> Hi ksinkar
+2011-07-28T04:47:33  *** jeffery has quit IRC
+2011-07-28T04:59:30  <Samit> ksinkar: what version of my highlight elements plugin are you using?
+2011-07-28T05:03:18  *** RossPatterson has joined #selenium
+2011-07-28T05:03:42  <ksinkar> Samit: 1.0
+2011-07-28T05:08:26  <Samit> ksinkar: check out http://bit.ly/rstblog
+2011-07-28T05:15:14  *** dereke has joined #selenium
+2011-07-28T05:18:24  *** dave_miles has joined #selenium
+2011-07-28T05:28:05  *** jimevans has joined #selenium
+2011-07-28T05:29:45  *** jimevans has left #selenium
+2011-07-28T05:31:17  *** cgoldberg has joined #selenium
+2011-07-28T05:39:36  <pngl> What is the current situation with screenshots? I see that they're a private method in the ruby gem selenium-webdriver.
+2011-07-28T05:45:32  <jarib> pngl: driver.save_screenshot and driver.screenshot_as should work if the driver supports them
+2011-07-28T05:47:59  <jarib> pngl: the Driver instance will be extended with Selenium::WebDriver::DriverExtensions::TakesScreenshot if the driver supports screenshots
+2011-07-28T05:48:07  <jarib> those shouldn't be private, that's a doc error
+2011-07-28T05:48:50  <pngl> jarib: ah ok, yes I was able to find that in the code. The doc should probably show those modules as included.
+2011-07-28T05:52:14  <jarib> they're included at runtime, based on what the driver supports
+2011-07-28T05:52:20  <pngl> jarib: the OS-level screenshot is gone for good?
+2011-07-28T05:52:58  <jarib> i can't recall an OS-level screenshot
+2011-07-28T05:53:08  <pngl> jarib: in seleniumRC
+2011-07-28T05:53:14  <jarib> and it's much more useful to get the entire page
+2011-07-28T05:53:15  <jarib> ah, ok
+2011-07-28T05:53:20  <jarib> guess that's gone for good :)
+2011-07-28T05:53:30  <pngl> :)
+2011-07-28T05:56:34  <selbot2> jari.bakken half a minute ago - JariBakken: Update docs for TakesScreenshot, Rotatable - http://code.google.com/p/selenium/source/detail?r=13114
+2011-07-28T05:57:44  *** somenickname has joined #selenium
+2011-07-28T05:58:35  *** Samit is now known as Samit|away
+2011-07-28T05:58:48  *** rpk has joined #selenium
+2011-07-28T05:59:01  *** simonstewart has joined #selenium
+2011-07-28T05:59:15  <simonstewart> Ave!
+2011-07-28T06:00:32  <jarib> hi simon
+2011-07-28T06:01:11  *** angshu has quit IRC
+2011-07-28T06:01:19  <jarib> the click atom is scaring me
+2011-07-28T06:01:28  <simonstewart> Generally does
+2011-07-28T06:01:31  <simonstewart> how come?
+2011-07-28T06:01:58  <simonstewart> (It was a lot simpler before I tested it on firefox)
+2011-07-28T06:02:14  *** jeffery has joined #selenium
+2011-07-28T06:02:55  <jarib> i have a failing test where you bot.action.click on <input type="checkbox" onclick="return false"> will select the element
+2011-07-28T06:03:03  <jarib> because it ends up calling bot.action.setSelected
+2011-07-28T06:04:04  *** amitev has quit IRC
+2011-07-28T06:04:12  <simonstewart> But only with !originalState
+2011-07-28T06:04:31  <jarib> hmm
+2011-07-28T06:04:32  <jarib> no
+2011-07-28T06:04:36  <jarib> uh
+2011-07-28T06:04:37  <jarib> yes
+2011-07-28T06:04:41  <simonstewart> :)
+2011-07-28T06:04:49  <jarib> the checkbox isn't set
+2011-07-28T06:04:55  *** cburroughs has joined #selenium
+2011-07-28T06:04:58  <simonstewart> That's the important point
+2011-07-28T06:05:07  <jarib> we set it even though we shouldn't
+2011-07-28T06:05:17  <simonstewart> Is there a reduced test case?
+2011-07-28T06:05:21  <simonstewart> I can hack on it
+2011-07-28T06:05:29  <jarib> cool, one sec
+2011-07-28T06:05:53  *** jimevans has joined #selenium
+2011-07-28T06:05:55  *** Nirdosh has left #selenium
+2011-07-28T06:06:34  <jarib> simonstewart: https://gist.github.com/1111520
+2011-07-28T06:07:04  * simonstewart rolls up sleeves
+2011-07-28T06:07:05  <jarib> the JS tests were passing when i commented out the last few lines of the click atom
+2011-07-28T06:07:13  <jarib> so i ported the first failing java test
+2011-07-28T06:07:19  <jarib> (testClickShouldEmitChangeEventsWhenSelectingElements)
+2011-07-28T06:09:03  *** Nirdosh has joined #selenium
+2011-07-28T06:09:51  <simonstewart> Interesting
+2011-07-28T06:09:56  <simonstewart> Also *argh*
+2011-07-28T06:09:59  <simonstewart> But interesting :)
+2011-07-28T06:11:23  <simonstewart> Ahhh... the onclick handler is returning false.
+2011-07-28T06:11:27  <simonstewart> That might be the problem
+2011-07-28T06:12:37  *** pnitin has joined #selenium
+2011-07-28T06:15:26  <jarib> i was able to get the JS tests passing by just firing the change event where it currently calls bot.action.setSelected
+2011-07-28T06:15:47  <jarib> didn't run the java tests with that change though
+2011-07-28T06:16:00  *** pnitin has quit IRC
+2011-07-28T06:16:29  *** dave_miles has quit IRC
+2011-07-28T06:16:43  *** pnitin has joined #selenium
+2011-07-28T06:17:04  *** dave_miles has joined #selenium
+2011-07-28T06:17:18  <jarib> generally, i guess if we can make everything pass by just firing events and not resorting to ever doing `element.checked = true`, this would take care of itself
+2011-07-28T06:17:29  <simonstewart> But we can't
+2011-07-28T06:17:35  <simonstewart> :(
+2011-07-28T06:18:14  <simonstewart> But we do have a fix
+2011-07-28T06:18:37  <selbot2> simon.m.stewart half a minute ago - SimonStewart: If the click action cancels the default action we should exit - http://code.google.com/p/selenium/source/detail?r=13115
+2011-07-28T06:18:49  <jarib> aha
+2011-07-28T06:18:59  <simonstewart> When you see it, it's obvious
+2011-07-28T06:19:01  <jarib> thanks :)
+2011-07-28T06:19:03  *** nirvdrum has joined #selenium
+2011-07-28T06:19:04  <simonstewart> np
+2011-07-28T06:19:17  <simonstewart> The atoms are nice to work on when all you need to do is hit f5
+2011-07-28T06:20:01  <jarib> indeed
+2011-07-28T06:20:43  <jarib> the log.addHandler thing in the test there - perhaps there's a better way to do it?
+2011-07-28T06:21:01  <jarib> (without adding a new select list)
+2011-07-28T06:22:11  <jimevans> really enjoying reading r13113, especially the last sentence. :)
+2011-07-28T06:22:25  <selbot2> PaulHammant about 3 hours ago - add page on hiring selenium devs - http://code.google.com/p/selenium/source/detail?r=13113
+2011-07-28T06:24:21  <Ajay> it should be uber expert
+2011-07-28T06:26:11  <jimevans> looking at the issue list depresses me.
+2011-07-28T06:26:48  <Stuk> simonstewart: is it possible to run an individual test from the Selenium java test suite?
+2011-07-28T06:27:23  *** Nirdosh has left #selenium
+2011-07-28T06:32:02  *** rajan has quit IRC
+2011-07-28T06:33:55  *** Nirdosh has joined #selenium
+2011-07-28T06:34:03  <selbot2> dawagner half a minute ago - DanielWagnerHall: Cleaning up whitespace - http://code.google.com/p/selenium/source/detail?r=13116
+2011-07-28T06:34:49  <jarib> Stuk: SingleTestSuite.java
+2011-07-28T06:36:39  <Stuk> jarib: thanks
+2011-07-28T06:46:41  <simonstewart> Excuse me one moment
+2011-07-28T06:46:46  <simonstewart> ARGH!
+2011-07-28T06:46:49  <simonstewart> That's better
+2011-07-28T06:47:22  <RossPatterson> Primal Scream therapy?
+2011-07-28T06:47:37  <simonstewart> Can't really do that in the office
+2011-07-28T06:49:07  <Ajay> any doc committer please  review #2149
+2011-07-28T06:49:08  <selbot2>  open/new http://code.google.com/p/selenium/wiki/AndroidDriver  has invalid path to adb - http://code.google.com/p/selenium/issues/detail?id=2149
+2011-07-28T06:49:35  *** pnitin has quit IRC
+2011-07-28T06:49:44  *** Mayank1 has quit IRC
+2011-07-28T06:50:22  *** pnitin has joined #selenium
+2011-07-28T06:58:21  *** jds has joined #selenium
+2011-07-28T06:59:55  *** Mayank has joined #selenium
+2011-07-28T07:00:04  *** jeffery has quit IRC
+2011-07-28T07:03:19  *** jds has quit IRC
+2011-07-28T07:03:39  *** jds has joined #selenium
+2011-07-28T07:05:38  *** pnitin has quit IRC
+2011-07-28T07:08:15  *** angshu has joined #selenium
+2011-07-28T07:09:36  *** andytinkham has joined #selenium
+2011-07-28T07:12:51  *** tunabum has joined #selenium
+2011-07-28T07:13:12  *** andytinkham1 has joined #selenium
+2011-07-28T07:13:57  *** nirvdrum has quit IRC
+2011-07-28T07:14:09  *** QAGuy has joined #selenium
+2011-07-28T07:14:16  *** nirvdrum has joined #selenium
+2011-07-28T07:15:33  *** Ajay has quit IRC
+2011-07-28T07:16:25  *** andytinkham has quit IRC
+2011-07-28T07:20:04  *** jxpx777 has joined #selenium
+2011-07-28T07:20:33  <selbot2> eran.mes@gmail.com less than 10 seconds ago - EranMes: SVG tests on Firefox 3.0 / Linux with native events are broken. For now, skip them. - http://code.google.com/p/selenium/source/detail?r=13117
+2011-07-28T07:23:00  *** pnitin has joined #selenium
+2011-07-28T07:25:39  *** csanchez has quit IRC
+2011-07-28T07:26:32  <jarib> jimevans: what are possible reasons IE will fail to inject the xpath engine?
+2011-07-28T07:26:37  <jarib> trying to help a watir-webdriver user
+2011-07-28T07:27:00  <jarib> he's running a script that works well for me
+2011-07-28T07:27:16  <simonstewart> no document being present would screw it up
+2011-07-28T07:27:21  <simonstewart> (yay! Races!)
+2011-07-28T07:27:37  *** brettporter has quit IRC
+2011-07-28T07:27:43  <jarib> it's a static html page
+2011-07-28T07:28:17  *** brettporter has joined #selenium
+2011-07-28T07:31:14  *** csanchez has joined #selenium
+2011-07-28T07:31:29  <simonstewart> no script elements can cause a rucks
+2011-07-28T07:31:32  <simonstewart> ruckus
+2011-07-28T07:31:52  *** cerberos has joined #selenium
+2011-07-28T07:32:10  <simonstewart> This debugging lark is proving somewhat tricky
+2011-07-28T07:32:22  *** ner0x has joined #selenium
+2011-07-28T07:32:35  <selbot2> berrada@google.com half a minute ago - DouniaBerrada: On behalf of AbdullahNayeem, adding ApplicationCache.clear() and toString() functions. - http://code.google.com/p/selenium/source/detail?r=13118
+2011-07-28T07:35:14  *** hexa has quit IRC
+2011-07-28T07:36:36  *** jxpx777 has quit IRC
+2011-07-28T07:38:47  *** cgp_ has joined #selenium
+2011-07-28T07:38:58  <cgp_> Is there a way to use the context menu to open up a link in a new window?>
+2011-07-28T07:39:07  *** hubc has joined #selenium
+2011-07-28T07:39:43  <cgp_> or should "openWindow(targetLinkURL, someId)" good enough
+2011-07-28T07:40:20  <dawagner> Why do we check in cpp/IEDriver/Generated/*.h?
+2011-07-28T07:40:48  <jimevans> dawagner: so that you can open and build from within Visual Studio.
+2011-07-28T07:41:03  <jimevans> jarib: dunno about when xpath engine would fail to inject.
+2011-07-28T07:41:07  <dawagner> That's sane :) Thanks for clarifying!
+2011-07-28T07:42:21  *** ksinkar has quit IRC
+2011-07-28T07:42:51  *** donald650 has joined #selenium
+2011-07-28T07:43:14  <hubc> any grid2 experts in here?
+2011-07-28T07:44:19  <cgp_> I'll be satisfied with openWindow
+2011-07-28T07:44:30  <cgp_> Simpler question, how do I close a window
+2011-07-28T07:45:33  *** XRayCulver has joined #selenium
+2011-07-28T07:46:26  <simonstewart> driver.close();
+2011-07-28T07:46:29  *** Archdude has quit IRC
+2011-07-28T07:46:55  *** brettporter has quit IRC
+2011-07-28T07:46:56  *** Archdude has joined #selenium
+2011-07-28T07:54:18  <hubc> Anyone have any insight to "Selenium::WebDriver::Error::UnhandledError: Session not available" when trying to run a test in grid2?
+2011-07-28T07:54:33  <hubc> full error: "Error: #<Selenium::WebDriver::Error::UnhandledError: Session not available - [ext. key 1311861936714] (org.openqa.grid.internal.GridException)> "
+2011-07-28T07:55:25  <simonstewart> The mozilla chaps might
+2011-07-28T07:56:01  <hubc> Does this mean all the nodes w/ available browsers are taken?
+2011-07-28T07:56:18  <hubc> or is it something else... grid should queue tests, right?
+2011-07-28T07:57:16  <RossPatterson> cgp_: Which API - RC or WebDriver?
+2011-07-28T07:57:45  *** dmachi has joined #selenium
+2011-07-28T07:57:45  *** dmachi1 has quit IRC
+2011-07-28T08:03:30  *** dmachi has quit IRC
+2011-07-28T08:06:03  *** jxpx777 has joined #selenium
+2011-07-28T08:06:23  <cerberos> simonstewart: do you know what the can of worms are in this ticket? http://code.google.com/p/selenium/issues/detail?id=2061
+2011-07-28T08:06:49  <simonstewart> Off the top of my head, no
+2011-07-28T08:07:06  <cgp_> simonstewart: I meant the browser window that I opened with openWindow
+2011-07-28T08:07:14  <cgp_> simonstewart: I ended up using the javascript method
+2011-07-28T08:07:18  <cgp_> simonstewart: seems to do the job
+2011-07-28T08:07:22  <simonstewart> driver.close() will close that
+2011-07-28T08:07:29  <simonstewart> once you've "switchTo()" it
+2011-07-28T08:07:35  <cerberos> who is theautomatedtester? are they here?
+2011-07-28T08:07:38  <cgp_> simonstewart: and... unfortunately, I mean in the IDE
+2011-07-28T08:07:40  <simonstewart> David Burns
+2011-07-28T08:07:49  <simonstewart> cgp_: selectWindow()
+2011-07-28T08:07:54  <simonstewart> then close
+2011-07-28T08:07:58  * cgp_ feels like a bastard child for using the IDE
+2011-07-28T08:07:59  <simonstewart> then selectWindow(null)
+2011-07-28T08:08:02  <cerberos> I'm seeing some odd behaviour I think is related
+2011-07-28T08:08:05  <cgp_> just close?
+2011-07-28T08:08:09  <cgp_> as the command?
+2011-07-28T08:08:19  <cgp_> I thought I checked that one
+2011-07-28T08:08:36  <cgp_> ( I did do the selectWindow though )
+2011-07-28T08:08:43  <cerberos> thanks, I'll add to the ticket
+2011-07-28T08:08:44  <simonstewart> should be okay
+2011-07-28T08:08:57  <cgp_> I'm encouraged by the selectWindow(null) though, that looked a little odd, but I figured that was how it selected the "main" window
+2011-07-28T08:09:12  <RossPatterson> cgp_: Not a bastard, just slightly unloved :-)
+2011-07-28T08:09:22  <cgp_> You know, the IDE is a good tool
+2011-07-28T08:09:28  <cgp_> you guys shouldn't be so tough on it
+2011-07-28T08:09:30  <RossPatterson> cgp_: So, the RC API and the IDE commands are basically the same.
+2011-07-28T08:09:42  <cgp_> RossPatterson: I use both, but I always start writing my tests with the IDE
+2011-07-28T08:10:34  <cgp_> I would love, love love to stay and chat, but I'm going to have to use this computer for my presentation
+2011-07-28T08:10:36  <cgp_> (selenium)
+2011-07-28T08:10:43  <cgp_> I promise, it won't be a disaster
+2011-07-28T08:10:54  <cgp_> O.O
+2011-07-28T08:10:55  <cgp_> :)
+2011-07-28T08:11:07  *** cgp_ has quit IRC
+2011-07-28T08:11:26  <RossPatterson> cgp_: Which means (for both IDE and RC), the openWindow command will open a link in a second window, and the close command will close the currently-selected window.
+2011-07-28T08:11:36  <RossPatterson> Rats, typed too slow.
+2011-07-28T08:14:15  *** sjmikem has joined #selenium
+2011-07-28T08:14:29  <cerberos> can changes be made to a webdriver firefox profile while the browser is running? I'm finding they don't work, not sure if it's a bug or not
+2011-07-28T08:14:51  <simonstewart> no. You can't change the profile mid-flight
+2011-07-28T08:15:03  <cerberos> that explains it, thanks
+2011-07-28T08:15:43  <cerberos> and profile.update_preferences(), what it the purpose of that as it seems not necessary?
+2011-07-28T08:15:58  <simonstewart> It's not a public API
+2011-07-28T08:16:01  <simonstewart> (or it shouldn't be)
+2011-07-28T08:16:21  <cerberos> I see from the code it says it writes to disk, but not sure when that's necessary
+2011-07-28T08:16:31  <cerberos> ok, seems to be public in python
+2011-07-28T08:16:39  <simonstewart> When we start the firefox instance it needs a profile laid out in a directory
+2011-07-28T08:16:43  <simonstewart> it's used for that
+2011-07-28T08:19:35  *** pnitin has quit IRC
+2011-07-28T08:25:22  <jimevans> right. lunch, then 3 hour meeting. later all.
+2011-07-28T08:25:25  *** jimevans has left #selenium
+2011-07-28T08:25:31  <simonstewart> ttfn
+2011-07-28T08:26:08  <simonstewart> Right. How the heck am I getting logging from goog.debug.Logger when there are no handlers configured?
+2011-07-28T08:27:20  *** angshu has quit IRC
+2011-07-28T08:34:39  *** Guest59768 has joined #selenium
+2011-07-28T08:41:06  <jarib> nice, new chromedriver is out
+2011-07-28T08:42:25  <simonstewart> Sweet
+2011-07-28T08:44:27  <jarib> i'd like to commit the chrome profile stuff, so speak up if you think i'm heading down the wrong path
+2011-07-28T08:45:02  <simonstewart> Right. I'll go read that email
+2011-07-28T08:45:56  *** hansjd has left #selenium
+2011-07-28T08:46:20  <jarib> since they've implemented the zipped-profile stuff in the driver, i guess that means the client libs will be responsible for creating valid profiles (incl. installing extensions etc.?)
+2011-07-28T08:46:31  <simonstewart> So it seems
+2011-07-28T08:47:00  *** kW_ has quit IRC
+2011-07-28T08:47:10  <jarib> i haven't looked into extensions, but tweaking the preference file is handy
+2011-07-28T08:47:12  <simonstewart> I have no idea how to lay one of those things out on disk, though
+2011-07-28T08:47:34  <selbot2> dawagner half a minute ago - DanielWagnerHall: Removing deleted methods.  Fixes issue 2041. - http://code.google.com/p/selenium/source/detail?r=13119
+2011-07-28T08:47:43  <jarib> hopefully not a lot more complicated than with firefox
+2011-07-28T08:47:46  *** pnitin has joined #selenium
+2011-07-28T08:49:06  <simonstewart> Having a common profile model feels like it might be nice
+2011-07-28T08:49:06  *** pnitin has quit IRC
+2011-07-28T08:49:32  <simonstewart> But a FirefoxProfile and a ChromeProfile are radically different beasts
+2011-07-28T08:49:47  *** pnitin has joined #selenium
+2011-07-28T08:50:25  <simonstewart> Nice to see you kept the two separat
+2011-07-28T08:50:28  <simonstewart> e
+2011-07-28T08:51:19  *** cakehero has joined #selenium
+2011-07-28T08:52:55  *** stephend has joined #selenium
+2011-07-28T08:53:33  *** pnitin has quit IRC
+2011-07-28T08:54:03  <selbot2> dawagner less than 20 seconds ago - DanielWagnerHall: Default text to empty string if none found.  Fixes issue 1650. - http://code.google.com/p/selenium/source/detail?r=13120
+2011-07-28T08:54:04  *** csanchez has quit IRC
+2011-07-28T08:54:18  *** pnitin has joined #selenium
+2011-07-28T08:55:38  *** zmijunkie has quit IRC
+2011-07-28T08:55:40  *** cheezy has joined #selenium
+2011-07-28T08:56:38  *** Ajay has joined #selenium
+2011-07-28T08:59:04  <DocD2> Could someone confirm what the correct method of adding a line break into a textarea is using Selenium.  The IDE uses <br/> but this fails when running the tests on Chrome via RC. Am I using the wrong command
+2011-07-28T09:01:09  *** Ajay has quit IRC
+2011-07-28T09:01:18  *** AutomatedTester has joined #selenium
+2011-07-28T09:05:51  *** mcr_mfc has quit IRC
+2011-07-28T09:06:45  *** somenickname has quit IRC
+2011-07-28T09:11:42  *** ethan1991 has joined #selenium
+2011-07-28T09:11:55  <ethan1991> yo
+2011-07-28T09:12:36  <simonstewart> :yt u can't touch this mc hammer
+2011-07-28T09:12:37  <selbot2> MC Hammer - U Can't Touch This - http://www.youtube.com/watch?v=otCpCn0l4Wo&feature=youtube_gdata
+2011-07-28T09:13:01  <simonstewart> sorry. Thought you said "Stop"
+2011-07-28T09:14:08  <simonstewart> Who doesn't wish that they had a pair of Hammer Pants
+2011-07-28T09:14:12  <simonstewart> ?
+2011-07-28T09:14:44  <ethan1991> no i
+2011-07-28T09:14:51  <DocD2> me
+2011-07-28T09:14:52  <AutomatedTester> hi hi
+2011-07-28T09:15:51  <ethan1991> not i *
+2011-07-28T09:17:37  <new2b2> Hi, I've asked this question before but because I am doing python I wasn't able to figure out a solution. I want to try to figure out if my problem is selenium or python lack of knowledge. (Using webdriver)
+2011-07-28T09:17:44  <new2b2> I have the regular Selenium script that sets up the browsers and whatnot. This script calls functionA inside it. functionA is located in its own file. is it possible for functionA to know where to run selenium commands if i pass the 'self.driver to it?. Or will I have to get the session ID and then pass session ID and specify that sessionid is where the function should be aiming at?
+2011-07-28T09:19:09  *** vrockai_ has quit IRC
+2011-07-28T09:21:00  <RossPatterson> http://www.hammerzeit.com/2009/06/hammerzeit-blog-first-post.html
+2011-07-28T09:21:06  *** dereke has quit IRC
+2011-07-28T09:22:00  <simonstewart> http://www.youtube.com/watch?v=KoQb8vb4blA
+2011-07-28T09:22:48  <RossPatterson> new2b2: If you pass the "selenium" object from A to B, everything ought to work fine.
+2011-07-28T09:23:40  <RossPatterson> :yt Springtime for Hitler
+2011-07-28T09:23:40  <selbot2> Sprintime for Htler - http://www.youtube.com/watch?v=WCUfkMkVbwo&feature=youtube_gdata
+2011-07-28T09:23:52  <simonstewart> Am I going to regret clicking on this?
+2011-07-28T09:23:55  *** tomh- has quit IRC
+2011-07-28T09:23:55  *** Parabola has quit IRC
+2011-07-28T09:23:56  *** mrchrisadams has quit IRC
+2011-07-28T09:24:10  <RossPatterson> "The Producers"
+2011-07-28T09:24:24  *** DocD2 has quit IRC
+2011-07-28T09:24:46  *** pnitin has quit IRC
+2011-07-28T09:24:56  <RossPatterson> Part of the Dancing Nazis theme :-)
+2011-07-28T09:24:57  *** Ajay has joined #selenium
+2011-07-28T09:25:01  *** zmijunkie has joined #selenium
+2011-07-28T09:25:16  <simonstewart> Those were Cossaks
+2011-07-28T09:26:09  <RossPatterson> Here in America, we don't cut differences that fine - either you're Republican or you're a Commie-Fascist-Pinko :-)
+2011-07-28T09:26:28  *** Gungy has joined #selenium
+2011-07-28T09:26:33  <selbot2> dawagner less than 20 seconds ago - DanielWagnerHall for AjayKemparaj: Fixing path to tool.  Fixes issue 2149. - http://code.google.com/p/selenium/source/detail?r=13121
+2011-07-28T09:26:53  <new2b2> RossPatterson: My code is this: in setUp method --> self.driver = webdriver.Firefox() then in the script --> webqDecide.qType(xpath + str(qCount) + "]/", self.driver), does this mean that when I call self.driver.find_element(name, "blah") it should work fine?
+2011-07-28T09:27:49  <Gungy> hi everyone
+2011-07-28T09:28:27  <RossPatterson> I doubt it - you'd need to pass self.driver from A to B first, otherwise B doesn't have a "driver".  This is just Python coding, nothing Selenium-specific.
+2011-07-28T09:28:34  * RossPatterson waves
+2011-07-28T09:28:37  <cerberos> Is there a way to insert passwords into ff's saved paswords list?
+2011-07-28T09:29:33  <cerberos> or copy a profile after they've been manually entered so it's usable with webdriver?
+2011-07-28T09:30:30  <simonstewart> The latter, certainly
+2011-07-28T09:31:40  <cerberos> I thought I'd tried that and it didn't work, let me try again
+2011-07-28T09:32:32  <selbot2> david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns fixing the way that preference items are set - http://code.google.com/p/selenium/source/detail?r=13122
+2011-07-28T09:32:53  *** lawcab has joined #selenium
+2011-07-28T09:33:04  <lawcab> Hello there
+2011-07-28T09:33:38  <lawcab> Just updated from 2beta to 2.2
+2011-07-28T09:33:51  <lawcab> and just noticed that the setSelected is not there anymore??
+2011-07-28T09:34:02  <XRayCulver> How soon can we expect 2.3?
+2011-07-28T09:34:05  <simonstewart> It was removed during the RCs
+2011-07-28T09:34:10  <simonstewart> And replaced with "click"
+2011-07-28T09:34:15  <simonstewart> 2.3? Probably Monday
+2011-07-28T09:34:31  <XRayCulver> thanks
+2011-07-28T09:34:37  <simonstewart> probably
+2011-07-28T09:34:40  <XRayCulver> ofc
+2011-07-28T09:35:03  <lawcab> ok..thankss
+2011-07-28T09:35:07  <lawcab> will try that out
+2011-07-28T09:35:44  *** sjmikem has quit IRC
+2011-07-28T09:36:17  <Ajay> 2.3 on this monday ?
+2011-07-28T09:36:21  <simonstewart> probably
+2011-07-28T09:36:36  <Ajay> then let me find an issue on work on it
+2011-07-28T09:36:38  <new2b2> RossPatterson: i tried pass "self.driver" as well as "self" and it keeps telling me [Error 32] The process cannot access the file because it is being used by another process: when I run it
+2011-07-28T09:37:26  *** davehunt has joined #selenium
+2011-07-28T09:38:06  <Gungy> hi has anyone come across the issue of firefox browser staying minimised when executing test case in eclipse?
+2011-07-28T09:41:14  *** tunabum has quit IRC
+2011-07-28T09:43:39  *** dhackner has joined #selenium
+2011-07-28T09:44:15  <Ajay> hi dhackner
+2011-07-28T09:44:18  <RossPatterson> new2b2: That puts you past my Python skills, sorry.
+2011-07-28T09:44:27  <hubc> simonstewart: any thoughts on the IE click not firing bug?
+2011-07-28T09:44:29  *** davehunt has quit IRC
+2011-07-28T09:45:12  *** rbalent has joined #selenium
+2011-07-28T09:45:12  *** rbalent has joined #selenium
+2011-07-28T09:45:18  <simonstewart> I thought 2.2 fixed it?
+2011-07-28T09:45:49  <hubc> Simonstewart: the bug where the window is out of focus and click doesn't fire?
+2011-07-28T09:45:59  *** sfbrian has joined #selenium
+2011-07-28T09:46:07  <simonstewart> I don't think anyone else has been working on that
+2011-07-28T09:46:54  <hubc> i'm confused now... haha - is it in progress or resolved or not in progress?
+2011-07-28T09:47:12  *** mrchrisadams has joined #selenium
+2011-07-28T09:47:12  <simonstewart> hubc: there are oodles of "click" doesn't work bugs
+2011-07-28T09:47:14  *** dhackner has quit IRC
+2011-07-28T09:47:19  <simonstewart> Some of them fixed, some not
+2011-07-28T09:47:33  <selbot2> david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns removing unused variables and imports - http://code.google.com/p/selenium/source/detail?r=13123
+2011-07-28T09:47:49  <hubc> simonstewart: ah, sorry. The one where when you try to click on an element in an IE window when it is out of focus, it doens't actually click the element but it just brings the window to focus
+2011-07-28T09:47:58  <lawcab> ok
+2011-07-28T09:48:03  <lawcab> have a question
+2011-07-28T09:48:10  <lawcab> i have 2 select boxes
+2011-07-28T09:48:18  <lawcab> same options
+2011-07-28T09:48:36  *** AutomatedTester has quit IRC
+2011-07-28T09:48:41  <lawcab> but the select boxes itself have different ids
+2011-07-28T09:49:35  <lawcab> so what i did was driver.findElement(By.id("idof1")).findElement(By.xpath("someexpath").click
+2011-07-28T09:49:53  <lawcab> then next line is driver.findElement(By.id("idof2")).findElement(By.xpath("someexpath").click
+2011-07-28T09:50:05  <lawcab> first statement selected on select1
+2011-07-28T09:50:25  <lawcab> but second statement still selected the first one
+2011-07-28T09:50:42  <lawcab> is there a properway to do this?
+2011-07-28T09:50:50  *** retornam has joined #selenium
+2011-07-28T09:51:16  <simonstewart> Make sure that your xpath doesn't begin with "//"
+2011-07-28T09:53:41  <lawcab> simonstewart: thanks...that helped
+2011-07-28T09:54:42  <simonstewart> np
+2011-07-28T09:56:00  *** DocD2 has joined #selenium
+2011-07-28T09:57:03  *** jxpx777 has quit IRC
+2011-07-28T09:57:59  *** adamgoucher has quit IRC
+2011-07-28T09:58:24  *** Parabola has joined #selenium
+2011-07-28T10:00:23  *** baijum has joined #selenium
+2011-07-28T10:00:32  *** Samit|away has quit IRC
+2011-07-28T10:01:48  *** dlam has joined #selenium
+2011-07-28T10:02:22  *** tomh- has joined #selenium
+2011-07-28T10:03:03  <selbot2> eran.mes@gmail.com less than 10 seconds ago - EranMes: Rather than using the information provided by getBoundingClientRect to get the element's coordinates, use the information from the accessibility API for mouse movement. This allows us to properly click link elements that contain an image. - http://code.google.com/p/selenium/source/detail?r=13124
+2011-07-28T10:05:17  *** cerberos has quit IRC
+2011-07-28T10:05:35  *** Briareos1 has quit IRC
+2011-07-28T10:14:05  *** dave_miles has quit IRC
+2011-07-28T10:14:33  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Moving towards using the closure library's logging infrastructure in the firefox driver - http://code.google.com/p/selenium/source/detail?r=13125
+2011-07-28T10:17:40  *** adamgoucher has joined #selenium
+2011-07-28T10:26:33  <selbot2> dawagner less than 10 seconds ago - DanielWagnerHall: Catch a more general exception. Fixes issue 2136. - http://code.google.com/p/selenium/source/detail?r=13126
+2011-07-28T10:28:20  *** XRayCulver has quit IRC
+2011-07-28T10:29:01  *** netcarver has joined #selenium
+2011-07-28T10:32:03  *** mashiara has joined #selenium
+2011-07-28T10:37:08  *** baijum has quit IRC
+2011-07-28T10:38:08  *** denzil has joined #selenium
+2011-07-28T10:42:34  *** dawagner has quit IRC
+2011-07-28T10:48:23  *** lawcab has quit IRC
+2011-07-28T10:57:25  *** Mayank has quit IRC
+2011-07-28T11:05:25  <simonstewart> G'night alol
+2011-07-28T11:05:28  *** simonstewart has left #selenium
+2011-07-28T11:11:00  *** zmijunkie_ has joined #selenium
+2011-07-28T11:11:39  *** cgp_ has joined #selenium
+2011-07-28T11:12:10  *** Mayank has joined #selenium
+2011-07-28T11:13:11  *** zmijunkie has quit IRC
+2011-07-28T11:13:11  *** zmijunkie_ is now known as zmijunkie
+2011-07-28T11:16:25  *** jds has quit IRC
+2011-07-28T11:19:35  *** boily has joined #selenium
+2011-07-28T11:28:40  *** Ajay has quit IRC
+2011-07-28T11:36:58  *** mpk_ has quit IRC
+2011-07-28T11:37:46  *** dave_miles has joined #selenium
+2011-07-28T11:38:55  *** donald650 has quit IRC
+2011-07-28T11:49:01  *** dhackner has joined #selenium
+2011-07-28T11:49:02  *** esotericbyte has joined #selenium
+2011-07-28T11:53:05  *** netcarver has quit IRC
+2011-07-28T11:55:52  <esotericbyte> short version how do i use python to encode a string containing html/xml for 'type' selenese command ?
+2011-07-28T11:55:56  <esotericbyte> long: Hello!  *Situation*:  I have the python remote and the server installed. I just don't have time to script getting into the system at this point just yet. I am writing a python script that genrates selenese / html script.  *Problem*: I need to encode html to be posted into a text area form field. I have created a template. What do I use to encode the test data for the "type" selenese command.
+2011-07-28T11:58:19  *** stephend has quit IRC
+2011-07-28T11:58:50  *** stephend has joined #selenium
+2011-07-28T11:59:41  <esotericbyte> Sorry to ask such a nube question but the search space is very cowed. taranslate /convert focuses on translating selenese html to python remote code for example.
+2011-07-28T12:04:34  *** dhackner has quit IRC
+2011-07-28T12:05:05  <eranm> esotericbyte, if you're using Python, you may as well use the WebDriver python bindings.
+2011-07-28T12:07:05  <eranm> There may be an answer to your question, but not many here are familiar with Selenese.
+2011-07-28T12:09:20  <esotericbyte> the issue with using anything directed by python is that I can't navigate to where I want the scripts to start and for various reasons including security i don't want to script it
+2011-07-28T12:10:28  <esotericbyte> i mean .. it seems that using remote or the driver you can't just tell it to start on the page you are on. if that will work i can do it that way though.. . maybe i should just try something like urlencode
+2011-07-28T12:17:03  *** Fyrespray has joined #selenium
+2011-07-28T12:18:54  *** donald650 has joined #selenium
+2011-07-28T12:19:11  *** mashiara has left #selenium
+2011-07-28T12:21:52  <esotericbyte>  i found this question in the forums. unfortunately no one answered it:
+2011-07-28T12:23:02  <esotericbyte> http://bit.ly/oeFOQx
+2011-07-28T12:24:46  <esotericbyte> anyway thanks for reading my question.. i guess it's a head scratcher. one place the  solution is: the ide code.  I am going to try to look to see how it  encode the recorded test case.
+2011-07-28T12:33:01  *** RossPatterson has quit IRC
+2011-07-28T12:35:16  *** Fyrespray has quit IRC
+2011-07-28T12:46:57  *** denzil has quit IRC
+2011-07-28T12:54:00  *** Siph0n has joined #selenium
+2011-07-28T12:55:35  *** jxpx777 has joined #selenium
+2011-07-28T12:56:22  <hubc> simonstewart: still around?
+2011-07-28T12:57:13  *** cgp_ has quit IRC
+2011-07-28T12:57:36  <jarib_> :seen simonstewart
+2011-07-28T12:57:36  <selbot2> simonstewart was last seen about 2 hours ago, leaving.
+2011-07-28T12:58:03  <hubc> ah
+2011-07-28T12:58:13  <hubc> jarib_: maybe you can help :)
+2011-07-28T13:02:37  <jarib_> hubc: possibly :)
+2011-07-28T13:02:47  <jarib_> also, :ask
+2011-07-28T13:02:47  <selbot2> If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+2011-07-28T13:04:41  <hubc> :ask Error: #<Selenium::WebDriver::Error::UnhandledError: Session not available - [] (org.openqa.grid.internal.GridException)> This happens when I'm running grid2, and I found that it has something to do with the server losing the sessionID or whatever when trying to close the brwoser after finishing the test
+2011-07-28T13:04:41  <selbot2> If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+2011-07-28T13:05:56  *** cheezy has quit IRC
+2011-07-28T13:07:59  <jarib_> hu
+2011-07-28T13:08:11  *** retornam has quit IRC
+2011-07-28T13:08:30  <jarib_> hubc: I don't know much about grid, sorry
+2011-07-28T13:08:34  *** retornam has joined #selenium
+2011-07-28T13:08:38  <hubc> jarib_ : :(
+2011-07-28T13:08:50  <hubc> well I have tons of questions, lol
+2011-07-28T13:09:04  <jarib_> I do recall seeing an issue in the tracker about this, perhaps search there
+2011-07-28T13:11:37  <hubc> ah, i see
+2011-07-28T13:12:07  * jarib_ found it?
+2011-07-28T13:12:44  <hubc> i found a few that look like my error, but no solutions really
+2011-07-28T13:17:51  <hubc> jarib_: any ideas about IE not clicking when it's lost focus?
+2011-07-28T13:18:07  *** Fyrespray has joined #selenium
+2011-07-28T13:19:41  *** rpk has left #selenium
+2011-07-28T13:19:58  <jarib_> not really, I don't use the IE driver extensively
+2011-07-28T13:20:04  *** ethan1991 has quit IRC
+2011-07-28T13:20:12  <Siph0n> U can't click something if it's not on the screen
+2011-07-28T13:20:21  <jarib_> jimevans would know
+2011-07-28T13:20:22  <Siph0n> Is that the problem hubc?
+2011-07-28T13:20:29  <jarib_> :seen jimevans
+2011-07-28T13:20:29  <selbot2> jimevans was last seen about 5 hours ago, leaving.
+2011-07-28T13:26:26  *** boily has quit IRC
+2011-07-28T13:27:26  <hubc> Siph0n: yeah, sometimes IE clicks don't register if the browser isn't in focus
+2011-07-28T13:27:54  <hubc> Siph0n: saw a few posts on stackoverflow about it, seems like it's a common issue?
+2011-07-28T13:28:25  *** cburroughs has quit IRC
+2011-07-28T13:29:29  <hubc> Siph0n: http://stackoverflow.com/questions/5574802/selenium-2-0b3-ie-webdriver-click-not-firing
+2011-07-28T13:33:17  <jarib_> hubc: that thread doesn't mention focus though?
+2011-07-28T13:33:25  <Siph0n> I sometimes think my button wasn't clicked, but I keep working and it finally goes... sometimes I dont wait and just click it manually..
+2011-07-28T13:33:55  <Siph0n> Maybe on those times I click it manually it wasn't actually clicked... not sure.
+2011-07-28T13:34:04  <jarib_> so could be another issue (maybe fixed since b3)
+2011-07-28T13:34:57  <hubc> jarib_: it might be another issue, but it seems to happen randomly on my tests (when i have several running at a time) my screenshots show forms not being submitted and my "find_elements" time out because it's not on the right page
+2011-07-28T13:35:57  <jarib_> does it happen when you run the tests serially as well?
+2011-07-28T13:39:25  <hubc> if i run one at a time, no
+2011-07-28T13:39:43  <hubc> that's why i'm trying to use grid
+2011-07-28T13:39:56  <hubc> so i can just send tests to the server and then let grid handle which ones are run
+2011-07-28T13:40:08  <hubc> but grid keeps dropping my sessions for whatever reason :(
+2011-07-28T13:41:53  <hubc> fix one thing, break another, right?
+2011-07-28T13:41:54  *** somenickname has joined #selenium
+2011-07-28T13:42:07  *** cburroughs has joined #selenium
+2011-07-28T13:42:09  *** andreashaas has left #selenium
+2011-07-28T13:42:17  *** ner0x has quit IRC
+2011-07-28T13:47:48  <hubc> Siph0n: any ideas on how to get focus back to the window before clicking?
+2011-07-28T13:47:59  <hubc> (also, i'm using Ruby)
+2011-07-28T13:48:25  <Siph0n> Someone said clicking on another element
+2011-07-28T13:49:07  <hubc> Yeah I tried that too... but in my case my tests aren't always the same. I'm trying to make it so it would work with all tests
+2011-07-28T13:49:23  <hubc> so I don't have to go through and add another click for each test
+2011-07-28T13:49:49  <hubc> trying to implement it in a method, for IE browsers, but i haven't found something that universally works for all elements
+2011-07-28T13:49:54  *** nirvdrum has quit IRC
+2011-07-28T13:50:18  *** nirvdrum has joined #selenium
+2011-07-28T13:51:24  *** cheezy has joined #selenium
+2011-07-28T13:52:01  <cheezy> what is the best way to force an element to have focus?
+2011-07-28T13:52:26  *** |izzie has quit IRC
+2011-07-28T13:52:54  <DocD2> Could someone confirm what the correct method of adding a line break into a textarea is using Selenium.  The IDE uses <br/> but this fails when running the tests on Chrome via RC. Am I using the wrong command.
+2011-07-28T13:53:27  <hubc> DocD2: what about "\n" ?
+2011-07-28T13:53:31  <hubc> (this is just a guess)
+2011-07-28T13:54:00  <DocD2> hubc I haven't had success with that.  I have it working for firefox
+2011-07-28T13:54:05  <DocD2> but the same test fails in chrome
+2011-07-28T13:54:12  <DocD2> guessing I may be doing something wrong
+2011-07-28T13:54:20  <hubc> what happens when you do \n?
+2011-07-28T13:54:35  <hubc> (in chrome)
+2011-07-28T13:55:03  <DocD2> well it doesn't work in firefox
+2011-07-28T13:55:07  <DocD2> and so haven't tried in chrome
+2011-07-28T13:55:13  <hubc> oh
+2011-07-28T13:55:17  <hubc> well what hapepns? does it just not do anything?
+2011-07-28T13:55:19  <hubc> or something weird
+2011-07-28T13:55:35  <DocD2> I think it puts it in the text area
+2011-07-28T13:57:45  <hubc> DocD2 i looked in the docs for Ruby bindings, there's a type_keys command
+2011-07-28T13:57:53  <hubc> have you tried that?
+2011-07-28T13:58:06  <DocD2> what key would I type?
+2011-07-28T13:58:13  *** QAGuy has quit IRC
+2011-07-28T13:58:42  *** adamgoucher has quit IRC
+2011-07-28T13:58:50  <hubc> DocD2 I found this : selenium.KeyPress("quicksearchtextcriteria", "13");
+2011-07-28T13:58:59  <hubc> (use your own locator)
+2011-07-28T13:59:12  <hubc> but it looks like 13
+2011-07-28T13:59:21  <hubc> http://asynchrony.blogspot.com/2008/11/enter-key-press-in-selenium.html
+2011-07-28T13:59:48  <DocD2> hmm thanks
+2011-07-28T13:59:53  <DocD2> but I don't want the form to submit
+2011-07-28T14:00:06  <DocD2> "Mike Gage needed to simulate an ENTER key press in Selenium to call a submit."
+2011-07-28T14:00:18  <hubc> yeah, try using the enter on your textbox
+2011-07-28T14:00:37  <hubc> what he's saying is they wanted the enter button to do something special
+2011-07-28T14:00:47  <hubc> so they used that command to emulate the enter button
+2011-07-28T14:00:51  <hubc> pressing enter in a textarea should make a new line, ya?
+2011-07-28T14:02:20  <DocD2> I will give it a go although its not quite what I wanted.  The selenium ide says this shoudl work
+2011-07-28T14:02:26  <DocD2> line1<br/>line2<br/>
+2011-07-28T14:02:38  <DocD2> which can be done in one line
+2011-07-28T14:02:55  <hubc> try doing the keypress
+2011-07-28T14:02:57  <hubc> so
+2011-07-28T14:03:06  <hubc> selenium.type("line1")
+2011-07-28T14:03:09  <DocD2> using the key press means 2 for each line(text and enters) and activating the textarea first
+2011-07-28T14:03:16  <hubc> yeah
+2011-07-28T14:03:59  <DocD2> http://jira.openqa.org/browse/SIDE-36 suggests it should work
+2011-07-28T14:04:04  <DocD2> and the ide as well
+2011-07-28T14:04:23  <DocD2> and it does, in firefox or in chrome on selenium 1.x
+2011-07-28T14:04:36  *** |izzie has joined #selenium
+2011-07-28T14:04:51  <DocD2> I'll give it a go :(
+2011-07-28T14:04:53  <DocD2> thanks
+2011-07-28T14:04:57  <hubc> no problem, i hope that works for you
+2011-07-28T14:07:18  *** cheezy has quit IRC
+2011-07-28T14:13:05  <hubc> DocD2: any luck?
+2011-07-28T14:13:16  *** nirvdrum_ has joined #selenium
+2011-07-28T14:13:25  *** tunabum has joined #selenium
+2011-07-28T14:15:16  *** Siph0n has quit IRC
+2011-07-28T14:15:22  *** jxpx777 has quit IRC
+2011-07-28T14:16:35  *** nirvdrum has quit IRC
+2011-07-28T14:18:05  *** nirvdrum_ has quit IRC
+2011-07-28T14:29:31  *** lfryc has quit IRC
+2011-07-28T14:30:58  *** csanchez has joined #selenium
+2011-07-28T14:39:51  *** adamgoucher has joined #selenium
+2011-07-28T14:44:04  *** andytinkham1 has quit IRC
+2011-07-28T14:48:18  *** brettporter has joined #selenium
+2011-07-28T15:00:18  *** linman-semerau has joined #selenium
+2011-07-28T15:03:02  *** jxpx777 has joined #selenium
+2011-07-28T15:07:07  *** AutomatedTester has joined #selenium
+2011-07-28T15:09:54  *** linman-semerau has quit IRC
+2011-07-28T15:14:46  *** hubc has quit IRC
+2011-07-28T15:16:28  *** cgoldberg has quit IRC
+2011-07-28T15:19:01  *** cheezy has joined #selenium
+2011-07-28T15:25:20  *** tunabum has quit IRC
+2011-07-28T15:30:00  *** jeffery has joined #selenium
+2011-07-28T15:36:04  *** csanchez has quit IRC
+2011-07-28T15:40:17  *** sjmikem has joined #selenium
+2011-07-28T15:43:12  *** Fyrespray has quit IRC
+2011-07-28T15:44:32  *** Delgadill has joined #selenium
+2011-07-28T15:45:48  <Delgadill> A little help please i try to selectwindow for the following site but it never works http://www.letsgolearn.com/assessinstruct/help2/helpdob.html any ideas
+2011-07-28T15:46:35  <Delgadill> I put title=Help item
+2011-07-28T15:54:42  *** sjmikem has left #selenium
+2011-07-28T15:55:07  *** Delgadill has quit IRC
+2011-07-28T15:55:36  *** Delgadill has joined #selenium
+2011-07-28T15:56:37  <esotericbyte> Is this a triggered window or has it been  for awhile before testing?  The title matches ...  The issue I've found is usually related to timing. Have you tried adding a long... even ridiculously long wait ?
+2011-07-28T15:57:31  <esotericbyte> Delgadll: forgot to address that to you. Sorry.
+2011-07-28T16:01:27  <Delgadill> im on annohter site and i have to click on help. this help opens a new tab in firefox
+2011-07-28T16:01:43  *** AutomatedTester has quit IRC
+2011-07-28T16:04:03  <esotericbyte> did you try this ? http://bit.ly/peZ0jf i did not look at the details
+2011-07-28T16:05:00  <esotericbyte> Delgadill: it just looked promising
+2011-07-28T16:05:00  <Delgadill> let me give it a try
+2011-07-28T16:05:05  <esotericbyte> cool
+2011-07-28T16:06:59  *** cburroughs has quit IRC
+2011-07-28T16:07:28  <esotericbyte> hum. Is it possible to start a remote script ( i am using python) and have it  pick up where  I  leave off browsing?  With the IDE I can start tests anywhere and delete the setup.  If it's not possible to interact with an existing browser could i open the home page and then put in a long wait or a wait for text / element present so that I can navigate manually a bit before it really starts to go?
+2011-07-28T16:08:39  *** jxpx777 has quit IRC
+2011-07-28T16:13:40  *** somenickname has quit IRC
+2011-07-28T16:16:25  *** donald650 has quit IRC
+2011-07-28T16:23:43  <Delgadill> :-( Thats a no go on the link. I think I'm overlooking something small. I will read more. Im pretty new to Selenium
+2011-07-28T16:40:25  *** Guest59768 has quit IRC
+2011-07-28T16:43:49  *** Guest59768 has joined #selenium
+2011-07-28T16:54:03  *** anjelica has quit IRC
+2011-07-28T17:02:20  *** rbalent has quit IRC
+2011-07-28T17:06:12  *** Delgadill has quit IRC
+2011-07-28T17:10:49  *** cerberos has joined #selenium
+2011-07-28T17:14:55  *** cerberos has quit IRC
+2011-07-28T17:15:52  *** retornam has quit IRC
+2011-07-28T17:23:58  *** Guest59768 has quit IRC
+2011-07-28T17:25:41  *** cgoldberg has joined #selenium
+2011-07-28T17:37:48  <cheezy> I need to switch to a window -> have the page title
+2011-07-28T17:37:58  <cheezy> I found the window_handles method to get all handles
+2011-07-28T17:38:17  <cheezy> and the TargetLocator#window method to switch to a window using the handle
+2011-07-28T17:38:34  <cheezy> but I cannot seem to determine which handle belongs to which window
+2011-07-28T17:39:24  <cheezy> anybody have some pointers?
+2011-07-28T17:42:18  *** sfbrian_ has joined #selenium
+2011-07-28T17:46:24  *** sfbrian has quit IRC
+2011-07-28T17:47:10  *** sfbrian_ has quit IRC
+2011-07-28T17:54:46  *** towski has joined #selenium
+2011-07-28T18:05:53  *** jxpx777 has joined #selenium
+2011-07-28T18:07:00  *** towski has quit IRC
+2011-07-28T18:10:37  *** cgoldberg has joined #selenium
+2011-07-28T18:13:39  *** dlam has quit IRC
+2011-07-28T18:32:45  *** pnitin has joined #selenium
+2011-07-28T18:40:46  *** jxpx777 has quit IRC
+2011-07-28T18:42:10  *** cakehero has quit IRC
+2011-07-28T18:44:55  *** cerberos has joined #selenium
+2011-07-28T18:55:30  *** pnitin has quit IRC
+2011-07-28T18:55:36  *** stephend has quit IRC
+2011-07-28T19:00:38  *** cakehero has joined #selenium
+2011-07-28T19:18:09  *** Binken_ has joined #selenium
+2011-07-28T19:20:14  <Binken_> Hello
+2011-07-28T19:27:56  *** sjmikem has joined #selenium
+2011-07-28T19:42:41  <esotericbyte> Binken: Hello. ... I just usually ask a question and home that eventually someone may answer it.. . it's worth a shot anyway ... right ?  ... and while I am at it i sometimes offer some answers.
+2011-07-28T19:43:03  <esotericbyte> home -> hope
+2011-07-28T19:43:17  <Binken_> (H)
+2011-07-28T19:44:48  <esotericbyte> :)
+2011-07-28T19:45:06  <esotericbyte> (I)
+2011-07-28T19:49:53  *** Binken_ has quit IRC
+2011-07-28T19:51:54  *** ian_mac has joined #selenium
+2011-07-28T20:01:29  *** esotericbyte has left #selenium
+2011-07-28T20:02:39  *** angshu has joined #selenium
+2011-07-28T20:03:25  *** Mayank has quit IRC
+2011-07-28T20:08:38  *** Binken_ has joined #selenium
+2011-07-28T20:09:36  *** cakehero has quit IRC
+2011-07-28T20:12:35  *** Siph0n has joined #selenium
+2011-07-28T20:25:21  *** angshu has quit IRC
+2011-07-28T20:26:10  *** baijum has joined #selenium
+2011-07-28T20:26:53  *** blowery is now known as blowery_off
+2011-07-28T20:31:57  *** blowery_off is now known as blowery
+2011-07-28T20:37:50  *** baijum has quit IRC
+2011-07-28T20:38:09  *** baijum has joined #selenium
+2011-07-28T20:40:58  *** Mayank has joined #selenium
+2011-07-28T21:01:29  *** Siph0n has quit IRC
+2011-07-28T21:01:30  *** Siph-Droid has joined #selenium
+2011-07-28T21:02:31  *** new2b2 has quit IRC
+2011-07-28T21:13:23  *** Binken_ has quit IRC
+2011-07-28T21:18:14  *** angshu has joined #selenium
+2011-07-28T21:22:25  *** blowery is now known as blowery_off
+2011-07-28T21:31:43  *** baijum has quit IRC
+2011-07-28T21:42:39  *** nilobject has joined #selenium
+2011-07-28T21:43:14  <nilobject> Now that the Ruby driver has deprecated Element#select entirely, how does one select options in <select> elements with Selenium WebDriver?
+2011-07-28T21:44:20  <nilobject> This does not work, of course: https://gist.github.com/1113157
+2011-07-28T21:45:06  *** towski has joined #selenium
+2011-07-28T21:52:27  <nilobject> Ah, you must click the select then the option. Fun!
+2011-07-28T21:52:29  *** nilobject has quit IRC
+2011-07-28T21:57:25  *** pnitin has joined #selenium
+2011-07-28T21:57:54  *** towski has quit IRC
+2011-07-28T21:59:57  *** ian_mac has quit IRC
+2011-07-28T22:17:40  *** Binken_ has joined #selenium
+2011-07-28T22:20:35  *** andialbrecht_ is now known as andialbrecht
+2011-07-28T22:23:10  *** andialbrecht is now known as andialbrecht_
+2011-07-28T22:27:15  *** andialbrecht_ is now known as andialbrecht
+2011-07-28T22:31:53  *** cerberos has quit IRC
+2011-07-28T22:34:17  *** cerberos has joined #selenium
+2011-07-28T22:39:39  *** Binken_ has quit IRC
+2011-07-28T22:40:00  *** Binken_ has joined #selenium
+2011-07-28T22:40:31  *** Mayank1 has joined #selenium
+2011-07-28T22:41:19  *** sjmikem has quit IRC
+2011-07-28T22:41:58  *** Mayank has quit IRC
+2011-07-28T22:46:55  *** andialbrecht is now known as andialbrecht_
+2011-07-28T22:48:01  *** AutomatedTester has joined #selenium
+2011-07-28T22:49:06  *** sjmikem has joined #selenium
+2011-07-28T22:53:26  *** Binken_ has quit IRC
+2011-07-28T22:56:00  *** angshu has quit IRC
+2011-07-28T22:56:50  *** andialbrecht_ is now known as andialbrecht
+2011-07-28T22:59:58  *** angshu has joined #selenium
+2011-07-28T23:29:05  *** sjmikem has quit IRC
+2011-07-28T23:29:27  *** somenickname has joined #selenium
+2011-07-28T23:32:47  *** Mayank1 has quit IRC
+2011-07-28T23:34:00  *** lfryc has joined #selenium
+2011-07-28T23:41:33  *** csanchez has joined #selenium
+2011-07-28T23:51:27  <selbot> New news from builds: WEB-SEHQ-181 was SUCCESSFUL : Updated by PaulHammant <http://xserve.openqa.org:8085/browse/WEB-SEHQ-181> || WEB-SEHQ-180 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-180> || WEB-SEHQ-179 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-179> || WEB-SEHQ-178 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-178> || WEB-SEHQ-177 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-177> || WEB-SEHQ-176 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-176> || WEB-SEHQ-175 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-175> || IDE-IDE-128 was SUCCESSFUL : Dependant of IDE-RB-14 <http://xserve.openqa.org:8085/browse/IDE-IDE-128> || IDE-RB-14 was SUCCESSFUL : Updated by Samit.Badle@googlemail.com <http://xserve.openqa.org:8085/browse/IDE-RB-14> || IDE-CSHARP-15 was SUCCESSFUL : Updated by Samit.Badle@googlemail.com <http://xserve.openqa.org:8085/browse/IDE-CSHARP-15> || IDE-PY-16 was SUCCESSFUL : Updated by Samit.Badle@googlemail.com <http://xserve.openqa.org:8085/browse/IDE-PY-16> || IDE-JAVA-18 was SUCCESSFUL : Updated by Samit.Badle@googlemail.com <http://xserve.openqa.org:8085/browse/IDE-JAVA-18> || IDE-EDITOR-146 was SUCCESSFUL : Updated by Samit.Badle@googlemail.com, simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-146>
+2011-07-28T23:53:14  *** lange has joined #selenium
+2011-07-28T23:53:14  *** somenickname has quit IRC

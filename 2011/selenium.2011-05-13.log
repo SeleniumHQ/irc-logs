@@ -1,0 +1,470 @@
+2011-05-13T00:07:57  *** lfryc has joined #selenium
+2011-05-13T00:58:39  *** AutomatedTester has joined #selenium
+2011-05-13T00:59:27  *** ivog has joined #selenium
+2011-05-13T01:05:04  *** ivog has quit IRC
+2011-05-13T01:06:31  *** ivog has joined #selenium
+2011-05-13T01:08:29  *** vrockai has joined #selenium
+2011-05-13T01:15:31  *** sjmikem has joined #selenium
+2011-05-13T01:32:15  <AutomatedTester> ato: hey
+2011-05-13T01:32:42  <AutomatedTester> just reread your thing about expose OperaDriver on class path, did you mean class path or path?
+2011-05-13T01:33:46  <jarib> class path
+2011-05-13T01:34:49  <jarib> AutomatedTester: if you start the remote server with the operadriver jars on the classpath, it will be picked up by the servlet
+2011-05-13T01:37:46  *** andialbrecht has quit IRC
+2011-05-13T01:38:21  *** andialbrecht has joined #selenium
+2011-05-13T01:38:37  *** andialbrecht is now known as andialbrecht_
+2011-05-13T01:38:44  *** andialbrecht_ is now known as andialbrecht
+2011-05-13T01:43:09  <AutomatedTester> jarib: so not like the chromedriver
+2011-05-13T01:43:41  * AutomatedTester wants python tight binding to opera
+2011-05-13T01:56:51  *** rbalent has joined #selenium
+2011-05-13T01:56:59  *** samitbadle has joined #selenium
+2011-05-13T02:04:13  *** freynaud has joined #selenium
+2011-05-13T02:06:43  *** csanchez has quit IRC
+2011-05-13T02:08:28  *** Guest52895 has left #selenium
+2011-05-13T02:08:39  <AutomatedTester> jarib: advanced user api for firefox is only in 3.6?
+2011-05-13T02:13:55  *** csanchez has joined #selenium
+2011-05-13T02:16:15  <jarib> AutomatedTester: yeah, operadriver is written in java
+2011-05-13T02:16:27  <jarib> AutomatedTester: native events doesn't work with 4.0 IIRC
+2011-05-13T02:16:55  <AutomatedTester> cool
+2011-05-13T02:17:08  <AutomatedTester> i thought that was a case but just wanted to check
+2011-05-13T02:17:51  <jarib> not sure about the state of/plans for a non-native implementation
+2011-05-13T02:25:34  *** samitbadle has quit IRC
+2011-05-13T02:35:14  <Stuk> jarib: do you have any ideas what the best way to integrate atoms into operadriver would be?
+2011-05-13T02:38:07  *** sjmikem has quit IRC
+2011-05-13T02:40:02  *** vrockai has quit IRC
+2011-05-13T02:43:06  *** mashiara has quit IRC
+2011-05-13T02:53:22  *** cheezy has joined #selenium
+2011-05-13T02:55:35  *** vrockai_ has joined #selenium
+2011-05-13T02:58:08  *** cheezy has quit IRC
+2011-05-13T02:59:35  *** cheezy has joined #selenium
+2011-05-13T03:26:58  *** samitbadle has joined #selenium
+2011-05-13T03:43:02  *** pnitin has quit IRC
+2011-05-13T03:46:28  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Cleaning up references to the RenderedWebElement since it's been deprecated - http://code.google.com/p/selenium/source/detail?r=12174
+2011-05-13T03:47:55  *** cheezy has quit IRC
+2011-05-13T04:12:12  *** wsmoak has joined #selenium
+2011-05-13T04:12:28  *** samitbadle has quit IRC
+2011-05-13T04:13:28  <ivog> hi, go //dotnet:firefox-test:run aborts the go build probably because of errors/failures in the tests, for java its now possible to ignore those errors using haltonerror=false haltonfailure=false parameters, can anyone point out what approximately needs to be done to make that work for the dotnet tests?
+2011-05-13T04:14:53  *** csanchez has quit IRC
+2011-05-13T04:16:36  *** aquarius1973 has joined #selenium
+2011-05-13T04:21:16  *** csanchez has joined #selenium
+2011-05-13T04:21:17  *** miker2 has joined #selenium
+2011-05-13T04:25:50  *** kylls has joined #selenium
+2011-05-13T04:26:23  *** amitev has joined #selenium
+2011-05-13T04:31:01  *** stepheneb has joined #selenium
+2011-05-13T04:42:55  *** esteele|away has quit IRC
+2011-05-13T04:46:28  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: the testng update didn't include the changes to allow testng tests in our build to run. Fixing this oversight - http://code.google.com/p/selenium/source/detail?r=12175
+2011-05-13T04:47:28  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Rolling back r12061. The return values for URLs should be consistent between browsers - http://code.google.com/p/selenium/source/detail?r=12176
+2011-05-13T04:47:39  *** stepheneb has quit IRC
+2011-05-13T04:53:03  *** miker2 has quit IRC
+2011-05-13T04:53:58  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Updating IE prebuilts to ensure that getattribute reflects the current state of the tree - http://code.google.com/p/selenium/source/detail?r=12177
+2011-05-13T04:58:15  *** miker2 has joined #selenium
+2011-05-13T04:58:29  *** cburroughs has joined #selenium
+2011-05-13T04:59:10  *** jarib has quit IRC
+2011-05-13T05:06:09  *** mbeierl has joined #selenium
+2011-05-13T05:08:23  *** jarib has joined #selenium
+2011-05-13T05:08:23  *** jarib has joined #selenium
+2011-05-13T05:10:28  <jarib> Stuk: add a build rule that compiles the JS atoms for opera, then import those in the operadriver repo
+2011-05-13T05:10:59  <ato> Stuk: Did you get the ecmascript service working, by the way?
+2011-05-13T05:11:18  <Stuk> jarib: thanks
+2011-05-13T05:11:21  <jarib> Stuk: either as .js files that you read in at runtime or just generate a java class with a bunch of String constants for the atoms
+2011-05-13T05:11:40  <jarib> Stuk: you'll see we do this for the C-based drivers, generating header files with compiled JS
+2011-05-13T05:12:04  *** RossPatterson has joined #selenium
+2011-05-13T05:12:26  <Stuk> ato: nope, there's a difference in implementation between debugger and service where service shuts down the connection if you try and use an invalid runtime, which happens quite a lot (debugger just gives us a nice null back)
+2011-05-13T05:12:30  <jarib> try running e.g. `go //javascript/webdriver-atoms:get_attribute`
+2011-05-13T05:12:30  <Stuk> so this need to be fixed in core
+2011-05-13T05:12:47  <jarib> and we have `go //javascript/webdriver-atoms:get_attribute:{ie,chrome,...}` etc
+2011-05-13T05:12:49  <ato> Stuk: Ugh.
+2011-05-13T05:12:51  <Stuk> jarib: brilliant, thanks, I'll see what I can do
+2011-05-13T05:13:12  <jarib> (where the compiler knows how remove user agent conditionals etc)
+2011-05-13T05:13:15  <jarib> s/how/how to
+2011-05-13T05:13:18  * jarib is off to a meeting
+2011-05-13T05:18:11  *** rbalent has quit IRC
+2011-05-13T05:18:30  *** rbalent has joined #selenium
+2011-05-13T05:23:02  *** rbalent has quit IRC
+2011-05-13T05:27:18  *** red^ is now known as reddeviL
+2011-05-13T05:27:40  *** miker2 has quit IRC
+2011-05-13T05:34:46  *** jimevans has joined #selenium
+2011-05-13T05:38:49  <ato> krosenvold: ping
+2011-05-13T05:40:17  <AutomatedTester> jimevans: :D
+2011-05-13T05:40:35  <jimevans> :D
+2011-05-13T05:41:26  *** carlisia has joined #selenium
+2011-05-13T05:42:48  *** adamgoucher has quit IRC
+2011-05-13T05:45:25  *** lord1234 has quit IRC
+2011-05-13T05:46:56  *** wsmoak has left #selenium
+2011-05-13T06:01:05  *** SL-BWood has joined #selenium
+2011-05-13T06:02:48  *** rbalent has joined #selenium
+2011-05-13T06:03:54  <ivog> jimevans: Hi Jim, the .net tests seem to abort the build, do you have any idea how that could be fixed?
+2011-05-13T06:04:59  <ivog> For java there are haltonerror and haltonfailure parameters which can be set to false to ignore any test errors
+2011-05-13T06:10:34  *** adamgoucher has joined #selenium
+2011-05-13T06:16:34  *** sdimkov has joined #selenium
+2011-05-13T06:18:31  *** stepheneb has joined #selenium
+2011-05-13T06:19:19  <sdimkov> is there a way to modify some path or other linux settings to add command line arguments to each lounch of firefox. My goal is to make firefox in kiosk mode by default, such solution would then easily apply to chrome, opera and so on..
+2011-05-13T06:19:48  *** cheezy has joined #selenium
+2011-05-13T06:24:26  *** rbalent has quit IRC
+2011-05-13T06:25:43  *** rbalent has joined #selenium
+2011-05-13T06:26:34  <ivog> sdimkov: isn't that something which can be accomplished with a firefox profile?
+2011-05-13T06:26:53  *** mbeierl has quit IRC
+2011-05-13T06:28:35  *** esteele has joined #selenium
+2011-05-13T06:29:27  <sdimkov> ivoq: I don't know. I'm still learing to use firefox profiles. Also if my idea is reasonable, I'll be able to apply it to Chrome and Opera..
+2011-05-13T06:29:45  *** mbeierl has joined #selenium
+2011-05-13T06:30:52  <ivog> yea your idea is probably more browser independant
+2011-05-13T06:31:36  <sdimkov> I'm basically building a vm with those 3 browsers (for now) and want selenium server to run them all in fullscreen/kiosk mode
+2011-05-13T06:32:38  *** trrr_ has joined #selenium
+2011-05-13T06:35:28  <ivog> in firefox you can probably handle it using the firefox profile, I dont know much about modifying chrome/opera settings using selenium but it probably can be done in those browsers as well, not sure though
+2011-05-13T06:36:06  <ivog> maybe it should be a capability which browsers can support?
+2011-05-13T06:36:20  <adamgoucher> AutomatedTester jimevans - thanks to you, i now have to clean water off my desk (re discussion of the show on twitter)
+2011-05-13T06:36:40  <AutomatedTester> adamgoucher: you should listen to it
+2011-05-13T06:39:40  <trrr_> hi guys, i'm new to #selenium
+2011-05-13T06:39:51  <trrr_> hi guwhen i automate a tooltip -- mouseOver(locator), mouseMove(locator) -- the tooltip appears in the upper-left corner instead of over the element
+2011-05-13T06:40:04  <trrr_> any ideas maybe ? thanks
+2011-05-13T06:41:10  *** sdimkov has quit IRC
+2011-05-13T06:47:13  *** bebef_1987 has joined #selenium
+2011-05-13T06:49:19  *** sdimkov has joined #selenium
+2011-05-13T06:50:35  <adamgoucher> anyone use se-ide w/ user agent switching plugin (to fake as an iphone for instance)?
+2011-05-13T06:51:36  *** brettporter has quit IRC
+2011-05-13T06:52:51  <jimevans> ivog: sorry. was in a meeting. what do you mean "abort the build"?
+2011-05-13T06:53:59  <jimevans> adamgoucher: glad to help. there's nothing more classic in comedy than a good spit take.
+2011-05-13T06:55:07  <ivog> jimevans: go aborts with message : go aborted!
+2011-05-13T06:56:05  <ivog> NUnit Failed. See Build Log For Detail`
+2011-05-13T06:56:13  <ivog> but there's nothing to see in the buildlog
+2011-05-13T06:56:33  <ivog> also, are the nunit test results stored somewhere?
+2011-05-13T06:56:55  <jimevans> ivog: no, i should change that in the build. the results are output to the console.
+2011-05-13T06:57:00  *** bebef_1987 has quit IRC
+2011-05-13T06:57:28  *** bebef_1987 has joined #selenium
+2011-05-13T06:58:48  <ivog> ok, im setting up a buildmachine for selenium locally so that there's some overview of the current status of tests, for that a nunit test result file would be handy
+2011-05-13T06:59:08  <ivog> i have no clue though how all that ruby stuff works
+2011-05-13T07:00:03  <jimevans> the .net tests do not run completely clean. java gets around this by ignoring tests the .net suite doesn't ignore.
+2011-05-13T07:00:21  <ivog> maybe i should just call nunit-console directly instead of using the ruby targets
+2011-05-13T07:01:08  <jimevans> of course you're welcome to do that.
+2011-05-13T07:02:09  <ivog> thats probably the easiest thing
+2011-05-13T07:02:18  <jimevans> i frequently do so when i'm testing
+2011-05-13T07:02:32  <jimevans> testing changes to the drivers, i mean.
+2011-05-13T07:02:53  <jimevans> that's all the crazy-fun build process is doing under the covers anyway, is calling nunit-console
+2011-05-13T07:02:55  <ivog> why are there no dotnet tests definitions on the build server?
+2011-05-13T07:03:21  <ivog> ya
+2011-05-13T07:03:53  <jimevans> which "build server"? the bamboo one?
+2011-05-13T07:04:00  <ivog> yes
+2011-05-13T07:04:11  <ivog> i only see java tests and website stuff there
+2011-05-13T07:04:25  <ivog> i mean all languages except dotnet
+2011-05-13T07:04:45  <jimevans> there are python tests there?
+2011-05-13T07:04:56  <ivog> it looks like it
+2011-05-13T07:05:04  <ivog> java python ruby
+2011-05-13T07:05:33  <ivog> but that buildserver doesn't seem to be maintained very well
+2011-05-13T07:06:09  <AutomatedTester> Ivog: its because Bamboo appears to hate our project
+2011-05-13T07:06:23  <AutomatedTester> i am in talks with someone to help sort that
+2011-05-13T07:08:01  *** wilhelm_ is now known as wilhelm
+2011-05-13T07:08:11  *** seanh-ansca has quit IRC
+2011-05-13T07:08:40  <adamgoucher> well, i think it is more that we are making the underlying hardware do too much
+2011-05-13T07:10:22  <ivog> i think there should just be a simple build set up while work continues on a buildserver which can build everything
+2011-05-13T07:12:07  <ivog> maybe i can ask if i can add some builddefinitation at http://teamcity.codebetter.com/ while that bamboo server is fixe'd
+2011-05-13T07:12:39  <ivog> although they probably dont like browsers opening
+2011-05-13T07:16:44  *** ahal has quit IRC
+2011-05-13T07:18:11  <adamgoucher> all the bamboo agents are now up
+2011-05-13T07:20:29  <adamgoucher> hah. this this build has been stuck before? Building for 6 mins. 1101 mins remaining
+2011-05-13T07:21:21  <ivog> only 18 hours
+2011-05-13T07:21:38  *** lucs has left #selenium
+2011-05-13T07:22:05  <ivog> maybe builds should be killed after a certain amount of time
+2011-05-13T07:24:01  <sdimkov> ivoq: I found how to implement my idea. Works like a charm. Basically I just modified /usr/bin/ {chrome/opera/...}  which start the actual binaries. The only problem that remains .. I can't find any command line argument to make ff fullscreen/kiosk.
+2011-05-13T07:28:05  <AutomatedTester> sdimkov: i am sure its a property in about:config
+2011-05-13T07:28:14  <AutomatedTester> and that you set via FirefoxProfile
+2011-05-13T07:28:30  <sdimkov> AutomatedTester: Thanks, I'll check it out
+2011-05-13T07:32:01  *** ivog has quit IRC
+2011-05-13T07:32:25  *** ivog has joined #selenium
+2011-05-13T07:36:48  <sdimkov> AnimatedTester: are you sure it has to be there? I read them all the entries under browser.*  , app.* , ui.* and layout.* . Couldn't find anything..
+2011-05-13T07:41:08  <AutomatedTester> i would have thought it was there
+2011-05-13T07:41:18  <AutomatedTester> btw...I like the name AnimatedTester....
+2011-05-13T07:41:45  <AutomatedTester> if its not there why not send through F11 once the browser opens?
+2011-05-13T07:44:54  <ivog> animated tester :)
+2011-05-13T07:46:03  *** andytinkham has joined #selenium
+2011-05-13T07:47:11  <sdimkov> AutomatedTester: oops Sorry :)
+2011-05-13T07:48:39  *** mbeierl has left #selenium
+2011-05-13T07:50:42  <adamgoucher> so when the rage virus is released he'd be the ReAnimatedTester?
+2011-05-13T07:51:58  *** stepheneb has quit IRC
+2011-05-13T07:52:34  *** sburjan has quit IRC
+2011-05-13T07:52:34  *** vrockai_ has quit IRC
+2011-05-13T07:53:06  <AutomatedTester> adamgoucher: *sigh*
+2011-05-13T07:53:20  <adamgoucher> it was funny. :P
+2011-05-13T07:55:54  <jimevans> jarib: ping
+2011-05-13T08:02:13  *** csanchez has quit IRC
+2011-05-13T08:04:13  <XCulver> reanimated, I like
+2011-05-13T08:08:04  <AutomatedTester> jimevans: did you know that our interview at SeConf is on the home page ?
+2011-05-13T08:08:28  <jimevans> i saw the interview on youtube. didn't know it was on the home page... :)
+2011-05-13T08:08:42  <AutomatedTester> we are the poster children for the conf
+2011-05-13T08:08:58  <jimevans> that frightens me to no small degree...
+2011-05-13T08:09:31  <AutomatedTester> but seriously who can think I am english with that accent
+2011-05-13T08:09:58  <ivog> Can the python builds be disabled untill they're fixed?
+2011-05-13T08:11:57  <AutomatedTester> Ivog: they appear to be done via manual builds?
+2011-05-13T08:12:14  <jarib> jimevans: pong
+2011-05-13T08:12:39  <ivog> are they manua?
+2011-05-13T08:12:53  <ivog> ok
+2011-05-13T08:12:59  <ivog> are they all manual?
+2011-05-13T08:13:45  <AutomatedTester> not all
+2011-05-13T08:13:46  <jimevans> jarib: Need some Ruby help. I need to monkey patch something in albacore, but i'm not sure how to go about it.
+2011-05-13T08:14:14  <jarib> ok
+2011-05-13T08:14:25  <jarib> what's the problem?
+2011-05-13T08:14:34  <AutomatedTester> its ruby
+2011-05-13T08:14:39  * AutomatedTester now runs away
+2011-05-13T08:14:44  <ato> d-:
+2011-05-13T08:14:50  <jimevans> i'd like to override the "fail the build on nunit test fail" behavior
+2011-05-13T08:14:57  <jarib> ah
+2011-05-13T08:15:25  <jimevans> looking at the albacore sources, it's hard-coded to fail the build if nunit-console.exe returns a failure code.
+2011-05-13T08:15:36  <jarib> do you have the file:line?
+2011-05-13T08:15:53  <jarib> i have the gem open
+2011-05-13T08:16:24  <jimevans> in albacore? yeah, it's in nunittestrunner.rb, around line 39.
+2011-05-13T08:17:05  <jimevans> it calls fail_with_message
+2011-05-13T08:17:52  * jimevans doesn't fully understand the albacore architecture with respect to modules and class hierarchy
+2011-05-13T08:18:19  <jarib> looks like you could monkey patch (a) NUnitTestRunner#execute or (b) Failure#fail_with_message
+2011-05-13T08:19:06  <jarib> or you could add Failure#fail (overriding Kernel#fail, which is an alias for Kernel#raise)
+2011-05-13T08:19:18  <jimevans> yes, i think either would work. just don't know how to do it. (ruby knowledge fail on my part)
+2011-05-13T08:20:22  <jarib> after albacore is required, just do:   class NUnitTestRunner; def execute; ...your implementation...; end; end
+2011-05-13T08:20:33  <jarib> it's that simple
+2011-05-13T08:20:37  <jimevans> ah. i see.
+2011-05-13T08:21:09  <jimevans> i'll give it a shot.
+2011-05-13T08:21:13  <jimevans> thanks.
+2011-05-13T08:21:33  *** mbeierl has joined #selenium
+2011-05-13T08:21:47  <jarib> jimevans: ideally you'd fork https://github.com/derickbailey/Albacore and send them a pull request, to make it configurable
+2011-05-13T08:22:08  <jimevans> somebody already did for the xunit test runner.
+2011-05-13T08:22:08  <jarib> since we bundle albacore in the jruby jar, we could easily bundle a gem built from your fork
+2011-05-13T08:22:29  <jarib> got to run, bbl
+2011-05-13T08:22:36  <jimevans> thanks again
+2011-05-13T08:25:33  *** bobMarley has joined #selenium
+2011-05-13T08:26:49  *** ivog has quit IRC
+2011-05-13T08:27:43  *** charleyb has quit IRC
+2011-05-13T08:28:44  *** erwan has quit IRC
+2011-05-13T08:37:42  *** bebef_1987 has quit IRC
+2011-05-13T08:45:31  *** samitbadle has joined #selenium
+2011-05-13T08:46:28  *** seanh-ansca has joined #selenium
+2011-05-13T08:47:41  *** trrr_ has quit IRC
+2011-05-13T08:49:55  *** rbalent has quit IRC
+2011-05-13T08:50:13  *** towski has joined #selenium
+2011-05-13T08:50:38  *** ivog has joined #selenium
+2011-05-13T08:50:52  *** samitbadle has quit IRC
+2011-05-13T08:56:39  <ivog> adamgoucher: can you maybe cancel the python builds?
+2011-05-13T08:59:29  *** barancev has joined #selenium
+2011-05-13T09:07:19  *** ammar01 has quit IRC
+2011-05-13T09:07:33  *** Spanktar has joined #selenium
+2011-05-13T09:11:49  *** towski has quit IRC
+2011-05-13T09:23:06  *** sjmikem has joined #selenium
+2011-05-13T09:29:58  *** sfbrian has joined #selenium
+2011-05-13T09:37:57  *** andialbrecht is now known as andialbrecht_
+2011-05-13T09:38:59  *** towski has joined #selenium
+2011-05-13T09:41:55  *** stepheneb has joined #selenium
+2011-05-13T09:47:48  *** sjmikem has quit IRC
+2011-05-13T09:50:26  *** aquarius1973 has quit IRC
+2011-05-13T09:54:27  *** adamgoucher has quit IRC
+2011-05-13T09:55:25  *** adamgoucher has joined #selenium
+2011-05-13T09:57:24  <barancev> http://selenium.saucelabs.com/irc/logs/ -- error on line 2 at column 6: XML declaration allowed only at the start of the document
+2011-05-13T10:00:12  <freynaud> works using FF
+2011-05-13T10:02:14  <barancev> google chrome
+2011-05-13T10:02:15  <selbot> http://www.google.com/chrome/
+2011-05-13T10:04:13  <barancev> chrome is a standard purist
+2011-05-13T10:07:01  <RossPatterson> Opera says the same thing: XML parsing failed
+2011-05-13T10:07:01  <RossPatterson> XML parsing failed: syntax error (Line: 2, Character: 0)
+2011-05-13T10:07:01  <RossPatterson> Reparse document as HTML
+2011-05-13T10:07:01  <RossPatterson> Error:
+2011-05-13T10:07:01  <RossPatterson> XML declaration not at beginning of document
+2011-05-13T10:07:02  <RossPatterson> Specification:
+2011-05-13T10:07:02  <RossPatterson> http://www.w3.org/TR/REC-xml/
+2011-05-13T10:07:03  <RossPatterson> 1:
+2011-05-13T10:07:03  <RossPatterson> 2: <?xml version="1.0" encoding="iso-8859-1"?>
+2011-05-13T10:07:04  <RossPatterson> 3: <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+2011-05-13T10:07:04  <RossPatterson> 4: <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+2011-05-13T10:07:05  <RossPatterson> 5: <head>
+2011-05-13T10:07:48  <ato> Remove newline at beginning.
+2011-05-13T10:07:55  <RossPatterson> Ayuh
+2011-05-13T10:12:57  *** mbeierl has quit IRC
+2011-05-13T10:17:08  *** dlam has joined #selenium
+2011-05-13T10:17:12  *** sjmikem has joined #selenium
+2011-05-13T10:29:44  <bobMarley> You guys need to start documenting your code.
+2011-05-13T10:30:50  <jimevans> bobMarley: That's a pretty blanket statement. Can you be more specific?
+2011-05-13T10:31:22  <bobMarley> jimevans: javadocs seem to be lacking afaict throughout the Selenium project
+2011-05-13T10:32:06  <jimevans> if you say so.
+2011-05-13T10:32:43  <jimevans> are you referring to specific classes or methods that have javadocs that are lacking?
+2011-05-13T10:33:59  <bobMarley> jimevans: Specifically at the moment I'm referring to the LocatingElementHandler
+2011-05-13T10:34:31  *** reddeviL is now known as red^
+2011-05-13T10:35:00  <bobMarley> jimevans: It would just be nice to have a few lines of explanation on each of your classes so that I know how to use them without having to dig through the source code.
+2011-05-13T10:35:48  *** phdaemon has quit IRC
+2011-05-13T10:37:10  *** stepheneb has quit IRC
+2011-05-13T10:38:01  <jimevans> i can see how that would be frustrating. i don't really look at the javadocs often, since i'm not primarily a java developer.
+2011-05-13T10:39:38  <bobMarley> jimevans: Yeah, I guess you guys have a lot of different communities to worry about.  I'll stop complaining now...
+2011-05-13T10:42:54  <ivog> submit a patch :)
+2011-05-13T10:43:21  *** Rogi has joined #selenium
+2011-05-13T10:44:07  *** stepheneb has joined #selenium
+2011-05-13T10:44:24  <bobMarley> ivog: Perhaps I will if I get comfortable enough with the code.
+2011-05-13T10:50:36  *** admc has joined #selenium
+2011-05-13T10:59:43  *** phdaemon has joined #selenium
+2011-05-13T11:00:01  *** melter has quit IRC
+2011-05-13T11:00:27  <phdaemon> ok, quick question, im trying to run this script on an SSL site, works fine in firefox and IE, but safari and chrome are giving me issues. the RC tries to setup some kind of proxy that invalidates the SSL certs... any way around that?
+2011-05-13T11:01:23  *** melter has joined #selenium
+2011-05-13T11:09:24  *** lfryc has quit IRC
+2011-05-13T11:16:28  *** admc1 has joined #selenium
+2011-05-13T11:16:42  *** aether__ has quit IRC
+2011-05-13T11:18:11  *** Ivog_ has joined #selenium
+2011-05-13T11:18:13  *** admc has quit IRC
+2011-05-13T11:22:49  *** dlam has quit IRC
+2011-05-13T11:23:50  *** towski has quit IRC
+2011-05-13T11:24:27  *** towski has joined #selenium
+2011-05-13T11:26:15  <jimevans> holy crap! i just spent 20 minutes poking around with the .NET webdriver bindings... in a REPL!
+2011-05-13T11:27:45  *** melter has quit IRC
+2011-05-13T11:28:07  <XCulver> repl?
+2011-05-13T11:28:26  <jimevans> read-evaluate-print-loop
+2011-05-13T11:28:34  <XCulver> i just googled it
+2011-05-13T11:28:38  <XCulver> reading the wikipedia on it now
+2011-05-13T11:28:48  <jimevans> like the ruby and python guys have had like forever.
+2011-05-13T11:29:19  <jimevans> powershell kinda rocks.
+2011-05-13T11:30:28  <selbot2> jari.bakken half a minute ago - JariBakken: Replace short-lived select() call with sleep + retry. - http://code.google.com/p/selenium/source/detail?r=12178
+2011-05-13T11:31:04  <XCulver> what was the purpose?
+2011-05-13T11:31:12  <XCulver> wondering how it was helping you
+2011-05-13T11:35:21  <jimevans> oh, i was just messing about.
+2011-05-13T11:35:39  <jimevans> it's kinda nice to be able to type a command and interactively see the result.
+2011-05-13T11:36:04  <XCulver> true
+2011-05-13T11:36:08  <jimevans> it'd probably be worth a pretty cool blog entry. you know, if i had a blog.
+2011-05-13T11:36:08  <XCulver> i've kinda avoided powershell
+2011-05-13T11:36:13  <XCulver> only used it when i have to
+2011-05-13T11:36:23  <XCulver> you totally should
+2011-05-13T11:37:41  *** melter has joined #selenium
+2011-05-13T11:42:06  *** adamgoucher has quit IRC
+2011-05-13T11:49:37  <AutomatedTester> jimevans: i played with the .NET bindings in the Iron languages REPL
+2011-05-13T11:49:40  *** hjb has quit IRC
+2011-05-13T11:49:41  <AutomatedTester> very cool
+2011-05-13T11:50:08  *** hjb_ has joined #selenium
+2011-05-13T11:51:27  <jimevans> the whole "i can just use it in powershell" kinda threw me for a loop.
+2011-05-13T11:51:33  *** hjb_ is now known as hjb
+2011-05-13T11:52:16  <AutomatedTester> F# also allows it
+2011-05-13T12:01:38  *** ivog has quit IRC
+2011-05-13T12:01:39  *** Ivog_ is now known as Ivog
+2011-05-13T12:04:22  *** AutomatedTester has quit IRC
+2011-05-13T12:05:37  *** esteele has quit IRC
+2011-05-13T12:05:42  *** esteele has joined #selenium
+2011-05-13T12:06:18  *** admc1 has quit IRC
+2011-05-13T12:12:17  *** adamgoucher has joined #selenium
+2011-05-13T12:17:42  *** celm has joined #selenium
+2011-05-13T12:19:47  *** Ivog has left #selenium
+2011-05-13T12:22:26  *** Ivog has joined #selenium
+2011-05-13T12:22:39  *** _ivog has joined #selenium
+2011-05-13T12:26:20  *** RossPatterson has quit IRC
+2011-05-13T12:27:43  *** mbeierl has joined #selenium
+2011-05-13T12:40:30  <jarib> jimevans: is there a technical reason IE doesn't return cookie expiration dates?
+2011-05-13T12:40:49  *** adamgoucher has joined #selenium
+2011-05-13T12:41:12  <jimevans> other than ie just doesn't make the information available?
+2011-05-13T12:41:38  <jarib> that's a good enough reason :)
+2011-05-13T12:42:00  <jarib> thanks
+2011-05-13T12:42:29  <jimevans> np
+2011-05-13T12:49:26  *** mashiara has joined #selenium
+2011-05-13T12:58:16  *** kylls has quit IRC
+2011-05-13T13:03:06  *** kylls has joined #selenium
+2011-05-13T13:05:55  *** esteele has quit IRC
+2011-05-13T13:05:58  *** esteele_ has joined #selenium
+2011-05-13T13:07:44  *** sjmikem has quit IRC
+2011-05-13T13:13:59  *** cburroughs has quit IRC
+2011-05-13T13:17:48  *** sjmikem has joined #selenium
+2011-05-13T13:17:59  <adamgoucher> i know ive done this before, but how do i retrieve the content of a text box immediately after i set it. get_attribute isnt working
+2011-05-13T13:18:09  *** celm has quit IRC
+2011-05-13T13:21:28  <ato> getValue, but that's been deprecated, right?
+2011-05-13T13:34:10  *** cheezy has quit IRC
+2011-05-13T13:34:37  *** towski_ has joined #selenium
+2011-05-13T13:37:08  *** towski has quit IRC
+2011-05-13T13:44:54  *** stepheneb has quit IRC
+2011-05-13T13:45:52  *** adamgoucher has quit IRC
+2011-05-13T13:46:15  *** admc1 has joined #selenium
+2011-05-13T13:53:28  *** kylls has quit IRC
+2011-05-13T13:54:40  *** Rajan has quit IRC
+2011-05-13T13:56:10  *** sfbrian_ has joined #selenium
+2011-05-13T13:56:28  *** SL-BWood has quit IRC
+2011-05-13T13:58:26  *** sfbrian has quit IRC
+2011-05-13T13:58:26  *** sfbrian_ is now known as sfbrian
+2011-05-13T14:02:37  *** red^ is now known as reddeviL
+2011-05-13T14:24:02  *** jimevans has quit IRC
+2011-05-13T14:27:32  *** darrenm_ has quit IRC
+2011-05-13T14:28:11  *** darrenm_ has joined #selenium
+2011-05-13T14:34:15  *** dragonOfTheWest has joined #selenium
+2011-05-13T14:35:55  *** bobMarley has quit IRC
+2011-05-13T14:36:20  *** admc1 has quit IRC
+2011-05-13T14:40:20  *** carlisia has left #selenium
+2011-05-13T14:40:53  *** darrenm_ has quit IRC
+2011-05-13T14:43:00  *** darrenm_ has joined #selenium
+2011-05-13T14:50:48  *** darrenm_ has quit IRC
+2011-05-13T14:53:12  *** darrenm_ has joined #selenium
+2011-05-13T15:14:24  *** admc has joined #selenium
+2011-05-13T15:15:59  *** andytinkham has quit IRC
+2011-05-13T15:17:01  *** amitev2 has joined #selenium
+2011-05-13T15:18:18  *** amitev has quit IRC
+2011-05-13T15:21:41  *** brettporter has joined #selenium
+2011-05-13T15:56:06  *** XCulver has quit IRC
+2011-05-13T16:04:12  *** Ivog has left #selenium
+2011-05-13T16:08:56  *** mbeierl has quit IRC
+2011-05-13T16:20:06  *** _ivog has quit IRC
+2011-05-13T16:20:23  *** ivog has joined #selenium
+2011-05-13T16:28:06  *** wsmoak has joined #selenium
+2011-05-13T16:29:16  *** wsmoak has quit IRC
+2011-05-13T16:39:30  *** esteele_ is now known as esteele
+2011-05-13T16:39:39  *** Rogi has quit IRC
+2011-05-13T16:43:51  *** josh_k has joined #selenium
+2011-05-13T16:44:23  <josh_k> anyone have any advice on how to debug if selenium is not matching an Xpath, but firebug's $x() does?
+2011-05-13T16:47:05  *** charleyb has joined #selenium
+2011-05-13T16:47:39  <sfbrian> josh_k: are you waiting long enough for the element to be present?
+2011-05-13T16:47:50  <josh_k> sfbrian: yep
+2011-05-13T16:47:57  <josh_k> I can see it in the screenshot selenium is taking
+2011-05-13T16:48:06  <sfbrian> what is the xpath?
+2011-05-13T16:48:44  <josh_k> /a[@id='6758a4dca6e99e34c42cf9f47a314ed529ee5b35'][contains(string(), 'to remote storage complete.')]
+2011-05-13T16:48:48  <josh_k> err
+2011-05-13T16:48:50  <josh_k>  //a[@id='6758a4dca6e99e34c42cf9f47a314ed529ee5b35'][contains(string(), 'to remote storage complete.')]
+2011-05-13T16:48:52  <sfbrian> ouch
+2011-05-13T16:49:10  <josh_k> contains(string()) has worked pretty consistently
+2011-05-13T16:49:24  <sfbrian> try using text() instead of string()
+2011-05-13T16:56:42  *** ivog has quit IRC
+2011-05-13T16:59:15  *** dragonOfTheWest has quit IRC
+2011-05-13T17:07:30  <sfbrian> josh_k: any luck?
+2011-05-13T17:15:47  *** esteele_ has joined #selenium
+2011-05-13T17:18:07  *** esteele_ has quit IRC
+2011-05-13T17:18:34  *** wsmoak has joined #selenium
+2011-05-13T17:20:50  <josh_k> sfbrian: win!
+2011-05-13T17:21:05  <josh_k> (I stepped away while it was running, but it looks like that path selector worked)
+2011-05-13T17:21:06  <sfbrian> woot
+2011-05-13T17:21:16  <sfbrian> i've never used string() before
+2011-05-13T17:21:18  <sfbrian> just text()
+2011-05-13T17:22:41  *** towski_ has quit IRC
+2011-05-13T17:23:01  *** towski has joined #selenium
+2011-05-13T17:25:03  <josh_k> sfbrian: thanks for the tip; my colleague had me using string() since it ignores contained tags; but in this case text() works just as well.
+2011-05-13T17:26:49  *** cburroughs has joined #selenium
+2011-05-13T17:28:17  *** wsmoak has left #selenium
+2011-05-13T17:32:59  *** Rogi has joined #selenium
+2011-05-13T17:33:32  <sfbrian> josh_k: no problem, anytime
+2011-05-13T17:33:50  *** sfbrian has quit IRC
+2011-05-13T17:35:07  *** adamgoucher has joined #selenium
+2011-05-13T17:35:13  *** sfbrian has joined #selenium
+2011-05-13T17:35:24  *** esteele has left #selenium
+2011-05-13T17:36:56  *** Spanktar has quit IRC
+2011-05-13T17:41:02  *** admc has quit IRC
+2011-05-13T18:03:34  *** jwl is now known as johnnywengluu
+2011-05-13T18:28:02  *** hrubi has quit IRC
+2011-05-13T18:28:05  *** seanh-ansca has quit IRC
+2011-05-13T18:38:14  *** hrubi has joined #selenium
+2011-05-13T18:52:17  *** cburroughs has quit IRC
+2011-05-13T18:56:31  *** josh_k has quit IRC
+2011-05-13T19:16:54  *** stepheneb has joined #selenium
+2011-05-13T19:45:26  *** adamgoucher has quit IRC
+2011-05-13T20:22:38  *** treme has joined #selenium
+2011-05-13T20:43:14  *** Rogi has quit IRC
+2011-05-13T20:47:37  *** sjmikem has quit IRC
+2011-05-13T20:48:02  *** sjmikem has joined #selenium
+2011-05-13T20:49:11  *** towski has quit IRC
+2011-05-13T20:51:04  *** sdimkov has quit IRC
+2011-05-13T20:55:14  *** treme has quit IRC
+2011-05-13T21:10:13  *** towski has joined #selenium
+2011-05-13T21:57:57  *** brettporter has quit IRC
+2011-05-13T22:12:33  *** erwan has joined #selenium
+2011-05-13T22:20:50  *** stepheneb has quit IRC
+2011-05-13T22:22:29  *** dmachi has joined #selenium
+2011-05-13T22:22:29  *** dmachi1 has quit IRC
+2011-05-13T22:44:08  *** twk3 has joined #selenium
+2011-05-13T23:10:15  *** mashiara has quit IRC
+2011-05-13T23:28:14  *** darrenm_ has quit IRC
+2011-05-13T23:29:42  *** darrenm_ has joined #selenium
+2011-05-13T23:34:01  *** darrenm_ has quit IRC
+2011-05-13T23:34:44  *** darrenm_ has joined #selenium
+2011-05-13T23:39:32  *** darrenm_ has quit IRC
+2011-05-13T23:39:52  *** darrenm_ has joined #selenium
+2011-05-13T23:48:44  *** darrenm_ has quit IRC
+2011-05-13T23:49:30  *** darrenm_ has joined #selenium
+2011-05-13T23:53:42  *** darrenm_ has quit IRC
+2011-05-13T23:54:11  *** darrenm_ has joined #selenium

@@ -1,0 +1,363 @@
+[IRC logfile - Started Sat Feb  2 00:01:29 2013]
+[00:01:29] kentor: KaibutsuX, do I need to do anything else after I unzip the file
+[00:02:06] kentor: how does my script know about the new directory
+[00:02:10] KaibutsuX: I don't believe so, it just needs to be importable so you can do from selenium import webdriver
+[00:02:13] KaibutsuX: sys.path
+[00:02:18] kentor: ah ok let me try that
+[00:02:23] KaibutsuX: or pip takes care of it if you do it that way
+[00:02:49] kentor: yes i had done pip previously but let me try this way since it isn't currently working
+[00:04:23] KaibutsuX: lukeis: any insight on this: d = webdriver.Firefox(); d.execute_script("alert('asd');"); d.execute_script("alert('asd');")
+[00:04:50] KaibutsuX: first one gives me an alert, second one a traceback in execute from extensions/fxdriver@googlecode.com/components/command_processor.js
+[00:05:11] kentor: sys.path.append("/home/sgalkov/selenium-2.29.0/py/selenium")
+[00:05:17] kentor: is that the correct level at which I should import
+[00:05:21] dude-x: KaibutsuX: you need to dismiss the alert
+[00:05:29] kentor: or should I go into another directory deeper
+[00:05:31] KaibutsuX: motherfuc...
+[00:05:36] KaibutsuX: I did dismiss it, but manually
+[00:05:39] KaibutsuX: not via script
+[00:06:05] dude-x: or accept the alert
+[00:07:25] KaibutsuX: yeah it's ok if I accept via script, but apparently it all goes to hell if I try to interact with the page
+[00:09:27] dude-x: why are you creating alerts anyway?
+[00:11:17] KaibutsuX: its just a test
+[00:13:26] albinadatsukova has joined #selenium
+[00:14:37] kentor: dude-x, do you know how to address my issue? I am able to run a python script which gets the html of the indicated url but I am not able to produce a HAR file, once I add it to the equation, I am returned an empty json blurb
+[00:15:32] dude-x: I don't have experience using browser mob proxy
+[00:15:44] kentor: any other way to get a .har file?
+[00:15:50] dude-x: maybe...
+[00:16:05] dude-x: somewhere at home i have an article about using firebug to record HARs
+[00:16:13] kentor: oh, this is a headless machine
+[00:16:16] kentor: no display
+[00:16:24] kentor: im not sure it is easy to add firebug into the mix
+[00:16:25] dude-x: you can use xvfb
+[00:16:34] kentor: ok I have that installed
+[00:16:37] kentor: but I couldnt get that to work
+[00:16:49] dude-x: you just have to start the 'server' and pick a display number
+[00:17:16] dude-x: then you can do something like export DISPLAY=0:5 | my_script.py
+[00:17:29] dude-x: err not pipe, &
+[00:17:37] dude-x: &&
+[00:17:39] dude-x: in bash
+[00:18:24] dude-x: that's all it takes. it's super easy ...
+[00:18:45] dude-x: and it should work in CentOS (which i find to be troublesome with webdriver from time to time)
+[00:19:43] kentor: ok, do I need to make any changes in my script?
+[00:20:05] dude-x: at my prior job, i never had code to deal with xvfb
+[00:20:13] dude-x: just scripts to start the webdriver tests
+[00:20:45] dude-x: on our jenkins server, it would start xvfb with 1024x768 (i'd recommend 1280x1024, at least these days)
+[00:21:00] kentor: I think I am already doing this inside the script itself
+[00:21:29] kentor: i just do
+[00:21:29] kentor: display = Display(visible=0, size=(800, 600)) display.start()
+[00:21:37] kentor: which I imported from from pyvirtualdisplay import Display
+[00:22:39] jimevans has left #selenium
+[00:26:38] dude-x: you can use that too
+[00:26:53] dude-x: i never had the need to use that, but at least you can build it into your script
+[00:27:05] kentor: yea but i am not getting any output in my har object
+[00:27:09] kentor: as soopn as i add the proxy
+[00:27:14] kentor: i cannot get anything
+[00:27:39] kentor: one sec let me show you my latest state
+[00:27:45] fatguylaughing has joined #selenium
+[00:33:29] kentor: previously I had: http://pastebin.com/eiECkhVn
+[00:33:53] kentor: this would grab the page, get the content, but it seems the proxy wasn't tied to the profiler here
+[00:34:05] kentor: so I changed it and simplified the script slightly to fix that
+[00:34:19] kentor: (and renamed script to bmp.py)
+[00:34:21] kentor: and now I have
+[00:34:21] kentor: http://pastebin.com/FMqh9xwv
+[00:34:54] kentor: however now I am not getting any content and the HAR json object while showing more output is still empty
+[00:35:32] kentor: KaibutsuX, thank you for your help so far, you've gotten me really close
+[00:38:17] KaibutsuX: np, good luck
+[00:44:48] cgoldberg has joined #selenium
+[IRC logfile - Started Sat Feb  2 01:10:28 2013]
+[01:10:28] Guruuu has joined #selenium
+[01:10:33] Guruuu: guys
+[01:10:42] Guruuu: how to stop the page loading
+[01:10:50] Guruuu: it takes forever to load some pages
+[01:10:58] Guruuu: and I want to work on the current loaded DOM
+[01:11:18] KaibutsuX: you should be able to set an implicit timeout
+[01:11:33] KaibutsuX: for all waits
+[01:11:40] KaibutsuX: i think it's usually only 3 seconds
+[01:11:59] KaibutsuX: anyone python-ish still around?
+[01:12:17] Guruuu: I did implicit wait for 10 seconds
+[01:12:51] Guruuu: but the open method on the driver takes a lot of time to return as the page loads forever
+[01:13:10] Guruuu: I'm using php btw 
+[01:13:22] Guruuu: does it differ using php or other languages?
+[01:13:29] Guruuu: will I have less features?
+[01:14:13] KaibutsuX: i don't think php is officially supported, let me look
+[01:14:26] Guruuu: nope it is not 
+[01:14:32] KaibutsuX: http://seleniumhq.org/download/
+[01:14:33] Guruuu: there is the facebook binding
+[01:15:00] KaibutsuX: personally i hate php and stay away from it
+[01:15:04] Guruuu: when it is not officially supported, then it will have "less features"?
+[01:15:09] Guruuu: lol, I know php sucks
+[01:15:15] Guruuu: but this is what my company uses
+[01:15:31] KaibutsuX: I don't know about features, but since it's not official it might not conform to conventions
+[01:15:46] Guruuu: hmmm
+[01:15:46] KaibutsuX: I would probably try out the one provided by AdamGoucher on that page though, he's a regular here
+[01:15:57] adamgoucher: which what?
+[01:16:05] Guruuu: :)
+[01:16:12] KaibutsuX: https://github.com/Element-34/php-webdriver
+[01:16:20] adamgoucher: yes, use that one
+[01:16:29] KaibutsuX: lol
+[01:16:32] adamgoucher: (its awesome -- and unlike facebooks, supported)
+[01:16:32] Guruuu: lol, ok but does this solve the problem ?
+[01:16:51] adamgoucher: which problem (assume i just got back from the gym and cant really read)
+[01:17:13] stephend: those damn endorphins
+[01:17:28] Guruuu: adamgoucher, the problem is soemtimes the page takes forever to load
+[01:17:40] Guruuu: and the session->open doesnt return 
+[01:17:51] Guruuu: so that I can work on the current loaded DOM elements
+[01:17:54] adamgoucher: more like the damn 'please dont puke' :D
+[01:18:19] adamgoucher: so your application is busted in a way that is breaking webdriver? :D
+[01:18:39] Guruuu: :o
+[01:19:22] adamgoucher: (again, assume i just got back from the gym so can't realy think)
+[01:19:22] stephend: and therefore would bust an end-user, too?
+[01:19:36] Guruuu: lol
+[01:19:39] stephend: familiar problem to use at Mozilla, thankfully it's gotten miles better in the last couple of years
+[01:19:45] stephend: s/use/us
+[01:20:10] llaskin has joined #selenium
+[01:20:31] adamgoucher: if its repeatable, and accessible from the outside world, log an issue on it for me to look at next week. or email me (adam@element34.ca) and i can nda up to see it
+[01:24:00] adamgoucher: wont be until tuesday at the earliest though
+[01:25:52] adamgoucher: does it only get hung on one browser? or all browsers? i have one client that for a couple of their scripts cant use chrome
+[01:26:22] Guruuu: nah, all browser
+[01:26:24] Guruuu: nah, all browsers
+[01:28:04] adamgoucher: well, the easy option rarely works...
+[01:49:21] farlan has joined #selenium
+[01:51:41] Guruuu: adamgoucher,  how can I provide a socks instead of a proxy?
+[01:52:00] Guruuu: I'm currently using PAC , but can not it be more easy?
+[01:57:10] adamgoucher: i dont know that you can. you'd have to setup the proxy object as normal and maybe set the magic authentication headers using the browsermob proxy? (thats how you deal with basic auth at any rate)
+[01:57:51] adamgoucher: (or not since i dont know anything about the socks protocoling)
+[01:58:59] adamgoucher: looks like the pac might be how to do it --- http://code.google.com/p/selenium/wiki/JsonWireProtocol#Proxy_JSON_Object
+[IRC logfile - Started Sat Feb  2 02:09:04 2013]
+[02:09:04] Guruuu: yeah adamgoucher, I'm using pac currently
+[02:09:07] Guruuu: thank you anyway
+[02:09:34] adamgoucher: socks isnt an option in the protocol
+[02:09:53] adamgoucher: doesnt mean its not doable mind you
+[02:10:15] Guruuu: yea
+[02:11:56] Guruuu: ur code is great adam
+[02:12:46] phishy has joined #selenium
+[02:12:57] adamgoucher: google chrome doesnt seem to expose socks either; just pac -- http://peter.sh/experiments/chromium-command-line-switches/
+[IRC logfile - Started Sat Feb  2 03:45:45 2013]
+[03:45:45] stephend has joined #selenium
+[IRC logfile - Started Sat Feb  2 04:19:44 2013]
+[04:19:44] rananda has joined #selenium
+[IRC logfile - Started Sat Feb  2 05:36:34 2013]
+[05:36:34] millenium_ has joined #selenium
+[IRC logfile - Started Sat Feb  2 06:55:24 2013]
+[06:55:24] narayan_ has joined #selenium
+[IRC logfile - Started Sat Feb  2 07:14:00 2013]
+[07:14:00] millenium_ has joined #selenium
+[07:37:01] narayan_ has joined #selenium
+[07:56:02] davehunt has joined #selenium
+[07:56:45] megha has joined #selenium
+[IRC logfile - Started Sat Feb  2 08:44:58 2013]
+[08:44:58] Michael_Wowro has joined #selenium
+[08:45:28] Guruuu has joined #selenium
+[08:54:57] noahsussman has joined #selenium
+[IRC logfile - Started Sat Feb  2 09:10:24 2013]
+[09:10:24] Osleg has joined #selenium
+[09:14:15] megha has joined #selenium
+[09:30:15] davehunt has joined #selenium
+[09:32:13] samphippen has joined #selenium
+[IRC logfile - Started Sat Feb  2 10:10:35 2013]
+[10:10:35] barancev has joined #selenium
+[IRC logfile - Started Sat Feb  2 11:00:27 2013]
+[11:00:27] kaawee has joined #selenium
+[11:09:17] megha has joined #selenium
+[11:23:09] samphippen has joined #selenium
+[11:35:30] stackedsax1 has joined #selenium
+[11:54:35] davehunt has joined #selenium
+[11:56:27] nari has joined #selenium
+[IRC logfile - Started Sat Feb  2 12:00:35 2013]
+[12:00:35] kaawee has joined #selenium
+[12:05:20] rbalent has joined #selenium
+[12:18:31] davehunt has joined #selenium
+[12:19:04] cheezy has joined #selenium
+[12:36:52] samphippen has joined #selenium
+[IRC logfile - Started Sat Feb  2 13:21:58 2013]
+[13:21:58] DarkRift has joined #selenium
+[13:21:58] DarkRift has joined #selenium
+[13:26:23] nari has joined #selenium
+[13:55:27] megha has joined #selenium
+[13:55:57] samphippen has joined #selenium
+[IRC logfile - Started Sat Feb  2 14:03:46 2013]
+[14:03:46] Ardesco_H has joined #selenium
+[14:09:20] rbalent has joined #selenium
+[14:22:31] samphippen has joined #selenium
+[14:28:02] alkemist has joined #selenium
+[14:34:47] davehunt has joined #selenium
+[14:35:40] farlan has joined #selenium
+[14:58:55] millenium has joined #selenium
+[IRC logfile - Started Sat Feb  2 15:10:17 2013]
+[15:10:17] mreedell has joined #selenium
+[15:11:26] barancev has joined #selenium
+[15:16:01] nirvdrum has joined #selenium
+[15:16:36] barancev: :log
+[15:16:37] selbot2: http://illicitonion.com/selogs/selenium/2013/02/02.txt | http://illicitonion.com/selogs/search
+[15:22:42] barancev: nirvdrum: I need a short consultation about hub and RC protocol, can you (try to) help?
+[15:30:59] samphippen has joined #selenium
+[15:33:34] nirvdrum: barancev: I can't right now, but I'll be able to in about an hour if you'll still be online.
+[15:33:45] girija_ has joined #selenium
+[15:34:00] barancev: ok
+[15:35:53] samphippen has joined #selenium
+[15:40:23] rbalent has joined #selenium
+[15:48:20] samphippen has joined #selenium
+[15:52:59] alkemist has joined #selenium
+[15:57:05] nari has joined #selenium
+[IRC logfile - Started Sat Feb  2 16:13:43 2013]
+[16:13:43] girija_ has joined #selenium
+[16:14:23] detroniz_ has joined #selenium
+[16:18:58] alkemist has joined #selenium
+[16:21:37] alkemist has joined #selenium
+[16:25:25] DarkRift has joined #selenium
+[16:35:31] nirvdrum: barancev: What's up?
+[16:37:50] barancev: why the hub has (in TestSession class) very short timeout for an RC session to become orphaned? MAX_IDLE_TIME_BEFORE_CONSIDERED_ORPHANED = 5000 
+[16:38:19] barancev: if a user has 5 seconds sleep in a test, hub kills the session
+[16:38:50] barancev: is there a technical reason?
+[16:39:40] nirvdrum: Because the RC protocol makes two calls back-to-back. I think it's startNewBrowserSession and setTimeout.  The user can't execute any code in between.
+[16:40:06] nirvdrum: The orphan check was to catch the session being lost before the setTimeout call is made.
+[16:40:59] barancev: setTimeout? where is it described?
+[16:41:09] barancev: http://wiki.openqa.org/display/SRC/Specifications+for+Selenium+Remote+Control+Client+Driver+Protocol is this specification actual?
+[16:41:33] nirvdrum: I'm going from memory, so I may have the exact call a bit wrong.
+[16:43:25] nirvdrum: But, yeah, it doesn't look like it's documented.  Fun.
+[16:44:14] barancev: and I can't see setTimeout in the server log: https://gist.github.com/4698197
+[16:44:49] barancev: getNewBrowserSession and then open, no setTimeout inbetween
+[16:45:53] nirvdrum: Maybe it was getNewBrowserSession and open.  I'd have to dig up some of my older RC code to be sure.
+[16:46:11] nirvdrum: Sorry.  I switched to WD on my grid back in May or June, so some of this isn't fresh for me.
+[16:46:38] nirvdrum: I'm opening up IDEA now, too.
+[16:47:03] nirvdrum: But, IIRC, RC pairs two commands.  And if the client connection breaks, the second one will never get sent.
+[16:47:14] nirvdrum: And that was what I was trying to catch.
+[16:47:19] barancev: actually, I'm working on #5113
+[16:47:20] selbot2: 03 open/new Running Selenium 2 RC With Grid Returns NullPointerExceptions - https://code.google.com/p/selenium/issues/detail?id=5113 [Type-Defect Priority-Medium Status-Untriaged]
+[16:48:14] nirvdrum: The problem is a client can disconnect, but its new browser request will still sit in the queue.  The hub then pops off the queue, creates, the browser, but there's no connected client.  So, the browser session sits there and is wasted.
+[16:48:15] davehunt has joined #selenium
+[16:48:28] nirvdrum: I saw this happen a lot on EC2, which has a bit of a flaky network.
+[16:49:12] barancev: hub accepts (and forwards) only POST requests for RC protocol, that is a bug
+[16:49:21] vila has joined #selenium
+[16:49:23] barancev: specification says "The Server MUST support HTTP GET requests. The Server MAY support HTTP POST requests, but the Client Driver MUST NOT submit POST requests to the Selenium Server until it has issued a "isPostSupported" Command "
+[16:51:01] nirvdrum: What client doesn't use POST?
+[16:51:22] nirvdrum: The only client I'm aware we broke was the old PHP one and they released a version that works.
+[16:54:31] nirvdrum: I can look at this issue, too.  I'm trying to get a site redesign out today, but I should have some time.
+[16:55:45] barancev: there is the specification that says "the Client Driver MUST NOT submit POST requests to the Selenium Server until it has issued a "isPostSupported" Command ""
+[16:56:09] barancev: so all our clients don't conform to the specification, right ? :)
+[16:56:33] barancev: I've already implemented GET forwarding
+[16:56:39] barancev: will submit soon
+[16:57:08] barancev: but when I tried to debug it interactively from the browser I've found this 5 sec timeout
+[16:58:06] barancev: that is hardcoded and can't be changed
+[16:58:11] alkemist has joined #selenium
+[16:58:49] nirvdrum: I've never even seen that wiki page before.  I have no idea how accurate it is.
+[16:59:20] barancev: is there another RC protocol specification?
+[16:59:24] nirvdrum: It may be that the POST and GET paths do something differently.
+[16:59:36] nirvdrum: I don't think so.  I think the specification is whatever the server does.
+[16:59:45] nirvdrum: And whatever the Java client does.
+[IRC logfile - Started Sat Feb  2 17:00:25 2013]
+[17:00:25] nari has joined #selenium
+[17:00:29] nirvdrum: Let me dig up my old code and see if I can find you a better answer.
+[17:00:57] barancev: ok
+[17:04:04] nirvdrum: I'm sure glad I added a tag for when I moved to WD :-P
+[17:10:01] narayan_ has joined #selenium
+[17:15:20] Swadq has joined #selenium
+[17:20:10] detroniz_ has joined #selenium
+[17:23:03] fatguylaughing has joined #selenium
+[17:27:55] barancev: nirvdrum: here is a repro: https://gist.github.com/4698433
+[17:28:27] barancev: if I do a sleep after selenium.start() before any operation the hub kills the session as orphaned
+[17:29:44] barancev: if I perform any operation in less than 5 sec after  session creation the hub keeps the session open for longer time (how long?)
+[17:30:46] nirvdrum: Until the client timeout.
+[17:31:20] nirvdrum: I think it's 5 minutes by default.
+[17:31:51] alkemist has joined #selenium
+[17:32:07] barancev: why do we have this special 5 sec timeout for new sessions?
+[17:32:23] barancev: and why don't we have the same for webdriver if it is usable?
+[17:33:12] nirvdrum: I've already said why.
+[17:33:36] nirvdrum: And we don't have it for WebDriver because the protocol is different.
+[17:33:49] nirvdrum: As is the entirety of timeout configurations.
+[17:34:37] barancev: "The orphan check was to catch the session being lost before the setTimeout call is made" <-- this one?
+[17:34:37] nirvdrum: I'm pulling up an old grid right now.  Please give me some time to review this.
+[17:35:15] nirvdrum: I said there was a pair of commands, I don't recall which the second was. I think it was a timeout.
+[17:35:32] nirvdrum: I'm trying to bring a grid up to verify.  Grilling me on that until I can verify is not a good use of time.
+[17:35:47] nirvdrum: But I also went on to explain the problem it's intended to solve.
+[17:48:21] llaskin has joined #selenium
+[17:54:21] stephend has joined #selenium
+[IRC logfile - Started Sat Feb  2 18:01:47 2013]
+[18:01:47] nirvdrum: barancev: I see three commands at startup:
+[18:02:06] nirvdrum: getTitle()
+[18:02:14] nirvdrum: setContext(...)
+[18:02:18] nirvdrum: setTimeout(...)
+[18:03:15] nirvdrum: I believe the issue was trying to catch the break between the getTitle() & setContext() calls.  I need to investigate more though.
+[18:07:22] barancev: nirvdrum: what do you think about this scenario: https://gist.github.com/4698433 ? should it fail?
+[18:09:29] nirvdrum: No.  At least not fail the orphan timeout.
+[18:09:55] nirvdrum: What do you see in the browser's command history box before the sleep call??
+[18:11:15] barancev: getTitle and setContext
+[18:11:54] barancev: and an exception on open command: Exception in thread "main" com.thoughtworks.selenium.SeleniumException: org.openqa.grid.common.exception.GridException: Session [02a32b6ae53f4548973e49d1e92df09 8] was terminated due to ORPHAN
+[18:12:13] nirvdrum: Okay.  So, either there's a race condition or the error message is wrong.
+[18:12:33] nirvdrum: What's supposed to happen is the setContext() call counts as the second call and the orphan check stops.
+[18:13:43] nirvdrum: I wonder if millisecond resolution isn't good enough here.  That'd shock me based on network overhead.  But it's possible.
+[18:16:15] nirvdrum: Can you try instrumenting when lastActivity is updated and compare to the sessionCreatedAt time please?
+[18:16:42] alkemist has joined #selenium
+[18:18:21] barancev: I suppose it's the node sends setContext operations, not the hub
+[18:18:56] barancev: and the hub thinks there was a single START_SESSION request
+[18:19:22] barancev: so lastActivity == sessionCreatedAt
+[18:21:21] nirvdrum: If that's true, then that's new behavior.  It used to be the client that set it.
+[18:22:45] nirvdrum: Maybe not.  I should look again before confusing things.
+[18:24:43] barancev: it's BrowserSessionFactory.createNewRemoteSession that issues setContext command
+[18:25:07] barancev: org.openqa.selenium.server.BrowserSessionFactory
+[18:25:33] nirvdrum: Right.
+[18:26:16] nirvdrum: The Ruby client sends the setTimeout() call right after the getNewBrowserSession call. So, it might have been setTimeout after all.
+[18:27:37] nirvdrum: Your code example aside, does anyone actually start a browser and then wait more than 5 seconds to use it?
+[18:30:51] barancev: yes, I've seen an implementation of "session pool" with the browser that were started in advance to avoid startup time delay in tests
+[18:31:06] barancev: *browsers
+[18:31:40] barancev: (the implemenation was for WebDriver, but I can imagine a similar thing for RC)
+[18:33:59] nirvdrum: I tried building one of those on grid . . . it doesn't work.  Unless you decide your clients aren't going to connect to the grid in the first place.  In which case, you probably shouldn't be using grid.
+[18:34:54] nirvdrum: I'm open to modifying or even removing the orphan check, but something needs to be in place to handle the common case of clients disconnecting and then wasting a test slot.
+[18:35:10] nirvdrum: Because it will crush a grid installation very quickly otherwise.
+[18:35:31] nirvdrum: Both Mozilla and I watched this happen more than once.  It's not fun.
+[18:36:27] nirvdrum: Without the orphan check, RC has to wait for the regular timeout, which is usually set high.  And in that case the test slot can be orphaned for 10+ minutes before it's released.
+[18:36:44] nirvdrum: In the meanwhile, more clients will likely time out, exacerbating the problem.
+[18:36:59] nirvdrum: And then the only real fix is to reset the hub and clear out the queue.  Killing all client connections in the process.
+[18:37:44] nirvdrum: Make sense?
+[18:43:16] Dude-X_ has joined #selenium
+[18:47:25] admc has joined #selenium
+[18:59:24] nirvdrum: barancev: Did I lose you? :-P
+[IRC logfile - Started Sat Feb  2 19:00:52 2013]
+[19:00:52] barancev: no :)
+[19:01:12] barancev: I'm trying to understand why this does not happen to WebDriver
+[19:01:56] barancev: why does RC need orphan check but WebDriver does not
+[19:02:04] nirvdrum: I think it's because WebDriver has several more timeouts that can be set as requested capabilities.
+[19:02:14] nirvdrum: Kristian wrote up a wiki page for all the various WD timeouts.
+[19:03:04] nirvdrum: RC only has the ability to specify a single timeout.  And using that single timeout to also check for an orphaned session means you either have to wait very long for orphaned sessions or you have to reduce your normal action timeouts too short.
+[19:03:19] nirvdrum: To compensate, the grid hub provides a second level timeout for RC.
+[19:03:19] barancev: I'd suggest to make this orphan timeout configurable (hub parameter)
+[19:03:38] nirvdrum: I would be okay with that.
+[19:03:51] nirvdrum: Originally it was only 200ms, I think.
+[19:04:21] nirvdrum: What you see today is the result of a compromise between Francois, Kristian, and me.
+[19:04:51] nirvdrum: If you can think of a better way to detect a client being disconnected from a session, that would be even better than the orphan check.
+[19:05:42] nirvdrum: But I couldn't come up with anything that didn't require changes to all the clients.
+[19:05:51] nirvdrum: TCP timeouts could work, but they're a flaky test.
+[19:11:03] barancev: I'm ok with this check, but 1) it's short (hub can close a session if I stop in debugger after session creation), 2) it's hardcoded
+[19:11:52] nirvdrum: Okay.  Well, we can make it configurable.  That should make everyone happy, until we run into another problem.
+[19:14:26] barancev: ^)
+[19:22:02] noahsussman has joined #selenium
+[19:27:45] llaskin has joined #selenium
+[19:33:37] barancev: :note dawagner push to github is broken on jenkins
+[19:33:38] selbot2: ok!
+[19:49:29] nirvdrum: barancev: If you want me to add it to the hub, I can.  I just don't know that I can get to it today.
+[19:52:22] barancev: np, may be I'll add it myself, there is no hurry
+[IRC logfile - Started Sat Feb  2 20:05:54 2013]
+[20:05:54] phishy has joined #selenium
+[20:25:26] cheezy has joined #selenium
+[20:28:15] Selenium-Git has joined #selenium
+[20:28:15] Selenium-Git: 01[13selenium01] 15none pushed 1 new commit to 06master: 02http://git.io/x_hI3g
+[20:28:15] Selenium-Git: 13selenium/06master 148301806 15Alexei Barantsev: Implementing GET requests support for RC protocol. According to the specification, RC protocol should allow GET requests (passing command and parameters in the query string). The hub could not forward these requests. Now it can. Closes issue 5113
+[20:28:15] Selenium-Git has left #selenium
+[20:31:17] sayd has joined #selenium
+[20:33:37] admc has joined #selenium
+[20:50:48] Swadq has joined #selenium
+[IRC logfile - Started Sat Feb  2 21:00:20 2013]
+[21:00:20] nirvdrum: barancev: What client is using GET requests?
+[21:06:41] fatguylaughing has joined #selenium
+[21:18:23] stephend has joined #selenium
+[21:28:39] barancev: nirvdrum: I don't know. I hope no one
+[21:30:44] samphippen has joined #selenium
+[21:40:18] Swadq has joined #selenium
+[21:46:05] nirvdrum: barancev|NotHere: Oh, so that wasn't to fix that guy's problem?  It's just a bug you found?
+[IRC logfile - Started Sat Feb  2 22:07:36 2013]
+[22:07:36] Swadq has joined #selenium
+[22:24:39] Swadq has joined #selenium
+[22:45:26] phishy has joined #selenium
+[IRC logfile - Started Sat Feb  2 23:07:53 2013]
+[23:07:53] Ardesco has joined #selenium
+[23:22:29] phishy has joined #selenium

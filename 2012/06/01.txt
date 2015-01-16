@@ -1,0 +1,1054 @@
+[IRC logfile - Started Fri Jun  1 11:58:21 2012]
+[11:58:32] selloggingbot has joined #selenium
+[11:58:32] selbot2: ok!
+[IRC logfile - Started Fri Jun  1 12:23:53 2012]
+[12:23:53] nirvdrum has joined #selenium
+[12:43:49] freynaud has joined #selenium
+[12:48:40] barancev has joined #selenium
+[12:55:19] SamuraiJack has joined #selenium
+[12:55:54] ian_mac has joined #selenium
+[IRC logfile - Started Fri Jun  1 13:23:30 2012]
+[13:23:30] ian_mac has joined #selenium
+[13:24:26] SamuraiJack has joined #selenium
+[13:30:24] stockton has joined #selenium
+[13:34:06] krosenvold: sjaak_trekhaak: Yes, you're not terminating the session properly. Is there anything else we could've written in the message to make it clearer ?
+[13:34:52] sjaak_trekhaak: krosenvold: yeah, that I didnt close it properly. As I call the close() method, quit() after that.
+[13:35:50] sjaak_trekhaak: Are close() and quit() not sufficient to close a session?
+[13:36:01] krosenvold: quit should be enough
+[13:36:40] krosenvold: It can also mean your client crashed
+[13:37:07] sjaak_trekhaak: That would most likely be the case then, haha
+[13:37:23] sjaak_trekhaak: Cheers ^^ 
+[13:46:41] mdgreenfield has joined #selenium
+[13:47:46] SamuraiJack_ has joined #selenium
+[13:49:09] ian_mac has joined #selenium
+[13:51:50] mreedell has joined #selenium
+[13:51:58] cmcgraw has joined #selenium
+[13:52:52] ian_mac has joined #selenium
+[13:54:05] darkrift has joined #selenium
+[13:54:24] darkrift has joined #selenium
+[13:55:03] darkrift: when selenium is talking about native events, does that relate to document.createEvent(...) or another mean ?
+[13:58:14] krosenvold: darkrift: Something entriely different ;)
+[IRC logfile - Started Fri Jun  1 14:00:29 2012]
+[14:00:29] SamuraiJack_ has joined #selenium
+[14:00:31] chillitom has joined #selenium
+[14:00:34] darkrift: ok, then how is it hook without dll injection ? native usage of internal functions ?
+[14:01:02] darkrift: for firefox I guess it uses the gecko engine with internal mecanism ?
+[14:01:04] chillitom: hey guys, is there someone here I can chat to about some changes in 2.21/2.22 that happened to the ChromeDriver?
+[14:01:06] darkrift: what about IE ?
+[14:01:27] chillitom: specifically the way extensions are set on ChromeOptions
+[14:03:17] nacho has joined #selenium
+[14:06:35] chillitom: kkania: you around?
+[14:06:39] SamuraiJack_ has joined #selenium
+[14:06:46] simonstewart has joined #selenium
+[14:07:13] simonstewart: yo
+[14:07:59] chillitom: hoday
+[14:08:08] chillitom: .. i mean howdy
+[14:10:08] nirvdrum: darkrift: It's done by whatever native mechanism each browser providers.  In the case of IE, it's MSHTML and there's a C driver that works via IBrowser2.
+[14:10:47] SamuraiJack_ has joined #selenium
+[14:13:46] cgoldberg has joined #selenium
+[14:17:03] darkrift: thanks nirvdrum and krosenvold 
+[14:19:28] chillitom: any commiters around?
+[14:20:09] nirvdrum: chillitom: Depends on what the next thing you're going to ask is :-)
+[14:21:01] chillitom: just trying to find the right people to talk to about a change that went in around christmas to the ChromeDriver stuff in WebDriver
+[14:22:06] nirvdrum: chillitom: Better off just asking.  Not all committers are familiar with all areas of the codebase, but if you ask outright, you might get better direction.
+[14:22:58] chillitom: So basically with the introduction of ChromeOptions as constructor arg to ChromeDriver we lost a bunch of capabilities
+[14:23:12] chillitom: it used to take DesiredCapabilities
+[14:23:21] chillitom: and this let you set a bunch of driver level options
+[14:23:40] chillitom: ChromeOptions only exposes a handful of the original capabilities
+[14:23:57] chillitom: and there's no way currently to work around to inject own caps into options
+[14:24:17] chillitom: breaking a whole lot of my tooling and preventing us from upgrading
+[14:25:21] farlan has joined #selenium
+[14:25:45] andreastt: chillitom: You can forward the ChromeOptions class inside a capability.
+[14:26:07] chillitom: ChromeDriver only take ChromeOptions
+[14:26:11] andreastt: Something like setCapability("chromeOptions", new ChromeOptions()) or something
+[14:26:38] andreastt: You'd have to verify that against :wiki desiredcapabilities.
+[14:26:40] selbot2: 1: 03IPhoneDriver: Information about the iPhone Driver - https://code.google.com/p/selenium/wiki/IPhoneDriver
+[14:26:40] selbot2: 2: 03ChromeDriver: Information about the Chrome Driver - https://code.google.com/p/selenium/wiki/ChromeDriver
+[14:26:41] selbot2: 3: 03AndroidDriver: Getting Started With Android Driver - https://code.google.com/p/selenium/wiki/AndroidDriver
+[14:26:43] andreastt: Ugh.
+[14:27:08] chillitom: I'd use RemoteWebDriver directly and set it as caps but can't get hold of ChomeCommandExecutor as it's internal to WebDriver
+[14:27:16] chillitom: (at least in C# api)
+[14:29:25] darkrift: you could probably extends ChromeOptions and look at the source of the ChromeDriver to see how it handles the ChromeOptions object, because in the java version the constructor does options.toCapabilities()... dunno what it is in the C# binding
+[14:29:35] chillitom: thanks andreastt, i think that documentation is a little out of date
+[14:30:13] chillitom: darkrift: that works in java, unfortunately in C# the methods are all non-virtual
+[14:31:05] chillitom: i'm pretty sure a code change is needed, at least in the C# world
+[14:37:01] sfbrian has joined #selenium
+[14:39:18] nirvdrum: chillitom: Ping jimevans when he's around and see what he suggests.  You may be right and an issue needs to be filed.  But he's the guy that would know.
+[14:39:43] chillitom: nirvdrum: thanks, will keep an eye open for him
+[14:46:00] Dude-X_ has joined #selenium
+[14:59:10] brokenthumbs has joined #selenium
+[IRC logfile - Started Fri Jun  1 15:00:22 2012]
+[15:00:22] llaskin has joined #selenium
+[15:02:52] selbot2: 03dave.hunt@gmail.com 1 minute ago - DaveHunt: Bumped Selenium IDE version number to 1.8.1 for upcoming release. | https://code.google.com/p/selenium/source/detail?r=17091 | http://seleniumhq.org/ci.jsp?r=17091
+[15:05:24] selbot2: 03dave.hunt@gmail.com less than a minute ago - DaveHunt: Added Firefox 13 support to Selenium IDE. | https://code.google.com/p/selenium/source/detail?r=17092 | http://seleniumhq.org/ci.jsp?r=17092
+[15:09:11] QAGuy has joined #selenium
+[15:10:24] llaskin: davehunt|away: ping
+[15:10:30] davehunt|away: llaskin: hey
+[15:10:48] davehunt|away: I'm thinking I might just push 1.8.1 today with Firefox 13 support
+[15:10:55] llaskin: ok
+[15:11:08] llaskin: i feel like we're behind but its not like we've hd a lot of new bugs right?
+[15:11:27] davehunt|away: We are behind, and I'm not even sure if there's been many bugs
+[15:11:37] davehunt|away: I've seen a few, but some were enhancement requests
+[15:11:54] llaskin: ya
+[15:12:09] davehunt|away: I'm closing a load of bugs that have been open with NeedsClarification for over two months
+[15:12:21] llaskin: good call
+[15:15:16] ian_mac has joined #selenium
+[15:15:26] davehunt: llaskin: did you see there's a comment on #1050 for you
+[15:15:27] selbot2: davehunt: note from santiycr about 15 hours ago: I'm investigating issues with invalid HTTPS certificates on AndroidDriver. Seems to be broken on ICS. Ping me when you're around 
+[15:15:28] selbot2: 03llas...@gmail.com open/needsclarification "Reset Options" disables Ok button in Selenium IDE - https://code.google.com/p/selenium/issues/detail?id=1050 [Type-Defect Priority-Low Component-IDE]
+[15:15:37] davehunt: I'll leave that one open
+[15:17:52] hourback has joined #selenium
+[15:17:52] hourback has left #selenium
+[15:18:05] davehunt: llaskin: also #2861
+[15:18:06] selbot2: 03 open/needsclarification Selenium IDE does not record on Firefox 8.0 Mac OS X 10.6.8 with a Qooxdoo application - https://code.google.com/p/selenium/issues/detail?id=2861 [Type-Defect Priority-Medium Component-IDE]
+[15:20:00] llaskin: hrmmmm ok will lok at #1050
+[15:20:01] selbot2: 03llas...@gmail.com open/needsclarification "Reset Options" disables Ok button in Selenium IDE - https://code.google.com/p/selenium/issues/detail?id=1050 [Type-Defect Priority-Low Component-IDE]
+[15:20:16] llaskin: wtf is Qooxdoo?
+[15:20:40] davehunt: no idea :)
+[15:21:07] davehunt: llaskin: neither of those are high priority/risk imo
+[15:21:07] xtian_ has joined #selenium
+[15:21:12] llaskin: ya
+[15:21:16] begmans has joined #selenium
+[15:24:20] Jackneill has joined #selenium
+[15:24:20] Jackneill has joined #selenium
+[15:24:22] chillitom: andreastt: darkrift: i owe you guys an apology, I can get it done using DesiredCaps and RemoteWebDriver..  just makes me question the point of ChromeDriver and ChromeOptions
+[15:28:27] darkrift: for locally running instead of using grid
+[15:29:01] davehunt: llaskin: sent Samit an email and CCd you
+[15:29:42] darkrift: chillitom: selenium grid is in java, so it uses the java ChromeDriver which still has the Capabilities in the constructor parameter
+[15:31:02] begmans: Hello. I am starting to work with webdriver. I would like to know what the difference is between By.className("toto") and By.cssSelector(".toto") ? 
+[15:31:43] davehunt: begmans: className just takes a class name, but cssSelector can be much more flexible
+[15:31:45] begmans: I would like it to match a DOM element of that kind : <div class="toto titi ...."
+[15:32:06] davehunt: in your example I would use className
+[15:32:18] begmans: Sure, but is there a performance diff ?
+[15:33:37] davehunt: one sec, lemme check the source.. they might be using the same in the backend
+[15:34:25] begmans: davehunt: thanks for your first answer anyway. 
+[15:35:06] davehunt: it looks like they should both use querySelector
+[15:35:59] davehunt: at least where it's available
+[15:36:13] jimevans has joined #selenium
+[15:36:21] davehunt: so I wouldn't expect a performance difference, no
+[15:36:41] begmans: OK, thank you very much davehunt 
+[15:36:45] davehunt: np
+[15:39:50] mdgreenfield has left #selenium
+[15:42:22] selbot2: 03dave.hunt@gmail.com half a minute ago - Edited wiki page SeIDEReleaseNotes through web user interface. | https://code.google.com/p/selenium/source/detail?r=17093 | http://seleniumhq.org/ci.jsp?r=17093
+[15:43:53] davehunt: llaskin: I can replicate #1050 if I enter invalid values for either of the first two textboxes
+[15:43:54] selbot2: 03llas...@gmail.com open/needsclarification "Reset Options" disables Ok button in Selenium IDE - https://code.google.com/p/selenium/issues/detail?id=1050 [Type-Defect Priority-Low Component-IDE]
+[15:44:20] davehunt: It looks like 'Reset Options' should simply retrigger the validation
+[15:44:27] davehunt: should be a simple fix
+[15:44:29] foolx: can anyone tell me, how to easily get a good locator out of the code? The internal chrome-xpather tells me to use //*[@id="wrapper"]/div[13] for <div class="logoutbutton_profil"><input type="image" src="http://battlestargalactica-756.ah.bpcdn.net/images/en/img_buttons/btn_logout_a_typo.png?__cv=ccb342d9f2865b6ca3e4e4c6a6f8ba00" value="Logout" onclick="location.href='/logout'"></div>... thats 
+[15:44:29] foolx: NOT helping ;) -> Any better idea?
+[15:44:53] llaskin: thats ugly
+[15:45:14] llaskin: why not just use :css, ".logoutubtton_profile input"
+[15:45:21] llaskin: woops profil not profile
+[15:49:43] foolx: llaskin: it's working, but how can i create those by myself? Can't ask #selenium everytime i stuck ;)
+[15:53:10] llaskin: learn CSS
+[15:53:16] llaskin: here's a website that is useful for me
+[15:53:29] llaskin: http://net.tutsplus.com/tutorials/html-css-techniques/the-30-css-selectors-you-must-memorize/
+[15:53:45] llaskin: stop using xpath if you can avoid it
+[15:53:46] llaskin: it sucks.
+[15:53:51] foolx: llaskin: thanks, will visit that ;)
+[15:54:05] llaskin: if you have questions aobut hwo the stuff on that page works, feel free to ask.
+[15:55:05] stackedsax has joined #selenium
+[15:56:26] jimevans: where can i find a comprehensive list of everything the chrome driver supports for capabilities?
+[15:57:06] jimevans: the wiki page doesn't seem comprehensive, based on what i'm seeing in #4011
+[15:57:06] selbot2: 03 open/new Patch: Allow passing extensions as Base64 encoded strings to ChromeOptions in C# API - https://code.google.com/p/selenium/issues/detail?id=4011 [Type-Defect Priority-Medium Status-Untriaged]
+[15:58:27] llaskin: foolx: some might argue that tehre is a more complete list of CSS selectors, and they are right, but those are the most commonly used ones(I'd say the list on http://www.w3.org/TR/CSS/#selectors is more complete, but the ones nettuts misses are just ones that you will probaly never use!)
+[15:59:09] davehunt: llaskin: mind giving 1.8.1 a spin in Firefox Beta?
+[15:59:10] davehunt: http://release.seleniumhq.org/selenium-ide/1.8.1/
+[15:59:38] simonstewart: jimevans: http://src.chromium.org/viewvc/chrome/trunk/src/chrome/test/webdriver/webdriver_capabilities_parser.cc?view=markup
+[15:59:54] davehunt: http://www.mozilla.org/firefox/beta
+[IRC logfile - Started Fri Jun  1 16:00:49 2012]
+[16:00:49] jimevans: simonstewart: thanks!
+[16:00:56] simonstewart: NP
+[16:01:04] simonstewart: Had a fun time digging around finding it
+[16:01:39] foolx: llaskin: selection then should look like this right? : By.cssSelector('.logoutbutton_profil input')? That seems to be not working at all ;(
+[16:02:59] chillitom: is there any way to stop chromedriver.exe from creating a console window?
+[16:06:30] lukeis has joined #selenium
+[16:06:30] selbot2: lukeis: note from dawagner about 4 hours ago: Wow, he does crash out a lot, doesn't he? 
+[16:07:28] lukeis: would appear so
+[16:08:25] llaskin: foolx what language?
+[16:08:29] foolx: java
+[16:08:47] llaskin: that should work
+[16:08:55] kenck has joined #selenium
+[16:09:23] foolx: i thought so too, but it doesn't. Somehow he keeps telling me that he couldn't find any element, or element is invalid
+[16:09:51] llaskin: some coffee head help him out?
+[16:09:55] llaskin: I don't know the coffeehead synta
+[16:09:57] llaskin: syntax 100%
+[16:11:36] lukeis: foolx: strings are double quotes "  ... i hope that's not your issue ;)
+[16:12:03] lukeis: By.cssSelector('.logoutbutton_profil input')   ->  By.cssSelector(".logoutbutton_profil input")
+[16:12:09] llaskin: lmfao
+[16:12:16] llaskin: davehunt: firefox beta still says its verson 12
+[16:12:17] llaskin: wierd
+[16:12:43] davehunt: llaskin: really? Try Help > About Firefox
+[16:12:52] llaskin: just did
+[16:12:57] llaskin: but the file version says its 13
+[16:12:58] davehunt: check for updates?
+[16:13:24] llaskin: hrmmmm wtf
+[16:13:27] davehunt: looks fine to me
+[16:13:41] llaskin: perhaps cuz i had 12 instances open
+[16:13:55] davehunt: heh
+[16:13:59] llaskin: lmfao
+[16:14:26] llaskin: so...ummm...i have 1.7.2 here too...and it works in FF 13:-P
+[16:14:27] llaskin: lmfao
+[16:14:50] davehunt: yeah, there's no changes other than the version bump :)
+[16:15:04] davehunt: It's just 'official' support is in 1.8.1
+[16:15:13] llaskin: lol
+[16:15:18] davehunt: The tests are passing against Firefox 15 ;)
+[16:15:27] llaskin: hahaha
+[16:15:47] llaskin: ya 1.8.1 works ok
+[16:15:53] llaskin: move on to next step i think
+[16:16:09] davehunt: llaskin: see http://mozmill-ci.blargon7.com/#/addons for results
+[16:16:22] davehunt: and that's still running with 1.7.1 :)
+[16:16:40] llaskin: lol
+[16:16:51] llaskin: yea i was like, why hasn't dave updated the FF testbed :-P
+[16:17:17] davehunt: bamboo runs the nightlies
+[16:17:36] davehunt: those are reported here: http://mozmill-crowd.blargon7.com/#/addons/reports
+[16:17:48] davehunt: that's against Firefox release though
+[16:18:06] davehunt: reporting was broken until this morning though, so not much there
+[16:19:22] foolx: llaskin/lukeis: doesn't work either way ;(, will now try to simple find it via className ;(
+[16:19:52] llaskin: class name will only work for the class= entry
+[16:21:35] kallisti has joined #selenium
+[16:21:35] kallisti has joined #selenium
+[16:21:53] stockton has joined #selenium
+[16:22:49] Dude-X: hmm i had a webelement throw two staleelement referene errors! 
+[16:22:57] ebass: hey foolx, can you pastebin or point me to the website where the element is @
+[16:23:00] Dude-X: i wonder what that means
+[16:24:02] ebass: what were you trying to do to it Dude-X?
+[16:26:25] llaskin: its ebasssssss
+[16:26:35] llaskin: sup E$, hows da rugrat?
+[16:26:44] Dude-X: ebass: i have a wait for element to become visible command
+[16:27:00] pete_otaqui has joined #selenium
+[16:27:15] melter has joined #selenium
+[16:27:15] pete_otaqui: hello, back again to pester you nice folks
+[16:27:45] Dude-X: it will locate an element first, then webdriverwait for visiblity
+[16:27:45] pete_otaqui: since upgrading to 2.22, I'm having a lot of trouble with Firefox 12 (on windows 7)
+[16:27:50] ebass: Does the page under test ever remove the webelement?
+[16:28:14] ebass: hello llaskin
+[16:28:22] ebass: he's doing good man.  they get big quick
+[16:28:44] Dude-X: if it throws a staleelement exception, it would try again; my reason is ithat if it throws two StaleElRefErrs then it's not a good locator to use to check for visbility
+[16:31:08] foolx: ebass: sure can do: http://pastebin.com/G7P5WbMf
+[16:31:52] foolx: ebass: the element should be there.. it's the last test to verify, login did work, so i have to check if it is avail.
+[16:33:11] Dude-X: ebass:  to answer your question, no, it should not, but maybe the CSS has changed… 
+[16:34:04] ebass: right, that would have to be one of the only other options I would think Dude-X
+[16:34:28] Dude-X: the test passes locally 
+[16:34:36] pete_otaqui has joined #selenium
+[16:34:44] Dude-X: and this particular function call worked well so far until now
+[16:36:10] ebass: foolx: are you performing any actions within the iframe on the page before attempting to find that element?
+[16:37:14] ebass: if you are you will need to switch back to the pages main frame.
+[16:37:40] ebass: Dude-X: can  I get to the page under test?
+[16:38:47] foolx: ebass: nope, directly after login i try to find the element
+[16:39:00] Dude-X: you want to see it yourself? what do you mean?
+[16:39:29] ebass: yea
+[16:39:46] ebass: staleelementexceptions should only be thrown when an element that once was in the DOM is no longer in the DOM
+[16:39:48] ebass: AFAIK
+[16:39:48] Dude-X: nope it's internal to the company
+[16:40:20] ebass: foolx: does the locator work in Firebug? 
+[16:40:46] ebass: well, you can download a Firebug extension called Firepath
+[16:41:03] ebass: and if that can find it selenium 99% of the time will find it.
+[16:41:04] Dude-X: <3 firepath
+[16:41:09] ebass: nothing is jumping out @ me.
+[16:41:26] ebass: maybe try adding div to the beginning of your locator
+[16:41:40] ebass: same here Dude-X
+[16:41:43] ebass: its the best
+[16:43:39] Dude-X: ebass: our CI uses firefox3.6 but as i am testing firefox10esr, i find that firefox and wd 2.22 is far more picky about what constitutes as a visible element
+[16:44:25] ebass: foolx: also, you can try looking for the logout button directly like so.  By.cssSelector("input[value='Logout']")
+[16:45:02] foolx: ebass: that sounds good. I seem to don't understand firebug, since non search there seem to work
+[16:45:24] ooo has left #selenium
+[16:45:54] ebass: foolx: you need to install firebug and then install firepath
+[16:45:59] ebass: that adds a new tab to firebug
+[16:46:15] lukeis: stephend: is that how you guys do 'code review'? all through pull requests? (then someone else reviews/ merges it?)
+[16:46:38] jleyba has joined #selenium
+[16:46:43] ebass: at that tab there are options for the selector
+[16:46:51] ebass: there is XPath, CSS, and Sizzle
+[16:46:58] ebass: you want CSS
+[16:47:09] ebass: i think it defaults to XPath
+[16:48:30] pete_otaqui: has anybody else been having a problem with Firefox profile loading since upgrading to 2.22?
+[16:48:36] foolx: just installing firepath ;)
+[16:48:41] ebass: cool
+[16:49:02] ebass: pretty funny that you need to install an extension for an extension right foolx :-D
+[16:49:39] Dude-X: you can use the console in firebug and type $x('xpath') or $$('css selector')
+[16:50:22] pete_otaqui: see pastebin of the error here: http://pastebin.com/Z6bte62J the key bit seems to be "*** LOG addons.xpi: Ignoring file entry whose name is not a valid add-on ID: C:\ Users\MANGAH~1\AppData\Local\Temp\anonymous3942261371431205891webdriver-profile\ extensions\webdriver-staging"
+[16:50:42] foolx: yeah, little surprising
+[16:50:43] foolx: ;)
+[16:50:49] foolx: but it says "should work" ;)
+[16:50:52] Dude-X: i've seen that too in linux
+[16:51:10] Dude-X: though i don't load custom profiles
+[16:51:19] pete_otaqui: Dude-X: I don't either
+[16:51:28] Dude-X: actually that error is a bit misleading
+[16:51:37] Dude-X: on linux it was complaining about a missing X library
+[16:52:08] lukeis: foolx: do you have any waits? explicit or implicit?
+[16:52:37] Dude-X: pete_otaqui: can you type firefox in windows and have it start up?
+[16:52:38] pete_otaqui: Dude-X: Hmm ... can't see anything obvious, except the default profile that webdriver is trying to load into FF fails
+[16:52:52] foolx: implicit for 5 sec
+[16:52:58] pete_otaqui: Dude-X: no
+[16:53:27] lukeis: foolx: ok... try By.cssSelector("input[value='Logout']")  (that's the one you want right?)
+[16:54:33] lukeis: and if it doesn't work, add an explicit wait....   new WebDriverWait(driver, 20).until(ExpectedConditions.presenceOfElementLocatedBy(By.cssSelector("input[value='Logout']"))).click()
+[16:54:37] foolx: lukeis/Dude-X: thanks, works now. I thought it worked before, but i had a logic error ... taking screenshot before i really now that it IS loaded ...
+[16:54:56] lukeis: ok :-D
+[16:56:09] pete_otaqui: Dude-X: have added the program directory to %PATH% (so ugly, windows), will try again
+[16:58:02] pete_otaqui: Dude-X: no dice, same problem
+[16:58:17] foolx: its working now, think firebug + firepath will help me much in the future ;)
+[16:58:29] pete_otaqui: The browser does start (and did before) with an empty page, and then after a while it throws the error
+[16:58:40] Dude-X: oh then i don't know
+[16:58:47] Dude-X: they did change the browser launcher in 2.22
+[16:58:47] foolx: to bad that i get "Banned" for 5minutes for trying to login @ 12 different server instances ;(
+[16:59:04] Dude-X: foolx: testing locally?
+[16:59:10] Dude-X: or on real servers
+[16:59:14] lukeis: pete_otaqui: your traceback shows you're using 2.18
+[16:59:15] foolx: on real servers
+[16:59:29] ebass: so that selector worked foolx?
+[16:59:42] foolx: ebass: yes, it does
+[16:59:46] ebass: great
+[IRC logfile - Started Fri Jun  1 17:00:09 2012]
+[17:00:09] pete_otaqui: lukeis: and you said you weren't smart
+[17:00:21] foolx: just had to change my code a little bit to first findelement and afterwards do screenshot and reporting. Before i did the findelement inside the report... 
+[17:00:35] lukeis: that's still debateable... i am often observant though ;)
+[17:01:04] pete_otaqui: lukeis: that's what comes of upgrading loads of virtual machines and forgetting to do the one that is actually running on, you know, _hardware_
+[17:01:17] lukeis: :-D
+[17:01:35] pete_otaqui: (did you know that FF in Win7 actually renders fonts slightly differently depending on hardware?)
+[17:02:07] llaskin has joined #selenium
+[17:02:37] *lukeis wouldn't doubt it...
+[17:05:00] pete_otaqui: lukeis: sorted.
+[17:05:11] lukeis: w00t
+[17:05:22] Dude-X: :thumbs up:
+[17:05:26] pete_otaqui: so essentially, instead of bothering you next time, I should a) "turn it off and on again" and then b) upgrade to the latest
+[17:05:45] lukeis: heh... wasn't too much of a bother ;)
+[17:05:58] lukeis: but if you do it again... we may not answer ;)
+[17:06:48] pete_otaqui: :)
+[17:06:51] pete_otaqui: thanks again
+[17:08:04] pete_otaqui: you know, this all happened because (despite only being run by selenium) FF got itself in a mess because it wanted to upgrade from 10 to 12 (while being opened and closed during tests).  So, I stopped the test, upgraded the browser, and everything fell apart.
+[17:09:12] lukeis: you're just lucky 2.22 came out ;) 
+[17:09:49] *lukeis hopes FF13 isn't borked
+[17:11:29] simonstewart: Talking of "luck"....
+[17:11:35] simonstewart: Who wants the release bacon for 2.23?
+[17:11:41] simonstewart: I'm going to be OOO for most of next week
+[17:11:51] simonstewart: And I'd like it out on Wednesday or Thursday
+[17:11:59] simonstewart: (let's get back to weekly releases :)
+[17:13:22] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Enabling compound CSS selectors. | https://code.google.com/p/selenium/source/detail?r=17094 | http://seleniumhq.org/ci.jsp?r=17094
+[17:13:43] lukeis: i was about to think about taking it... but then i just saw that ;)
+[17:13:59] simonstewart: Compound CSS selectors?
+[17:14:11] barancev: yes :) what's up?
+[17:14:26] Dude-X: really?
+[17:14:34] simonstewart: There's a chance you just scared lukeis from holding the release bacon
+[17:14:37] simonstewart: :)
+[17:15:01] *lukeis will take it
+[17:15:17] *lukeis spoke too soon ;)
+[17:15:20] Dude-X: heh
+[17:15:20] barancev: oh, god!
+[17:15:36] simonstewart: lukeis: good luck!
+[17:15:43] simonstewart: dawagner: what happened there?
+[17:16:07] barancev: they are failing by timeout, 2hrs
+[17:16:16] stackedsax has joined #selenium
+[17:16:47] dawagner: What barancev said
+[17:16:53] lukeis: wow... so, why are they taking that long?
+[17:17:18] *dawagner is looking
+[17:17:26] lukeis: sauce issue?
+[17:17:32] barancev: enabling compound CSS selectors is a local change, that's not so scaring
+[17:18:49] dawagner: :note santiycr A bunch of your VMs just appear to have failed to start a browser, e.g. https://saucelabs.com/jobs/77cd7b79c4e2482285a37147fc6a364b
+[17:18:50] selbot2: ok!
+[17:21:37] Spanktar has joined #selenium
+[17:21:48] dawagner: :note santiycr Sorry that was incorrect; but something very weird is going on https://saucelabs.com/jobs/ae5686518f46403da99a38f94fb9533c claims to have taken 465 seconds to do basically nothing, and the log times don't jive with the total time
+[17:21:49] selbot2: ok!
+[17:21:59] barancev: simonstewart: can you please look at #903 - should it really work *this* way? first you do profile.layoutOnDisk , and later you change the profile -- should these changes be in memory only or auto-saved to the disk? what was your intention?
+[17:22:00] selbot2: 03 open/new FirefoxProfile appears to lose preferences when initialized from a directory - https://code.google.com/p/selenium/issues/detail?id=903 [Type-Defect Priority-Medium Browser-Firefox Component-WebDriver GettingInvolved]
+[17:22:26] *dawagner is going to stop CI builds because *something* bad is happening at Sauce
+[17:25:26] llaskin: utoh
+[17:26:10] stephend: lukeis: yep, code review throught github, then a merge, indeed
+[17:26:43] stephend|mtg: dawagner: we were seeing oddness too, late last night, good to know
+[17:26:58] stephend|mtg: 8 minutes to do a test that should've taken around 2 min
+[17:27:07] simonstewart: barancev: that bug is a reproducible test case
+[17:27:20] simonstewart: It's basically using "layoutOnDisk" to prepare a skeleton profile
+[17:27:31] simonstewart: but you could imagine it being a profile that already exists
+[17:27:39] simonstewart: The import line is that last one
+[17:27:50] simonstewart: Where we try to create a new profile from an existing one
+[17:27:53] dawagner: http://status.saucelabs.com Looks like they don't know; stephend|mtg: Did you contact them?
+[17:27:54] simonstewart: (on disk)
+[17:28:32] jfunk has joined #selenium
+[17:28:34] barancev: new FirefoxProfile(profiledir) <-- this code reads the profile from the disk, it's ok
+[17:28:44] stephend|mtg: I couldn't confirm it at 3am, which is when I started conking out
+[17:28:54] stephend|mtg: have a meeting now, then will head into the office, but will follow-up on it
+[17:29:02] simonstewart: HA
+[17:29:05] simonstewart: Reread the code
+[17:29:06] barancev: File profileDir = profile.layoutOnDisk(); <-- this code saves the profile from the memory to the disk, it's ok too
+[17:29:15] simonstewart: That's an awful bug report :)
+[17:29:28] barancev: aha, you got it!
+[17:29:38] simonstewart: Yes, the profile should be laid out _after_ those changes
+[17:29:55] simonstewart: So move the layoutOnDisk below the setPreferences
+[17:30:12] barancev: yes, after that move all is ok
+[17:30:22] simonstewart: Then we can probably close that bug
+[17:30:29] barancev: ok, thanks!
+[17:30:55] pete_otaqui: If I was interested in putting some work into the grid web console (I've got a few ideas) ... is there anything on the wiki about contributing code?  Should I just go ahead and submit a patch in an issue ticket when I'm ready?
+[17:31:20] simonstewart: That's a great way to submit a patch
+[17:31:38] simonstewart: Popping on here and pointing nirvdrum or francois at the issue would speed things up
+[17:31:42] simonstewart: :cla
+[17:31:42] selbot2: http://goo.gl/qC50R
+[17:31:53] simonstewart: and signing the CLA is needed too
+[17:32:06] pete_otaqui: And in terms of Sure
+[17:32:09] pete_otaqui: whoops
+[17:32:40] pete_otaqui: And in terms of discussing where the console might be improved?  An issue over on google/code?
+[17:33:12] simonstewart: Here is fine
+[17:33:20] simonstewart: Or in the selenium-developers google group
+[17:33:41] pete_otaqui: ok cool
+[17:33:47] pete_otaqui: thanks simonstewart
+[17:34:32] simonstewart: NP
+[17:34:36] simonstewart: Thank you!
+[17:34:50] foolx: yeah, jenkins with selenium rocks! ;) Finally finding all my screenshots easily on jenkins ;) Now i can go to another easy weekend!
+[17:35:46] pete_otaqui: hmmm ..... ConsoleServlet.java ... generating the console with a StringBuilder ... no wonder it's still kind of plain ;)
+[17:37:32] simonstewart: Please don't use JSPs :)
+[17:37:52] simonstewart: StringTemplate is kind of interesting
+[17:37:56] barancev: pete_otaqui: look at ConsoleServlet in org.openqa.grid.web.servlet.beta too, it's more colorful
+[17:38:59] barancev: pete_otaqui: it's awailable as http://hub:4444/grid/beta/console/
+[17:42:08] pete_otaqui: barancev: oh wow, that's a lot better :)
+[17:42:32] pete_otaqui: version numbers in plain sight!  hooray!
+[17:42:44] santiycr has joined #selenium
+[17:42:45] selbot2: santiycr: note from dawagner 24 minutes ago: A bunch of your VMs just appear to have failed to start a browser, e.g. https://saucelabs.com/jobs/77cd7b79c4e2482285a37147fc6a364b 
+[17:42:45] selbot2: santiycr: note from dawagner 21 minutes ago: Sorry that was incorrect; but something very weird is going on https://saucelabs.com/jobs/ae5686518f46403da99a38f94fb9533c claims to have taken 465 seconds to do basically nothing, and the log times don't jive with the total time 
+[17:43:06] santiycr: dawagner: you around?
+[17:43:09] santiycr: I have a theory
+[17:43:14] barancev: o, santi, our saviour!
+[17:43:27] santiycr: \o/
+[17:44:03] dawagner: santiycr: Hello!
+[17:44:13] santiycr: I have a theory
+[17:44:17] Dude-X: ebass`afk: i was wrong, staleelement ref didn;t occur twice; i remedied the problem by catching and relocating the element 
+[17:44:28] dawagner: Try me!
+[17:44:45] santiycr: the so long job start time is due to our servers DDOS'ing your web server
+[17:44:51] santiycr: the one that serves the jars
+[17:45:05] stockton has joined #selenium
+[17:45:06] llaskin: i haven't gotten stale element in forever thanks to dawagner
+[17:45:39] santiycr: 30 parallel tests * downloading 25 MB = 750 MB transfer
+[17:46:09] dawagner: I can well believe that... Did you ever put caching in? :p
+[17:46:21] santiycr: still working on it :)
+[17:46:25] davehunt: ping santiycr
+[17:46:36] santiycr: started investigating on squid, but haven't been able to get it to cache yet
+[17:46:41] barancev: btw, it has started to be slow only yesterday
+[17:46:45] santiycr: well, only invested a couple of hours so far
+[17:47:03] santiycr: when did you parallelization change?
+[17:47:09] santiycr: davehunt: yo
+[17:48:18] davehunt: santiycr: got your note about Android and certificates
+[17:48:22] barancev: #1760    31.05.2012 8:07:59 -- this build was OK
+[17:48:23] selbot2: 03 closed/duplicate DragAndDropTest.testDragTooFar failed with C++ error in Firefox 4 - https://code.google.com/p/selenium/issues/detail?id=1760 [Type-Defect Priority-Medium] (duplicate of https://code.google.com/p/selenium/issues/detail?id=1771)
+[17:48:36] barancev: #1761    31.05.2012 11:49:58 -- this one failed due to 2hrs timeouts
+[17:48:37] selbot2: 03 closed/fixed selenium-server-2.0rc2 won't start in windows 7 x64 - https://code.google.com/p/selenium/issues/detail?id=1761 [Type-Defect Priority-Medium]
+[17:48:38] davehunt: we don't have this issue with our devices, but we did have it when we were running on Froyo
+[17:49:17] santiycr: davehunt: you mean, you only dealt with Froyo
+[17:49:56] davehunt: On Froyo we had to fix #3504
+[17:49:58] selbot2: 03dave.h...@gmail.com closed/fixed Enable acceptSslCerts by default in AndroidDriver - https://code.google.com/p/selenium/issues/detail?id=3504 [Type-Defect Priority-Medium]
+[17:50:11] jeichar has joined #selenium
+[17:50:19] santiycr: davehunt: how about ICS
+[17:50:29] davehunt: santiycr: we don't have the issue on ICS
+[17:50:42] davehunt: but we are setting that capability
+[17:50:43] santiycr: davehunt: interesting!
+[17:50:51] santiycr: it does break in our end
+[17:50:58] davehunt: santiycr: what do you see?
+[17:51:01] santiycr: maybe it's something else
+[17:51:11] santiycr: it's just unable to open https sites
+[17:51:19] davehunt: emulator issue?
+[17:51:31] jimevans: kkania: yt?
+[17:51:34] santiycr: shows the sad android face and "coudln't open https://....."
+[17:51:46] davehunt: santiycr: we're using 2.21 on our devices iirc
+[17:51:47] santiycr: davehunt: we're currently using Androidx86
+[17:51:48] teodosia has left #selenium
+[17:51:55] kkania: jimevans: yes
+[17:51:59] santiycr: I just checked, we are as well
+[17:52:02] davehunt: I haven't tried with an emulator for a while
+[17:52:11] dawagner: santiycr: We've been running 30 in parallel 12 hours a day since the beginning
+[17:52:22] santiycr: dawagner: interesting
+[17:52:35] santiycr: let me check internally, maybe our pipe is jammed or something
+[17:52:36] dawagner: We did recently add the IEDriverServer downloading, which will be a few more HTTP requests for IE builds
+[17:52:44] dawagner: But very small requests, and not many builds
+[17:52:53] santiycr: dawagner: that's so small, shoudln't be a problem
+[17:52:56] jimevans: kkania: i've only got a couple of minutes, but i'm looking at #4013, and was hoping that you could give me a heads up when your java api patch is ready.
+[17:52:57] selbot2: 03kka...@google.com open/accepted Can no long pass extensions as Base64 encoder CRX files. - https://code.google.com/p/selenium/issues/detail?id=4013 [Type-Defect Priority-Low Component-WebDriver Browser-Chrome]
+[17:53:02] dawagner: And stephend|mtg was also seeing issues
+[17:53:20] santiycr: sauce slowness issues?
+[17:53:34] jimevans: also, when would it be safe to remove the deprecated "chrome.whatever" style of capability passing?
+[17:53:59] stephend|mtg: santiycr: yeah, wasn't sure if we were getting throttled or what
+[17:54:46] stephend|mtg: need to head in, then will troubleshoot a bit more
+[17:54:50] santiycr: cool, thanks for the heads up, guys
+[17:54:50] stephend|mtg: be back in 40 or so
+[17:55:08] dmachi has joined #selenium
+[17:55:10] *santiycr running in the offfice screaming our pipes are jammed
+[17:55:26] kkania: jimevans: I'll cc you when I put the patch up for review and ping you when its committed; The "chrome.stuff" way has been deprecated for about 4 versions now, so you should be safe to exclusively use the other way
+[17:55:45] jimevans: kkania: thanks, mate.
+[17:56:02] llaskin: sooo many googlers
+[17:56:06] jimevans: meeting time!
+[17:56:10] simonstewart: It's good, isn't it?
+[17:56:38] barancev: jimevans: kkania: merge #4011 to #4013?
+[17:56:39] selbot2: 03kka...@google.com open/new Patch: Allow passing extensions as Base64 encoded strings to ChromeOptions in C# API - https://code.google.com/p/selenium/issues/detail?id=4011 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Browser-Chrome]
+[17:56:39] selbot2: 03kka...@google.com open/accepted Can no long pass extensions as Base64 encoder CRX files. - https://code.google.com/p/selenium/issues/detail?id=4013 [Type-Defect Priority-Low Component-WebDriver Browser-Chrome]
+[17:57:11] kkania: brancev: sounds good to me
+[17:57:50] barancev: there is a patch in 4011, don't miss it
+[17:58:21] jimevans: barancev: the patch in 4011 is going to be obsolete.
+[17:58:36] barancev: ok
+[17:59:08] jimevans: it'll be rewritten from scratch, as i'll be modifying the .net bindings to mimic (within reason) the java changes kkania will be crafting.
+[17:59:24] jimevans: "it" being the patch, not the entire class...
+[IRC logfile - Started Fri Jun  1 18:00:05 2012]
+[18:00:05] jleyba: jimevans: Would you mind running the java SafariDriver tests for me real quick?
+[18:00:23] jleyba: I'm getting a lot of emails about "it doesn't work", but it works just fine for me on OS X
+[18:00:31] jimevans: wouldn't mind at all, but i'm about to head into a meeting. what's the target?
+[18:00:39] jleyba: go.bat safari:test
+[18:01:53] jimevans: tests running. i already have the extension installed, so i should be good.
+[18:02:03] jleyba: (it's just 1 test right now)
+[18:02:12] jimevans: well, not running yet; building i should've said
+[18:02:43] santiycr: dawagner: our BW usage seems normal for the last 24 hs
+[18:02:48] santiycr: still investigating
+[18:03:16] santiycr: dawagner: mind running a build using an official release, like "2.22.0" to see if that fixes things?
+[18:03:26] santiycr: it would prove the problem resides in the jar transfer
+[18:03:58] barancev: jimevans: can we do anything about #1500? or it is absolutely out of control?
+[18:04:00] selbot2: 03 open/new WebDriver - MSIE XPath broken by element with id="tags" - https://code.google.com/p/selenium/issues/detail?id=1500 [Type-Defect Priority-Medium Component-WebDriver]
+[18:05:56] *pete_otaqui was distracted by sketching out some responsive design strategies for the grid console
+[18:06:21] pete_otaqui: simonstewart: I would rather carry the bits around to people's houses _myself_ than use jsps
+[18:06:23] dawagner: santiycr: Will do
+[18:06:36] simonstewart: It's a deal
+[18:06:37] santiycr: dawagner: tks
+[18:06:45] simonstewart: You're going to be a busy man, pete_otaqui
+[18:07:04] santiycr: I'm going through logs to figure out what happened with those 7 minutes before the test started
+[18:07:10] pete_otaqui: but happier than ever doing *shudder* the other thing again
+[18:07:34] pete_otaqui: anyway .... I'm off for a very long weekend.  Thanks, Queen Liz!
+[18:07:40] simonstewart: Yay!
+[18:07:47] simonstewart: I  those planned too
+[18:07:53] simonstewart: Good old lizzie
+[18:07:58] lukeis: monday a holiday for you brits?
+[18:08:03] pete_otaqui: And Tuesday
+[18:08:06] simonstewart: And Tuesday
+[18:08:07] lukeis: oh nice...
+[18:08:24] lukeis: enjoy :)
+[18:08:28] pete_otaqui: right, see you guys later
+[18:08:32] Dude-X: two holidays
+[18:08:32] Dude-X: wow
+[18:08:40] Dude-X: we only get thanksgiving like that in the US
+[18:09:02] lukeis: and only *some* places do at that
+[18:09:11] nirvdrum: Oops.  Just missed him.
+[18:09:11] dawagner: Oh Java, why don't you let me have semi-static methods in nested classes? :(
+[18:09:31] andreastt: Semi-static?
+[18:09:55] dawagner: I want it to have a this.parent pointer, without having a this pointer
+[18:10:10] andreastt: Ah, quite.
+[18:10:16] dawagner: So from my top-level class I can say "NestedClass.staticMethod()"
+[18:10:28] andreastt: But aren't inner classes essentially just a hack from Java's side anyways?
+[18:10:28] dawagner: Which, as it's a private nested class, it *can* do, it just doesn't allow :)
+[18:10:38] andreastt: I mean, it's essentially just a class.
+[18:10:39] darkrift has joined #selenium
+[18:10:57] dawagner: Yeah
+[18:11:07] andreastt: You'd operate with different types of classes.
+[18:11:10] lukeis: it's  a$class ;)
+[18:11:51] santiycr: dawagner: confirmed, the download of the jar is eating up 7 minutes before the test can even get started
+[18:11:59] lukeis: (winnie the pooh) oh java.... 
+[18:12:14] dawagner: Bloody hell :S
+[18:12:17] santiycr: dawagner:  also, I can't access http://sci.illicitonion.com/selenium-server-standalone-r17091.jar
+[18:12:19] selbot2: 03dave.hunt@gmail.com about 3 hours ago - DaveHunt: Bumped Selenium IDE version number to 1.8.1 for upcoming release. | https://code.google.com/p/selenium/source/detail?r=17091 | http://seleniumhq.org/ci.jsp?r=17091
+[18:12:28] dawagner: I just restarted the server
+[18:12:49] santiycr: does it have a whitelist?
+[18:13:12] dawagner: Oh to access? Yeah, only the Sauce IPs I get sent
+[18:14:06] lukeis: jarib: since I had no log to see what happened, did you look at / decide what to do about the user's issue from yesterday (where simultaneous runs on firefox caused a hang in ruby 1.8.7)
+[18:15:55] QAGuy: lukies: Jarib was able to reproduce on 1.8.7. Made a fix and pushed out an updated gem 2.22.1. I updated and ecything is working fine now. Thanks for the help
+[18:16:08] QAGuy: lukeis*
+[18:16:15] lukeis: sweet
+[18:16:44] santiycr: dawagner: then I can't test it :)
+[18:17:01] darkrift: jimevans: there for some internal javascript comprehension ? in IE, I have a LI html tag binded with a jquery tree plugin but it doesn't seem to be triggered by the document.getElementById().click() but doing a document.createEvent("MouseEvent") and propagating it to the element directly activates the function, any idea why IE doesn't recognize the .click() ?
+[18:17:09] *dawagner wonders why the server hasn't come up yet
+[18:17:27] *santiycr now blames dawagner 
+[18:17:28] santiycr: :)
+[18:18:02] nirvdrum: santiycr: I'll respond to your email sometime today.  Sorry for the delay on that.
+[18:18:25] santiycr: nirvdrum: no worries, I know what inbox overload feels like
+[18:18:26] santiycr: :)
+[18:18:48] nirvdrum: Heh.
+[18:19:24] nirvdrum: We just rewrote all of our web templates in a new engine and then some Rails SQL injection exploit was announced, so got backed up a bit.
+[18:21:16] santiycr: which engine did you choose?
+[18:21:23] nirvdrum: slim
+[18:21:33] nirvdrum: We were all haml, but it was just way too slow.
+[18:22:17] nirvdrum: Some templates are 10x faster now.  We're a minimum of 2x faster across the board, which is kinda crazy for just simple page render time.
+[18:27:10] seljenkinsbot has joined #selenium
+[18:28:23] stephend|mtg has joined #selenium
+[18:28:29] QAGuy has joined #selenium
+[18:29:44] santiycr: nirvdrum: interesting 
+[18:31:22] santiycr: are you using newrelic? they are awesome for checking out what is eating up load times
+[18:31:34] santiycr: from template rendering, to transfer, to client side rendering
+[18:32:49] stephend|mtg: santiycr: hrm, our last run seemed a lot faster
+[18:32:50] dawagner: santiycr: One 2.22.0 and one http://... job sent, we'll see what happens
+[18:32:57] stephend: dawagner: are you still seeing issues?
+[18:32:57] dawagner: It could be a transient thing
+[18:33:06] stephend: a test that took 9 minutes at 3am now takes 3
+[18:33:08] stephend: er, 4
+[18:33:24] stephend: but we're also calling out to a staging server, and a REST API in the middle
+[18:33:27] *stephend will keep an eye on it
+[18:33:28] dawagner: Or it could be that Jenkins is as bad at handling FDs as I think
+[18:34:27] santiycr: man, the fact that both started being slow pretty much at the same time trips me out
+[18:34:33] sassda has joined #selenium
+[18:39:07] dawagner: https://saucelabs.com/jobs/d9f3cbfdbb1f4ffabc7cfe79a3f55834 << running with download
+[18:39:12] dawagner: https://saucelabs.com/jobs/eaf6fd35f88d4e94a57729773ace0ebc << running without
+[18:41:22] santiycr: woah
+[18:41:26] santiycr: so the download is the issue
+[18:41:47] santiycr: job starts blazing fast without the download
+[18:41:52] nacho has joined #selenium
+[18:41:54] santiycr: man, we could speed up your tests so much
+[18:42:40] *santiycr needs to dedicate more time to this caching server
+[18:45:00] simonstewart: Cheerio, everybody!
+[18:45:03] simonstewart has left #selenium
+[18:45:28] rbalent has joined #selenium
+[18:47:35] barancev: santiycr: can you explain why the runs before yesterday midday were successfull? for example, chrome on XP -- http://sci.illicitonion.com:8080/job/Chrome%20XP%20Java%20Tests/
+[18:48:53] barancev: why did not they suffer from low jar download speed?
+[18:50:56] santiycr: barancev: I'm not completely sure
+[18:51:33] santiycr: whenever connectivity issues like this happen, they can reside anywhere between the two ends
+[18:52:05] santiycr: I've seen internet backbones randomly cause up to 0.7 packet drop out of the blue, and then seen it resolve the following day
+[18:52:32] santiycr: though, that's very rare
+[18:52:44] santiycr: that's why I start investigating closer to each end first
+[18:52:49] santiycr: our end seems fast enough right now
+[18:53:01] santiycr: https://saucelabs.com/jobs/d9e88196c97948028e7bdadbd66aab72/0001screenshot.png?auth=7f007cc568d743051cf28ec2248ddd19
+[18:53:22] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS: adding to Chapter04 of docs, more on ExpectedConditions, a table of support for NativeEvents, how to set a FirefoxProfile and ChromeOptions using RemoteWebDriver. Also updating downloads page, since ruby is now 2.22.1 | https://code.google.com/p/selenium/source/detail?r=17095 | http://seleniumhq.org/ci.jsp?r=17095
+[18:53:25] santiycr: 194mbps
+[18:53:30] lukeis: santiycr: remedied ;) ^
+[18:53:49] santiycr: lukeis: nice! you're the man
+[18:54:43] santiycr: dawagner: still there?
+[18:54:53] santiycr: maybe we can do some testing over your end
+[18:55:03] llaskin: hey anyone have a good ide ahow to FORCE a jenkins build to die?
+[18:55:09] llaskin: i've been trying to kill it by clicking redX, but no joy
+[18:55:09] santiycr: I guess I could do it myself through scout :)
+[18:55:12] llaskin: suggestions welcome!
+[18:55:38] lukeis: ssh to the box and start killing processes? ;)
+[18:55:44] llaskin: yea i guess thats what will have to happen
+[18:59:28] lukeis: barancev: since you're the bug master, is there an issue out there regarding html5 drag* events? (as in a feature we need to support) namely to support trying to run selenium against this: http://html5demos.com/drag
+[IRC logfile - Started Fri Jun  1 19:01:47 2012]
+[19:01:47] lukeis: aha there is... #3604
+[19:01:48] selbot2: 03 open/new HTML5 Drag and Drop with Selenium Webdriver with Ruby - https://code.google.com/p/selenium/issues/detail?id=3604 [Type-Defect Priority-Medium Component-WebDriver]
+[19:04:37] nirvdrum: santiycr: After New Relic took our site completely offline once, we ripped it out and haven't looked back.
+[19:04:49] nirvdrum: Not worth the risk.
+[19:09:51] dawagner: santiycr: Yep
+[19:10:10] santiycr: nirvdrum: hah, they also took us partially down! 
+[19:10:34] santiycr: nirvdrum: though our site is a pylons app. I thought their rails integration would be more reliable
+[19:10:40] santiycr: we don't use them anymore since then
+[19:11:14] nirvdrum: santiycr: They claimed to support Rails 2.3, but updated their code to be Rails 3 only.  It mostly worked with 2.3, but they were rewriting ever response object and fucked it up.
+[19:11:21] nirvdrum: This was a while back.
+[19:11:42] santiycr: too bad, it's an awesome idea and they did it really well
+[19:11:59] nirvdrum: Then their support staff had the balls to tell us we were wrong and they should be able to rewrite the response object because it's Rack-based, but there's multiple versions of Rack and they just weren't doing it right.
+[19:12:36] nirvdrum: Yeah.  I haven't really found anything to replace it.  But it's better than going offline.
+[19:12:52] nirvdrum: Like you, we're mostly a backend company anyway, so it's not a huge loss.
+[19:12:56] stephend: when we presented on continuous deployment at Stanford, folks said New Relic actually caused them a huge slowdown too
+[19:13:03] stephend: with Python, iirc, but that was some time ago
+[19:13:18] stephend: and even New Relic admitted then that it was their issue
+[19:13:22] stephend: not sure how it is now
+[19:13:36] stephend: I think we're looking at catchpoint now
+[19:13:38] stephend: for our SLA
+[19:13:49] stephend: https://wiki.mozilla.org/Marketplace/SLA
+[19:14:08] nirvdrum: Interesting.  Never heard of them.
+[19:14:31] nirvdrum: What's nice about new relic is they actually profile the executing code and run explain queries against the SQL.
+[19:14:53] stephend: yeah
+[19:15:06] stephend: right now, we have a combination of gomez, nagios, watchmouse, and I think a couple others...
+[19:15:10] stephend: very disparate
+[19:16:10] nirvdrum: We've kinda rolled our own and then use some services for uptime monitoring and exception reporting.  A hefty amount of internal monitoring for individual servers.
+[19:20:01] santiycr: dawagner: should we keep on working on figuring out slow jar downloads?
+[19:20:59] stephend: too bad that can't be on a CDN
+[19:21:30] stephend: santiycr: it's a long shot, but I could ask my IT guys if we could try to get it on our CDNs...?
+[19:21:35] stephend: or are you attacking it another angle?
+[19:21:47] stephend: or how about a mirror network?
+[19:22:12] stephend: oh, right
+[19:22:17] stephend: it's already on googlecode, nvm me
+[19:22:23] stephend: that's plenty of capacity right there, I'm guessing
+[19:22:47] stephend: pretty much all of Google's infra is on a self-hosted CDN, iirc
+[19:23:48] santiycr: stephend: it's not on cdn
+[19:24:11] santiycr: as Selenium CI's tests user custom builds of the jar, we can't move 
+[19:24:35] santiycr: sorry, we can't move it to a CDN or googlecode every time
+[19:24:35] stephend: oh, you're right, static: Address: 74.125.127.82 
+[19:24:45] stephend: oh, I see
+[19:24:46] santiycr: my plan is to put a caching proxy in our end
+[19:24:48] stephend: ignore me
+[19:24:59] santiycr: so that the file gets downloaded only a couple of times, then our proxy caches it internally
+[19:25:05] santiycr: which will be blazing fast
+[19:25:22] stephend: squid?
+[19:25:25] stephend: or something, cool
+[19:25:30] santiycr: when you specify an official version, like "2.22.0", the file gets pulled from our internal network, which takes less than 2 seconds
+[19:25:39] santiycr: I've been checking out squid
+[19:26:00] santiycr: but after an hour reading, wasn't able to get it to cache jars
+[19:26:14] santiycr: so, I may give it another shot, or I may just go with vagrant
+[19:27:27] dawagner: Anything I can do to help?
+[19:27:35] santiycr: er, varnish, not vagrant
+[19:27:36] santiycr: :)
+[19:27:59] santiycr: dawagner, regarding the proxying server, or the current slowness problems?
+[19:28:21] dawagner: Both :)
+[19:29:15] santiycr: regarding slowness issues, you should try downloading the jars by hand, while tests are running and see how long it takes
+[19:29:27] santiycr: I can't do that myself from a location that is not our servers
+[19:29:51] santiycr: that will determine whether the problem resides on the web server or the pipes 
+[19:30:25] santiycr: if the web server is serving the files reasonably fast from a different location that is not sauce
+[19:30:39] santiycr: we'll probably have to ping and traceroute the hell of our connection
+[19:30:45] santiycr: er, hell out of
+[19:33:50] dawagner: santiycr: Looks slow from everywhere
+[19:34:06] santiycr: dawagner: ok, that's good news
+[19:34:23] santiycr: means we're DOS'ing your web server
+[19:35:16] santiycr: I guess bandwidth issues?
+[19:35:28] santiycr: is that an EC2 box or something?
+[19:36:43] dawagner: Nope, it's slow from everywhere *with no other connections*
+[19:36:58] dawagner: So definitely a network issue my side
+[19:37:00] dawagner: Will dig in :)
+[19:38:52] santiycr: alright
+[19:39:16] santiycr: I'll put a mental note "I should really work on this caching proxy"
+[19:40:08] llaskin has joined #selenium
+[19:45:34] Dude-X has joined #selenium
+[IRC logfile - Started Fri Jun  1 20:02:22 2012]
+[20:02:22] selbot2: 03barancev less than 10 seconds ago - AlexeiBarantsev: Ignoring StaleElementReferenceException that can be thrown when you move focus from a removed element to some other element. Fixes issue 1521 | https://code.google.com/p/selenium/source/detail?r=17096 | http://seleniumhq.org/ci.jsp?r=17096
+[20:07:41] andreastt: I wish there was a “show more context” option in Google Code diffs.
+[20:08:16] andreastt: If the code is in the middle of a method, I want to know which method in which class, typically.  And which arguments.
+[20:09:54] nacho has joined #selenium
+[20:22:12] ebass`afk: thats what i like about git diff.
+[20:26:15] hourback has joined #selenium
+[20:26:32] hourback has left #selenium
+[20:35:28] jimevans: jleyba: ping
+[20:35:42] jleyba: jimevans: pong
+[20:35:54] jimevans: ran your safari tests. or rather failed to run them.
+[20:36:01] jimevans: i don't have safari on my path.
+[20:36:11] BucketBatman has joined #selenium
+[20:36:26] BucketBatman: word people dot com
+[20:36:51] BucketBatman: what is the best practices for webdriver component based design?
+[20:37:52] BucketBatman: i looked into 'LoadableComponent' but im not sure its really a solution
+[20:39:19] BucketBatman: quiet in here : (
+[20:39:56] jimevans: jleyba: okay, adding the directory to my path, 'go safari:test' passes without incident\
+[20:40:36] jleyba: jimevans: Ok, thanks for running that
+[20:41:03] jimevans: my safari extension is of fairly recent vintage too :)
+[20:41:07] jleyba: Some users are complaining that the browser opens, but then just sits there on the initial connect page
+[20:41:19] jimevans: worked a treat for me.
+[20:41:21] jimevans: on windows
+[20:41:37] jleyba: The recent ones are.  I've had a few for OSX
+[20:41:54] jleyba: The logs have errors about failing to parse the initial connect message.  They swear they're using 2.22 with the extension built from head
+[20:42:14] darkrift: jleyba: the only case I've seen on the user list was that someone tried to use selenium 2.22 with a 2.21 safari driver ...
+[20:42:31] darkrift: told him that would be the problem, and he answered back that it worked with latest trunk
+[20:42:38] jleyba: darkrift: I was stupid and changed my profile to show my full email.  I get all kinds of direct emails about the SafariDriver
+[20:42:51] darkrift: erf
+[20:43:09] jimevans: i get surprisingly little direct email about the IE driver.
+[20:43:17] *jimevans knocks the nearest wooden surface
+[20:43:26] darkrift: lol
+[20:43:34] darkrift: don't jinx it
+[20:43:40] darkrift: jynx *
+[20:45:16] jimevans: of course, i think i've made it pretty clear that if you send me an unsolicited email, and don't bring me a full repro case, i'm not going to help you. and even then, it's no guarantee
+[20:45:28] *jimevans is pretty curmudgeonly when he wants to be
+[20:46:18] jleyba: I'm horrible at responding to email.  I'm notorious for letting emails sit unanswered for days
+[20:47:18] jimevans: darkrift: to follow up on your earlier question, it seems clear to me that IE's implementation of the javascript element.click() function doesn't propagate whatever mouse event jquery is binding to.
+[20:47:59] jimevans: jleyba: i'm selectively bad about it. if you haven't heard from me in a few days, you likely won't. and the reason is likely to be because i didn't want to answer you.
+[20:48:08] jleyba: lol
+[20:48:29] opapo has joined #selenium
+[20:49:25] darkrift: well jquery binds to click ... which looks weird, but I'll probably have to investigate jquery and the plugin with IE driver ...
+[20:49:33] darkrift: what does the atoms do in the IEDriver ?
+[20:49:43] darkrift: normal element.click() ?
+[20:49:53] jleyba: darkrift: i wish
+[20:50:03] jimevans: darkrift: unless you've turned native events off in the IEDriver (which you probably haven't), it doesn't use the atoms.
+[20:50:15] darkrift: nop I haven't indeed
+[20:50:29] jimevans: and until 2.22, you couldn't turn off native events anyway. :)
+[20:50:34] darkrift: yeah, using 2.21
+[20:50:46] jcrza: If I have a list of div elements that I got via xpath, can I search those elements specifically for occurences of class="whatever" easily? class="whatever" is everywhere on the page, but I only want the one in the particular element in the list I'm dealing with at the time
+[20:50:55] jimevans: so what IE is doing is sending actual mouse messages to the IE window, at the proper coordinates.
+[20:51:02] darkrift: well not really using it in prod yet, still in the process to make it accepted as a testing solution for UI
+[20:51:13] jimevans: if the IE window isn't the window in focus, those messages might be getting lost.
+[20:51:32] darkrift: hummm that might be one of the problems
+[20:52:43] jimevans: IE works really hard to break apps that try to simulate mouse events by throwing messages at the window.
+[20:53:22] darkrift: then should I just try to use 2.22 and disable native events ?
+[20:53:29] jimevans: no! don't do that!
+[20:53:34] darkrift: heh
+[20:54:01] jimevans: hang on.
+[20:54:05] darkrift: sure
+[20:56:04] jimevans: darkrift: you should read the comment on the commit that enabled turning native events off in the IE driver (r16888)
+[20:56:07] selbot2: 03james.h.evans.jr@gmail.com 20 days ago - JimEvans: Allows the user to disable native events in favor of synthetic (JavaScript) events in the IE driver. This would alleviate the problems with, for example, hovering over elements with the mouse to access a JavaScript-based menu framework. Note that using synthetic events will cause user code to block if an JavaScript alert is displayed while performing the event. This will be a limitation of ...
+[20:56:07] selbot2: ... synthetic events, and will not be fixed for the foreseeable future. | https://code.google.com/p/selenium/source/detail?r=16888 | http://seleniumhq.org/ci.jsp?r=16888
+[20:56:34] jimevans: ^^ there's a whole second paragraph that selbot doesn't bring back.
+[20:57:07] jimevans: which is the important bit.
+[20:57:26] darkrift: alright I'll take a read
+[20:57:28] darkrift: thanks
+[20:57:47] barancev: btw, why it is impossiblr to change native/syntetic on the fly?
+[20:58:19] darkrift: jimevans: message is clear enough
+[20:58:20] jimevans: synthetic vs. native events are an all-or-nothing thing at the moment. i've asked simonstewart about making such a thing settable at runtime, rather than at driver instantiation time, but haven't yet gotten a response.
+[20:59:13] jimevans: darkrift: i tried to make it as clear as i could. i'm thinking i could've done a better job there. :)
+[20:59:45] barancev: so it is just not implemeneted, and not investigated, good
+[IRC logfile - Started Fri Jun  1 21:00:47 2012]
+[21:00:47] darkrift: jimevans: how should I go about it to debug it then ?
+[21:00:51] jimevans: barancev: which is?
+[21:01:13] barancev: jimevans: switching on the fly
+[21:01:19] darkrift: I'll try to make a sample this week end (if I have time with this 2 days take home exam)
+[21:01:23] darkrift: that reproduces the problem
+[21:01:29] barancev: I was afraid that it is proven to be technically impossible
+[21:01:37] jimevans: darkrift: that'd be the best approach.
+[21:02:03] jimevans: what would be technically impossible? switching native vs synthetic events on the fly?
+[21:02:07] barancev: yes
+[21:02:18] jimevans: that's driver-implementation specific.
+[21:02:25] jimevans: in the IE driver, it's a piece of cake.
+[21:03:08] barancev: that's why I said 'good' :)
+[21:03:45] jimevans: :) yeah, i just need to expose a command to call IECommandExecutor::set_enable_native_events().
+[21:04:02] jimevans: but that would require a WebDriver API change.
+[21:04:22] jimevans: and i don't know if it's that simple in other driver implementations.
+[21:05:22] barancev: I see, we should investigate this issue, it would be very useful
+[21:05:42] darkrift: have another feature request tho about iedriver ... would it be possible with a capability parameter or a system property to make IE not resize when it takes a screenshot ?
+[21:05:51] jimevans: darkrift: nope.
+[21:06:04] jimevans: we define screenshots as full-DOM.
+[21:06:12] jimevans: only way to make that happen is to resize the window.
+[21:06:26] darkrift: I mean not resize in width
+[21:06:37] darkrift: if it's larger enough to integrate everything already
+[21:06:39] BucketBatman: anyone here familiar with 'page object' design pattern willing to chat with me?
+[21:06:55] diminoten: sure
+[21:07:08] diminoten: I've used it a few times, anyway
+[21:07:10] jimevans: BucketBatman: you'll get a better response if you have a specific question.
+[21:07:24] BucketBatman: well i have many questions, i didn't want to just spam em out
+[21:07:27] diminoten: and you'll get the best responses if you ask the whole room instead of just one of us
+[21:07:28] jimevans: rather than very broad "what are the best practices"
+[21:07:48] jimevans: darkrift: that's just a bug, i think.
+[21:08:11] darkrift: jimevans: my problem is that I put IE fullscreen, but when I take a screenshot, it resizes to a smaller size 
+[21:08:17] BucketBatman: what is the best practices involving component based elements... like say I have a page that returns a table of 10+ objects, each have many elements and such
+[21:08:55] BucketBatman: the findby seems to only work well with single elements not groups
+[21:09:12] jimevans: darkrift: "full screen" meaning what exactly? maximized as if you'd clicked the maximize button on the window, or resized so that it fills the screen, but not actually maximized?
+[21:09:18] BucketBatman: and they are static locators which wont allow me to select a specific entry in the group
+[21:09:34] darkrift: resized as it fills the screen
+[21:10:03] jimevans: darkrift: okay, that's just a bug then. i can even tell you exactly where it is.
+[21:10:23] darkrift: ok, then I'll create a bug report when I get home for this
+[21:10:27] BucketBatman: like an example might be ...say google. you have static locators for the page object for the search button and such, but the results are all very dynamic
+[21:10:47] jimevans: for those of you keeping score at home, it's in ScreenshotCommandHandler.h, at or about line 151.
+[21:11:10] jimevans: we blindly set the width and height of the browser window, without checking to see if it's already large enough.
+[21:11:53] darkrift: ok
+[21:12:07] Evil_Work has joined #selenium
+[21:12:09] mdgreenfield has joined #selenium
+[21:12:16] jimevans: the fix would be to check the original height and width before setting them.
+[21:12:22] darkrift: want me to create the bug report for it or ?
+[21:12:36] *jimevans is trying to persuade darkrift to include a patch with the issue report.
+[21:12:41] jimevans: :)
+[21:12:57] *darkrift was trying not to ever touch c/c++ ever again
+[21:13:01] darkrift: :p
+[21:13:06] jimevans: i'm not a C++ developer!
+[21:13:08] darkrift: but ok I'll check that out this week end
+[21:13:09] Evil_Work: Hi.  I apologize if this is a FAQ, but I'd like to know if you can use storeText in conjunction with a regular expression to find part of a pattern and store it?
+[21:13:16] jimevans: i'm not, i'm not, i'm not!
+[21:13:19] darkrift: I nkow
+[21:13:33] mdgreenfield has left #selenium
+[21:13:34] darkrift: heard about it in a presentation
+[21:13:43] *jimevans stomps his foot and throws a tantrum worthy of a two-year-old.
+[21:13:46] darkrift: about lessons learned while doing IEdriver
+[21:14:01] jimevans: the guy that gave that presentation is a hack.
+[21:14:16] jimevans: both at programming and at songwriting.
+[21:14:48] BucketBatman: dimioten where did you go?
+[21:15:29] darkrift: the 2 checks should be real simple
+[21:15:39] darkrift: so I'll try to submit them this week end
+[21:16:04] jcrza: Hey guys, can ya help me out? I have a list of elements, I'm trying to find elements inside those elements, but it keeps just returning xpaths of the whole page even though I'm doing each.find_element_by_xpath through the list of elements I wanted
+[21:16:09] jcrza: Not sure how to do it right
+[21:16:41] jcrza: How do you correctly search within previously isolated web elements?
+[21:16:44] BucketBatman: .
+[21:16:49] BucketBatman: you have to put a . infront of your xpath
+[21:16:50] jimevans: jcrza: are you using "//foo" in your xpath?
+[21:16:52] BucketBatman: for it to be relative
+[21:16:57] jcrza: Oooh, yes and yes.
+[21:16:59] jcrza: Thank you 
+[21:17:05] jimevans: yep, that's it.
+[21:17:09] jcrza: Should read the xpath documentation more clearly I guess. Appreciate it
+[21:17:12] jimevans: i was working up to it.
+[21:17:13] jimevans: :)
+[21:17:49] BucketBatman: so if you had to make a page object for google search results, how would you handle the actual element results if you wanted to compartmentize that in a page object sort of way
+[21:18:19] Evil_Work: For example:  Say I have the text "Foo: Bar" on the page I'm working with.  But it could be in various locations on the page.  What I'm looking to do is store "Bar" in a variable.
+[21:18:35] jimevans: BucketBatman: when you say "findby seems to only work well with single elements", are you talking about the PageFactory annotation?
+[21:18:51] diminoten: sorry BucketBatman what was your question again?
+[21:18:56] BucketBatman: yeah, well i know how i could do this, i just want to know best practices for a clean way to do it
+[21:19:11] diminoten: I think of page objects as dirty places in general
+[21:19:13] BucketBatman: say you had interactions you would want to do with a particular search result element... 
+[21:19:15] diminoten: but I could be wrong
+[21:19:17] lukeis: best practice is subjective ;)
+[21:19:30] diminoten: page objects is where all the dark magic happens
+[21:19:33] diminoten: *are
+[21:19:42] BucketBatman: it really does seem like black box stuff
+[21:19:56] BucketBatman: is there an annotation to work with element collections?
+[21:20:04] barancev: jimevans: #1889 -- is this still an issue? I can't reproduce, IE9 works with optgroup as expected
+[21:20:05] jimevans: @findBy should do
+[21:20:06] selbot2: 03james.h....@gmail.com open/accepted java webdriver select list with optgroup not working in IE9 - https://code.google.com/p/selenium/issues/detail?id=1889 [Type-Defect Priority-Medium Component-WebDriver Browser-IE]
+[21:20:14] BucketBatman: in c#
+[21:20:19] jimevans: barancev: i don't know
+[21:20:38] jimevans: BucketBatman: the FindBy attribute initializes lists too.
+[21:20:45] jimevans: i added the change myself.
+[21:20:49] lukeis: page objects is where the selenium "work" should be done... tests just use page objects and assert things. There's no difference in my mind in PageObjects that deal with the whole page and ones that only deal with part of it (componenets/widgets)
+[21:21:03] BucketBatman: does it use the same thing findelements uses? i tried ReadOnlyCollection<IWebElement> and it puked on me
+[21:21:43] BucketBatman: that is good luke, but how do you work with components on a page using a page object if there is like 3 of hte same component on the page
+[21:22:00] BucketBatman: the locators are static
+[21:22:20] lukeis: make better locators and they should key off a 'parent' container of some kind
+[21:22:23] jimevans: BucketBatman: i wouldn't use the page factory. sure, it's convenient, but i find it much more useful to roll my own page objects.
+[21:22:40] santiycr has joined #selenium
+[21:22:40] lukeis: like jim, i don't use the page factory either
+[21:23:00] BucketBatman: when you say roll your own, you mean store By objects in the page object instead of webelements using findby?
+[21:23:14] lukeis: i often do that
+[21:23:30] darkrift: I don't use the factory either
+[21:23:51] BucketBatman: hmm, seems to be factory hate going on here
+[21:24:04] lukeis: not really, just opted out ;)
+[21:24:09] lukeis: there's plenty who use it
+[21:24:36] jcrza: Am I doing anything obviously stupid here? This won't select a list of elems on reddit.com driver.find_elements_by_xpath("//*[@id='siteTable']/[contains(@class, 'link')]")
+[21:24:37] jimevans: no, i just consider everything in the Support assembly to be offered for convenience, and as reference code for how to accomplish certain things in the .NET bindings.
+[21:24:37] BucketBatman: i could see how it would be good if you had a fairly static page..but ...when i tried to use it with component type page objects
+[21:24:39] *lukeis will even help troubleshoot it if you have issue... well, in java ;)
+[21:24:50] ebass: I just dont like littering my code with a bunch on annotations....so i don't use it :-D
+[21:25:27] lukeis: jcrza: let me translate that to a css selector for you... "#siteTable.link"
+[21:25:33] BucketBatman: well the reason it looked nice to me, was that you can do auto element caching with it
+[21:25:38] jcrza: No shit?
+[21:25:42] jcrza: Damn. That's a lot easier
+[21:25:45] lukeis: jcrza: sorry... "#siteTable .link"
+[21:25:45] ebass: heheh
+[21:25:47] lukeis: space
+[21:26:02] jcrza: Mind is slow-motion being blown
+[21:26:04] jcrza: I hate xpaths
+[21:26:20] ebass: if your page is so dynamic i would think u wouldnt want to cache elements
+[21:26:36] jimevans: BucketBatman: but there's no magic there. all it does is use the attribute to indicate that it *shouldn't* do the lookup every time you access the propery.
+[21:26:48] jimevans: it'd be dead simple to do the same thing in your own page object.
+[21:27:08] BucketBatman: how do you do that normally without the annotations?
+[21:27:11] diminoten: the better question is what you're automating on Reddit :D
+[21:27:23] BucketBatman: lol reddit
+[21:27:26] ebass: BucketBatman: have you thought about getting the container element and then writing convenience functions that let you know, in your example, how many search results are being displayed and what their title line is?
+[21:27:42] BucketBatman: well i shouldn't have used that as an example
+[21:27:56] BucketBatman: i have common elements on the page I'll call...dimensions
+[21:28:03] ebass: i figured, it sounded too easy :-D
+[21:28:07] BucketBatman: they are hierarchy displays
+[21:28:18] BucketBatman: but the base interaction with each hierarchy can be shared
+[21:28:35] BucketBatman: but a page might have 1-8 hierarchy dimensions to interact with
+[21:28:52] diminoten: you can break page objects into components rather than literal pages
+[21:28:53] lukeis: i think i would make one dimension page object that knows how to interact with the N dimensions that may exist on a page
+[21:28:57] BucketBatman: they are only uniquely identified by their hierarchy class
+[21:29:06] diminoten: if you feel that's necessary
+[21:29:13] BucketBatman: well yeah i mean originally i was gonna do that
+[21:29:26] dawagner has joined #selenium
+[21:29:39] BucketBatman: and make the base page have some 'GetDimension(string hierarchyclass); return that guy
+[21:30:02] diminoten: I do recommend the 1-n approach however
+[21:30:04] BucketBatman: but then the dimension page object can't actually use the stupid annotation method
+[21:30:12] darkrift: BucketBatman: that's actually what I did on a page that had multiple tables in the page to interact individually with each different tables. Used an object I called a PageSection and in the Page object I have a method to return a page section for each tables displayed
+[21:30:23] diminoten: are you talking about annotation inheritance?
+[21:30:33] BucketBatman: well say i have the dimension page object
+[21:30:49] BucketBatman: so yeah i could technically ahve that guy store a webelement pointing to its root element
+[21:30:57] BucketBatman: and do all element searches from that point
+[21:31:01] ebass: yes
+[21:31:11] BucketBatman: but that means i can't use the findsby stuff
+[21:31:17] jcrza: How can I search an element for elements inside of it? I don't think doing each.find_stuff for my list is working the way I think it is
+[21:31:22] BucketBatman: since the strings it uses for a locator are static 
+[21:31:29] Dude-X: is it possible to create a webelement that is not found by using find_element?
+[21:31:45] ebass: Dude-X, I don't think so.
+[21:32:07] ebass: unless you want to create a null pointer :-P
+[21:32:08] Dude-X: okay good. because if it was possible, it would totally violate my understanding of webdriver!
+[21:32:10] lukeis: Dude-X: maybe... if you create a DOM object in the JS executor and return it
+[21:32:26] Dude-X: that fits in my understanding though :D
+[21:33:00] ebass: but he would still essentially be creating a WebElement and specifying that as the return type in the JS Executor.
+[21:33:31] lukeis: yup... but it wouldn't exist in the DOM
+[21:34:07] ebass: oh i see what you mean, dont actually append it into the page DOM
+[21:35:07] barancev: :apidocs
+[21:35:08] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[21:35:14] darkrift: leaving now, ttyl, thanks for the pointers jimevans I'll check that out in the handler for the screenshot fix and I'll try to make a sample code for you to debug that jquery+native event thingie
+[21:35:29] ebass: anyways....BucketBatman: you can find elements using a root element
+[21:35:51] jimevans: darkrift: cool.
+[21:35:57] ebass: at least you can using the Java API.  A WebElement has findElement(s) functions
+[21:36:37] jimevans: BucketBatman: here's an off-the-cuff object that i whipped up to give you a flavor of how i might handle something like this. https://gist.github.com/2854994
+[21:37:04] farlan has left #selenium
+[21:37:24] jimevans: note, i did that directly in the browser, not in an IDE, so it's not tested code, and it's just off the top of my head, so i have no idea if the pattern would even come close to meeting your needs.
+[21:37:45] ebass: and if you are worried about using find by's, I always have a really good time using the JS Executor to create custom functionality that Webdriver doesn't provide me with.
+[21:40:53] ebass: BucketBatman:  and if you are making these as page components, I would still make a page object that understands how to manage them based off of actions with with page.
+[21:41:32] BucketBatman: hmm
+[21:42:53] BucketBatman: jimevans: you said you did the change to allow findbys to support multiple results, what is the object type it is expecting? List<IWebElement>?
+[21:43:47] diminoten: ebass you would still create something to represent the page as a whole?
+[21:43:55] ebass: yes
+[21:43:56] jimevans: well, i may have misspoke. there was an issue, i remember a change for it, but looking at the code, i don't see it at the moment.
+[21:44:09] ebass: because the page still manges its components 
+[21:44:16] diminoten: that's fair
+[21:44:21] ebass: so I would make something to represent how it does that
+[21:45:35] ebass: for me, I think it made others more aware that the page components were not page object but rather important pieces of reusable functionality that arent tied to a specific page
+[21:46:15] ebass: the app I was testing had 10 or 15 totally different pages that shared some of the same components
+[21:52:57] BucketBatman: i know that if you use element.findelement that xpath locators need a . infront to be relative, what is the case for css selectors?
+[21:53:12] BucketBatman: or all other types of by locators come to think of it
+[21:56:21] Dude-X: there is no relative thing
+[21:56:53] Dude-X: but i've done this kind of thing get_element_by_css_selector().find_element_by_xpath('./../..')
+[21:57:15] BucketBatman: you mean if i have an element and i use element.findelement its not gonna work on its descendents? 
+[21:58:01] Dude-X: oops that shouldn't work;
+[21:58:06] Dude-X: nevermind that
+[21:58:11] *Dude-X checks
+[21:58:14] BucketBatman: neverminding
+[21:58:38] Dude-X: when you locate the first element, you can find it's descendents
+[21:59:43] Dude-X: findElement(By.Xpath('xpath').findElement(By.Xpath('') should find children, but you can use xpath to find any thing in the DOM
+[IRC logfile - Started Fri Jun  1 22:00:14 2012]
+[22:00:14] BucketBatman: well in the example you got there
+[22:00:28] BucketBatman: you have to use a . infront of the second xpath string in order for it to stay relative
+[22:00:43] BucketBatman: i was just wondering if there were cases like that for css selectors
+[22:03:26] Dude-X: acutually here's a real code snippet i used in atest
+[22:04:27] Dude-X: getElementsBySelector(SCORING_CELL_SELECTOR, "score cell").get(index).findElement(By.xpath("./../../..")).getCssValue("background-color");
+[22:07:55] BucketBatman: yeah but thats xpath : (
+[22:07:58] BucketBatman: i already know it works with xpath
+[22:08:52] Dude-X: there is no relative selector 
+[22:09:00] Dude-X: i also wish you can go up a level too
+[22:10:16] cgoldberg has joined #selenium
+[22:11:05] testingb0t has joined #selenium
+[22:13:58] nirvdrum has joined #selenium
+[22:17:31] kyconquers has joined #selenium
+[22:19:31] confuseduser has joined #selenium
+[22:20:13] confuseduser: I have two windows open in FF. I want to: switch to window 1, change proxy, do something. Then, repeat with window 2. Is that possible?
+[22:24:02] lukeis: nope.... you'll need to start your browser that you want the different proxy on with a different firefox profile (with the proxy configured)
+[22:24:40] lukeis: can't change the proxy after the browser has been started with Selenium
+[22:25:53] lukeis: you can however start a proxy with BrowserMobProxy that they point to and change that mid-stream in your test to point to something different
+[22:26:27] lukeis: (change the proxy, not the browsers proxy configuration)
+[22:28:47] lukeis: Dude-X: you missed batman's question (which the answer was yes, with css selectors webelement.findElement is relative to that element, it will only find children of it)
+[22:29:12] lukeis: he left... so oh well ;)
+[22:31:10] lukeis: the other way to do "parent" traversal is with the JS executor.... WebElement parent = (WebElement) ((JavascriptExecutor)driver).executeScript("return arguments[0].parentNode;", element);  ... but straight up that might be longer to type, but useful if you'd like to do something more complex ;)
+[22:31:33] *lukeis likes talking to the wind
+[22:35:50] confuseduser: I'm looking into browsermob. The situation is that I wasn't able to open multiple copies of Firefox; I got the "Unable to bind to locking port 7054" message
+[22:36:26] confuseduser: What I basically want are multiple windows/tabs/Firefoxes with separate cookies and proxies
+[22:36:53] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Implementing testSendingKeyboardEventsShouldAppendTextinTextAreas for HtmlUnitDriver | https://code.google.com/p/selenium/source/detail?r=17097 | http://seleniumhq.org/ci.jsp?r=17097
+[22:37:10] confuseduser: I can open multiple FF windows with separate cookies using MultiFox, but I also need separate proxies
+[22:41:32] jimevans has left #selenium
+[22:53:25] Dude-X: lukeis: i understood that but i didn't make the connection :/
+[IRC logfile - Started Fri Jun  1 23:05:36 2012]
+[23:05:36] lukeis: stephend: sooo... when does my pull request get merged? ;)
+[23:05:58] stephend: lukeis: davehunt|away was looking into it
+[23:06:07] lukeis: ah, ok
+[23:06:08] stephend: lukeis: there's a cleaner fix involving an explicit wait, here
+[23:06:15] lukeis: bah ;)
+[23:06:16] stephend: https://github.com/mozilla/Addon-Tests/blob/master/pages/desktop/regions/paypal_frame.py#L20
+[23:06:31] stephend: well, he said your fix was fine too, but it caught the problem at a later stage, iirc
+[23:06:38] lukeis: yep
+[23:06:41] lukeis: true
+[23:06:51] davehunt|away: hello :)
+[23:06:55] lukeis: it's you're code (aka do with it as you please)
+[23:07:06] davehunt: lukeis: thanks for the pull request :)
+[23:07:11] stephend: <3
+[23:07:15] stephend: yeah, it's awesome
+[23:08:06] davehunt: lukeis: I'm thinking an explicit wait when initiating the paypal frame page region object would prevent the stale element exception entirely
+[23:08:13] davehunt: I haven't tested it yet though
+[23:08:37] davehunt: the wait could be for the exact same element you've used in your pull
+[23:08:44] lukeis: yeah, that would be a good way to go... or since you already have implicit you can just do the find element right in the constructor
+[23:08:51] lukeis: yeah
+[23:09:38] davehunt: yeah, but I'm going off implicit waits :)
+[23:09:59] lukeis: then you'll certainly need an explicit one :-D
+[23:10:12] *lukeis doesn't let the implicit even get set in my code base ;)
+[23:10:59] davehunt: yeah, I don't think I'd get away with that
+[23:11:41] davehunt: stephend would kill me for introducing failures caused by tests relying on implicit waits
+[23:12:03] stephend: "kill" is a strong word
+[23:12:10] davehunt: maim?
+[23:12:11] stephend: but we need to get a handle on this, it's driving everyone nuts
+[23:12:14] stephend: heh
+[23:12:23] selbot2: 03barancev less than 10 seconds ago - AlexeiBarantsev: Enabling a couple of tests for HtmlUnitDriver that pass green in my local environment | https://code.google.com/p/selenium/source/detail?r=17098 | http://seleniumhq.org/ci.jsp?r=17098
+[23:12:36] davehunt: stephend: if waits were used appropriately there would be no isssue ;)
+[23:12:48] stephend: I know
+[23:12:59] stephend: I'm hoping we've all read zac's doc...I know I have
+[23:13:26] davehunt: he presented it as a lightning talk at the meetup
+[23:13:30] davehunt: went down well
+[23:13:34] stephend: aweseome
+[23:13:35] davehunt: he's a good speaker!
+[23:13:38] stephend: was there video?
+[23:13:42] stephend: yeah, he writes well, too
+[23:13:47] davehunt: not of the lightning talks, no
+[23:13:51] stephend: ah
+[23:13:58] davehunt: I have to focus now, bbl
+[23:14:22] stephend: l8r
+[23:15:39] stackedsax has joined #selenium
+[23:25:47] stackedsax has joined #selenium
+[23:28:12] rbalent has joined #selenium
+[23:28:13] rbalent has joined #selenium
+[23:32:22] ian_mac has joined #selenium
+[23:48:14] mreedell has joined #selenium
+[23:55:30] lukeis: stephend: I think I want to add (in my copious free time) expected conditions to python, so you would do something like: from selenium.webdriver.common.expected_conditions import ExpectedConditions;   WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocatedBy(By.*, "something"));  (would you use it?)
+[23:56:46] *lukeis would stick with the naming that Java used at first
+[23:57:03] stephend: nah, I wouldn't use it
+[23:57:07] stephend: ...but my team might :-)
+[23:57:10] stephend: I srsly don't code
+[23:57:17] stephend: it's best for all involved!
+[23:57:21] lukeis: what good ARE YOU ;)
+[23:57:29] stephend: I poke and prod people to work
+[23:57:36] stephend: and they pay me big bucks, and call that "work" :-P
+[23:57:37] stephend: but, yeah
+[23:57:45] stephend: we've thought of overriding, or writing a custom method, too
+[23:58:13] stephend: lukeis: oh, wow
+[23:58:18] stephend: failure, even _with_ your patch
+[23:58:40] lukeis: my idea for python to work would be that the expected conditions would actually return an instance that would respond to __call__
+[23:58:41] lukeis: oh...
+[23:58:43] lukeis: really?
+[23:58:48] lukeis: same error?
+[23:59:02] stephend: though I wonder if this is that whole focus issue
+[23:59:04] lukeis: screenshot / screencast of it?
+[23:59:23] *lukeis is heading home in 2 min ;)
+[23:59:43] stephend: full log: http://pastie.org/4010844
+[23:59:45] stephend: one sec

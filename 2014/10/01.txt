@@ -1,0 +1,857 @@
+[2014-10-01 00:00:21] tony2, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 00:02:52] andy_seit, joining. (#selenium)
+[2014-10-01 00:06:32] Albino1, joining. (#selenium)
+[2014-10-01 00:10:50] jusmyth1, leaving. (#selenium)
+[2014-10-01 00:14:45] selbot2: 04 Open issues: 832
+[2014-10-01 00:15:37] AndreiH, joining. (#selenium)
+[2014-10-01 00:16:29] tilgovi, joining. (#selenium)
+[2014-10-01 00:18:45] pixelport, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 00:19:25] davehunt, joining. (#selenium)
+[2014-10-01 00:19:50] cristi, joining. (#selenium)
+[2014-10-01 00:22:36] jimb, joining. (#selenium)
+[2014-10-01 00:34:08] Neo--, joining. (#selenium)
+[2014-10-01 00:35:12] sburjan, quitting. (Ping timeout: 245 seconds)
+[2014-10-01 00:35:54] Neo--, quitting. (Client Quit)
+[2014-10-01 00:36:40] davehunt, quitting. (Quit: Leaving...)
+[2014-10-01 00:37:00] cable, joining. (#selenium)
+[2014-10-01 00:44:45] selbot2: 04 Open issues: 832
+[2014-10-01 00:46:10] cable: hey hey ^^
+[2014-10-01 00:46:26] cable: still figured out after doing everything correctly , windows doessnt love ssh xD even with pageant
+[2014-10-01 00:51:49] andy_seit, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 00:55:07] cable: ah... passwords and ssh works better o.0
+[2014-10-01 00:55:15] cable: guess I got a breakthrough :p
+[2014-10-01 00:55:35] tony2, joining. (#selenium)
+[2014-10-01 00:55:56] cable: cd home
+[2014-10-01 00:55:59] cable: oops :p
+[2014-10-01 00:57:12] losh, joining. (#selenium)
+[2014-10-01 01:00:01] bimmelino, joining. (#selenium)
+[2014-10-01 01:00:17] tony2, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 01:04:26] losh: Hi, I'm trying to setup selenium grid with nodes which have multiple instances of xvfb.  I'm not clear on how the selenium node decides which display should be used for a given script.  Does anyone here have such a setup which could walk me through how to get such a configuration working correctly?
+[2014-10-01 01:08:18] tilgovi, quitting. (Read error: Connection reset by peer)
+[2014-10-01 01:09:10] WhereIsMySpoon: losh: http://stackoverflow.com/questions/6325946/selenium-grid-2-to-achieve-continous-integration-headlessly-using-xvfb-or-xvnc
+[2014-10-01 01:09:23] WhereIsMySpoon: losh: basically, use xvfb-run
+[2014-10-01 01:11:19] losh: WhereIsMySpoon: thanks ... I'll have a look at that.  I was hoping to have persistent X server instances with xvfb but if it's not an option I'll use xvfb-run
+[2014-10-01 01:12:58] WhereIsMySpoon: losh: you only need to use xbfb-run for starting the node - once it's started it's persistent for as long as you want the node up
+[2014-10-01 01:13:00] dakotasmith, quitting. (Quit: Leaving...)
+[2014-10-01 01:14:45] selbot2: 04 Open issues: 832
+[2014-10-01 01:15:23] numdig, joining. (#selenium)
+[2014-10-01 01:15:25] losh: WhereIsMySpoon:  I want execution isolation between browser instances (this machine will be shared between different teams).  I was thinking to setup mutliple X servers as a given system user, then have one node instance dispatch scripts to the appropriate X instance.  I was thinking each team would specify a display in their selenium scripts to pick the X/nagivator combination (if that all makes sense?)
+[2014-10-01 01:16:07] sorinello, joining. (#selenium)
+[2014-10-01 01:16:11] losh: I'm new to selenium so I don't even know if what I'm trying to do is supported.
+[2014-10-01 01:16:28] WhereIsMySpoon: i dont think that's possible
+[2014-10-01 01:16:43] WhereIsMySpoon: selenium really only interacts with the browser
+[2014-10-01 01:17:03] WhereIsMySpoon: you could maybe do it with other code/libraries
+[2014-10-01 01:17:06] WhereIsMySpoon: but not with just selenium
+[2014-10-01 01:18:04] losh: OK .. so I'll have to think outside the box a little ... or abandon the idea.  Thanks for your help ... I'm going to have a tinker with the info in the url you sent earlier.
+[2014-10-01 01:19:04] andy_seit, joining. (#selenium)
+[2014-10-01 01:19:19] WhereIsMySpoon: losh: I don't see the problem with, for example, you setting up say 10 nodes on the machine, all with xvfb-run on different displays, and then people just running scripts from the hub
+[2014-10-01 01:19:31] WhereIsMySpoon: does that not satisfy your requirements?
+[2014-10-01 01:20:33] WhereIsMySpoon: although you'd have to make sure to have an interceptor on each script fire so that all the tests are parallel
+[2014-10-01 01:20:37] losh: It may do.  I was hoping to get process seperation with different system accounts.  Which I may be able to acheive through sudo.
+[2014-10-01 01:20:45] WhereIsMySpoon: brb
+[2014-10-01 01:20:49] losh: OK.
+[2014-10-01 01:25:41] losh: WhereIsMySpoon: you make a good point.  I was trying to reduce resource consommation.  10 JVM instances verses 1 to manage all the browsers sounded heavy.
+[2014-10-01 01:29:14] WhereIsMySpoon: losh: I dont think the jvm itself really uses a lot of memory, especially if you limit it with Xmx and Xms
+[2014-10-01 01:29:40] WhereIsMySpoon: losh: please bear in mind that just because you have 10 nodes all connected to a hub does not mean that you magically have parallel tests
+[2014-10-01 01:29:48] WhereIsMySpoon: you have to actually fire them off in a parallel way
+[2014-10-01 01:30:57] WhereIsMySpoon: usually you'd have some sort of test runner that does for(Test t : tests) { fireNewProcess(t.test()); }
+[2014-10-01 01:31:03] losh: oh, i was of the impression that you dispatch a script and the grib allocated it to which ever node had the corresponding platform/browser resource available.
+[2014-10-01 01:31:45] jimb: I'm glad I'm not the only one that was under that impression.
+[2014-10-01 01:31:53] WhereIsMySpoon: it will, but if you then execute a second test, it will be executed on the same process line as the first unless you fire a new process for it
+[2014-10-01 01:31:53] andy_seit, quitting. (Read error: Connection reset by peer)
+[2014-10-01 01:32:13] jimb: Maybe there should be a warning/note for us n00bs first thing on the Grid info page… :-/
+[2014-10-01 01:32:23] andy_seit, joining. (#selenium)
+[2014-10-01 01:33:00] losh: WhereIsMySpoon: I see. And the fire new process is managed from with the selenium script or externally?
+[2014-10-01 01:33:06] WhereIsMySpoon: with a test runner usually
+[2014-10-01 01:33:20] losh: I don't know what that is .. I'll have RTFM more.
+[2014-10-01 01:33:30] jimb: something along the lines of: "Grid does NOT give you parallelization, Grid DOES give you the CAPABILITY of running tests in parallel"
+[2014-10-01 01:33:33] mika, quitting. (Quit: "kernel update")
+[2014-10-01 01:33:52] jimb: and yes, I'm screaming :D
+[2014-10-01 01:34:09] WhereIsMySpoon: :p
+[2014-10-01 01:35:25] WhereIsMySpoon: losh: https://saucelabs.com/resources/running-your-selenium-tests-in-parallel-python this is a python example
+[2014-10-01 01:35:36] WhereIsMySpoon: halfway down the page
+[2014-10-01 01:36:13] WhereIsMySpoon: the point is that on the hub's side, it will try and execute the tests one after the other
+[2014-10-01 01:36:28] losh: WhereIsMySpoon:  You've re-aligned my understand of selenium grid and clearly I need to rethink what I'm try to achieve here.  Thanks a lot, I'm going to pop off and study up a bit.  Thanks for the link, we're a Python shop where I work so that link's prefect.
+[2014-10-01 01:36:30] WhereIsMySpoon: if you put each test run in a separate process, it will all execute in parallel
+[2014-10-01 01:36:42] WhereIsMySpoon: and the grid will allocate each test to a differetn node
+[2014-10-01 01:37:17] WhereIsMySpoon: no probs, feel free to ask more qs at any time :)
+[2014-10-01 01:37:58] losh: OK, I see what you mean.  Thanks again .. I'll most definately be back  ;)
+[2014-10-01 01:38:03] mika, joining. (#selenium)
+[2014-10-01 01:38:24] WhereIsMySpoon: great! :)
+[2014-10-01 01:39:21] Bebe_sel, joining. (#selenium)
+[2014-10-01 01:40:17] jimb: I have a question, now that you're in that mood :D
+[2014-10-01 01:40:51] jimb: What happens if there are moar processes than nodes and browsers. Will the hub queue them up or do I need to handle that in code?
+[2014-10-01 01:41:50] jimb: I differe here between "a node with that cabability does not EXIST" and "a node with that capability exists, but it is BUSY"
+[2014-10-01 01:43:01] WhereIsMySpoon: i would imagine it would be queued up, it's the same state as if you just fired up all the tests without process handling
+[2014-10-01 01:43:17] WhereIsMySpoon: well actually...not quite the same state
+[2014-10-01 01:43:30] WhereIsMySpoon: cause the tests that cant run are in different processes
+[2014-10-01 01:43:35] WhereIsMySpoon: not sure then
+[2014-10-01 01:43:38] WhereIsMySpoon: tias :)
+[2014-10-01 01:44:44] selbot2: 04 Open issues: 831
+[2014-10-01 01:46:36] jimb: Right, that's what I was expecting (queued up)
+[2014-10-01 01:47:34] jimb: And since the code, I'm speculating regardless of level of parallelization, hands over the code to the hub and waits for a response (or not) I'm ASSuming the hub will queue it.
+[2014-10-01 01:47:37] antsanto, joining. (#selenium)
+[2014-10-01 01:47:41] jimb: I'll have to try it out :D
+[2014-10-01 01:47:45] WhereIsMySpoon: jimb: note that I said "not sure"
+[2014-10-01 01:47:49] Dave_B_, joining. (#selenium)
+[2014-10-01 01:48:26] jimb: nope, I'll hold you personally responsible ;)
+[2014-10-01 01:48:26] WhereIsMySpoon: selenium works on a simple approach, and to do as little jobs as possible (it's job really is just to communicate between the browser and your script, and expose the apis to do that)
+[2014-10-01 01:48:46] jimb: yes, and that's the way we like it
+[2014-10-01 01:48:47] WhereIsMySpoon: therefore it isnt unreasonable to assume that they didnt implement any queueing mechanism
+[2014-10-01 01:48:49] jimb: kiss basically
+[2014-10-01 01:48:51] WhereIsMySpoon: ya
+[2014-10-01 01:48:58] WhereIsMySpoon: hey dave :)
+[2014-10-01 01:49:12] WhereIsMySpoon: but anyway, it isnt hard to find out :D
+[2014-10-01 01:49:38] WhereIsMySpoon: fire up a node + hub locally, fire up more processes with tests than you have browsers, done
+[2014-10-01 01:50:12] WhereIsMySpoon: I think by default nodes have 4 ff, 4 chrome, 2 IE and 2 opera browser instances available
+[2014-10-01 01:50:22] WhereIsMySpoon: not 100%
+[2014-10-01 01:50:28] WhereIsMySpoon: its documented somewhere
+[2014-10-01 01:52:18] antsanto: People out there, does any one used Selenide wrapper for Selenium?
+[2014-10-01 01:53:00] WhereIsMySpoon: "It's extremely easy to start using Selenide. Definitely not a rocket science."
+[2014-10-01 01:53:07] WhereIsMySpoon: "-a- rocket science"?
+[2014-10-01 01:53:25] WhereIsMySpoon: "The whole work with Selenide consists of three simple things! "
+[2014-10-01 01:53:34] WhereIsMySpoon: antsanto: this website is terrible for selenide
+[2014-10-01 01:53:49] WhereIsMySpoon: and the fonts are really hard to read lol
+[2014-10-01 01:53:50] antsanto: ha ha ha..
+[2014-10-01 01:53:58] WhereIsMySpoon: http://selenide.org/
+[2014-10-01 01:54:05] antsanto: The Condition class of Selenide looks promising.
+[2014-10-01 01:54:20] antsanto: But they doesnt support Safari ..
+[2014-10-01 01:54:24] jimb: when you're right, you're right WhereIsMySpoon
+[2014-10-01 01:55:33] tony2, joining. (#selenium)
+[2014-10-01 01:55:42] WhereIsMySpoon: oh my
+[2014-10-01 01:56:38] [1]JP, joining. (#selenium)
+[2014-10-01 01:57:31] WhereIsMySpoon: antsanto: I'd recommend against using something like this tbh, selenium is already quite concise, and adding another layer on top of it just makes it more likely to break
+[2014-10-01 01:57:49] WhereIsMySpoon: especially when they seem to be missing features
+[2014-10-01 01:57:50] antsanto: Having tough time to handle test data for selenium.
+[2014-10-01 01:57:58] antsanto: Any Framework can help me.
+[2014-10-01 01:58:00] WhereIsMySpoon: you're going to end up writing selenium code and selenide code
+[2014-10-01 01:58:11] WhereIsMySpoon: antsanto: "test data"? like what? :)
+[2014-10-01 01:58:12] antsanto: Ya true WhereIsMySpoon
+[2014-10-01 01:58:34] antsanto: WhereIsMySpoon The data required for testing.. Forms data etc..
+[2014-10-01 01:59:01] WhereIsMySpoon: whats the problem
+[2014-10-01 01:59:54] antsanto: Nope, I'm trying to say all the data are writtem in class files. I wish it could go somewhere.
+[2014-10-01 01:59:56] tony2, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 02:00:03] antsanto: Something like injecting the data on demand.
+[2014-10-01 02:01:01] antsanto: say a page object method requires two param, username and password. I didnt like these data are passed from Test classes. Rather they automatically injected at proper time.
+[2014-10-01 02:01:45] antsanto: Something like autowiring in Spring. Wish to know how you people handle these sort of datas.
+[2014-10-01 02:02:54] Dave_B_: morning!
+[2014-10-01 02:03:02] Dave_B_: sorry logged in then went and made tea :)
+[2014-10-01 02:03:33] cable: ah good idea.. allthough love my cappucino / chocolate mix better ( big cup ;p) 2 buttons
+[2014-10-01 02:03:48] antsanto: Dave_B_ Gud mrn :)
+[2014-10-01 02:05:55] WhereIsMySpoon: antsanto: something like having an xml format of say locators with data to data, and being able to just pass that to the driver? like this: http://pastie.org/9609685 ?
+[2014-10-01 02:07:03] WhereIsMySpoon: antsanto: then when this is passed to the driver, it would look up the element with css of '#searchInput' and send "searchTerm" to it
+[2014-10-01 02:07:09] cable: yay 5-8 video's further and 3 days xD first SSH git cmd usage xd. ( on windows) mind that :p.
+[2014-10-01 02:07:53] WhereIsMySpoon: antsanto: but yea all I have at the moment are just methods with lots of parameters for all the data that is needed to pass to the forms im filling
+[2014-10-01 02:08:02] WhereIsMySpoon: which is a bit cumbersome
+[2014-10-01 02:08:22] antsanto: WhereIsMySpoon Checking. Sorry in 2g, taking time to load the pastie !! errr
+[2014-10-01 02:08:48] WhereIsMySpoon: I missed a </locator>
+[2014-10-01 02:08:50] WhereIsMySpoon: but u get the idea
+[2014-10-01 02:09:12] WhereIsMySpoon: or you can do in json...doesnt matter
+[2014-10-01 02:09:21] antsanto: Yes I got the idea. I was thinking about this only. Thanks WhereIsMySpoon
+[2014-10-01 02:09:32] WhereIsMySpoon: this doesnt exist btw, just an idea in my head :D
+[2014-10-01 02:10:44] WhereIsMySpoon: ato: what you think?
+[2014-10-01 02:12:15] antsanto: WhereIsMySpoon Looks nice idea
+[2014-10-01 02:14:45] selbot2: 04 Open issues: 831
+[2014-10-01 02:16:21] Albino1, quitting. (Quit: Leaving.)
+[2014-10-01 02:17:25] antsanto: WhereIsMySpoon Where are you from?
+[2014-10-01 02:17:31] WhereIsMySpoon: antsanto: UK
+[2014-10-01 02:17:44] WhereIsMySpoon: you?
+[2014-10-01 02:19:02] antsanto: WhereIsMySpoon India :)
+[2014-10-01 02:19:22] WhereIsMySpoon: aha :) too hot for me ^^
+[2014-10-01 02:21:40] jimb, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 02:21:48] antsanto, quitting. (Remote host closed the connection)
+[2014-10-01 02:21:55] jimb, joining. (#selenium)
+[2014-10-01 02:23:17] Albino1, joining. (#selenium)
+[2014-10-01 02:23:43] barancev: No More RC!
+[2014-10-01 02:25:13] WhereIsMySpoon: olay!
+[2014-10-01 02:25:21] WhereIsMySpoon: barancev: did you see my idea above?
+[2014-10-01 02:25:50] barancev: what? xml as a language? I'm out
+[2014-10-01 02:25:56] WhereIsMySpoon: lol
+[2014-10-01 02:26:04] WhereIsMySpoon: the definition language doesnt matter
+[2014-10-01 02:26:06] WhereIsMySpoon: xml, json, whatever
+[2014-10-01 02:26:29] WhereIsMySpoon: http://pastie.org/9609734 here's it in json :p
+[2014-10-01 02:26:55] WhereIsMySpoon: but the general idea of being able to define all your form data beforehand sounds useful to me
+[2014-10-01 02:27:02] WhereIsMySpoon: what say you :)
+[2014-10-01 02:27:19] barancev: http://selenium2advanced.blogspot.ru/2012/01/reading-from-xml-to-trigger-selenium.html
+[2014-10-01 02:27:23] barancev: http://www.binpress.com/app/satix-seleniumbased-automation-testing-in-xml/1958
+[2014-10-01 02:27:37] barancev: and even http://www.xml2selenium.com/xml-dsl-platform/
+[2014-10-01 02:27:49] barancev: if you like this :)
+[2014-10-01 02:28:26] barancev: I prefer Java
+[2014-10-01 02:29:32] barancev: if one wants to separate the data from the code -- there is "data provider" feature in (almost) every testing framework
+[2014-10-01 02:30:26] WhereIsMySpoon: the satix one looks closest to what I was suggesting
+[2014-10-01 02:30:45] jimb_, joining. (#selenium)
+[2014-10-01 02:31:12] jimb, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 02:31:12] jimb_, changing nick to jimb.
+[2014-10-01 02:31:31] barancev: then, look at RobotFramework
+[2014-10-01 02:32:08] barancev: xml is not a human-oriented notation
+[2014-10-01 02:33:45] WhereIsMySpoon: true, I wasnt actually looking to put entire tests in xml, just the parts that are something like public MyPageObject { ... public MyPageObject fillOutForm(String param1, String param2, String param3.....) { pageElement.sendKeys(param1); ... } ... }
+[2014-10-01 02:33:53] WhereIsMySpoon: which is a little tedious
+[2014-10-01 02:35:07] WhereIsMySpoon: and you then have to do fillOutForm("value1", "value2", "value3"...)
+[2014-10-01 02:37:25] Neo--, joining. (#selenium)
+[2014-10-01 02:44:44] selbot2: 04 Open issues: 832
+[2014-10-01 02:45:11] Dave_B_: if the data is key to a particular test case I like to keep it explicit within the test, but for the times when it's not what makes that test case unique it could be handy
+[2014-10-01 02:45:53] Dave_B_: cause it is pretty dull passing a bunch of params around that are the same you use most of the time
+[2014-10-01 02:46:18] Dave_B_: (OK, I generally create methods to do that set of params anyway, but then you end up with a bunch of helper methods….)
+[2014-10-01 02:48:36] swypych, joining. (#selenium)
+[2014-10-01 02:49:29] barancev: Value Object pattern is your friend
+[2014-10-01 02:51:28] Dave_B_: as in object with state but no logic / data transfer object?
+[2014-10-01 02:51:35] Dave_B_: if so then yep I use that
+[2014-10-01 02:51:44] Dave_B_: if not then I'm too stupid and don't understand
+[2014-10-01 02:51:55] barancev: yes, data transfer object
+[2014-10-01 02:53:00] swypych, quitting. (Ping timeout: 250 seconds)
+[2014-10-01 02:54:47] operatiay, quitting. ()
+[2014-10-01 02:55:26] tony3, joining. (#selenium)
+[2014-10-01 02:55:57] Dave_B_: :log
+[2014-10-01 02:55:57] selbot2: https://raw.github.com/SeleniumHQ/irc-logs/master/2014/10/01.txt
+[2014-10-01 02:56:10] operatiay, joining. (#selenium)
+[2014-10-01 02:59:42] tony3, quitting. (Ping timeout: 246 seconds)
+[2014-10-01 03:14:45] selbot2: 04 Open issues: 831
+[2014-10-01 03:19:34] fabrice31, quitting. (Remote host closed the connection)
+[2014-10-01 03:19:58] fabrice31, joining. (#selenium)
+[2014-10-01 03:27:37] cable: dang some regedit key needed to get ssh to work xD windows is weird
+[2014-10-01 03:29:03] WhereIsMySpoon: O.o
+[2014-10-01 03:30:40] ato: WhereIsMySpoon: Locators are serialized like that in the protocol.  If you want to use similar data-like locators in the API it sounds like a custom By locator is what you're after.
+[2014-10-01 03:32:30] cable: well kudo's for me I got ssh working with jenkins on a windows machine xD
+[2014-10-01 03:34:04] Neo--, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2014-10-01 03:35:37] losh, quitting. (Quit: Leaving)
+[2014-10-01 03:36:33] WhereIsMySpoon: ato: the point was to avoid writing by locators and .sendKeys calls at all, as you end up with what I described above, with loads of params you're passnig around
+[2014-10-01 03:37:10] ato: Sure.  Go ahead and do it.  WebDriver is extensible enough to facilitate it.
+[2014-10-01 03:44:45] selbot2: 04 Open issues: 827
+[2014-10-01 03:51:04] barancev: if web was as simple as filling forms with data we would not need selenium at all
+[2014-10-01 03:51:23] barancev: htmlunit works well enough :)
+[2014-10-01 03:53:50] WhereIsMySpoon: barancev: of course
+[2014-10-01 03:54:06] WhereIsMySpoon: again, I'm not talking about replacing whole tests with this xml definition, just for filling out forms
+[2014-10-01 03:54:45] WhereIsMySpoon: or form-like uis
+[2014-10-01 03:57:18] jimb: What could be wrong when pip install <package>  doesn't install the same contents as on github?
+[2014-10-01 03:57:36] barancev: why should it?
+[2014-10-01 03:58:34] ulmi, joining. (#selenium)
+[2014-10-01 03:58:36] jimb: I'm _pretty_ sure this package is setup to pull from it's github repository...
+[2014-10-01 03:59:46] jimb: but I could definitely be wrong (probably :-/)
+[2014-10-01 04:00:37] jimb: I've reached out to the code-owner, we'll see what he says. :)
+[2014-10-01 04:07:04] amikiri, joining. (#selenium)
+[2014-10-01 04:14:45] selbot2: 04 Open issues: 827
+[2014-10-01 04:15:41] farlan, quitting. (Quit: Leaving.)
+[2014-10-01 04:27:03] tony3, joining. (#selenium)
+[2014-10-01 04:28:21] tony3, quitting. (Client Quit)
+[2014-10-01 04:29:12] tony3, joining. (#selenium)
+[2014-10-01 04:31:41] SamuraiJack_, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 04:35:00] snappy, quitting. (Quit: WeeChat 0.4.3)
+[2014-10-01 04:41:44] nirvdrum, joining. (#selenium)
+[2014-10-01 04:44:35] icarot, joining. (#selenium)
+[2014-10-01 04:44:45] selbot2: 04 Open issues: 827
+[2014-10-01 05:04:23] Albino1, quitting. (Quit: Leaving.)
+[2014-10-01 05:09:57] amikiri, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2014-10-01 05:13:21] Naughton, joining. (#selenium)
+[2014-10-01 05:14:45] selbot2: 04 Open issues: 827
+[2014-10-01 05:15:02] Naughton: Good morning. I am having a problem driving selenium with javascript and mocha. I posted the following question to stackoverflow. If anyone has a moment please have a look  https://stackoverflow.com/questions/26141016/always-getting-error-timeout-of-2000ms-exceeded-with-selenium
+[2014-10-01 05:17:19] Albino1, joining. (#selenium)
+[2014-10-01 05:20:26] pixelport, joining. (#selenium)
+[2014-10-01 05:27:02] WhereIsMySpoon, quitting. (Quit: http://www.kiwiirc.com/ - A hand crafted IRC client)
+[2014-10-01 05:27:11] WhereIsMySpoon, joining. (#selenium)
+[2014-10-01 05:29:21] Mitsos101, joining. (#selenium)
+[2014-10-01 05:29:36] Mitsos101, leaving. (#selenium)
+[2014-10-01 05:29:53] Dave_B_, quitting. (Quit: Leaving.)
+[2014-10-01 05:31:57] cristi, quitting. (Ping timeout: 245 seconds)
+[2014-10-01 05:32:49] andy_seit, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 05:33:13] andy_seit, joining. (#selenium)
+[2014-10-01 05:37:56] WhereIsMySpoon, quitting. (Changing host)
+[2014-10-01 05:37:56] WhereIsMySpoon, joining. (#selenium)
+[2014-10-01 05:37:56] WhereIsMySpoon, joining. (#selenium)
+[2014-10-01 05:37:56] WhereIsMySpoon, quitting. (Changing host)
+[2014-10-01 05:38:46] SamuraiJack_, joining. (#selenium)
+[2014-10-01 05:42:51] farlan, joining. (#selenium)
+[2014-10-01 05:43:33] pixelport, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 05:44:45] selbot2: 04 Open issues: 827
+[2014-10-01 05:47:11] cristi, joining. (#selenium)
+[2014-10-01 05:59:07] ntobeko, joining. (#selenium)
+[2014-10-01 06:00:21] ntobeko: I am getting an error with WebDriver.createSession() when testing against firefox
+[2014-10-01 06:02:17] andy_seit, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 06:03:17] WhereIsMySpoon: ntobeko: createSession?
+[2014-10-01 06:03:32] WhereIsMySpoon: i dont see any method called that
+[2014-10-01 06:04:12] WhereIsMySpoon: ah it's like creating a new instance of it
+[2014-10-01 06:04:19] WhereIsMySpoon: ntobeko: what's the exception you're getting?
+[2014-10-01 06:04:26] WhereIsMySpoon: put it in http://pastie.org
+[2014-10-01 06:09:35] rodrigomartin, joining. (#selenium)
+[2014-10-01 06:11:20] ntobeko: http://pastie.org/9610232#16
+[2014-10-01 06:12:08] ntobeko: if I switch over to phantomjs the tests execute fine
+[2014-10-01 06:12:36] timg: Hi
+[2014-10-01 06:13:19] timg: I am trying to execute JavaScript with Selenium to upload a file
+[2014-10-01 06:13:27] timg: like this https://stackoverflow.com/questions/3300580/webdriver-file-upload
+[2014-10-01 06:14:03] timg: (the first answer)
+[2014-10-01 06:14:34] timg: It is not working for the reason that Oleg Tarasenko says. I get a webdriver exception "The operation is not secure"
+[2014-10-01 06:14:41] timg: Is there some workaround for this?
+[2014-10-01 06:14:44] selbot2: 04 Open issues: 827
+[2014-10-01 06:17:21] smccarthy, joining. (#selenium)
+[2014-10-01 06:17:29] swypych, joining. (#selenium)
+[2014-10-01 06:20:44] dimacus, joining. (#selenium)
+[2014-10-01 06:21:08] icarot, quitting. (Excess Flood)
+[2014-10-01 06:21:25] *dimacus has game of thrones stuck in his head all morning long'
+[2014-10-01 06:21:52] rodrigomartin, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 06:22:06] cmcgraw, joining. (#selenium)
+[2014-10-01 06:22:14] ntobeko: any ideas http://pastie.org/9610232#16
+[2014-10-01 06:23:13] WhereIsMySpoon: ntobeko: can you paste your code too?
+[2014-10-01 06:25:52] ntobeko: protractor.conf.js file http://pastie.org/9610269
+[2014-10-01 06:27:43] ntobeko: further to that this is the output from firfox http://pastie.org/9610270
+[2014-10-01 06:28:20] barancev: FF32 and old selenium?
+[2014-10-01 06:28:38] jkrocil, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 06:29:25] richdownie, joining. (#selenium)
+[2014-10-01 06:29:32] ntobeko: hmm...let me try back version FF
+[2014-10-01 06:30:16] barancev: better upgrade selenium to 2.43
+[2014-10-01 06:31:13] Dave_B_, joining. (#selenium)
+[2014-10-01 06:32:43] ntobeko: ya baran, I will move to 2.43 and let you know
+[2014-10-01 06:32:59] ntobeko: auto updates are not good for a dev environment :-(
+[2014-10-01 06:36:25] joshin4colours, joining. (#selenium)
+[2014-10-01 06:37:19] Neo--, joining. (#selenium)
+[2014-10-01 06:41:04] rodrigomartin, joining. (#selenium)
+[2014-10-01 06:44:21] jkrocil, joining. (#selenium)
+[2014-10-01 06:44:44] selbot2: 04 Open issues: 827
+[2014-10-01 06:45:32] Naughton: Good morning. I am having a problem driving selenium with javascript and mocha. I posted the following question to stackoverflow. If anyone has a moment please have a look  https://stackoverflow.com/questions/26141016/always-getting-error-timeout-of-2000ms-exceeded-with-selenium
+[2014-10-01 06:45:54] polyvisual, joining. (#selenium)
+[2014-10-01 06:56:57] billhunt, joining. (#selenium)
+[2014-10-01 06:57:52] billhunt, quitting. (Client Quit)
+[2014-10-01 07:01:49] WhereIsMySpoon: Naughton: odd, the same test translated to java works fine
+[2014-10-01 07:03:24] Dave_B_: I'll natural python it but I suspect it'll be fine
+[2014-10-01 07:04:07] billhunt, joining. (#selenium)
+[2014-10-01 07:04:56] Dave_B_: yeah no problem
+[2014-10-01 07:05:27] Dave_B_: so presumably one of something to do with the js bindings or something about how you've set up your browser/chromewdriver
+[2014-10-01 07:06:27] cristi, quitting. (Ping timeout: 246 seconds)
+[2014-10-01 07:14:44] selbot2: 04 Open issues: 827
+[2014-10-01 07:17:11] ntobeko: upgrading to selenium 2.43.1 seems to solve the issue. thanks
+[2014-10-01 07:18:59] almostwhitehat, joining. (#selenium)
+[2014-10-01 07:21:06] papegaaij, quitting. (Remote host closed the connection)
+[2014-10-01 07:24:50] dude-x, joining. (#selenium)
+[2014-10-01 07:25:24] cristi, joining. (#selenium)
+[2014-10-01 07:32:07] Albino1, quitting. (Quit: Leaving.)
+[2014-10-01 07:34:07] cgoldberg, joining. (#selenium)
+[2014-10-01 07:35:05] dude-x, quitting. (Remote host closed the connection)
+[2014-10-01 07:39:45] jimb, quitting. (Quit: jimb)
+[2014-10-01 07:41:13] dimacus: ntobeko: rule of the thumb is this, if you have firefox auto upgrading, you should upgrade to new version of WD as soon as it comes out, bc each upgrade of FF will break your tests
+[2014-10-01 07:41:32] dimacus: so you either need to disable auto upgrades, or write a script to auto download latest jar as soon as it comes out
+[2014-10-01 07:44:44] selbot2: 04 Open issues: 827
+[2014-10-01 07:54:10] ntobeko: thanks for the assistance
+[2014-10-01 07:55:37] dude-x, joining. (#selenium)
+[2014-10-01 07:58:16] cgoldberg, quitting. (Quit: Ex-Chat)
+[2014-10-01 08:01:27] cgoldberg, joining. (#selenium)
+[2014-10-01 08:04:48] ddary, joining. (#selenium)
+[2014-10-01 08:07:58] hirani, joining. (#selenium)
+[2014-10-01 08:09:05] pixelport, joining. (#selenium)
+[2014-10-01 08:12:39] ato: Pinning to a specific Firefox and Selenium version is best because it gives you determinism.
+[2014-10-01 08:13:52] ksoviero, joining. (#selenium)
+[2014-10-01 08:13:57] ksoviero: Hi all!
+[2014-10-01 08:14:21] rebelagentm, joining. (#selenium)
+[2014-10-01 08:14:42] ksoviero: After exporting a Python RemoteControl script using the IDE, I get this error when trying to run it: AttributeError: 'selenium' object has no attribute 'send_keys'
+[2014-10-01 08:14:45] selbot2: 04 Open issues: 827
+[2014-10-01 08:14:45] ksoviero: Any ideas?
+[2014-10-01 08:15:56] ntobeko: echo @ato
+[2014-10-01 08:16:39] ddary, quitting. (Quit: ddary)
+[2014-10-01 08:16:41] ato: ksoviero: send_keys is a method in the WebDriver API.
+[2014-10-01 08:16:50] ato: ksoviero: Not in RC.
+[2014-10-01 08:17:02] ksoviero: ato: Is there a way to do something similar then in RC?
+[2014-10-01 08:17:24] ato: I don't know, I've never used RC.
+[2014-10-01 08:17:34] ato: Also you should use WebDriver because RC is going away.
+[2014-10-01 08:18:25] ksoviero: ato: I know, but we need to be able to have the scripts "run" on one host, and the web browser stuff be handeled by another. Is there a way to do that with WebDriver.
+[2014-10-01 08:18:43] ato: Yes.
+[2014-10-01 08:19:06] ksoviero: ato: Link?
+[2014-10-01 08:19:16] ato: Have your script use a RemoteWebDriver, which communicates with a Selenium server on another host.
+[2014-10-01 08:19:49] ato: http://docs.seleniumhq.org/docs/03_webdriver.jsp
+[2014-10-01 08:19:49] fatguylaughing, joining. (#selenium)
+[2014-10-01 08:19:51] bdonnahue: hello everyone... i was wondering how i can have the web driver wait until all the elements on the page are loaded.
+[2014-10-01 08:19:59] ksoviero: ato: I've already written about 500 lines worth of RC code. Is there an "easy" way to convert it over to WD?
+[2014-10-01 08:20:01] bdonnahue: im crawling a page that uses iframes
+[2014-10-01 08:20:02] ato: Or :wiki remotewebdriver
+[2014-10-01 08:20:03] selbot2: 1: 03RemoteWebDriver: Information about the RemoteWebDriver - https://code.google.com/p/selenium/wiki/RemoteWebDriver
+[2014-10-01 08:20:15] dale_fukami1, joining. (#selenium)
+[2014-10-01 08:20:32] bdonnahue: can anyone tell me a way to do this?
+[2014-10-01 08:20:45] dale_fukami, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 08:20:45] ato: ksoviero: Not that I know of.  Automatically rewriting programs is hard.
+[2014-10-01 08:21:24] ato: bdonnahue: WebDriver will block until the document has finished loading, but won't block for elements loaded asynchronously.
+[2014-10-01 08:21:58] pixelport, quitting. (Read error: Connection reset by peer)
+[2014-10-01 08:22:28] ato: bdonnahue: To wait for other things than page load, you need to explicitly wait for a known condition in which you know the element will be available.
+[2014-10-01 08:23:20] bdonnahue: that seems a little hacky, how does the driver not know that ajax or some other method of asyc is happening?
+[2014-10-01 08:24:02] fabrice31, quitting. (Remote host closed the connection)
+[2014-10-01 08:24:12] whatloveb, joining. (#selenium)
+[2014-10-01 08:24:22] whatloveb, changing nick to mindhaze.
+[2014-10-01 08:24:57] WhereIsMySpoon: bdonnahue: how can it know?
+[2014-10-01 08:26:38] lukeis, joining. (#selenium)
+[2014-10-01 08:26:47] bdonnahue: if there is client side activity there must be a way to know
+[2014-10-01 08:27:29] ato: bdonnahue: JavaScript is a weakly typed dynamic language, and it's not easy to know what the code will or won't do.
+[2014-10-01 08:27:31] WhereIsMySpoon: what if there isnt client side acvitity
+[2014-10-01 08:27:36] WhereIsMySpoon: activity*
+[2014-10-01 08:27:45] ato: Also I don't know what this “activity” you speak of is.
+[2014-10-01 08:28:28] bdonnahue: for the server to push something to the client wouldnt the only way be through some type of ajax long poll? or if using an iframe then there would be a secondary request sent somewhere?
+[2014-10-01 08:28:45] ksoviero: ato: how long till Selenium 1 EOL?
+[2014-10-01 08:29:39] ato: bdonnahue: HTTP requests are usually short-lived, we don't know when the next one will be scheduled.
+[2014-10-01 08:29:45] ato: ksoviero: When Selenium 3 is ready (-:
+[2014-10-01 08:30:17] ksoviero: ato: How bad would it be if I just continued using RC?
+[2014-10-01 08:30:32] ksoviero: Will there come a point when the RC will no longer even be available?
+[2014-10-01 08:30:54] lukeis: you'll always be able to get / run what is currently released
+[2014-10-01 08:31:09] lukeis: but it might not work on modern browsers :)
+[2014-10-01 08:31:10] ato: ksoviero: RC will continue to work through WebDriverBackedSelenium, but RC will be a download on its own and won't be part of the normal Selenium release.
+[2014-10-01 08:31:18] ato: ksoviero: Also there is absolutely no active development on RC.
+[2014-10-01 08:31:23] ato: ksoviero: E.g. bugs aren't fixed.
+[2014-10-01 08:31:29] jkrocil, quitting. (Quit: Ex-Chat)
+[2014-10-01 08:31:39] lukeis: except for when barancev fixes them ;)
+[2014-10-01 08:31:46] ato: Sssh.
+[2014-10-01 08:32:23] lukeis: the fix for IE5 support had me lmao
+[2014-10-01 08:32:51] cable: uuh...
+[2014-10-01 08:33:57] cable: let me guess a really simple hot fix.  :p
+[2014-10-01 08:34:41] lukeis: seemingly 5adeab
+[2014-10-01 08:34:42] selbot2: 03barancev 8 days ago - Fixing WDBS compatibility with IE5. Fixes issue 7938 | https://code.google.com/p/selenium/source/detail?r=5adeab4 | http://dashboard.ci.seleniumhq.org/#/revision/5adeab4f164a9f8651d886b34917df5dc5db5f30
+[2014-10-01 08:34:56] ksoviero, quitting. (Quit: Lost terminal)
+[2014-10-01 08:37:21] cable: I love the open source world :3
+[2014-10-01 08:37:25] cable: this made me giggle lukeis
+[2014-10-01 08:37:26] cable: :D
+[2014-10-01 08:38:07] lampd1, joining. (#selenium)
+[2014-10-01 08:39:22] cable, leaving. (#selenium)
+[2014-10-01 08:39:43] antsanto, joining. (#selenium)
+[2014-10-01 08:40:13] Bebe_sel, quitting. (Remote host closed the connection)
+[2014-10-01 08:40:19] davehunt, joining. (#selenium)
+[2014-10-01 08:44:44] selbot2: 04 Open issues: 827
+[2014-10-01 08:45:37] brian_, joining. (#selenium)
+[2014-10-01 08:46:58] Dave_B_: bdonnahue
+[2014-10-01 08:46:58] Dave_B_: 16:28
+[2014-10-01 08:46:58] Dave_B_: for the server to push something to the client wouldnt the only way be through some type of ajax long poll? or if using an iframe then there would be a secondary request sent somewhere?
+[2014-10-01 08:47:03] Dave_B_: ^^websockets? :)
+[2014-10-01 08:50:04] Guest46071, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 08:51:30] PDun, joining. (#selenium)
+[2014-10-01 08:51:37] PDun, quitting. (Client Quit)
+[2014-10-01 08:55:30] admc, joining. (#selenium)
+[2014-10-01 09:01:26] Guest81863, joining. (#selenium)
+[2014-10-01 09:01:32] antsanto, quitting. (Quit: AndroIRC - Android IRC Client ( http://www.androirc.com ))
+[2014-10-01 09:09:04] Guest81863, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 09:12:24] DarkRift2, joining. (#selenium)
+[2014-10-01 09:12:48] [1]JP, quitting. (Quit:  HydraIRC -> http://www.hydrairc.com <- Po-ta-to, boil em, mash em, stick em in a stew.)
+[2014-10-01 09:14:06] dude-x__, joining. (#selenium)
+[2014-10-01 09:14:11] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:14:35] timg1, joining. (#selenium)
+[2014-10-01 09:14:44] dude-x__, joining. (#selenium)
+[2014-10-01 09:14:45] selbot2: 04 Open issues: 827
+[2014-10-01 09:14:51] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:15:26] dude-x__, joining. (#selenium)
+[2014-10-01 09:15:37] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:15:41] ulmi1, joining. (#selenium)
+[2014-10-01 09:15:47] stan, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 09:16:08] dude-x__, joining. (#selenium)
+[2014-10-01 09:16:14] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:16:21] tony2, joining. (#selenium)
+[2014-10-01 09:16:34] jimevans, joining. (#selenium)
+[2014-10-01 09:16:41] opapo_, joining. (#selenium)
+[2014-10-01 09:16:53] dude-x__, joining. (#selenium)
+[2014-10-01 09:16:59] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:17:34] Eleccy_, joining. (#selenium)
+[2014-10-01 09:17:34] dude-x__, joining. (#selenium)
+[2014-10-01 09:17:40] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:17:43] DarkRift, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:43] timg, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:44] ulmi, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:45] WhereIsMySpoon, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] Eleccy, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] tkeith, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] tony3, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] dude-x, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] opapo, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:49] cgoldberg, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:50] robinsmidsrod, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 09:17:51] tkeith_, joining. (#selenium)
+[2014-10-01 09:18:13] dude-x, joining. (#selenium)
+[2014-10-01 09:18:43] davehunt, quitting. (Remote host closed the connection)
+[2014-10-01 09:18:49] cgoldberg, joining. (#selenium)
+[2014-10-01 09:18:52] sorinello, quitting. (Ping timeout: 240 seconds)
+[2014-10-01 09:19:07] lukeis: warning to all those who have depended upon me to build native events for linux for the releases, I will no longer have my linux workstation next week and will take me a while to figure out how to make a VM image to do it again :)
+[2014-10-01 09:19:16] davehunt, joining. (#selenium)
+[2014-10-01 09:19:19] robins, joining. (#selenium)
+[2014-10-01 09:19:52] bl4ckscor3, quitting. (Ping timeout: 240 seconds)
+[2014-10-01 09:20:26] davehunt_, joining. (#selenium)
+[2014-10-01 09:20:38] davehunt, quitting. (Read error: Connection reset by peer)
+[2014-10-01 09:20:56] admc, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 09:20:58] KyleG, joining. (#selenium)
+[2014-10-01 09:20:58] KyleG, quitting. (Changing host)
+[2014-10-01 09:20:58] KyleG, joining. (#selenium)
+[2014-10-01 09:21:44] admc, joining. (#selenium)
+[2014-10-01 09:25:26] Guest78128, joining. (#selenium)
+[2014-10-01 09:26:33] dude-x: is there a pending release?
+[2014-10-01 09:26:39] lukeis: ¯\_(ツ)_/¯
+[2014-10-01 09:27:15] dude-x: heh
+[2014-10-01 09:27:41] dude-x: i love how TSU and SHI look like a smiling face
+[2014-10-01 09:27:45] dude-x: that one is a TSU
+[2014-10-01 09:27:46] lukeis: FF 33 Oct. 14
+[2014-10-01 09:28:39] lukeis: TSU SHI?   hmmm sushi… now i'm hungry
+[2014-10-01 09:39:35] ntobeko, quitting. (Quit: Page closed)
+[2014-10-01 09:40:54] barancev: No More RC!
+[2014-10-01 09:41:13] lukeis: g'day to you barancev
+[2014-10-01 09:41:57] barancev: on the other hand, I've implemented sendKeys in the core too, so it is technically possible to add a method to Selenium interface
+[2014-10-01 09:42:28] barancev: but adding new methods to a deprecated interface has bad smell
+[2014-10-01 09:43:32] timg1, changing nick to timg.
+[2014-10-01 09:44:45] selbot2: 04 Open issues: 827
+[2014-10-01 09:46:21] merike|away, changing nick to merike.
+[2014-10-01 09:46:50] cristi, quitting. (Ping timeout: 250 seconds)
+[2014-10-01 09:52:01] bimmelino, quitting. (Quit: Leaving.)
+[2014-10-01 09:56:41] barancev: #7983 -- is it really so?
+[2014-10-01 09:56:43] selbot2: 03---- open/New elem.click() takes a long time when the element has the attribute style="width:100%;" - https://code.google.com/p/selenium/issues/detail?id=7983 [Type-Defect Priority-Medium Status-Untriaged ]
+[2014-10-01 10:00:35] bdonnahue: hello, selenium seems to hang while creating the screenshot (it eventually times out)
+[2014-10-01 10:00:46] bdonnahue: how can i change the timeout
+[2014-10-01 10:00:55] bdonnahue: or determine why its irratically hanging
+[2014-10-01 10:01:22] jimevans: bdonnahue: which browser? all? one in particular?
+[2014-10-01 10:02:00] tony2, quitting. (Ping timeout: 250 seconds)
+[2014-10-01 10:02:43] tony2, joining. (#selenium)
+[2014-10-01 10:02:49] bdonnahue: im using phantomjs
+[2014-10-01 10:03:48] bdonnahue: sometimes it has no problem writing the file, but right now it simple refuses. could this be because the driver is not at the defaultcontent?
+[2014-10-01 10:04:32] bdonnahue: actually it sill also hang while switching to an iframe
+[2014-10-01 10:07:02] ulmi1, quitting. (Quit: Leaving.)
+[2014-10-01 10:08:35] lampd1, quitting. (Remote host closed the connection)
+[2014-10-01 10:09:01] ddary, joining. (#selenium)
+[2014-10-01 10:09:34] admc, quitting. (Quit: Leaving.)
+[2014-10-01 10:09:48] ddary, quitting. (Client Quit)
+[2014-10-01 10:11:38] barancev: :spec
+[2014-10-01 10:11:39] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/ | bugs: http://goo.gl/LxCtcV
+[2014-10-01 10:13:43] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 10:14:44] selbot2: 04 Open issues: 827
+[2014-10-01 10:14:50] numdig, quitting. (Read error: Connection reset by peer)
+[2014-10-01 10:15:09] ddary, joining. (#selenium)
+[2014-10-01 10:17:20] jarib: barancev: wow, that clicking thing is a nice catch if it's true
+[2014-10-01 10:18:06] *jarib tries to write a benchmark'
+[2014-10-01 10:25:04] fabrice31, joining. (#selenium)
+[2014-10-01 10:29:18] fabrice31, quitting. (Ping timeout: 250 seconds)
+[2014-10-01 10:31:39] ksoviero, joining. (#selenium)
+[2014-10-01 10:32:04] ksoviero: ato: Now that I'm using the WebDriver, I've run into this: AttributeError: 'IPcenter' object has no attribute 'close_alert_and_get_its_text'
+[2014-10-01 10:32:38] ksoviero: Nevermind, I found the bug. *smacks forehead*
+[2014-10-01 10:35:40] timg: rubberduck success
+[2014-10-01 10:39:23] ksoviero: Nevermind, it's still a problem.
+[2014-10-01 10:39:33] ksoviero: IPcenter is the name of my unittest calss
+[2014-10-01 10:39:35] ksoviero: class
+[2014-10-01 10:39:40] ksoviero: any ideas?
+[2014-10-01 10:40:11] jarib: barancev: i couldn't reproduce #7983
+[2014-10-01 10:40:12] selbot2: 03---- open/NeedsClarification elem.click() takes a long time when the element has the attribute style="width:100%;" - https://code.google.com/p/selenium/issues/detail?id=7983 [Type-Defect Priority-Medium Status-Untriaged ]
+[2014-10-01 10:43:19] AndreiH, quitting. (Quit: Leaving)
+[2014-10-01 10:44:49] selbot2: 04 Open issues: 827
+[2014-10-01 10:49:24] tony2, joining. (#selenium)
+[2014-10-01 10:50:16] dimacus: smccarthy: started to worok on Jenkins Grid plugin, any feedback? like do i need anything else added to that view https://s3-eu-west-1.amazonaws.com/uploads-eu.hipchat.com/8700/527377/LRNVk40AqvvOqLt/Bootstrap%20101%20Template-2.png
+[2014-10-01 10:53:06] santiycr, joining. (#selenium)
+[2014-10-01 10:54:36] ksoviero, quitting. (Quit: Lost terminal)
+[2014-10-01 10:54:37] merike, changing nick to merike|away.
+[2014-10-01 10:57:21] davehunt_, quitting. (Quit: Leaving...)
+[2014-10-01 10:58:43] smccarthy: dimacus: let me check it out, and i can get back to you. Btw, my selenium-grid-extas jar died on my hub last night. I am not sure if its because of my hub-config changes or not though lol
+[2014-10-01 10:59:25] dimacus: smccarthy: well need some logs to debug, you got those?
+[2014-10-01 10:59:55] smccarthy: Ok yea, I can check the logs.
+[2014-10-01 11:00:45] smccarthy: dimacus:  so with the jenkins grid plugin, Are those statistics with the hub ? or ?
+[2014-10-01 11:00:52] smccarthy: or per node ?
+[2014-10-01 11:01:05] dimacus: both, currently working on node
+[2014-10-01 11:01:18] dimacus: and then will add a grid view for the whole hub
+[2014-10-01 11:04:26] smccarthy: I can't think of anything more to add just yet, I'll keep thinking though
+[2014-10-01 11:04:46] dimacus: cool
+[2014-10-01 11:05:29] smccarthy: and grid_extras didn't show anything about an error
+[2014-10-01 11:05:39] dimacus: what about hub log?
+[2014-10-01 11:05:46] smccarthy: not in there either.
+[2014-10-01 11:05:49] smccarthy: Does yours ever just quit ?
+[2014-10-01 11:06:03] smccarthy: the hub/nodes are still up, just the hub's extras jar isnt
+[2014-10-01 11:06:32] dimacus: no never had that happen
+[2014-10-01 11:06:37] dimacus: wonder if you have something else killing it
+[2014-10-01 11:07:55] smccarthy: maybe. I did notice that the SetupTeardown proxy was giving me issues, so i removed it from my node's json
+[2014-10-01 11:09:34] jkrocil, joining. (#selenium)
+[2014-10-01 11:13:48] SwampDragons, joining. (#selenium)
+[2014-10-01 11:13:51] SwampDragons, leaving. (#selenium)
+[2014-10-01 11:14:45] selbot2: 04 Open issues: 827
+[2014-10-01 11:15:27] dimacus: smccarthy: ahh well that would probably do it :(
+[2014-10-01 11:16:04] smccarthy: but it (the setupteardown proxy in the node json) was already removed. I will keep an eye out on my grid this week and see if it happens again
+[2014-10-01 11:16:14] dimacus: ok
+[2014-10-01 11:16:19] dimacus: let me know what you see
+[2014-10-01 11:16:41] smccarthy: I can't think of anything in my changes that would cause it to stop though. Since it only gets called when you first start the jar I think! :)
+[2014-10-01 11:17:45] dimacus: no the setupTeardown gets called a lot
+[2014-10-01 11:17:54] dimacus: well at least it is uesd a lot during the build
+[2014-10-01 11:19:03] davehunt, joining. (#selenium)
+[2014-10-01 11:23:12] smccarthy: not that, the startHubs or startNodes or startGrid
+[2014-10-01 11:27:46] smccarthy: dimacus: one thing I just thought about for that jenkins grid plugin, was dimensions of screen. Is that possible ?
+[2014-10-01 11:28:06] dimacus: of the screenshot?
+[2014-10-01 11:32:57] smccarthy: well the screenshot might not be full screen. But if it was full screen, than yes
+[2014-10-01 11:34:01] smccarthy: Size of the screenshot might be more valuable? Or maybe both, size of the screenshot and size of the screen itself
+[2014-10-01 11:39:19] lampd1, joining. (#selenium)
+[2014-10-01 11:40:28] stephend, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 11:40:48] stephend, joining. (#selenium)
+[2014-10-01 11:41:23] dimacus: i see i'll take a look
+[2014-10-01 11:41:32] bdonnahue: my webdriver appears to hang when switching to iframes or printing screen shots. i can see that while it is still trying to switch to that asynchronous clean-up hase starts
+[2014-10-01 11:41:37] bdonnahue: is this expected?
+[2014-10-01 11:44:06] santiycr, quitting. (Quit: Leaving.)
+[2014-10-01 11:44:45] selbot2: 04 Open issues: 826
+[2014-10-01 11:55:01] daleharvey, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 11:55:52] freynaud, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 11:55:57] Gates, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 11:55:57] garndt, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 11:56:12] freynaud, joining. (#selenium)
+[2014-10-01 11:56:55] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 11:57:12] tony2, joining. (#selenium)
+[2014-10-01 11:57:52] garndt, joining. (#selenium)
+[2014-10-01 11:57:57] daleharvey, joining. (#selenium)
+[2014-10-01 11:58:00] Gates, joining. (#selenium)
+[2014-10-01 11:59:29] bl4ckscor3, joining. (#selenium)
+[2014-10-01 12:02:05] davehunt, quitting. (Quit: Leaving...)
+[2014-10-01 12:03:04] bl4ckscor3, quitting. (Client Quit)
+[2014-10-01 12:03:04] rodrigomartin, quitting. (Read error: Connection reset by peer)
+[2014-10-01 12:03:19] rodrigomartin, joining. (#selenium)
+[2014-10-01 12:06:01] rodrigomartin, leaving. (#selenium)
+[2014-10-01 12:07:29] tony3, joining. (#selenium)
+[2014-10-01 12:07:40] lampd1, quitting. (Remote host closed the connection)
+[2014-10-01 12:07:58] bl4ckscor3, joining. (#selenium)
+[2014-10-01 12:08:03] bl4ckscor3, quitting. (Read error: Connection reset by peer)
+[2014-10-01 12:09:21] tony2, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 12:13:36] fabrice31, joining. (#selenium)
+[2014-10-01 12:14:45] selbot2: 04 Open issues: 823
+[2014-10-01 12:18:25] fabrice31, quitting. (Ping timeout: 244 seconds)
+[2014-10-01 12:19:27] tony3, quitting. (Read error: Connection reset by peer)
+[2014-10-01 12:19:28] tony2, joining. (#selenium)
+[2014-10-01 12:19:37] bl4ckscor3, joining. (#selenium)
+[2014-10-01 12:30:09] sburjan, joining. (#selenium)
+[2014-10-01 12:34:00] jleyba, joining. (#selenium)
+[2014-10-01 12:37:08] lampd1, joining. (#selenium)
+[2014-10-01 12:37:49] dvorkbjel, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 12:38:22] kandinski, quitting. (Ping timeout: 240 seconds)
+[2014-10-01 12:39:09] jeffg, joining. (#selenium)
+[2014-10-01 12:39:27] kandinski, joining. (#selenium)
+[2014-10-01 12:40:29] jeffg: hey folks. i've broken one of our selenium smoke tests by revising <a href="foo">Edit</a> to <a href="foo"><button>Edit</button></a>.
+[2014-10-01 12:41:25] jeffg: anybody got an idea whether updating the selector in my test to include "text() = '<button>Edit</button>'" rather than "text() = 'Edit'" will have the desired effect?
+[2014-10-01 12:41:55] lukeis: broke how? can't find element?
+[2014-10-01 12:41:58] jeffg: (i ask rather than just trying it because these tests run from our CI and take about five hours to finish)
+[2014-10-01 12:42:07] jeffg: lukeis, exactly:
+[2014-10-01 12:42:13] jeffg: com.thoughtworks.selenium.SeleniumException: Element //a[contains(@href, 'SeleniumTestGroup') and contains(@href, 'editRequisition') and text() = 'Edit'] not found
+[2014-10-01 12:42:27] lukeis: ugh, RC ;)
+[2014-10-01 12:42:28] jimevans: oh! selenium rc! i'm out.
+[2014-10-01 12:42:58] jeffg: hah, thanks for playing, huh? ;)
+[2014-10-01 12:43:00] jimevans: but… the element no longer matches the xpath
+[2014-10-01 12:43:23] barancev: No More RC!
+[2014-10-01 12:43:41] jimevans: "Edit" is no longer the text of the <a> element.
+[2014-10-01 12:43:47] dvorkbjel, joining. (#selenium)
+[2014-10-01 12:43:50] jimevans: it's now the text of the child <button> element.
+[2014-10-01 12:43:52] jeffg: jimevans, right, i understand why it broke.
+[2014-10-01 12:44:00] lukeis: i think you can use "." instead?
+[2014-10-01 12:44:14] jimevans: doesn't matter, i don't think.
+[2014-10-01 12:44:17] jeffg: just trying to get a handle on whether i can be lazy here
+[2014-10-01 12:44:18] lukeis: …. and contains(., 'Edit')
+[2014-10-01 12:44:29] jimevans: that might work, but i'm not sure it will.
+[2014-10-01 12:44:36] lukeis: ¯\_(ツ)_/¯
+[2014-10-01 12:44:40] *lukeis hates xpath'
+[2014-10-01 12:44:41] jimevans: because again, the <a> element has no text child.
+[2014-10-01 12:44:45] selbot2: 04 Open issues: 821
+[2014-10-01 12:45:21] lukeis: could do //a[contains(@href, 'SeleniumTestGroup') and contains(@href, 'editRequisition')]/button[.='Edit']
+[2014-10-01 12:45:25] jeffg: sounds as if the right answer is "stop using RC", but i have no idea what to use in its place as i'm cargo-culting here
+[2014-10-01 12:45:36] lukeis: WebDriver :)
+[2014-10-01 12:46:02] jeffg: good to know
+[2014-10-01 12:46:19] jimevans: lukeis: your xpath is correct. though if you want the actual <a> element, you'd need to navigate up to the parent node in the xpath.
+[2014-10-01 12:46:21] barancev: actually, migration to webdriver does not resolve xpath-related issues :)
+[2014-10-01 12:46:25] jeffg: would a good halfway solution be to slap an id on that <a> and select it by that in the RC?
+[2014-10-01 12:46:33] lukeis: yes
+[2014-10-01 12:46:36] lukeis: that would be ideal
+[2014-10-01 12:46:42] jeffg: xpath i don't mind so much. xml is my everyday reality.
+[2014-10-01 12:46:54] jimevans: jeffg: you have my sympathies.
+[2014-10-01 12:47:15] jkrocil, quitting. (Quit: Ex-Chat)
+[2014-10-01 12:47:19] jeffg: jimevans, thanks, but not necessary. i'm a fan. sick that way, i suppose.
+[2014-10-01 12:47:45] jimevans: xml is a perfectly fine data interchange format, as long as no human ever has to read or write it.
+[2014-10-01 12:52:04] AutomatedTester: jleyba: can you have a look at https://bugzilla.mozilla.org/show_bug.cgi?id=1071526 ?
+[2014-10-01 12:58:39] jeffg: jimevans, lukeis, thanks for the tips. i moved to using an id and pushed... guess i'll know tomorrow whether i got it right :)
+[2014-10-01 12:59:15] lukeis: you can't run one of the tests one-off yourself?
+[2014-10-01 13:00:54] Naughton, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 13:01:46] jleyba: AutomatedTester: where is your atoms.js?
+[2014-10-01 13:02:11] AutomatedTester: http://dxr.mozilla.org/mozilla-central/source/testing/marionette/atoms/atoms.js
+[2014-10-01 13:02:14] AutomatedTester: jleyba: ^
+[2014-10-01 13:02:46] jeffg: lukeis, i would if i knew how... too much else to learn right now, so i'll let the CI handle it and put up with the wait.
+[2014-10-01 13:03:25] rodrigomartin1, joining. (#selenium)
+[2014-10-01 13:03:43] hirani1, joining. (#selenium)
+[2014-10-01 13:04:09] hirani, quitting. (Ping timeout: 246 seconds)
+[2014-10-01 13:04:13] AutomatedTester: jleyba: could this be because the atoms were compiled with an older closure
+[2014-10-01 13:04:17] AutomatedTester: or ...
+[2014-10-01 13:05:03] jleyba: is it being used in strict mode?
+[2014-10-01 13:05:15] AutomatedTester: um probably
+[2014-10-01 13:05:33] jleyba: the compiler generates es3 compatible code by default. might contribute to some of those warnings
+[2014-10-01 13:05:40] AutomatedTester: aha
+[2014-10-01 13:05:56] stgao, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 13:06:45] AutomatedTester: jimevans: what IE do we support?
+[2014-10-01 13:06:51] AutomatedTester: ie7?
+[2014-10-01 13:07:03] AutomatedTester: if so could we ES4 the atoms?
+[2014-10-01 13:07:35] jimevans: IE7, yes. we officially dropped support for IE6, though i've maintained that it should still "work"
+[2014-10-01 13:07:42] jimevans: this might change that.
+[2014-10-01 13:07:48] AutomatedTester: booo hissss
+[2014-10-01 13:07:51] AutomatedTester: :)
+[2014-10-01 13:07:54] jimevans: which i'm okay with, by the way.
+[2014-10-01 13:08:28] jleyba: output options are ES3, ES5, or ES5 strict
+[2014-10-01 13:09:33] jleyba: e.g. add --language_out=ECMASCRIPT5_STRICT
+[2014-10-01 13:09:34] jleyba: https://github.com/SeleniumHQ/selenium/blob/master/rake-tasks/crazy_fun/mappings/javascript.rb#L769
+[2014-10-01 13:10:32] rodrigomartin1, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 13:11:44] ddary, leaving. (#selenium)
+[2014-10-01 13:14:44] selbot2: 04 Open issues: 818
+[2014-10-01 13:16:23] AutomatedTester: jleyba: I might do that for the marionette export and then see how things go
+[2014-10-01 13:16:43] AutomatedTester: ES5... jimevans could we drop IE7 and IE8...
+[2014-10-01 13:16:45] AutomatedTester: :D
+[2014-10-01 13:16:45] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 13:17:02] tony2, joining. (#selenium)
+[2014-10-01 13:17:02] AutomatedTester: asking for a friend obvs
+[2014-10-01 13:17:11] jimevans: oh, if only wishing made it so.
+[2014-10-01 13:17:38] jleyba: AutomatedTester: we could expand the browser-specific options to include target language
+[2014-10-01 13:17:39] jleyba: https://github.com/SeleniumHQ/selenium/blob/master/rake-tasks/crazy_fun/mappings/javascript.rb#L120
+[2014-10-01 13:18:01] jleyba: (we currently just use define guards to strip out browser-specific code paths)
+[2014-10-01 13:18:02] AutomatedTester: oooo
+[2014-10-01 13:18:20] AutomatedTester: lets
+[2014-10-01 13:18:54] AutomatedTester: so I just need to add "language_out=ECMASCRIPT5" to the array?
+[2014-10-01 13:20:35] AutomatedTester: jleyba: ^
+[2014-10-01 13:21:32] jleyba: no.  add another arg to the CompileFragment ctor for additional flags. https://github.com/SeleniumHQ/selenium/blob/master/rake-tasks/crazy_fun/mappings/javascript.rb#L719
+[2014-10-01 13:25:33] rodrigomartin, joining. (#selenium)
+[2014-10-01 13:34:56] billhunt, quitting. (Quit: Textual IRC Client: www.textualapp.com)
+[2014-10-01 13:37:02] jleyba, quitting. (Quit: Leaving)
+[2014-10-01 13:38:06] ianbrandt, joining. (#selenium)
+[2014-10-01 13:39:37] Simos_, joining. (#selenium)
+[2014-10-01 13:40:28] rodrigomartin, quitting. (Quit: Leaving.)
+[2014-10-01 13:41:33] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 13:42:11] dakotasmith, joining. (#selenium)
+[2014-10-01 13:44:35] swypych, quitting. (Remote host closed the connection)
+[2014-10-01 13:44:45] selbot2: 04 Open issues: 818
+[2014-10-01 13:45:15] swypych, joining. (#selenium)
+[2014-10-01 13:46:00] swypych, quitting. (Remote host closed the connection)
+[2014-10-01 13:46:19] swypych, joining. (#selenium)
+[2014-10-01 13:46:23] swypych, quitting. (Remote host closed the connection)
+[2014-10-01 13:46:55] swypych, joining. (#selenium)
+[2014-10-01 13:49:12] SamuraiJack_, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 13:50:34] stryx`, joining. (#selenium)
+[2014-10-01 13:51:14] swypych, quitting. (Ping timeout: 250 seconds)
+[2014-10-01 13:52:15] almostwhitehat, quitting. (Quit: almostwhitehat)
+[2014-10-01 14:00:33] farlan, quitting. (Quit: Leaving.)
+[2014-10-01 14:02:27] fabrice31, joining. (#selenium)
+[2014-10-01 14:04:26] jimevans1, joining. (#selenium)
+[2014-10-01 14:06:04] jimevans, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 14:07:05] fabrice31, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 14:14:45] selbot2: 04 Open issues: 818
+[2014-10-01 14:15:48] joshin4colours, leaving. (#selenium)
+[2014-10-01 14:39:23] hirani1, leaving. (#selenium)
+[2014-10-01 14:40:38] sevaseva, joining. (#selenium)
+[2014-10-01 14:43:25] Neo--, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2014-10-01 14:44:45] selbot2: 04 Open issues: 818
+[2014-10-01 14:56:31] sburjan, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 14:58:55] rebelagentm, leaving. ("PART #openstack-horizon :QUIT :Leaving.")
+[2014-10-01 15:00:50] richdownie, quitting. (Quit: richdownie)
+[2014-10-01 15:01:16] dimacus, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 15:01:51] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2014-10-01 15:12:42] Archdude_, joining. (#selenium)
+[2014-10-01 15:12:43] dude-x__, joining. (#selenium)
+[2014-10-01 15:12:50] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 15:13:28] dude-x__, joining. (#selenium)
+[2014-10-01 15:13:36] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 15:13:59] mindhaze, quitting. ()
+[2014-10-01 15:14:13] dude-x__, joining. (#selenium)
+[2014-10-01 15:14:18] Archdude, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 15:14:19] Archdude_, changing nick to Archdude.
+[2014-10-01 15:14:19] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 15:14:44] selbot2: 04 Open issues: 818
+[2014-10-01 15:14:53] dude-x__, joining. (#selenium)
+[2014-10-01 15:15:02] dude-x__, quitting. (Read error: Connection reset by peer)
+[2014-10-01 15:15:27] dude-x, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 15:15:38] dude-x, joining. (#selenium)
+[2014-10-01 15:24:45] jimevans, joining. (#selenium)
+[2014-10-01 15:24:46] jimevans1, quitting. (Read error: Connection reset by peer)
+[2014-10-01 15:28:40] lawcab, leaving. (#selenium)
+[2014-10-01 15:40:16] jimevans, quitting. (Quit: Leaving.)
+[2014-10-01 15:43:48] test, joining. (#selenium)
+[2014-10-01 15:44:09] test: hi. anyone here familiar with IDE?
+[2014-10-01 15:44:46] selbot2: 04 Open issues: 818
+[2014-10-01 15:51:07] fabrice31, joining. (#selenium)
+[2014-10-01 15:56:05] fabrice31, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 16:01:02] admc, joining. (#selenium)
+[2014-10-01 16:02:52] admc, quitting. (Client Quit)
+[2014-10-01 16:03:22] lukeis, quitting. (Ping timeout: 240 seconds)
+[2014-10-01 16:03:52] admc, joining. (#selenium)
+[2014-10-01 16:09:35] dude-x, quitting. (Remote host closed the connection)
+[2014-10-01 16:14:45] selbot2: 04 Open issues: 817
+[2014-10-01 16:20:31] huyhong, joining. (#selenium)
+[2014-10-01 16:32:27] Neo--, joining. (#selenium)
+[2014-10-01 16:43:59] bdonnahue: hey everyone. im trying to wait for an iframe to finish loading
+[2014-10-01 16:44:11] bdonnahue: i so a switchto() but that doesnt work
+[2014-10-01 16:44:26] bdonnahue: the iframe has the loading symbol when i grab a screenshot
+[2014-10-01 16:44:45] selbot2: 04 Open issues: 817
+[2014-10-01 16:46:27] tony2, joining. (#selenium)
+[2014-10-01 16:46:45] farlan, joining. (#selenium)
+[2014-10-01 16:57:22] Neo--, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2014-10-01 17:02:26] smccarthy, quitting. (Quit: Leaving...)
+[2014-10-01 17:14:45] selbot2: 04 Open issues: 817
+[2014-10-01 17:18:31] snayder, joining. (#selenium)
+[2014-10-01 17:18:44] ianbrandt, quitting. (Quit: ianbrandt)
+[2014-10-01 17:19:10] snayder: how can I start the safari browser?
+[2014-10-01 17:24:34] patrick99e99, joining. (#selenium)
+[2014-10-01 17:26:19] patrick99e99: hi guys.. im really depreesed..  so I am trying to figure out whats going on with my integration test problems, and I want to watch what is happening (not use headless)-- so I am trying to use selenium...  If I registed chrome as the browser for selenium, then it launches my app but as soon as I open the web inspector, chrome quits and the test fails saying: Selenium::WebDriver::Error::WebDriverError: disconnected: received Inspector.detached event
+[2014-10-01 17:26:33] patrick99e99: and if I use Firefox as my browser, then it just launches firefox with a blank page, and never goes to my app
+[2014-10-01 17:26:39] patrick99e99: and I am feeling quite confined and stuck...
+[2014-10-01 17:26:46] jamfade, joining. (#selenium)
+[2014-10-01 17:26:48] snayder: Unable to establish a connection with the SafariDriver extension
+[2014-10-01 17:26:52] patrick99e99: does anyone have any suggestions on how I can get the web inspector to open in chrome?
+[2014-10-01 17:27:28] admc, quitting. (Quit: Leaving.)
+[2014-10-01 17:32:54] jamfade, quitting. (Quit: Leaving)
+[2014-10-01 17:38:03] brian_, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 17:39:51] fabrice31, joining. (#selenium)
+[2014-10-01 17:44:45] selbot2: 04 Open issues: 817
+[2014-10-01 17:44:59] fabrice31, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 17:47:14] lampd1, quitting. (Quit: bitbuckets down - time for beer)
+[2014-10-01 17:49:11] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 17:50:56] tony2, joining. (#selenium)
+[2014-10-01 17:55:50] cmcgraw, quitting. (Quit: cmcgraw)
+[2014-10-01 18:00:36] smccarthy, joining. (#selenium)
+[2014-10-01 18:00:40] Simos_, quitting. (Remote host closed the connection)
+[2014-10-01 18:13:22] KyleG, quitting. (Quit: Leaving.)
+[2014-10-01 18:14:17] bdonnahue: hello im tyring to do a recursive traversal of al lthe elements in a document
+[2014-10-01 18:14:42] bdonnahue: can someone explain how i can access the root element? i thought xpath would be "/"
+[2014-10-01 18:14:45] selbot2: 04 Open issues: 817
+[2014-10-01 18:21:00] dakotasmith, quitting. (Quit: Linkinus - http://linkinus.com)
+[2014-10-01 18:35:01] patrick99e99, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 18:44:45] selbot2: 04 Open issues: 817
+[2014-10-01 18:48:04] snayder, quitting. ()
+[2014-10-01 18:50:35] huyhong, leaving. (#selenium)
+[2014-10-01 18:54:51] dimacus, joining. (#selenium)
+[2014-10-01 19:00:12] dimacus, quitting. (Quit: Leaving.)
+[2014-10-01 19:14:08] SwampDragons, joining. (#selenium)
+[2014-10-01 19:14:44] selbot2: 04 Open issues: 817
+[2014-10-01 19:21:36] dimacus, joining. (#selenium)
+[2014-10-01 19:28:41] fabrice31, joining. (#selenium)
+[2014-10-01 19:34:09] fabrice31, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 19:34:53] tony2, quitting. (Quit: Leaving.)
+[2014-10-01 19:35:37] tony2, joining. (#selenium)
+[2014-10-01 19:40:15] tony2, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 19:44:45] selbot2: 04 Open issues: 817
+[2014-10-01 20:05:55] tony2, joining. (#selenium)
+[2014-10-01 20:11:56] tony2, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 20:14:45] selbot2: 04 Open issues: 817
+[2014-10-01 20:15:16] sevaseva, quitting. (Quit: Leaving)
+[2014-10-01 20:15:39] almostwhitehat, joining. (#selenium)
+[2014-10-01 20:15:43] almostwhitehat, quitting. (Client Quit)
+[2014-10-01 20:16:12] dimacus, quitting. (Quit: Leaving.)
+[2014-10-01 20:19:55] robins, quitting. (Excess Flood)
+[2014-10-01 20:20:50] robinsmidsrod, joining. (#selenium)
+[2014-10-01 20:20:59] fatguylaughing, joining. (#selenium)
+[2014-10-01 20:31:15] patrick99e99, joining. (#selenium)
+[2014-10-01 20:35:55] patrick99e99, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 20:38:09] robinsmidsrod, quitting. (Excess Flood)
+[2014-10-01 20:40:51] robinsmidsrod, joining. (#selenium)
+[2014-10-01 20:43:47] SwampDragons, quitting. (Quit: Leaving.)
+[2014-10-01 20:44:44] selbot2: 04 Open issues: 817
+[2014-10-01 21:06:37] letsdoit, joining. (#selenium)
+[2014-10-01 21:07:30] tony2, joining. (#selenium)
+[2014-10-01 21:12:08] tony2, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 21:13:35] letsdoit, quitting. (Quit: Page closed)
+[2014-10-01 21:14:45] selbot2: 04 Open issues: 817
+[2014-10-01 21:17:27] fabrice31, joining. (#selenium)
+[2014-10-01 21:19:44] nirvdrum, quitting. (Remote host closed the connection)
+[2014-10-01 21:21:57] smccarthy, quitting. (Quit: Leaving...)
+[2014-10-01 21:22:24] fabrice31, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 21:29:07] cgoldberg, quitting. (Quit: Ex-Chat)
+[2014-10-01 21:44:45] selbot2: 04 Open issues: 817
+[2014-10-01 22:07:23] tony2, joining. (#selenium)
+[2014-10-01 22:07:33] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2014-10-01 22:13:40] tony2, quitting. (Ping timeout: 258 seconds)
+[2014-10-01 22:14:46] selbot2: 04 Open issues: 818
+[2014-10-01 22:32:07] patrick99e99, joining. (#selenium)
+[2014-10-01 22:36:32] patrick99e99, quitting. (Ping timeout: 245 seconds)
+[2014-10-01 22:44:45] selbot2: 04 Open issues: 818
+[2014-10-01 23:06:18] fabrice31, joining. (#selenium)
+[2014-10-01 23:07:29] tony2, joining. (#selenium)
+[2014-10-01 23:11:13] fabrice31, quitting. (Ping timeout: 260 seconds)
+[2014-10-01 23:11:57] tony2, quitting. (Ping timeout: 245 seconds)
+[2014-10-01 23:14:44] selbot2: 04 Open issues: 818
+[2014-10-01 23:16:07] papegaaij, joining. (#selenium)
+[2014-10-01 23:16:37] SamuraiJack_, joining. (#selenium)
+[2014-10-01 23:21:48] Archdude_, joining. (#selenium)
+[2014-10-01 23:24:03] Archdude, quitting. (Ping timeout: 272 seconds)
+[2014-10-01 23:24:04] Archdude_, changing nick to Archdude.
+[2014-10-01 23:44:44] selbot2: 04 Open issues: 818
+[2014-10-01 23:48:12] fabrice31, joining. (#selenium)

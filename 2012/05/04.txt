@@ -1,0 +1,904 @@
+[IRC logfile - Started Fri May  4 00:10:08 2012]
+[00:10:08] stackedsax: AutomatedTester: you want me to create an issue and attach the diff?  
+[00:14:17] stackedsax: AutomatedTester: #3849
+[00:14:18] selbot2: 03 open/new Just some little changes to highlight the 2.3.x Android emulator bug in the wiki - https://code.google.com/p/selenium/issues/detail?id=3849 [Type-Defect Priority-Medium Status-Untriaged]
+[00:15:11] AutomatedTester: stackedsax: have you signed the :cla?
+[00:15:11] selbot2: http://goo.gl/qC50R
+[00:15:23] stackedsax: yep
+[00:15:37] AutomatedTester: name is Alex Scammon?
+[00:15:40] stackedsax: yep
+[00:16:03] AutomatedTester: ok, will do it firth thing tomorrow
+[00:16:17] stackedsax: cool, thanks!
+[00:16:31] AutomatedTester: thanks for the patch
+[00:17:50] cMical has joined #selenium
+[00:21:55] odix has joined #selenium
+[00:22:06] odix: anyone have problems here with iframe on different platforms ?
+[00:24:05] AutomatedTester: laters
+[00:24:45] stackedsax: cya
+[00:25:01] stackedsax: btw: my tests running beautfilly now — cheers
+[00:26:11] frdelrosario has joined #selenium
+[00:31:20] IvanDM: Hi, anyone here that I could ask questions about WebDrivers compliancy tests?
+[00:32:37] IvanDM: I want to run the same WebDriver tests against GhostDriver, but I'm confused on what test I should actually try
+[00:32:42] IvanDM: anyone can help?
+[00:35:41] dgtlmoon has joined #selenium
+[00:39:47] jimevans has joined #selenium
+[00:39:47] selbot2: jimevans: note from stackedsax about 1 hour ago: update on android emulator: version 4.x seems to work just fine 
+[00:40:58] jimevans: stackedsax: glad it worked out. 
+[00:41:13] stackedsax: jimevans: actually, I just found that 4.x is exhibiting the same problem eventually
+[00:41:22] stackedsax: the window goes away
+[00:41:35] stackedsax: I can get it back by manually executing an adb command
+[00:41:44] stackedsax: but sub optimal
+[00:43:12] jimevans: Well, like I said, I hear it works great on an actual device. :)
+[00:44:32] IvanDM: jimevans: I read your tweet about your kid. All good?
+[00:45:10] jimevans: Hospital has good internets
+[00:45:33] jimevans: Having tests done. 
+[00:46:32] IvanDM: so you are there right now? Bless you and bless him/her.
+[00:47:29] jimevans: Yeah I'm here now. The boy looks pretty pitiful. 
+[00:48:11] jimevans: He's in good hands though. 
+[00:49:40] IvanDM: I'm sure he is.
+[00:51:27] jimevans: Looking like pneumonia. 
+[IRC logfile - Started Fri May  4 01:03:17 2012]
+[01:03:17] mikeheme has joined #selenium
+[01:09:04] odix: whats the best way to get selenium to type in a email box ?
+[01:09:16] odix: the main part ? switch to frame for me just is not working
+[01:13:05] IvanDM has joined #selenium
+[01:15:21] cMical has joined #selenium
+[01:17:59] dgtlmoon: soooo
+[01:18:11] dgtlmoon: i have my selenium WebDrivers running on my windows/IE machine for testing
+[01:18:12] mreedell has joined #selenium
+[01:18:14] dgtlmoon: and the code on a linux machine
+[01:18:26] dgtlmoon: hmm
+[01:18:49] dgtlmoon: they register with the hub
+[01:18:54] dgtlmoon: can i tell the hub to run the tests?
+[01:25:52] odix:           driver.switch_to_frame("postingComposeBox") <--that looks ok on  <iframe id="postingComposeBox" > ?
+[01:27:00] odix: <textarea is there as well maybe i should try that, trying to input text
+[01:27:44] santiycr has joined #selenium
+[01:28:55] kallisti: I suspect there's a bug in the Python profile code.
+[01:29:01] kallisti: it looks for a user.js
+[01:29:05] kallisti: but it should be looking for prefs.js
+[01:29:33] kallisti: also it doesn't handle escape sequences in its parsing regex
+[01:29:39] kallisti: which are something that can actually occur
+[01:29:48] kallisti: and shouldn't be overlooked
+[01:30:30] odix: i feel like there is a bug in the python coding too
+[01:31:13] kallisti: if I recall there are some limitations with frame switching
+[01:31:19] kallisti: that apply to all of webdriver.
+[01:31:23] kallisti: but I don't recall what.
+[01:31:28] kallisti: I'm talking about the Firefox profile code.
+[01:33:19] kallisti: hm..
+[01:33:23] kallisti: but Ruby does it as well
+[01:33:38] kallisti: I have no user.js in my own profile. so why is it in this one?
+[01:39:40] kallisti: oh I see
+[01:39:57] kallisti: user.js is a second file for permanent changes, and prefs.js is auto-generated including changes from user.js
+[01:40:15] sumxyz has joined #selenium
+[01:46:16] sfbrian_ has joined #selenium
+[01:52:01] kallisti: hm I wonder if it's a problem that I only copy extensions and profile preferences
+[01:52:06] kallisti: and not everything else in the profile directory.
+[01:55:35] Binken_ has joined #selenium
+[IRC logfile - Started Fri May  4 02:05:33 2012]
+[02:05:33] ejelinek has joined #selenium
+[02:09:22] cMical has joined #selenium
+[02:10:24] mikeheme has joined #selenium
+[02:13:16] ejelinek has joined #selenium
+[02:36:59] kallisti: so apparently
+[02:37:12] kallisti: the standalone Firefox isn't recognizing my profiles or something?
+[02:41:03] mikeheme has joined #selenium
+[02:43:26] odix: can frames work in xpaths ?
+[02:43:42] odix: /frame/frameid/body/id/class
+[02:43:49] odix: ./html
+[02:44:34] kallisti: I don't see why not
+[02:48:54] kallisti: hm
+[02:49:00] kallisti: now it hangs indefinitely.
+[02:49:15] kallisti: I saw that the Ruby code encodes profiles as {"zip": "..."}
+[02:49:17] kallisti: so I did that
+[02:49:31] kallisti: and now loading my own profile doesn't open up a Firefox window.
+[02:49:38] kallisti: the server confirms that the session command terminated
+[02:49:40] kallisti: but no window appears
+[02:49:50] kallisti: so I'm guessing extensions are breaking.
+[02:49:57] kallisti: because I don't copy the entire profile directory.
+[02:51:35] ksummerlin has joined #selenium
+[IRC logfile - Started Fri May  4 03:13:59 2012]
+[03:13:59] IvanDM has joined #selenium
+[03:14:36] ejelinek_ has joined #selenium
+[03:16:41] jleyba has joined #selenium
+[03:30:10] snuff-work1 has joined #selenium
+[03:45:08] ksummerlin: :help
+[03:57:28] stackedsax1 has joined #selenium
+[IRC logfile - Started Fri May  4 04:01:09 2012]
+[04:01:09] mdgreenfield has joined #selenium
+[04:19:58] ksummerlin: :note jimevans Implemented SlowLoadableComponent.cs using new pattern => https://gist.github.com/2591548. Code cleans up nicely. Also gisted a couple of my components using the new pattern -> https://gist.github.com/2591617 and https://gist.github.com/2591717.
+[04:19:58] selbot2: ok!
+[04:23:27] sumxyz has joined #selenium
+[04:35:07] sumxyz has joined #selenium
+[04:36:53] dmachi has joined #selenium
+[04:42:24] pnitin has joined #selenium
+[IRC logfile - Started Fri May  4 05:14:27 2012]
+[05:14:27] IvanDM has joined #selenium
+[05:51:41] pnitin has joined #selenium
+[05:52:32] baijum has joined #selenium
+[IRC logfile - Started Fri May  4 06:18:35 2012]
+[06:18:35] baijum has joined #selenium
+[06:33:00] testingb0t has joined #selenium
+[06:33:17] testingb0t1 has joined #selenium
+[06:37:31] _kip has joined #selenium
+[06:51:33] barancev has joined #selenium
+[IRC logfile - Started Fri May  4 07:07:59 2012]
+[07:07:59] jeichar has joined #selenium
+[07:11:16] snuff-work: mm.. why would selenium keep putting more n more stuff in local settings\temp
+[07:12:00] snuff-work: aka i have tons of 'plugtmp / userprofile' folders
+[07:14:54] IvanDM has joined #selenium
+[07:21:53] papegaaij has joined #selenium
+[07:27:43] ArmEagle has joined #selenium
+[07:49:09] lfryc has joined #selenium
+[07:49:09] lfryc has joined #selenium
+[07:50:02] teodosia has joined #selenium
+[07:58:05] Alex0011 has joined #selenium
+[IRC logfile - Started Fri May  4 08:00:15 2012]
+[08:00:15] SamuraiJack has joined #selenium
+[08:18:14] baijum has joined #selenium
+[08:27:28] joar has joined #selenium
+[08:27:45] joar has joined #selenium
+[08:28:21] foolx has joined #selenium
+[08:30:32] andreastt: Good morning!
+[08:32:34] Binken_: Good afternoon
+[08:37:47] testingb0t has joined #selenium
+[08:43:49] rbalent has joined #selenium
+[08:43:49] rbalent has joined #selenium
+[08:45:15] selbot2: 03barancev less than 10 seconds ago - AlexeiBarantsev: Added copyright statement | https://code.google.com/p/selenium/source/detail?r=16783 | http://seleniumhq.org/ci.jsp?r=16783
+[08:47:42] snuff-work: mm.. 
+[08:51:09] andreastt: Wraarargh.  I hate travel and expense management systems.
+[08:53:55] Jayakumar has joined #selenium
+[08:57:36] sburjan has joined #selenium
+[08:58:54] Jayakumar01 has joined #selenium
+[IRC logfile - Started Fri May  4 09:02:57 2012]
+[09:02:57] freynaud has joined #selenium
+[09:05:23] IvanDM has joined #selenium
+[09:10:44] snuff-work: it appears selenium does not del its 'plugtmp' folders
+[09:11:07] snuff-work: it cleans them but never del's
+[09:11:12] jimevans has joined #selenium
+[09:11:12] selbot2: jimevans: note from ksummerlin about 5 hours ago: Implemented SlowLoadableComponent.cs using new pattern => https://gist.github.com/2591548. Code cleans up nicely. Also gisted a couple of my components using the new pattern -> https://gist.github.com/2591617 and https://gist.github.com/2591717. 
+[09:12:09] Jayakumar has joined #selenium
+[09:14:55] Binken_: Morning Jim
+[09:15:41] jimevans: Could be due to the fact that I've slept no more than a few minutes at a time last night. 
+[09:16:03] jimevans: Binken_: Hi
+[09:17:25] Binken_: #1486
+[09:17:27] selbot2: 03james.h....@gmail.com open/needsclarification session cookie lost when click made to a link that opens a window with window.open() - https://code.google.com/p/selenium/issues/detail?id=1486 [Type-Defect Priority-Medium Component-WebDriver Browser-IE]
+[09:17:47] Binken_: Jim, could you reproduce the issue now?
+[09:19:37] snuff-work: mm.. using -Dwebdriver.firefox.profile = left behind profiles in local setting\temp.. -Dfirefox.profile= just leaves a 'plugtmp' folder behind
+[09:20:25] snuff-work: mm.. using -Dwebdriver.firefox.profile = left behind profiles in local setting\temp (full size like 15-30mb).. -Dfirefox.profile= just leaves a 'plugtmp' folder behind (0 size)
+[09:24:11] benadderson has joined #selenium
+[09:24:33] Bebe has joined #selenium
+[09:27:12] IvanDM: jimevans: So, he is going to be ok. Right? It's treatable.
+[09:31:17] jimevans has joined #selenium
+[09:33:30] barancev: jimevans: hi! would you mind if I merge #3753 into #3291?
+[09:33:31] selbot2: 03 open/accepted IWebDriver CurrentWindowHandle inconsistent exceptions. - https://code.google.com/p/selenium/issues/detail?id=3753 [Type-Defect Priority-Medium Component-WebDriver]
+[09:33:31] selbot2: 03 open/new Automatically switch to previous window after closing a window - https://code.google.com/p/selenium/issues/detail?id=3291 [Type-Enhancement Priority-Medium Browser-Firefox Browser-IE Browser-Chrome Browser-HtmlUnit Browser-Opera Browser-Atoms Browser-Android GettingInvolved]
+[09:34:19] zac_sel has joined #selenium
+[09:36:58] jimevans: barancev: I'm not sure those issues should necessarily be merged, but I honestly don't care today. 
+[09:37:57] jimevans: I've got an 8-year-old boy with pneumonia that I've been looking after most of the night, so sure, knock yourself out. 
+[09:38:51] barancev: jimevans: oh, I see, get him well first, the world can wait
+[09:39:07] barancev: I have three children and I know what it is...
+[09:41:02] jimevans: If you want to take a crack at fixing the .NET docs, since I'm apparently an utter failure at svn, feel free to do that too. 
+[09:42:23] Ammar01 has joined #selenium
+[09:42:37] jimevans: Binken_: No, I've honestly not looked at that issue in some time. I'd gladly review a patch if someone submitted one, though. 
+[09:43:25] OperaDriver has joined #selenium
+[09:43:25] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/fc5559a397a79d96857857605543d5ffc0803e1b
+[09:43:25] OperaDriver: [operadriver/master] Introducing annotation NoDriverAfterTest to force a restart of the browser after a class/method - Andreas Tolf Tolfsen
+[09:43:25] OperaDriver has left #selenium
+[09:44:02] andreastt: jimevans: I hope he recovers soon!
+[09:45:59] jimevans: andreastt: Thanks, mate. We've started a course of antibiotics, but it'll likely still be a couple of days before he's getting real relief. 
+[09:49:56] jimevans: Tyf
+[09:50:14] jimevans: Err... Stupid phone. 
+[09:50:34] jimevans: Ttfn. Back later maybe. 
+[09:50:36] jimevans has left #selenium
+[09:58:04] OperaDriver has joined #selenium
+[09:58:04] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/8534ba785dbe5e102b78589172d16fc84edeeebc
+[09:58:04] OperaDriver: [operadriver/master] Until we can make NoDriverAfterTest work on a class - Andreas Tolf Tolfsen
+[09:58:04] OperaDriver has left #selenium
+[IRC logfile - Started Fri May  4 10:02:16 2012]
+[10:02:16] baijum1 has joined #selenium
+[10:06:46] robbim02 has joined #selenium
+[10:14:41] sumxyz has joined #selenium
+[10:24:48] robbim02_ has joined #selenium
+[10:32:45] robbim02 has joined #selenium
+[10:33:31] Bebe has joined #selenium
+[10:35:59] Bebe has joined #selenium
+[10:40:03] Bebe has joined #selenium
+[10:40:47] baijum has joined #selenium
+[10:41:33] andreastt: About the BasicMouseInterfaceTest.testCannotMoveToANullLocator() test.
+[10:42:19] andreastt: Why should one be allowed to call new Actions(driver).click().perform()?  The context depends on what actions you've done before, surely?
+[10:43:34] andreastt: Should the last known mouse position be disregarded if calling click() through an Actions chain?
+[10:44:11] andreastt: I think we have some tests disagreeing with that.
+[10:44:38] freynaud has joined #selenium
+[10:44:57] addNtoX has joined #selenium
+[10:45:00] addNtoX: hi
+[10:46:52] addNtoX: i have a very strange error with a phpunit selenium testcase: in a testXX method i set some values to a logger object. then, after waitForElementPresent times out, onNotSuccessFulTest is called. in this method the values in the logger object are correct. but then, when tearDown is called, the values have changed. how is this possible?
+[10:47:08] addNtoX: they are basically 'resettet' to the original state
+[10:50:16] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Splitting mouse position preservation test in actions chain out | https://code.google.com/p/selenium/source/detail?r=16784 | http://seleniumhq.org/ci.jsp?r=16784
+[10:54:07] AutomatedTester has joined #selenium
+[10:57:00] jibay has joined #selenium
+[IRC logfile - Started Fri May  4 11:00:42 2012]
+[11:00:42] Bebe has joined #selenium
+[11:00:44] andreastt: 3127
+[11:00:51] andreastt: :issue 3127
+[11:00:56] andreastt: #3127
+[11:00:56] selbot2: 03simon.m.stewart open/accepted Tracking issue for focus issues in Firefox - https://code.google.com/p/selenium/issues/detail?id=3127 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox]
+[11:01:52] baijum has joined #selenium
+[11:01:58] barancev: andreastt: click without parameters should not change the current mouse coordinates
+[11:02:34] barancev: new Actions(driver).moveToElement(element, 10, 10).click().perform()
+[11:03:03] andreastt: Hm, that makes no sense to me.
+[11:03:17] andreastt: We need to have talk about it.
+[11:03:23] AutomatedTester has joined #selenium
+[11:03:29] barancev: it should click to the point that has offset (10,10) from the top left corner of the element
+[11:04:15] barancev: otherwise, how can you perform this click? (not in the center, but into a specific point of an element)
+[11:05:10] barancev: the same for other methods that have no element parameter, fro example -- release()
+[11:05:24] andreastt: I think we're talking about different things.
+[11:05:54] barancev: new Actions(driver).clickAndHold(element).moveByOffset(100, 100).release().perform()
+[11:06:32] barancev: may be I've not got the context of your question? :)
+[11:07:05] andreastt: When we perform an actions chain, we store the mouse's last known position internally in the driver so that a future click() action (like new Actions(driver).click().perform()) would click the same coordinates.
+[11:07:18] barancev: yes
+[11:07:36] andreastt: That test sort of implies that line should throw.
+[11:08:27] andreastt: … because no coordinates were given.
+[11:09:57] barancev: it's expected to throw on moveToElement(null)
+[11:10:43] barancev: there is no calls to 'click' in the test testCannotMoveToANullLocator
+[11:10:52] barancev: that's a different issue
+[11:11:20] barancev: aha, you mean the second assert, sorry
+[11:11:54] barancev: I see, yes, I don't know how should it work :)
+[11:13:04] andreastt: (=
+[11:13:04] barancev: no wonder it is @Ignore :)
+[11:13:24] andreastt: Yes, thought I'd make two tests to make it clearer.
+[11:13:28] andreastt: It was testing two things previously.
+[11:15:42] jens__ has joined #selenium
+[11:16:23] AutomatedTester has joined #selenium
+[11:16:46] SamuraiJack has joined #selenium
+[11:17:02] nsussman has joined #selenium
+[11:17:07] OperaDriver has joined #selenium
+[11:17:07] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/24d22f0d72e7655978beda78797e9144276767f1
+[11:17:07] OperaDriver: [operadriver/master] Tag names are always upper-case - Andreas Tolf Tolfsen
+[11:17:07] OperaDriver has left #selenium
+[11:20:05] AutomatedTester has joined #selenium
+[11:28:12] Jayakumar has joined #selenium
+[11:45:07] AutomatedTester has joined #selenium
+[11:46:42] Ammar01 has joined #selenium
+[11:50:37] AutomatedTester has joined #selenium
+[11:57:56] barancev: why our tests are so unstable?
+[IRC logfile - Started Fri May  4 12:00:37 2012]
+[12:00:37] barancev: they failed here and there for unknown reason, and succeeded on the next run without any sufficient changes in code, and failed again on the next run with no changes too
+[12:01:35] andreastt: I hope it's not from the change I made.
+[12:05:11] barancev: absolutely no
+[12:06:09] barancev: -18 failures for Firefox 10 XP Native Java, +27 failures for Firefox 11 XP Native Java
+[12:06:15] barancev: that's terrible..
+[12:11:27] AutomatedTester has joined #selenium
+[12:12:30] nirvdrum has joined #selenium
+[12:13:25] dawagner has joined #selenium
+[12:13:25] selbot2: dawagner: note from santiycr about 13 hours ago: did you guys try out the new IEDriverServer in Sauce? 
+[12:13:52] andreastt: :seen santiycr
+[12:13:52] selbot2: santiycr was last seen about 9 hours ago, quitting.
+[12:15:23] barancev: wish I know how to use the new IEDriverServer in Sauce
+[12:15:57] barancev: IE tests don't use it, no signs in console logs that server started
+[12:16:27] AutomatedTester has joined #selenium
+[12:19:00] skiphuffman has joined #selenium
+[12:23:45] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Correcting ignores for Opera | https://code.google.com/p/selenium/source/detail?r=16785 | http://seleniumhq.org/ci.jsp?r=16785
+[12:24:31] AutomatedTester has joined #selenium
+[12:26:28] OperaDriver has joined #selenium
+[12:26:28] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/ec844b03b78e18d3e5a134c12b99f07f3eb5bd60
+[12:26:28] OperaDriver: [operadriver/master] Allowing popups by default when using WebDriver - Andreas Tolf Tolfsen
+[12:26:28] OperaDriver has left #selenium
+[12:27:21] OperaDriver has joined #selenium
+[12:27:21] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/66daca17af8e52500b80aee2af7cb11a0d471b1a
+[12:27:21] OperaDriver: [operadriver/master] Use real clicks for contenteditable fields - Andreas Tolf Tolfsen
+[12:27:21] OperaDriver has left #selenium
+[12:30:22] OperaDriver has joined #selenium
+[12:30:22] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/4198e1c0dd839c30ea4457973d5cc13ea3ff3545
+[12:30:22] OperaDriver: [operadriver/master] Removing PbActionHandler, replaced by OperaMouse - Andreas Tolf Tolfsen
+[12:30:22] OperaDriver has left #selenium
+[12:31:22] quinn1 has joined #selenium
+[12:35:00] andreastt: Does FirefoxDriver throw a TimeoutException if it can't fetch the page within the set timeout value?  I thought we were meant to just hand back control to the user.
+[12:36:36] AutomatedTester has joined #selenium
+[12:37:28] Dude-X_: andreastt, the default setting is to block until the page loads
+[12:37:39] Dude-X_: which means no timeout
+[12:37:45] selbot2: 03andreastt@opera.com less than 20 seconds ago - AndreasTolfTolfsen: Unignoring opacity test which is now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16786 | http://seleniumhq.org/ci.jsp?r=16786
+[12:38:49] Dude-X_: andreastt, you can set the fast load strategy to unstable to have it stop waiting for the page to load after a while, but it makes the overall tests flaky
+[12:41:49] andreastt: AHa.
+[12:42:06] andreastt: I've heard rumours of this loading strategy scheme.
+[12:42:21] jimevans has joined #selenium
+[12:43:15] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Unignoring various JavascriptEnabeldDriver tests now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16787 | http://seleniumhq.org/ci.jsp?r=16787
+[12:44:45] selbot2: 03andreastt@opera.com less than 10 seconds ago - AndreasTolfTolfsen: Unignoring GetMultipleAttributeTest completely, passing in Opera | https://code.google.com/p/selenium/source/detail?r=16788 | http://seleniumhq.org/ci.jsp?r=16788
+[12:45:30] jimevans: Go andreastt! o/
+[12:47:41] andreastt: \o
+[12:48:42] jimevans: :)
+[12:48:57] jimevans: I love unignoring tests. 
+[12:51:12] jimevans: andreastt: Forgive the naive question, but what's the transport for the scope protocol?
+[12:51:15] selbot2: 03andreastt@opera.com half a minute ago - Unignoring various frame switching related tests now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16789 | http://seleniumhq.org/ci.jsp?r=16789
+[12:51:47] ksummerlin has joined #selenium
+[12:52:55] jimevans: Hi ksummerlin. 
+[12:53:17] RossPatterson has joined #selenium
+[12:53:18] jimevans: Loki g
+[12:53:20] ksummerlin: jimevans: Hey jim
+[12:53:23] dawagner: jimevans: Protocol buffers, IIRC
+[12:54:05] jimevans: dawagner: Right. I knew that. I've been up all night. Sorry. 
+[12:54:08] andreastt: jimevans: Yes, what dawagner said.
+[12:54:21] andreastt: We started out using XML.
+[12:54:38] andreastt: But that was waaay too heavyweight, so we switched to PB.
+[12:54:57] jimevans: dawagner: Thanks. We're getting by. 
+[12:55:21] AutomatedTester has joined #selenium
+[12:55:52] jimevans: ksummerlin: Like what I'm seeing in the latest round of revisions. 
+[12:56:15] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Ignoring appending text test which fails in Opera | https://code.google.com/p/selenium/source/detail?r=16790 | http://seleniumhq.org/ci.jsp?r=16790
+[12:57:07] ksummerlin: jimevans: Yeah, after seeing the SlowLoadableComponent and working through some real page objects using it, I like the way this version works.
+[12:57:45] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Unignoring some ExecutingJavaScriptTest tests which are now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16791 | http://seleniumhq.org/ci.jsp?r=16791
+[12:58:43] RossPatterson: jimevans: Good thoughts @ you & yours
+[12:59:30] jimevans: ksummerlin: Nitpicks: change IsError() to HandleErrors() and WaitFor() to Wait(). 
+[12:59:54] jimevans: RossPatterson: Thanks mate. It means a lot. 
+[IRC logfile - Started Fri May  4 13:02:15 2012]
+[13:02:15] selbot2: 03andreastt@opera.com less than 10 seconds ago - AndreasTolfTolfsen: Unignoring a test in ElementEqualityTest that's now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16792 | http://seleniumhq.org/ci.jsp?r=16792
+[13:02:41] jimevans: ksummerlin: Other than that, we should remove the constructors that take ints, and leave only those that take TimeSpans. 
+[13:03:19] jimevans: If you want to package all that up into a patch, I'll look at it later today. 
+[13:03:46] AutomatedTester has joined #selenium
+[13:04:03] ksummerlin: jimevans: Will do.
+[13:04:51] jimevans: Oh, and the translator you're using to translate your git patches to svn produces patches that don't apply cleanly in subversion. :)
+[13:05:15] selbot2: 03andreastt@opera.com less than 20 seconds ago - AndreasTolfTolfsen: Unignoring some ElementAttribute tests now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16793 | http://seleniumhq.org/ci.jsp?r=16793
+[13:05:53] jimevans: At least not for me. 
+[13:05:56] ksummerlin: jimevans: Yeah. I was hoping that it would. I'm a git slave, but I guess I'll pull in from SVN and patch from there.
+[13:06:13] jimevans: That's 
+[13:06:38] jimevans: That'd make my life marginally easier. :)
+[13:07:15] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Unignoring some drag and drop tests passing in Opera | https://code.google.com/p/selenium/source/detail?r=16794 | http://seleniumhq.org/ci.jsp?r=16794
+[13:08:00] ksummerlin: jimevans: From your tweets it sounds like you need some easy right now. My best to him. Makes you hurt when the little ones get so sick.
+[13:08:12] SamuraiJack has joined #selenium
+[13:10:11] jimevans: ksummerlin: Thanks. Got him started on meds today. Pretty confident that he'll respond to that treatment. We're just glad we know what it is. 
+[13:13:45] selbot2: 03andreastt@opera.com less than 20 seconds ago - AndreasTolfTolfsen: Unignoring some clear tests for Opera | https://code.google.com/p/selenium/source/detail?r=16795 | http://seleniumhq.org/ci.jsp?r=16795
+[13:14:09] jimevans: The Wife wanted me to say thanks to everybody for their good wishes. 
+[13:18:00] jimevans: Since she got to meet a number of you in London, she understands something of why I like working on this project so much. 
+[13:18:48] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Unignoring a few window switching tests now passing in Opera | https://code.google.com/p/selenium/source/detail?r=16796 | http://seleniumhq.org/ci.jsp?r=16796
+[13:18:54] andreastt: jimevans: Send my regards to her
+[13:19:15] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Fix double-clicking problem in ff36 again [SimonStewart overwrote it, the knave\!] | https://code.google.com/p/selenium/source/detail?r=16797 | http://seleniumhq.org/ci.jsp?r=16797
+[13:19:23] andreastt: There.  I think I've unignored the important tests at least.
+[13:20:11] jimevans: andreastt: Will do. 
+[13:25:02] ImmoJack has joined #selenium
+[13:25:15] ImmoJack: hi all
+[13:25:47] ImmoJack: during the selenium conference there was a workshop about webdriver grid
+[13:26:55] ImmoJack: does anybody has some infos about the workshop? some slides? code examples? 
+[13:27:05] ejelinek has joined #selenium
+[13:28:55] OperaDriver has joined #selenium
+[13:28:55] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/32bea1ede87e7458ede786dac73f0d0bf5c1ab48
+[13:28:55] OperaDriver: [operadriver/master] Oops, didn't mean for an sout to be here - Andreas Tolf Tolfsen
+[13:28:55] OperaDriver has left #selenium
+[13:30:05] AutomatedTester has joined #selenium
+[13:31:32] jimevans: ImmoJack: nirvdrum presented that workshop. He'd have all that info. 
+[13:33:13] ImmoJack: ok thx
+[13:35:46] selbot2: 03dawagner less than 20 seconds ago - DanielWagnerHall: Some linting | https://code.google.com/p/selenium/source/detail?r=16798 | http://seleniumhq.org/ci.jsp?r=16798
+[13:36:01] jimevans: Ok. Back later. 
+[13:36:04] jimevans has left #selenium
+[13:37:16] SamuraiJack has joined #selenium
+[13:38:25] lfryc has joined #selenium
+[13:38:40] andreastt: Is there anything I can do to get more output in the console when running tests using go?
+[13:39:45] sburjan has joined #selenium
+[13:43:57] quinn1 has joined #selenium
+[13:44:55] SamuraiJack has joined #selenium
+[13:47:47] mreedell has joined #selenium
+[13:48:21] dawagner: andreastt: What output are you hoping for?
+[13:48:41] dawagner: `./go test_opera log=true` is likely the best you can get without playing with the source
+[13:58:11] teodosia has left #selenium
+[IRC logfile - Started Fri May  4 14:04:53 2012]
+[14:04:53] OperaDriver has joined #selenium
+[14:04:53] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/32bea1e...04c984a
+[14:04:53] OperaDriver: [operadriver/master] Revert "Use real clicks for contenteditable fields" - Andreas Tolf Tolfsen
+[14:04:53] OperaDriver: [operadriver/master] Updates to test names - Andreas Tolf Tolfsen
+[14:04:53] OperaDriver has left #selenium
+[14:05:13] andreastt: That had some disasterous affects on normal text fields. d-:
+[14:07:09] andreastt: dawagner: Thanks, exactly what I was looking for (-:
+[14:07:24] andreastt: I had it set in my shell profile earlier, but removed it for some reason.
+[14:10:50] bsilwal has joined #selenium
+[14:11:36] AutomatedTester: dawagner: hey, has Google changed the SSL signature on google code?
+[14:11:46] mdgreenfield has joined #selenium
+[14:12:07] bsilwal: Question for Any PHP guys: I have an iFrame in which there is a Light box and if wrong/unavailable combinations are chosen from drop downs then a Modal Box appears. How do I handle it? I cant event inspect it.
+[14:13:42] baijum has joined #selenium
+[14:17:08] AutomatedTester has joined #selenium
+[14:17:18] dawagner: AutomatedTester: I wouldn't know, but I can ask... Why?
+[14:17:23] mdgreenfield has left #selenium
+[14:17:50] AutomatedTester: dawagner : https://gist.github.com/a566e5ac228290c4da5a
+[14:17:59] AutomatedTester: dawagner: jarib has seen it too
+[14:18:04] andreastt: AutomatedTester: I get that all the time too.
+[14:18:50] dawagner: andreastt: Always, or recently?
+[14:19:00] andreastt: I got it this morning.
+[14:19:09] andreastt: Maybe every third-fourth day or so.
+[14:19:20] AutomatedTester: dawagner: for about the last week
+[14:19:27] jarib: i've seen it once in a while over the last week
+[14:19:44] andreastt: Kind of scary.
+[14:19:52] dawagner: Will poke some people
+[14:20:22] drnikki has joined #selenium
+[14:20:30] bsilwal: I repeat "Question for Any PHP guys: I have an iFrame in which there is a Light box and if wrong/unavailable combinations are chosen from drop downs then a Modal Box appears. How do I handle it? I cant event inspect it."
+[14:22:59] dawagner: andreastt, AutomatedTester, jarib: All running macs?
+[14:23:07] AutomatedTester: dawagner: I am
+[14:23:23] AutomatedTester: I am assuming andreastt isnt though...
+[14:24:33] jarib: yes
+[14:25:31] AutomatedTester has joined #selenium
+[14:27:15] cmcgraw has joined #selenium
+[14:28:51] AutomatedTester has joined #selenium
+[14:29:42] andreastt: dawagner: I use a Mac primarily now.
+[14:29:51] dawagner: Seen the error on a mac?
+[14:29:55] andreastt: Yes.
+[14:30:05] andreastt: Can't say if I've seen it on Linux...
+[14:30:09] andreastt: I'll let you know if I do.
+[14:30:11] dawagner: Thanks :)
+[14:31:48] andreastt: dawagner: I see what you mean about the big chunk of JavaScript code bug in Opera now.
+[14:32:19] sumxyz has joined #selenium
+[14:34:00] Tante|_ has joined #selenium
+[14:34:24] dawagner: Seeing it yourself?
+[14:34:40] andreastt: Yes.
+[14:34:44] andreastt: )-:
+[14:34:44] dawagner: Yay :D
+[14:35:53] AutomatedTester: I am trying to get an XP machine setup and getting this error when I try buildanyone https://gist.github.com/98b4577bd903e0a931b3
+[14:36:03] AutomatedTester: anyone know what step I missed?
+[14:36:15] selbot2: 03andreastt@opera.com half a minute ago - AndreasTolfTolfsen: Ignoring big JS chunk tests for Opera again, I'm suspecting a stateful bug somewhere in our ECMAscript parser | https://code.google.com/p/selenium/source/detail?r=16799 | http://seleniumhq.org/ci.jsp?r=16799
+[14:40:45] Tante|_: I want to use Selenium + Firefox Nightly/alder. I've compiled Selenium from SVN and added  the jars from build/dist/selenium-java-2.21.0.zip. Starting Firefox works, but get(foo) doesn't affect the instance at all. After a while a timeout occur: "Unable to connect to host localhost on port 7055 after 45000 ms". (Webdriver Fx Extension is enabled in firefox). Firefox 12 works without any problems.
+[14:40:54] Tante|_: Does anyone know how to solve this issue?
+[14:41:25] h8R_at_work has joined #selenium
+[14:42:03] OperaDriver has joined #selenium
+[14:42:03] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/087ed0f13d278780098690fae58b65d7880192a4
+[14:42:03] OperaDriver: [operadriver/master] Make sure we close all windows (apart from commanding window) before tests start - Andreas Tolf Tolfsen
+[14:42:03] OperaDriver has left #selenium
+[14:43:42] bluescreen10 has joined #selenium
+[14:44:17] AutomatedTester: Tante|_: whats in the error console
+[14:44:19] Tante|_: http://pastebin.com/0K1D9nN4 this is the entire output
+[14:44:40] h8R_at_work: Hello! I've been using Selenium those days actively. Yesterday I've switched the server which I'm using. Everything is the same but I get this in Selenium console  - http://pastebin.com/6EMkzCyL and this in PHP - http://pastebin.com/KLS3fayC
+[14:45:15] h8R_at_work: what can cause this error, i've tryied firefox 11, and firefox 12 (i've googled that ff12 is not supported now, then i've downgraded)
+[14:45:42] h8R_at_work: i'm on debian, i've created /usr/bin/firefox which executes firefox
+[14:48:25] Tante|_: AutomatedTester, http://pastebin.com/gy5tqQsq this is the output of the error console in Firefox. Line 13 seems to be the cause, but I don't know how to fix this
+[14:48:31] h8R_at_work_ has joined #selenium
+[14:48:44] RossPatterson: h8r_at_work: What do you mean by "i've created /usr/bin/firefox which executes firefox"?  Because that might be the problem.
+[14:49:42] h8R_at_work_: RossPatterson: i'm on debian, there is no firefox packages, so I've downloaded firefox and putted in my home directory
+[14:49:44] nacho has joined #selenium
+[14:50:12] h8R_at_work_: RossPatterson: then I've created /usr/bin/firefox whcih is +x, and in it i've putted this line: /home/h8r/firefox/firefox
+[14:50:24] RossPatterson: So /usr/bin/firefox is the actual Firefox binary?
+[14:50:32] RossPatterson: Oh, that's your problem.
+[14:50:42] h8R_at_work: RossPatterson: yes, when I execute it, it opens firefox
+[14:51:15] RossPatterson: You can't feed Selenium a shell-script as the Firefox "executable".  You need to give it the actual filepath of the compiled Firefox program.
+[14:52:00] h8R_at_work: RossPatterson: so if i change     $session = $web_driver->session('firefox'); with the actual filepath of the firefox will be okay ?
+[14:53:26] RossPatterson: Dunno - I don't do PHP.  But somehow you need to specify the real path of the Firefox binary, not the shell script.
+[14:53:54] RossPatterson: In C#, I think it would be specified as a DesiredCapability element when creating the session.
+[14:54:06] h8R_at_work: RossPatterson: i can do this with php 
+[14:57:36] theabrar has joined #selenium
+[14:58:07] theabrar: Hello Guys! quick question, has anyone used Fitnesse with Grid?
+[IRC logfile - Started Fri May  4 15:00:54 2012]
+[15:00:54] quinn1 has left #selenium
+[15:01:28] theabrar: anyone?
+[15:04:23] SamuraiJack has joined #selenium
+[15:05:30] QAGuy has joined #selenium
+[15:06:16] SamuraiJack has joined #selenium
+[15:07:03] SamuraiJack has joined #selenium
+[15:11:40] lfryc has joined #selenium
+[15:11:41] lfryc has joined #selenium
+[15:12:22] AutomatedTester: yay for death by a thousand papercuts
+[15:13:50] Mkop has joined #selenium
+[15:15:52] sumxyz has left #selenium
+[15:19:46] selbot2: 03david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns updating error messages that I need to handle when working with file inputs because death by a thousand papercuts is the way to go apparently | https://code.google.com/p/selenium/source/detail?r=16800 | http://seleniumhq.org/ci.jsp?r=16800
+[15:20:12] OperaDriver has joined #selenium
+[15:20:12] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/0ec5a0161fdb8cbfa3f526678874b7e225708fa8
+[15:20:12] OperaDriver: [operadriver/master] Updating changelog for 0.12 - Andreas Tolf Tolfsen
+[15:20:12] OperaDriver has left #selenium
+[15:20:38] stockton has joined #selenium
+[15:23:36] AutomatedTester has joined #selenium
+[15:24:49] Dude-X has left #selenium
+[15:24:58] Dude-X has joined #selenium
+[15:30:03] noahsussman has joined #selenium
+[15:30:14] andreastt: :wiki chromedriver
+[15:30:17] andreastt: :wiki firefoxdriver
+[15:30:23] selbot2: 1: 03FirefoxDriver: Information about the Firefox Driver - https://code.google.com/p/selenium/wiki/FirefoxDriver
+[15:30:23] selbot2: 1: 03ChromeDriver: Information about the Chrome Driver - https://code.google.com/p/selenium/wiki/ChromeDriver
+[15:30:35] AutomatedTester: andreastt: I think :wiki blackhole is what you are after
+[15:30:36] selbot2: No results.
+[15:30:46] andreastt: (=
+[15:31:20] AutomatedTester: I do love it when people give me a patch to review, delete it in favour of a new patch
+[15:31:35] AutomatedTester: and the first patch is clean and succinct and the new one is overengineered
+[15:31:50] Dude-X: you have to cover every possible case!
+[15:32:10] AutomatedTester: yo dawg, I heard you like methods within methods so I created a method within a methon within a method
+[15:33:28] Dude-X: oh.
+[15:33:47] Dude-X: one of my former coworkers created a class within a class in one of our page objects
+[15:33:58] AutomatedTester: Dude-X: thats not so bad
+[15:34:11] AutomatedTester: inner classes, if used properly serve a purpose
+[15:34:13] Dude-X: it was well designed but it took a minute to wrap my head around it
+[15:34:41] lawcab has joined #selenium
+[15:34:51] lawcab: Hi there
+[15:34:58] lawcab: have a problem...
+[15:35:37] lawcab: i have a test where I open the browser, so stuff, close the browser, re-open the browser
+[15:35:44] lawcab: then do more stuff
+[15:35:54] AutomatedTester: but this wasnt classes this was methods
+[15:35:56] lawcab: the problem is when I take a screen shot it will say
+[15:36:12] lawcab: Error communicating with the remote browser. It may have died.
+[15:36:45] lawcab: so the screen shot taker is another class that i passed in my initial webbrowser
+[15:36:56] lawcab: do i need to re initialize it with the new browser?
+[15:37:47] h8R_at_work: RossPatterson: I've tried everything. tried to pass the real path to the firefox folder, then I've tried to alter $PATH, tried with iceweasel.. very strange because I'm running Selenium headlessly with ln -s /usr/bin/firefox .. 
+[15:37:55] jimevans has joined #selenium
+[15:37:56] jfunk has joined #selenium
+[15:42:26] RossPatterson: h8R_at_work: Yes, symlinks work fine in Linux, but Selenium wants the actual Firefox binary location.  I wish I knew how to get PHP to pass it along, but I don't.
+[15:45:32] andreastt: :wiki webdriver
+[15:49:51] selbot2_ has joined #selenium
+[15:51:09] h8R_at_work: RossPatterson: okay, thanks anyway!
+[15:52:40] kenck has joined #selenium
+[15:54:39] noahsussman has joined #selenium
+[15:55:26] noahsussman has joined #selenium
+[15:55:27] dawagner: :yt divine comedy tonight we fly
+[15:55:28] selbot2_: The Divine Comedy - Tonight we fly - http://www.youtube.com/watch?v=cnY9ea_q3nI&feature=youtube_gdata
+[15:56:19] cgoldberg has joined #selenium
+[15:56:21] dawagner: krosenvold: How's that git business going, by the way?
+[15:57:19] dawagner: Oh.  Boris has been reelected.
+[15:57:51] davehunt: :(
+[15:57:57] davehunt: thought that might happen
+[15:59:09] dawagner: I thought it might not, but hey, either way we were going to have a base level of corruption in the office...
+[15:59:29] Dude-X: who is Boris in British politics?
+[IRC logfile - Started Fri May  4 16:00:08 2012]
+[16:00:08] dawagner: The Mayor of London
+[16:00:35] Dude-X: is he right or left?
+[16:00:50] dawagner: Right
+[16:00:53] davehunt: http://2.bp.blogspot.com/-7fiYe0gdfxI/Tq9OJZPzgBI/AAAAAAAAFGw/GFvB3mNw984/s1600/Boris_J_415+%25281%2529.jpg
+[16:01:00] davehunt: that's him :)
+[16:01:07] dawagner: :D
+[16:01:10] Dude-X: NYC has a right wing mayor; and he's a billionaire too
+[16:01:21] Dude-X: somehow bought his way to have a 3rd term as mayor
+[16:01:43] Dude-X: when we normally have a two-term term limit
+[16:01:51] davehunt: lol @ http://punditkitchen.files.wordpress.com/2010/05/129185296573299550.jpg
+[16:02:30] Dude-X: so much  for democracy...
+[16:05:04] dawagner: :yt the booklovers
+[16:05:05] selbot2_: The Divine Comedy - The Booklovers - http://www.youtube.com/watch?v=vPzS91gGzLM&feature=youtube_gdata
+[16:10:36] SamuraiJack has joined #selenium
+[16:10:42] algard has joined #selenium
+[16:15:24] SamuraiJack has joined #selenium
+[16:16:36] noahsussman has joined #selenium
+[16:19:53] stockton has joined #selenium
+[16:22:36] andreastt: :wiki desiredcapabilities
+[16:22:37] selbot2_: 1: 03DesiredCapabilities: (still under work) A specification of DesiredCapabilities and their content when used in JsonWireProtocol - https://code.google.com/p/selenium/wiki/DesiredCapabilities
+[16:23:26] SamuraiJack has joined #selenium
+[16:24:04] bsilwal has joined #selenium
+[16:30:22] SamuraiJack has joined #selenium
+[16:36:19] Tante|_ has left #selenium
+[16:36:55] dmachi1 has joined #selenium
+[16:38:37] SamuraiJack has joined #selenium
+[16:41:57] dawagner: Wow, UKIP + BNP + NF got more votes than the Lib Dems in my area. I'm not sure what that means, exactly.
+[16:42:48] emil_temp_nick has joined #selenium
+[16:43:36] emil_temp_nick: does anyone have any info on load testing with webdriver 2 (C#)?
+[16:45:13] jimevans: emil_temp_nick: i'm sure somebody, somewhere is doing load testing with webdriver, but i don't believe it to be the right tool for that job.
+[16:45:54] jimevans: you'd be far better off using a dedicated load-testing framework for that.
+[16:49:06] SamuraiJack has joined #selenium
+[16:49:18] jimevans: anybody know when simonstewart gets back? next week?
+[16:52:39] emil_temp_nick: jimevans; why the tool is not suitable for the load test?
+[16:53:03] dawagner: jimevans: Next week :)
+[16:53:17] ksummerlin has joined #selenium
+[16:53:25] jimevans: to generate appreciable load, you'll want hundreds, if not thousands of users enacting transactions on your website. it'll be difficult to generate that with WebDriver
+[16:53:31] dawagner: The 9th, I believe
+[16:53:44] ksummerlin: :help
+[16:53:50] jimevans: dawagner: ta
+[16:55:07] dawagner: Note to self: You shouldn't expect a server to start, if you forget to call the start method.
+[16:55:26] jimevans: well, just in case he pops in sometime over the next few days...
+[16:55:30] lukeis has joined #selenium
+[16:56:20] jimevans: :note simonstewart got simulated keyboard mostly working, though doesn't handle non-printable keys. going to take a crack at the mouse, but will yell if i need help.
+[16:56:21] selbot2_: ok!
+[16:56:46] ksummerlin: jimevans: updated issue #3755 with new patch. Should be in correct patch format now :)
+[16:56:47] selbot2_: 03 open/started Need a .NET version of LoadableComponent - https://code.google.com/p/selenium/issues/detail?id=3755 [Type-Defect Priority-Medium Lang-CSharp Component-WebDriver]
+[16:57:08] jimevans: ksummerlin: awesome. i'll take a look this afternoon.
+[16:57:29] jimevans: or if i don't get to it then, i'll look at it over the weekend.
+[16:57:47] jimevans: The Boy is sleeping, so i have a minute or two.
+[16:58:30] AutomatedTester has joined #selenium
+[16:58:34] stephend has joined #selenium
+[IRC logfile - Started Fri May  4 17:00:25 2012]
+[17:00:25] Dude-X: jimevans: your son is coping well?
+[17:00:30] mreedell has joined #selenium
+[17:03:27] jimevans: coping as well as he can. his fever is up and down, but we're out of the extreme danger zone.
+[17:03:46] jimevans: gotta give the antibiotics a chance to do their thing.
+[17:06:40] zac_sel_ has joined #selenium
+[17:07:07] jimevans: right. just about out of juice. back in a bit.
+[17:07:09] jimevans has left #selenium
+[17:07:15] Dude-X: k
+[17:17:05] OperaDriver has joined #selenium
+[17:17:05] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/79c1f6ec7aaa6d68aea9f70ef2ccc00281c6712b
+[17:17:05] OperaDriver: [operadriver/master] Updated readme and capabilities documentation - Andreas Tolf Tolfsen
+[17:17:05] OperaDriver has left #selenium
+[17:17:32] stackedsax has joined #selenium
+[17:22:01] OperaDriver has joined #selenium
+[17:22:01] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/01b841ba655ac871094cd48cb2e6af630f159db5
+[17:22:01] OperaDriver: [operadriver/master] Fixes to readme - Andreas Tolf Tolfsen
+[17:22:01] OperaDriver has left #selenium
+[17:23:10] dawagner has joined #selenium
+[17:23:14] OperaDriver has joined #selenium
+[17:23:14] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/056f1df8d7d9444c980820b363771d1e06951c2f
+[17:23:14] OperaDriver: [operadriver/master] OperaProfile in camel-case - Andreas Tolf Tolfsen
+[17:23:14] OperaDriver has left #selenium
+[17:23:47] dawagner: davehunt: I may have spoken too soon; I presumed that when the guardian gave percentages for each candidate, they meant those were the percentages, rather than "For about half the votes, these are the percentages"...
+[17:24:03] davehunt: heh
+[17:24:51] kallisti: andreastt: it seems that using port 0 with the Opera driver is likely to cause address already in use errors
+[17:24:55] kallisti: so right now I have the default set to -1
+[17:25:14] andreastt: kallisti: With 0.11?
+[17:25:14] OperaDriver has joined #selenium
+[17:25:14] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/8ed2ba011145dcc43d58966d44c6f8f24f880b5e
+[17:25:14] OperaDriver: [operadriver/master] Better wording - Andreas Tolf Tolfsen
+[17:25:14] OperaDriver has left #selenium
+[17:25:44] kallisti: I believe so.
+[17:25:48] kallisti: maybe I just did something wrong.
+[17:26:04] andreastt: I was planning to release a new version today.
+[17:26:26] andreastt: But Friday is a bad release day anyways, maybe tomorrow.
+[17:26:38] kallisti: oh cool. any significant changes to the capabilities?
+[17:26:39] andreastt: (We are afterall green!)
+[17:26:50] andreastt: Some, but not that many.
+[17:26:55] kallisti: oh, it is? heh, I just releases a bugfix version of my client today. :P
+[17:26:56] andreastt: I think I highlighted most of them to you the other day.
+[17:27:01] kallisti: ah okay.
+[17:27:15] andreastt: I'll make sure to duely note the relevant changes in the CHANGES file.
+[17:27:16] lukeis: :note dawagner anyway to set the content type to your chat log files as text/plain? today's (4th) isn't loading in the browser because of a special character
+[17:27:17] selbot2_: ok!
+[17:27:20] chainey has joined #selenium
+[17:27:34] kallisti: awesome. :D
+[17:28:50] chainey has left #selenium
+[17:30:22] kallisti: http://hpaste.org/68090 currently this is how I encode the opera capabilities. The first list with all of the "opt" calls is the optional capabilities -- if they're set to a null value then they're omitted in the JSON. The second list is always included.
+[17:30:45] kallisti: nothing has crashes with this, so I'm assuming it works. :P
+[17:30:54] Spanktar has joined #selenium
+[17:34:45] lawcab: can i ask a java question
+[17:34:49] lawcab: ??
+[17:34:54] lawcab: classpath issue??
+[17:35:12] algard: :ask
+[17:35:13] selbot2_: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[17:36:22] lawcab: my dir structure is qa\lib\sel.jar qa\properties\log4j.properties
+[17:37:08] lawcab: from the qa dir i try to run java -cp properties;lib\sel.jar class
+[17:37:30] lawcab: complains properties\log4j.properties can't be found
+[17:37:41] lawcab: ??
+[17:41:10] mdgreenfield1 has joined #selenium
+[17:42:05] mdgreenfield2 has joined #selenium
+[17:45:05] mdgreenfield1 has joined #selenium
+[17:55:21] mdgreenfield1 has left #selenium
+[17:58:20] lord123 has joined #selenium
+[17:58:32] llaskin1: :seen RossPatterson
+[17:58:32] selbot2_: RossPatterson was last seen about 2 hours ago, saying 'h8R_at_work: Yes, symlinks work fine in Linux, but Selenium wants the actual Firefox binary location.  I wish I knew how to get PHP to pass it along, but I don't.'.
+[17:59:08] AutomatedTester has joined #selenium
+[17:59:14] RossPatterson: llaskin1: RossPatterson was last seen typing 'llaskin1: RossPatterson was last seen typing  'llaskin1: RossPatterson was last seen typing 'llaskin1: RossPatterson was last seen typing ...
+[17:59:49] llaskin1: lol
+[17:59:54] llaskin1: got a question for u
+[IRC logfile - Started Fri May  4 18:01:20 2012]
+[18:01:20] sfbrian has joined #selenium
+[18:01:50] jeichar has joined #selenium
+[18:02:32] llaskin1: pm
+[18:03:31] jarib: nirvdrum: ping
+[18:03:43] nirvdrum: jarib: Talk to me, baby.
+[18:04:10] llaskin1: /s/Talk to/Talk dirty to
+[18:05:57] jarib: nirvdrum: for the U2711, are you using the native resolution? what cable and graphics card do you have?
+[18:06:33] jarib: just borrowed a Mini-DP to DP cable at work, and the resolution works great, but there's some bad flickering
+[18:06:46] jarib: wondering if using the dual-link DVI adapter would solve it
+[18:08:18] nirvdrum: When I had my MBP, I did mini DP - DP with native resolution and didn't have any problems.
+[18:08:33] nirvdrum: I currently do single DVI with my linux laptop and that can handle the full resolution.
+[18:08:57] nirvdrum: Flickering sounds like either a bad cable or a bad monitor.
+[18:10:21] sassda has joined #selenium
+[18:10:56] jarib: it could be the cable or monitor, but from what i've read online i'm suspecting the (Nvidia GeForce 330M)
+[18:11:08] jarib: do you know what graphics card you had in the MBP?
+[18:15:49] nirvdrum: I don't recall off-hand.  It was a 17" MBP from last summer.
+[18:15:56] nirvdrum: I'll try to find the info on it.
+[18:20:53] OperaDriver has joined #selenium
+[18:20:53] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/ef88f26007392049b6f3a9fbea3de53895e5853d
+[18:20:53] OperaDriver: [operadriver/master] Typos - Andreas Tolf Tolfsen
+[18:20:53] OperaDriver has left #selenium
+[18:27:45] jeichar has joined #selenium
+[18:30:25] jens__ has joined #selenium
+[18:33:12] jimevans has joined #selenium
+[18:34:06] jarib: nirvdrum: looks like that's the AMD Radeon HD 6750M according to http://support.apple.com/kb/SP621
+[18:34:25] barancev: I've tried today -- we can run multiple IEs in parallel using new IEDriverServer from Java. so we have significant progress in #463
+[18:34:26] selbot2_: 03 open/accepted Unable to open multiple IE sessions using selenium - https://code.google.com/p/selenium/issues/detail?id=463 [Type-Defect Priority-Medium Browser-IE Component-WebDriver]
+[18:35:06] barancev: only python binding is to be updated
+[18:35:26] nirvdrum: jarib: My current laptop has an NVidia 5600M
+[18:36:17] jarib: yeah. looks like i'm in the same boat as this guy https://discussions.apple.com/thread/2647937
+[18:36:33] jarib: no definitive answer whether the dual-link adapter solves it though
+[18:36:56] jimevans: barancev: so you've got multiple instances of IE working in java? awesome!
+[18:37:21] mikeheme has joined #selenium
+[18:38:06] mikeheme has joined #selenium
+[18:38:37] barancev: jimevans: yes, multiple ones, in parallel, or you may instantiate several ones and use them independently
+[18:40:24] jarib: i wonder how long we've supported that from .NET and ruby.. ;)
+[18:40:58] jimevans: jarib: :)
+[18:42:12] stockton has joined #selenium
+[18:49:21] sumxyz has joined #selenium
+[18:50:36] sumxyz has left #selenium
+[18:51:31] ksummerlin has joined #selenium
+[18:52:02] testingb0t has joined #selenium
+[18:52:03] mikeheme_ has joined #selenium
+[18:58:59] jimevans_ has joined #selenium
+[IRC logfile - Started Fri May  4 19:07:17 2012]
+[19:07:17] nirvdrum: jarib: Sorry I recommended a monitor that wouldn't work for you.
+[19:16:24] santiycr has joined #selenium
+[19:16:47] jarib: nirvdrum: oh, no worries. i'll figure it out. it works fine at the current resolution, just that 2560x1440 would be even better
+[19:16:53] ksummerlin: quit
+[19:16:56] ksummerlin has left #selenium
+[19:17:03] santiycr: good friday everyone!
+[19:17:11] nirvdrum: I love the high resolution.  I can fit a ton on the screen.
+[19:17:27] jeichar has joined #selenium
+[19:18:12] odix_ has joined #selenium
+[19:25:21] methods has joined #selenium
+[19:26:06] methods: is there any event in selenium that i can add a callback too for when a new window object is created ? i basically want to bind a window.onerror for every new window before any javascript starts running on the client 
+[19:27:59] mikeheme has joined #selenium
+[19:33:00] friskd has joined #selenium
+[19:34:15] lukeis: methods: you'd have to write that into each of the browsers code (and build it yourself)... there's currently no wire call that will let you do that. But really you should start issue #148
+[19:34:18] selbot2_: 03 open/new API for checking for JavaScript errors on the page - https://code.google.com/p/selenium/issues/detail?id=148 [Type-Enhancement Priority-Medium Component-WebDriver]
+[19:36:29] RossPatterson: methods: Are you using the Selenium RC or WebDriver API?
+[19:39:23] joar has joined #selenium
+[19:43:17] methods: rc which i can't upgrade right away 
+[19:43:20] methods: actually i just found a way i think 
+[19:43:26] methods: http://stackoverflow.com/questions/4670481/can-selenium-notice-script-errors
+[19:44:20] AutomatedTester has joined #selenium
+[19:46:56] RossPatterson: methods: I'm not sure that will work.  I don't think RC uses the Recorder - I'm pretty sure that's IDE-only.
+[19:47:52] RossPatterson: But I have a thing we use to capture JavaScript errors on pages, and it works by hooking window.onerror, and it does it during window creation.
+[19:48:11] RossPatterson: It's pretty invasive to RC, and it wouldn't work with WebDriver at all.
+[19:49:20] RossPatterson: But if you're comfortable supporting a couple of hundred lines of moderately-complicated JavaScript, it works quite well.
+[19:50:19] RossPatterson: It's based on the existing RC model for hooking window.alert.
+[19:50:54] methods: link ?
+[19:51:49] methods: RossPatterson:  the comments below the author says it works with rc 
+[19:51:56] stephend has joined #selenium
+[19:53:03] RossPatterson: Yeah, I saw that too.  But there aren't any references to Recorder in the RC code.
+[19:54:00] adamgoucher has joined #selenium
+[19:54:12] RossPatterson: methods: Check out git://gist.github.com/2596952.git.
+[19:54:18] RossPatterson: Feel free to use it if you want.
+[19:54:37] adamgoucher: right. if i wanted to run the se server as a windows service i would look where / talk to whom…?
+[19:54:59] SamuraiJack has joined #selenium
+[19:56:28] RossPatterson: "Java Service Launcher (for Windows)" http://jslwin.sourceforge.net/index.html  works we;;
+[19:56:45] santiycr has joined #selenium
+[19:57:32] selbot2_ has joined #selenium
+[19:58:04] methods: that link isn't working 
+[IRC logfile - Started Fri May  4 20:04:28 2012]
+[20:04:28] lukeis: methods: apparently RossPatterson was being mean ;)  https://gist.github.com/2596952
+[20:05:27] sumxyz1 has joined #selenium
+[20:08:48] methods: RossPatterson:  ?
+[20:11:59] sumxyz1 has joined #selenium
+[20:21:29] methods: RossPatterson:  i think your right it doesn't seme to work.. but that link you gave me before isn't working eitehr 
+[20:21:55] bluescreen10 has joined #selenium
+[20:21:56] methods: lukeis:  ah thanks 
+[20:24:00] RossPatterson: methods: Try this
+[20:24:53] methods: i just put that code into user-exgtensions.js right ?
+[20:25:43] _kip has joined #selenium
+[20:26:04] nacho has joined #selenium
+[20:26:33] _kip has joined #selenium
+[20:27:59] nacho has joined #selenium
+[20:30:51] RossPatterson: Yup
+[20:31:13] lfryc has joined #selenium
+[20:31:14] lfryc has joined #selenium
+[20:31:44] lukeis: Dude-X: I'm glad daniel asked that question yesterday... cause I just got to use that (non-python performant line)....  if all(map(lambda x:x.is_displayed(), driver.find_elements_by_class_name("errorMsg"))):    yay for one liners ;)
+[20:32:05] Dude-X: ah nice
+[20:32:13] methods: RossPatterson:  you got a good way to test this without me having to modify the application ?  like i tried to do       windowToModify.setTimeout(function(){this.undef()},1000);
+[20:32:32] Dude-X: lukeis: i wrote a similar function today in java, but not as a one liner
+[20:33:46] RossPatterson: methods: I've got a couple of unit tests in C#.  They boil down to a RunScript() call. I'll add them to the gist/
+[20:35:15] Dude-X: lukeis: I wish i can use python for this project I am on. :'(
+[20:35:26] methods: RossPatterson:  i tried to use run some js  to throw an error but i just see an ERROR message I don't see the SeleniumError … 
+[20:35:52] lukeis: i use java for my actual testing... but i'm writing an automation script for people to run, so python! ;)
+[20:36:28] RossPatterson: methods: It's like getAlert, getConfirmation, etc.  You call getJavaScriptError() to get the error text.  If one occurs and you don't ask for it's text, the next command fails.
+[20:36:49] Dude-X: actually the devs are using python bindings for webdriver loadtesting
+[20:37:05] Dude-X: i did the work of porting our wrappers :D
+[20:37:50] methods: RossPatterson:  i wonder how to prove that this is even working .. 
+[20:39:37] RossPatterson: I had to write a test that caused an error.  For example: selenium.RunScript("window.ThereBetterNotBeAFunctionByThisName();"); should record an error "window.ThereBetterNotBeAFunctionByThisName is not a function at http://localhost/ line 0", and the next Selenium command you send should fail with an exception saying that.
+[20:40:04] methods: sure that happens 
+[20:40:21] methods: but it says ERROR: .. i figured i should see  what your printing out                   LOG.info('window.onerror() recorded: ' + error);
+[20:41:46] RossPatterson: You may not see that.  It depends on how you're starting the RC server.   We run it with -debug and -browserlog, so we get all the info in the server log files.
+[20:42:07] methods: but i even tried throwing a window.alert in there and got nothing 
+[20:42:56] methods: Permission denied for <moz-safe-about:blank> to get property Window.onerror
+[20:44:06] methods:  surprised this isn't a standard thing 
+[20:44:37] RossPatterson: Hmm ... "Works On My Machine" ... and every other machine we use :-)
+[20:44:53] RossPatterson: Wait - RC isn't catching alerts either?
+[20:45:05] RossPatterson: That's a core RC function.  This code doesn't change that.
+[20:45:07] methods: well maybe i didn't save the file correctly 
+[20:45:08] methods: sorry 
+[20:45:13] methods: but I'm definitively getting that error now 
+[20:45:27] methods: it makes sense that some external window shouldn't be allowed to set the onerror for another window right ?
+[20:46:55] RossPatterson: If the windows are loaded from the same site, they ought to be able to.  Selenium does this all the time
+[20:48:49] methods: yea idk 
+[20:49:04] methods: so basically rc has a different js implementation of browserbot and your hooking into that right ?
+[20:49:24] methods: I'm using selenium 2.15.0 
+[20:50:47] RossPatterson: Yes.  RC's selenium-browserbot.js has it's own hooks that take over window.create() so they can take over window.alert(), window.prompt(), and window.confirm() in pop-up windows.  This code wraps that hook to also take over window.onerror().
+[20:51:15] RossPatterson: RC is almost entirely unchanged since 1.0.3.  Just some minor browser-version changes in the Firefox plugin
+[20:52:13] RossPatterson: The code I studied to set this up is Selenium.prototype.ensureNoUnhandledPopups in selenium-api.js, and the browserbot parts it calls.
+[20:54:40] RossPatterson: Gotta go - much to do tonight.  I'll see if I can spend some time this weekend packaging this code in a form for someone else to use :-)
+[20:54:47] marcuy has joined #selenium
+[20:58:33] santiycr has joined #selenium
+[IRC logfile - Started Fri May  4 21:00:24 2012]
+[21:00:24] andreastt_ has joined #selenium
+[21:03:12] stockton has joined #selenium
+[21:07:52] Automate_ has joined #selenium
+[21:10:28] methods has joined #selenium
+[21:14:06] AutomatedTester has joined #selenium
+[21:22:09] mikeheme_ has joined #selenium
+[21:22:43] methods has left #selenium
+[21:22:44] methods has joined #selenium
+[21:22:46] methods has left #selenium
+[21:24:16] farlan has left #selenium
+[21:32:23] nirvdrum has joined #selenium
+[21:35:00] sumxyz2 has joined #selenium
+[21:35:13] mikeheme has joined #selenium
+[21:40:40] mdgreenfield has joined #selenium
+[21:47:06] mdgreenfield has left #selenium
+[21:47:56] mdgreenfield1 has joined #selenium
+[21:49:25] testingb0t has joined #selenium
+[21:49:40] algard has joined #selenium
+[21:51:23] andreastt_: Has the window resizing stuff been added to ChromeDriver yet?
+[21:52:11] andreastt_: santiycr: Which Opera version do you have on Sauce now?
+[21:52:20] AutomatedTester: andreastt_: afaik its only in Firefox
+[21:52:38] AutomatedTester: omg... the selenium server is slow to launch
+[21:53:03] santiycr: andreastt: 11.61
+[21:53:07] mdgreenfield1 has left #selenium
+[21:53:36] andreastt_: santiycr: Is it available on Windows also?
+[21:53:41] andreastt_: AutomatedTester: Aha.
+[21:53:47] barancev: IE can resize too
+[21:54:02] andreastt_: AutomatedTester: Is that a pure JS implementation?  window.resizeTo() or something?
+[21:54:47] AutomatedTester: andreastt_: no, Firefox blocks that now
+[21:54:57] andreastt_: Interesting.
+[21:54:58] AutomatedTester: so its done via calls to the Chrome
+[21:55:29] barancev: santiycr: hi! I bet out CI server does not run IE tests using IEDriverServer
+[21:55:46] lukeis: i thought we just had that JS in the plugin (which wasn't blocked)... or is the xpi the same thing as calling it the Chrome?
+[21:55:46] barancev: no signs of the server starting in the console log
+[21:55:47] AutomatedTester: yay bug fixed off to bed
+[21:56:47] AutomatedTester: andreastt_:  r16287
+[21:56:50] selbot2_: 03dawagner about 1 month ago - DanielWagnerHall for ZacCampbell: Implementing window.maximise/restore for firefox.  Update issue #3489 Patch applied | https://code.google.com/p/selenium/source/detail?r=16287 | http://seleniumhq.org/ci.jsp?r=16287
+[21:57:10] AutomatedTester: laters
+[21:57:21] lukeis: ah ha
+[21:57:32] santiycr: andreastt: not on windows, due to an error
+[21:57:53] AutomatedTester: lukeis: ah ha?
+[21:57:53] andreastt_: AutomatedTester: Oh, cheers!
+[21:57:58] andreastt_: santiycr: Error?
+[21:58:05] andreastt_: santiycr: Anything I can help with?
+[21:58:07] santiycr: let me get you the error message
+[21:58:11] santiycr: tots!
+[21:58:18] santiycr: barancev: Sauce is ready for it!
+[21:59:02] andreastt_: santiycr: Recently enabled Selenium CI testing for Opera.  It's working quite well so far.
+[21:59:26] barancev: santiycr: let's see: http://sci.illicitonion.com:8080/job/IE%209%20Java%20Tests/1099/consoleFull
+[IRC logfile - Started Fri May  4 22:00:33 2012]
+[22:00:33] barancev: there should be a line like "Started InternetExplorerDriver server (32-bit)" -- there is no one
+[22:00:57] sfbrian_ has joined #selenium
+[22:01:05] santiycr: andreastt: what do you mean? using sauce?
+[22:01:25] santiycr: barancev: the remote driver tests should be the ones running in Sauce
+[22:01:39] santiycr: and I don't think you'll see that log in the client side if that's the case
+[22:01:53] mikeheme has joined #selenium
+[22:02:32] testingb0t1 has joined #selenium
+[22:03:12] santiycr: andreastt: won't be able to focus on opera's issue today, sorry
+[22:03:13] andreastt_: santiycr: Yes
+[22:03:21] santiycr: andreastt: on linux?
+[22:03:30] andreastt_: santiycr: Okay, just let me know if there's anything you need from our side.
+[22:03:36] andreastt_: santiycr: Yep.
+[22:03:52] barancev: :gist
+[22:03:53] selbot2_: Please paste >3 lines of text to https://gist.github.com
+[22:03:55] santiycr: andreastt: cool, I'll re-enable opera on windows and get back to you with the failure message
+[22:04:04] andreastt_: Great! (-:
+[22:04:24] santiycr: andreastt: all our images have it installed, I'm sure it's just a matter of figuring out the config and env variables
+[22:04:49] andreastt_: santiycr: Speaking of which, what kind of VM solution are you using?
+[22:04:55] barancev: santiycr: when I run 'go test_ie' on my local machine I have my log starting with something like this: https://gist.github.com/2597720
+[22:05:07] andreastt_: I'm tasked with setting up a cloud-like solution for a new system at work.
+[22:05:14] barancev: lines 8-10 shows that ie server started
+[22:05:30] santiycr: andreastt_: kvm-quemu
+[22:05:52] andreastt_: santiycr: I don't know that very well, does it support stopping/resuming from a VM image?
+[22:06:09] barancev: why don't we have the same on CI server?
+[22:06:10] santiycr: yeah
+[22:06:15] santiycr: you give it a hard drive image
+[22:06:24] andreastt_: Ah, right.
+[22:07:19] santiycr: barancev: not completely sure
+[22:07:26] santiycr: dawagner is the one to ask that :)
+[22:07:38] barancev: ok
+[22:07:38] santiycr: barancev: did you patch get merged already?
+[22:07:58] barancev: santiycr: yes, it is commited
+[22:08:28] santiycr: barancev: https://saucelabs.com/jobs/f3fa310be15c4a49816ac518b5bd716c/selenium-server.log
+[22:08:33] santiycr: that's the server side log in Sauce
+[22:08:39] santiycr: Started InternetExplorerDriver server (32-bit)
+[22:08:39] santiycr: 2.21.1.0
+[22:08:42] santiycr: ;)
+[22:09:15] santiycr: so, good news, you guys are running tests using the new IEDriverServer
+[22:09:19] santiycr: in the cloud!
+[22:09:38] barancev: yes, I see, it does work, nice!
+[22:10:45] Dude-X: you're probably influenced by Microsoft commercials, santiycr :p
+[22:11:09] santiycr: oh man, I love the clouds
+[22:11:27] santiycr: http://sooocloud.com/
+[22:12:55] santiycr1 has joined #selenium
+[22:13:01] lukeis: did hugs tweet that one a bit ago ;) soooo trendy of you guys :)
+[22:13:11] santiycr1: heh
+[22:13:25] santiycr1: you know
+[22:15:56] lukeis: that's one way to get the bug count below 1k again ;)
+[22:30:56] brokenthumbs has joined #selenium
+[22:32:04] mashiara has joined #selenium
+[22:32:32] barancev: andreastt_: what about tests in XPathElementFindingTest that are ignored for Opera? can't they be enabled too?
+[22:46:07] barancev: no, they can't :(
+[22:51:59] sfbrian has joined #selenium
+[IRC logfile - Started Fri May  4 23:03:27 2012]
+[23:03:27] marcuy has joined #selenium
+[23:09:28] bluescreen10 has joined #selenium
+[23:35:57] dawagner has joined #selenium
+[23:35:58] selbot2_: dawagner: note from lukeis about 6 hours ago: anyway to set the content type to your chat log files as text/plain? today's (4th) isn't loading in the browser because of a special character 
+[23:36:48] lukeis: go to sleep ;)
+[23:37:16] Dude-X: utf8 everywhere!
+[23:37:29] dawagner: Need to fix things.
+[23:37:48] lukeis: *need* ? doubtful...
+[23:54:50] friskd_ has joined #selenium
+[23:57:37] tessarakt2 has joined #selenium

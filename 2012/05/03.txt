@@ -1,0 +1,947 @@
+[IRC logfile - Started Thu May  3 00:00:26 2012]
+[00:00:26] jimevans: jarib: so you'll be happy to know that contrary to appearances, multiple instances of the standalone server won't attempt to bind to the same port.
+[00:00:38] stackedsax: hey there — anybody written any alternatives to davehunt's flynnid?
+[00:00:43] lukeis: :log
+[00:00:43] selbot2: http://illicitonion.com/selogs/selenium/2012/05/02.txt
+[00:00:46] jimevans: or actually will attempt to, but it won't succeed.
+[00:00:51] lukeis: now it's d'oh
+[00:01:05] dawagner: Depends on jarib's VPS clock
+[00:01:13] dawagner: :log
+[00:01:13] selbot2: http://illicitonion.com/selogs/selenium/2012/05/02.txt
+[00:01:33] lukeis: is london GMT right now?
+[00:01:42] dawagner: London is BST right now :)
+[00:01:48] dawagner: GMT+1
+[00:01:59] lukeis: hrm
+[00:02:08] lukeis: then it should have shifted an hour ago
+[00:02:42] jarib: jimevans: ok?
+[00:02:52] lukeis: or i have my maths completely backwards :-D
+[00:03:06] jimevans: jarib: that was one of your concerns yesterday.
+[00:03:12] lukeis: everyone be glad i don't normally work on timezone code
+[00:03:29] stackedsax: there's this little utility we've been using https://github.com/davehunt/flynnid
+[00:03:45] stackedsax: for which I thank davehunt
+[00:03:47] jarib: jimevans: indeed. i can launch the server twice with the same --port argument. what's going on?
+[00:04:29] stackedsax: but doing anything with python in my org is just a drag — wondered if anybody had implemented the same in perl
+[00:04:31] lukeis: davehunt: modified my extremely simple python script for that ;) ... so my alternative is another python script ;)
+[00:04:43] stackedsax: heh, dangit
+[00:05:07] jarib: lukeis: my VPS is oslo time, UTC+2
+[00:05:16] stackedsax: I'll have to write something up in perl or bash...
+[00:05:41] lukeis: jarib: but the call i made in ruby i thought would get GMT no matter what... /me officially confused
+[00:06:05] jarib: jimevans: it also reports 5555 when it's launched twice without a --port argument
+[00:07:32] jarib: jimevans: actually seems like i'm able to launch it as many times as i want, and never get a bind error
+[00:07:47] lukeis: ok... BST+1 = GMT  so right now is 2300... ok, in one hour it'll switch... i feel better now
+[00:08:41] lukeis: GMT+1 = BST... whatever... i give up on today
+[00:10:12] lukeis: 'night all
+[00:10:18] jarib: jimevans: interstingly, chromedriver does the same on Windows (Win7)
+[00:11:07] jarib: on OS X, chromedriver silently quits (with exit code 0) if you try to launch a second server on the same port
+[00:12:22] jimevans: jarib: you're right, you don't get a bind error, but that's because I'm an idiot.
+[00:12:34] jimevans: internally, it does the right thing, but it just doesn't terminate itself.
+[00:13:04] jimevans: again, more correctly, the server does encounter a bind error, it just silently swallows it. :)
+[00:13:33] jimevans: i'm working on correcting that oversight.
+[00:13:42] jimevans: (and implementing the --host arg)
+[00:13:47] jarib: it's interesting that chromedriver does the same
+[00:14:23] jimevans: i think it's just laziness. actually, i'm sure it's laziness on my part.
+[00:16:34] krosenvold has joined #selenium
+[00:17:52] nsussman has joined #selenium
+[00:22:39] jarib: i wonder if the java PortProber has the same problem
+[00:23:01] jimevans: no idea
+[00:23:38] jezuz has joined #selenium
+[00:23:48] jezuz: hello, can anyone tell my why pause doesn't work?
+[00:24:26] jezuz: alternatively, why clickAndWait doesn't work when waiting for javascript to execute
+[00:28:06] dgtlmoon has joined #selenium
+[00:33:10] jimevans: jarib: where does mongoose allow binding to a specific NIC?
+[00:34:12] jimevans: i mean, i can set the acl to only allow connections from a specific IP address, but i'm not sure that's what you're looking for.
+[00:35:04] dawagner: jimevans: By the way, I would suggest we by default bind to 0.0.0.0 not 127.0.0.1 because we *will* get people complaining
+[00:35:36] jarib: jimevans: the listening_ports option can be "127.0.0.1:5555"
+[00:35:38] jimevans: doesn't matter to me, as long as it works.
+[00:35:42] jarib: https://github.com/krosenvold/selenium-git-release-candidate/blob/master/third_party/mongoose/mongoose.c#L3416
+[00:35:55] jarib: i think it already does 0.0.0.0 by default
+[00:36:00] jimevans: ah. that's the piece i'd forgotten from yesterday's conversations.
+[00:36:45] jarib: i'm trying to figure out how this stuff can possibly work
+[00:37:21] jarib: it doesn't seem to be a problem for java
+[00:37:40] AutomatedTester: jezuz: clickAndWait waits for the page to return that it has loaded
+[00:37:46] AutomatedTester: its not for javascript
+[00:39:42] AutomatedTester: night guys
+[00:41:10] jimevans: jarib: which stuff would that be?
+[00:42:51] jarib: at least on OS X, "localhost" will resolve to 3 different interfaces
+[00:43:08] Dude-X: oh gosh, a webdriver test that's poorly written. I just ran a test and it passed except the condition is testing is not working properly. :/ 
+[00:43:29] jimevans: ah. i see.
+[00:44:29] Dude-X: turns out the only reason i am lookng at it is because it's failing on our nightly full test suite (due to flakiness i presume)
+[00:44:56] jarib: jimevans: yeah, our find_free_port code would need to know what interface to check, unless it also controls what interface the servers are binding to
+[00:46:12] jarib: chances of this actually happening is pretty low, but unless there's something i'm missing it is a relatively significant flaw in our code..
+[00:47:05] Dude-X: last thursday when i ran selenium-standalone it grabbed the ip from vmnet adapter :/
+[00:47:11] Dude-X: instead of ethernet
+[00:47:11] jarib: on Win 7, two interfaces
+[00:47:59] jarib: linux, two
+[00:49:24] jarib: safest bet is probably to just use 0.0.0.0 for everything
+[00:49:48] Dude-X: does isEnabled check if class contains disabled?
+[00:50:05] dawagner: No, why would it?
+[00:50:13] Dude-X: what does it do actually?
+[00:50:40] dawagner: Check the disabled property
+[00:51:03] Dude-X: what's a property?
+[00:51:09] Dude-X: ah in the javascript sense
+[00:51:12] jarib: but then again, i think firefox binds to 127.0.0.1, so if you're checking 0.0.0.0 for free ports, you may pick one already in use...
+[00:51:37] jarib: what a depressing realization.
+[00:53:34] dawagner: jarib: Yes, the firefoxdriver bind to 127.0.0.1
+[00:53:58] dawagner: But also is a very different mechanism
+[00:54:13] eanxgeek: not directly related to selenium, but anyone here help with pytest?  https://gist.github.com/2581987
+[00:54:29] eanxgeek: scenario1 works, scenario2 does not; TypeError: 'set' object does not support indexing
+[00:54:58] eanxgeek: I'm thinking I need to change something in pytest_generate_tests() however, not sure what / where to ensure compatability with dict
+[00:55:21] jarib: dawagner: still a problem if you're launching multiple instances of Firefox and probing 0.0.0.0 for free ports. you may find one that's free on 0.0.0.0, but not on 127.0.0.1
+[00:55:57] Dude-X: eanxgeek: {'read','write'} is a set in python 2.7
+[00:56:33] Dude-X: maybe it should be parans or a bracket 
+[00:56:43] eanxgeek: Dude-X: sorry yes a set, I'm trying to leverage a set for certain keys so that I can do for i in verb: select(i)
+[00:56:49] jarib: dawagner: it's not a problem in Firefox' case, since PortProber actually checks 127.0.0.1
+[00:57:05] eanxgeek: that's my end goal, but I'm trying to use data driven tests for the first time so this is a learning expierment 
+[00:57:13] jarib: dawagner: but the mongoose based servers listens on 0.0.0.0, and now you have the opposite problem
+[00:57:20] eanxgeek: Dude-X: let me play with those two
+[00:57:27] Dude-X: eanxgeek: can you use a tuple instead? same benefits as a set unless you want to do set operations
+[00:57:40] jarib: dawagner: you see the issue?
+[00:57:47] Dude-X: but if you explicitly want to do est operations, then just do set(thing)
+[00:57:56] dawagner: jarib: Unfortunately so :(
+[00:57:58] eanxgeek: Dude-X: that looks to have worked, both tests passed
+[00:58:04] Dude-X: :)
+[00:58:06] eanxgeek: 'verb': ['read','write']})
+[00:58:17] eanxgeek: that's awesome
+[00:58:28] eanxgeek: Dude-X: thanks!
+[00:59:35] mreedell has joined #selenium
+[00:59:53] jarib: i guess the simplest solution is to find a port that's free on all interfaces.
+[IRC logfile - Started Thu May  3 01:08:08 2012]
+[01:08:08] Dude-X: gosh I have to do more thorough code reviews
+[01:08:25] Dude-X: I wish i can whip the noobs for writing bad tests
+[01:08:59] Dude-X: hmm google analytics is running; I ought to complain to the devs
+[01:15:07] Odd_Bloke has joined #selenium
+[01:24:28] dawagner: :log
+[01:24:28] selbot2: http://illicitonion.com/selogs/selenium/2012/05/03.txt
+[01:24:51] dawagner: :note lukeis [01:24]  <selbot2> http://illicitonion.com/selogs/selenium/2012/05/03.txt
+[01:24:51] selbot2: ok!
+[01:25:31] eanxgeek: Dude-X: ok so I have a interesting issue, if my verbs tuple has one item in it, i.e. 'verbs': ('manage_all') I get Cannot locate option with value: m' if I have multiple items in the tuple it works perfect.
+[01:25:54] eanxgeek: Dude-X: the for code, for v in verbs:
+[01:25:56] eanxgeek:             home_page.select('verbs', v)
+[01:26:32] eanxgeek: home_page.select is just a call to a method I wrote that takes two args, id and value
+[01:27:44] brettporter has joined #selenium
+[01:28:18] eanxgeek: Dude-X: fixed, had to add a comma at the end of my list, i.e. verbs: ('manage_all',)
+[01:29:05] eanxgeek: Dude-X: not sure what's the deal with that.
+[01:42:08] iainrose has left #selenium
+[01:42:53] iainrose has joined #selenium
+[01:45:17] Binken_ has joined #selenium
+[01:45:31] Binken_: :loh
+[01:45:35] Binken_: :log
+[01:45:35] selbot2: http://illicitonion.com/selogs/selenium/2012/05/03.txt
+[01:47:49] jarib: ugh
+[01:48:04] jarib: just realized i have an all-day meeting starting at 08:30 tomorrow :/
+[IRC logfile - Started Thu May  3 02:01:50 2012]
+[02:01:50] selbot2: 03jari.bakken less than 10 seconds ago - JariBakken: Make sure Ruby's PortProber.above checks all network interfaces. | https://code.google.com/p/selenium/source/detail?r=16769 | http://seleniumhq.org/ci.jsp?r=16769
+[02:02:20] selbot2: 03jari.bakken less than 20 seconds ago - JariBakken: Avoid PortProber.random unless we control what interface the server is binding to. | https://code.google.com/p/selenium/source/detail?r=16770 | http://seleniumhq.org/ci.jsp?r=16770
+[02:02:50] selbot2: 03jari.bakken half a minute ago - JariBakken: Default to using the standalone IE server from Ruby. | https://code.google.com/p/selenium/source/detail?r=16771 | http://seleniumhq.org/ci.jsp?r=16771
+[02:03:07] krosenvold has joined #selenium
+[02:03:20] selbot2: 03jari.bakken half a minute ago - JariBakken: Add a todo | https://code.google.com/p/selenium/source/detail?r=16772 | http://seleniumhq.org/ci.jsp?r=16772
+[02:06:40] Odd_Bloke has joined #selenium
+[02:16:29] travis-ci has joined #selenium
+[02:16:29] travis-ci: [travis-ci] jarib/selenium-travis#24 (master - 2ff6c73 : Jari Bakken): The build passed.
+[02:16:29] travis-ci: [travis-ci] Change view : https://github.com/jarib/selenium-travis/compare/75267a4...2ff6c73
+[02:16:29] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selenium-travis/builds/1232557
+[02:16:29] travis-ci has left #selenium
+[02:27:25] sfbrian_ has joined #selenium
+[02:30:18] sumxyz has joined #selenium
+[02:31:37] Dude-X_: eanxgeek, python single value tuples require a tuple, otherwise how do you know if you have just an argument call or a simple expression (1+1) x(y) 
+[02:42:41] nhirata has joined #selenium
+[02:54:04] nhirata_ has joined #selenium
+[02:54:34] nhirata_ has joined #selenium
+[02:55:29] nhirata has joined #selenium
+[02:56:57] stackedsax: in case it helps someone with android: https://gist.github.com/2582499
+[02:57:48] stackedsax: had to remove my dependency on python — might help someone else register their android emulators in a non-python-friendly world
+[IRC logfile - Started Thu May  3 03:34:00 2012]
+[03:34:00] baijum has joined #selenium
+[03:37:51] retornam has joined #selenium
+[03:50:51] iainrose_ has joined #selenium
+[03:59:18] iainrose_ has left #selenium
+[IRC logfile - Started Thu May  3 04:09:37 2012]
+[04:09:37] bsilverberg has joined #selenium
+[04:11:22] bsilverberg: jarib: ping
+[04:12:53] stockton has joined #selenium
+[04:33:51] barancev|2 has joined #selenium
+[04:35:08] mattp_ has joined #selenium
+[04:36:42] dmachi has joined #selenium
+[04:53:41] snuff-work: anyone have issue with using GRID in 2.21 and selecting IE ?
+[04:54:54] snuff-work: i have a webdriver client that has IE.. yet i get msgs back from hub when i try to instanciate syaying 'new session cannot find { platform:WINDOWS, browserName=internet explorer}'
+[04:58:31] Dude-X_: start the node with -browser {browserName=InternetExplorer;platform=WINDOWS} or something like that
+[04:58:36] Dude-X_: that's what i do
+[04:58:45] Dude-X_: but yeah it should be smart enough to do this....
+[04:59:30] snuff-work: do u then need to specify something special in ur remote webdriver call.. or does it just 'start working'
+[04:59:58] snuff-work: the worst thing is.. it lists in the startup of the webdriver node that it has ie..
+[IRC logfile - Started Thu May  3 05:00:31 2012]
+[05:00:31] snuff-work: the hub when u look at a node says.. yer he has IE
+[05:01:19] snuff-work: if i dont use a hub and start sel standalone normally.. my IE call works fine
+[05:03:00] Dude-X_: you have to specify for the node IE and windows then it works fine
+[05:03:23] Dude-X_: though i didn't write the code for my remote webdriver startup
+[05:05:09] Dude-X_: it works though, when i set the property to use internet explorer and remote; it also seems to pass in a generic DesiredCapabalities regardless of the browser i select
+[05:07:15] snuff-work: mm just seems 'broken'
+[05:09:54] snuff-work: when i was using just the 'server' part.. i had issues with some IE never closing after tests finished
+[05:10:16] snuff-work: so it would pile up ie windows.. until it got to like 28 or so and 100% java usage
+[05:10:42] Dude-X_: well 2.22 will fix some termination issues
+[05:11:27] Dude-X_: -browser “browserName=internet explorer,platform=WINDOWS” <-- this is what you can start on the node that's on the windows box
+[05:12:58] snuff-work: that works..
+[05:13:20] snuff-work: maybe it was caring about the version.. ( i dont specify)
+[05:13:38] Dude-X_: just match what the error says
+[05:15:17] snuff-work: mm.. so the 'ONLY' thing i can see that might be wrong for a startup by default is this..
+[05:15:55] snuff-work: {seleniumProtocol:Webdriver,browserName=internet explorer,maxInstances:1}
+[05:16:09] snuff-work: aka it does not mention windows as a platform
+[05:17:29] Dude-X_: it shouldn't have too but that's what it wants ...
+[05:18:47] snuff-work: so when i call for IE.. i never specify platform windows.. but i'd say the 'DesiredCapabilities.internetExplorer() adds it
+[05:19:40] Binken_: #1486
+[05:19:41] selbot2: 03james.h....@gmail.com open/needsclarification session cookie lost when click made to a link that opens a window with window.open() - https://code.google.com/p/selenium/issues/detail?id=1486 [Type-Defect Priority-Medium Component-WebDriver Browser-IE]
+[05:19:45] snuff-work: my fav thing about webdriver is i dont need to update my code i just deploy a standalone server
+[05:19:57] snuff-work: and throw my cmds at it
+[05:22:26] davehunt has joined #selenium
+[05:27:39] davehunt has joined #selenium
+[05:43:00] snuff-work: Dude-X.. any idea when 2.22 will be out then?
+[05:46:10] santiycr has joined #selenium
+[05:47:12] Dude-X_: whenever the builds are sufficiently green 
+[05:47:30] Dude-X_: and the devs have fixed bugs/added enough features
+[05:47:41] Dude-X_: i think in about two weeks 2.22 should be out
+[05:47:51] Dude-X_: will have IEServer 
+[05:47:57] Dude-X_: just like the chromedriver
+[05:48:25] Dude-X_: ok time for sleep
+[05:49:43] snuff-work: k thanks for the update much appreciated 
+[IRC logfile - Started Thu May  3 06:04:16 2012]
+[06:04:16] jezuz: does anyone else have a problem with getting the pause command to do anything?
+[06:11:03] sassda has joined #selenium
+[06:17:13] baijum1 has joined #selenium
+[06:31:14] JackDandy1 has joined #selenium
+[06:32:34] Alex0011 has joined #selenium
+[06:34:25] testingb0t has joined #selenium
+[IRC logfile - Started Thu May  3 07:05:48 2012]
+[07:05:48] JakeSays has joined #selenium
+[07:12:24] ian_mac has joined #selenium
+[07:15:00] baijum has joined #selenium
+[07:32:34] iainrose_ has joined #selenium
+[07:33:09] iainrose_ has left #selenium
+[07:42:51] lfryc has joined #selenium
+[07:42:51] lfryc has joined #selenium
+[07:44:30] SamuraiJack has joined #selenium
+[07:51:20] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Using the standalone IEDriverServer in Java binding | https://code.google.com/p/selenium/source/detail?r=16773 | http://seleniumhq.org/ci.jsp?r=16773
+[07:51:40] bpc415 has joined #selenium
+[IRC logfile - Started Thu May  3 08:00:53 2012]
+[08:00:53] blowery has joined #selenium
+[08:06:33] Mayank1 has joined #selenium
+[08:09:00] MattR_ has joined #selenium
+[08:14:54] baijum1 has joined #selenium
+[08:20:39] barancev|2: huh! browsermob absorbed by neustar?
+[08:29:38] jibay has joined #selenium
+[08:30:38] andreastt: Good morning!
+[08:34:37] benadderson has joined #selenium
+[08:39:25] baijum has joined #selenium
+[08:39:26] sburjan has joined #selenium
+[08:40:25] Jayakumar has joined #selenium
+[08:41:17] testingb0t has joined #selenium
+[08:42:20] Jayakumar has left #selenium
+[08:44:41] testingb0t has joined #selenium
+[08:51:53] dgtlmoon: anyone use PHPUnit with webdriver?
+[08:53:11] algard`` has joined #selenium
+[08:54:30] dgtlmoon: algard, hey man, know anything about phpunit and webdriver?
+[08:54:54] rbalent has joined #selenium
+[08:54:54] rbalent has joined #selenium
+[08:55:55] xirkus_ has joined #selenium
+[08:57:37] Bebe has joined #selenium
+[08:57:43] testingb0t: dgtlmoon: you can use phpunit and webdriver together 
+[08:57:56] kyconquers has joined #selenium
+[08:58:15] mydog2 has joined #selenium
+[08:59:39] dgtlmoon: :D
+[08:59:40] dgtlmoon: gnite
+[IRC logfile - Started Thu May  3 09:12:00 2012]
+[09:12:00] Mayank1 has joined #selenium
+[09:13:06] OtherJakeSays has joined #selenium
+[09:19:55] RedCap_work has joined #selenium
+[09:20:26] stackedsax1 has joined #selenium
+[09:20:47] sburjan_ has joined #selenium
+[09:21:21] baijum1 has joined #selenium
+[09:22:09] Mayank1 has joined #selenium
+[09:29:50] sburjan_ has joined #selenium
+[09:34:03] Mayank1 has joined #selenium
+[09:34:12] AutomatedTester has joined #selenium
+[09:56:30] zac_sel has joined #selenium
+[IRC logfile - Started Thu May  3 10:02:22 2012]
+[10:02:22] Jayakumar has joined #selenium
+[10:07:20] joar has joined #selenium
+[10:08:03] DataBeaver: Is it possible to simulate mouse events in a general way, to interact with UI elements created with javascript (using webdriver)?
+[10:08:13] foolx has joined #selenium
+[10:09:55] melter has joined #selenium
+[10:10:12] DataBeaver: The manual mentions an Actions class for drag and drop, but that doesn't seem to be available in Python.
+[10:13:09] Jayakumar: In Python driver. It's  'from  selenium.webdriver import ActionChains'
+[10:15:10] AutomatedTester: DataBeaver: :apidocs will give tell you what is available and where
+[10:15:10] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[10:15:23] AutomatedTester: Jayakumar: can you sign the :cla
+[10:15:23] selbot2: http://goo.gl/qC50R
+[10:15:35] AutomatedTester: and I will look at the patch asap
+[10:15:50] Jayakumar: Sure
+[10:17:00] DataBeaver: AutomatedTester: Thanks.  The class I was looking for appears to be called ActionChains in Python.
+[10:17:05] Bebe has joined #selenium
+[10:22:05] papegaaij has joined #selenium
+[10:22:47] AutomatedTester: DataBeaver: I will be adding Touch actions soon
+[10:23:14] TimSukhachev has joined #selenium
+[10:39:29] papegaaij has joined #selenium
+[10:40:07] mashiara has joined #selenium
+[10:52:42] jarib: bsilverberg: reading your email now
+[10:54:58] jarib: oh, he's not here
+[10:55:08] jarib: my nick completion is messed up
+[IRC logfile - Started Thu May  3 11:08:49 2012]
+[11:08:49] SamuraiJack_ has joined #selenium
+[11:17:48] Bebe has joined #selenium
+[IRC logfile - Started Thu May  3 12:11:39 2012]
+[12:11:39] nirvdrum has joined #selenium
+[12:17:52] Andrei_Khveras has joined #selenium
+[12:18:42] skiphuffman has joined #selenium
+[12:20:21] Andrei_Khveras: Hi Guys. Has anybody experienced in WebDriver a problem of ignoring javascript events like "document.findElementBy...click()", until you intentionally "shake" the browser using native events (Actions)?
+[12:24:30] SamuraiJack__ has joined #selenium
+[12:28:15] robbim02 has joined #selenium
+[12:44:53] dgtlmoon has joined #selenium
+[IRC logfile - Started Thu May  3 13:24:19 2012]
+[13:24:19] mltolun has joined #selenium
+[13:29:46] elopio has joined #selenium
+[13:35:22] dawagner has joined #selenium
+[13:37:42] nacho has joined #selenium
+[13:38:01] ejelinek has joined #selenium
+[13:41:14] bluescreen10 has joined #selenium
+[13:42:51] tizzo has joined #selenium
+[13:44:41] mdgreenfield has joined #selenium
+[13:50:10] mreedell has joined #selenium
+[13:54:29] jimevans has joined #selenium
+[13:55:03] elopio has joined #selenium
+[IRC logfile - Started Thu May  3 14:01:26 2012]
+[14:01:26] jibay_ has joined #selenium
+[14:10:29] AutomatedTester: Andrei_Khveras: can you explain what you mean?
+[14:11:08] gmonnerat has joined #selenium
+[14:12:50] gmonnerat: Hello, I have this traceback using the command clickAndWait => Command execution failure. Please search the user group at https://groups.google.com/forum/#!forum/selenium-users for error details from the log window.  The error message is: Permission denied to access property 'document'
+[14:13:33] gmonnerat: someone have any idea because this code is not inside one iframe.
+[14:14:27] sumxyz has joined #selenium
+[14:24:59] bsilverberg has joined #selenium
+[14:26:31] elopio has joined #selenium
+[14:43:20] elopio has joined #selenium
+[14:45:07] simonstewart has joined #selenium
+[14:45:08] selbot2: simonstewart: note from andreastt 1 day ago: Shall we have a look at why the proto files doesn't compile for you? 
+[14:45:24] simonstewart: andreastt: I can send you a patch
+[14:45:38] simonstewart: krosenvold: ping
+[14:46:12] jimevans: simonstewart: hi! how's the city of the broad shoulders?
+[14:46:14] andreastt: simonstewart: Nothing is better, seeing as I can't reproduce it here (-:
+[14:46:29] Andrei_Khveras: AutomatedTester: Thank you for interest, problem was workarounded. The matter is that JavaScript event doesn't affect elements on page until ANY native event called by Actions.
+[14:46:41] simonstewart: jimevans: it turns out that the conference is situated in the 'burbs
+[14:46:47] andreastt: simonstewart: So there are ready-transformed Google protobuf-compatible .proto files in /protos, the files in /protos/scope are Scope protos.
+[14:46:50] simonstewart: So close to ChiTown and yet so far
+[14:46:55] simonstewart: Yes there are
+[14:46:57] jimevans: indeed.
+[14:47:20] simonstewart: The problem boiled down to the fact that you're mixing proto1 and proto2 formats. 
+[14:47:24] andreastt: (It was initially the other way around, but I found it messy.)
+[14:47:27] simonstewart: Seriously, I can send a patch
+[14:47:30] andreastt: Aha.
+[14:47:47] simonstewart: Greg Dennis spent some time looking into the problem and came up with a fix
+[14:47:54] andreastt: It's entirely possible that that might be fixed in Opera core.  I haven't updated the proto files for quite a while.
+[14:48:06] andreastt: <3 Greg Dennis
+[14:48:10] andreastt: In a purely platonic way, of course.
+[14:48:41] Andrei_Khveras: I wish I could join your selenium patch development team, so we can make WebDriver robust and powerful tool. )
+[14:48:56] Andrei_Khveras: one day when I get more experienced
+[14:53:02] Jackneill has joined #selenium
+[14:53:02] Jackneill has joined #selenium
+[14:58:52] cmcgraw has joined #selenium
+[IRC logfile - Started Thu May  3 15:00:15 2012]
+[15:00:15] simonstewart: Andrei_Khveras: just find a bug that irks you and send us a patch to fix it
+[15:00:30] simonstewart: Do that a few times, and it's pretty easy to get the commit bit :)
+[15:02:21] Andrei_Khveras: Simon, I find LOTS of bugs overy day, I am forced to workaround them every time, made browser-type specific forks. But I don't feel myself experienced enough to fix WebDriver code itself. And my workarounds can't became a part of WebDriver, unfortunately.
+[15:05:25] barancev: I told to Andrei in private, sould like his problems are caused by outdated selenium version in sauce environment
+[15:05:43] barancev: no native events for modern browsers
+[15:05:51] selbot2: 03jmleyba@gmail.com less than 10 seconds ago - Edited wiki page SafariDriver through web user interface. | https://code.google.com/p/selenium/source/detail?r=16774 | http://seleniumhq.org/ci.jsp?r=16774
+[15:06:20] barancev: according to official docs, latest selenium on sauce is 2.9, it's too old...
+[15:12:31] cgoldberg has joined #selenium
+[15:13:47] stockton has joined #selenium
+[15:14:10] jarib: jimevans: i landed the standalone IE server for ruby yesterday
+[15:14:41] jarib: jimevans: re the bind() thing, i'm not sure just exiting the server (like chromedriver does) is a good solution
+[15:15:42] jarib: basically it's saying "someone are already listening to this port, i assume it's another chromedriver server"
+[15:16:01] jarib: which may be the case, but the code that's starting the server has no control over the running instance
+[15:16:02] jimevans: no, you're right about that.
+[15:16:35] jimevans: i'm working on a patch that will properly exit with a status code that you can check for, as well as log to the console.
+[15:16:43] jarib: sounds good
+[15:16:48] jarib: i'll file a bug with chromedriver
+[15:16:52] jarib: :chrome
+[15:16:52] selbot2: https://code.google.com/p/selenium/wiki/ChromeDriver | https://code.google.com/p/chromedriver/downloads/list 
+[15:19:26] cgoldberg has joined #selenium
+[15:20:48] jarib: also, r16770 is a potential issue in the other bindings
+[15:20:53] selbot2: 03jari.bakken about 13 hours ago - JariBakken: Avoid PortProber.random unless we control what interface the server is binding to. | https://code.google.com/p/selenium/source/detail?r=16770 | http://seleniumhq.org/ci.jsp?r=16770
+[15:20:57] jarib: uhm
+[15:20:59] jarib: wrong commit
+[15:21:05] jarib: r16769
+[15:21:07] selbot2: 03jari.bakken about 13 hours ago - JariBakken: Make sure Ruby's PortProber.above checks all network interfaces. | https://code.google.com/p/selenium/source/detail?r=16769 | http://seleniumhq.org/ci.jsp?r=16769
+[15:21:36] jarib: that'll lead to subtle bugs, especially if you're running multiple browser instances on the same machine
+[15:21:50] SamuraiJack has joined #selenium
+[15:23:04] simonstewart has joined #selenium
+[15:23:28] jarib: ah, was hoping simonstewart would see that :)
+[15:23:34] jarib: simonstewart: r16769
+[15:23:36] selbot2: 03jari.bakken about 13 hours ago - JariBakken: Make sure Ruby's PortProber.above checks all network interfaces. | https://code.google.com/p/selenium/source/detail?r=16769 | http://seleniumhq.org/ci.jsp?r=16769
+[15:24:18] simonstewart: jarib: eh?
+[15:25:16] jarib: simonstewart: java (and the others probably) has the PortProber bug fixed in that commit
+[15:25:41] simonstewart: Nice
+[15:25:49] simonstewart: I'll take a look in my copious free time :)
+[15:25:55] jarib: :D
+[15:26:06] jimevans: hey! i got dibs on his free time! :)
+[15:26:32] simonstewart: jimevans: don't worry. I'm having a chat with Greg Dennis about the way to solve synthetic events
+[15:26:48] jimevans: i was actually kidding, but thanks.
+[15:27:14] jarib: simonstewart: it'll lead to subtle bugs; e.g. when starting a server that by default binds to 0.0.0.0 (like the mongoose servers), the PortProber only checks 127.0.0.1
+[15:27:37] dgtlmoon has joined #selenium
+[15:27:40] simonstewart: jimevans: I've got a prioritized list of Things I've Promised To Do
+[15:27:44] jarib: if the port is free on 127.0.0.1 but taken on 0.0.0.0, that's a problem
+[15:27:51] simonstewart: Grief
+[15:27:55] simonstewart: Got to go
+[15:27:58] simonstewart has left #selenium
+[15:28:50] brokenthumbs has joined #selenium
+[15:30:42] dawagner has joined #selenium
+[15:31:23] tizzo has joined #selenium
+[15:32:41] AutomatedTester has joined #selenium
+[15:45:27] mdgreenfield has left #selenium
+[15:48:23] QAGuy has joined #selenium
+[15:58:03] tachikoma has joined #selenium
+[IRC logfile - Started Thu May  3 16:11:39 2012]
+[16:11:39] OperaDriver has joined #selenium
+[16:11:39] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/579f0ef...1a3fe2e
+[16:11:39] OperaDriver: [operadriver/master] Correcting and adding relevant run configurations - Andreas Tolf Tolfsen
+[16:11:39] OperaDriver: [operadriver/master] Mocking OperaDriver to allow testing of configuration parsing in OperaSettings - Andreas Tolf Tolfsen
+[16:11:39] OperaDriver has left #selenium
+[16:12:58] OperaDriver has joined #selenium
+[16:12:58] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/78a2b1f35117630369f78b43aa8c2d3205057983
+[16:12:58] OperaDriver: [operadriver/master] Adding a few more fixtures - Andreas Tolf Tolfsen
+[16:12:58] OperaDriver has left #selenium
+[16:13:36] OperaDriver has joined #selenium
+[16:13:36] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/cda107c53799ab589a6b495905554260ec475cb4
+[16:13:36] OperaDriver: [operadriver/master] Mimicing Selenium test setup to more easily allow test exchange - Andreas Tolf Tolfsen
+[16:13:36] OperaDriver has left #selenium
+[16:13:59] kenck has joined #selenium
+[16:14:00] OperaDriver has joined #selenium
+[16:14:00] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/23da2add291fd4ca5ecdb136a4c6aaaa9ce2e205
+[16:14:00] OperaDriver: [operadriver/master] Adapting tests to improved test setup - Andreas Tolf Tolfsen
+[16:14:00] OperaDriver has left #selenium
+[16:14:40] OperaDriver has joined #selenium
+[16:14:40] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/ad7e4e43f8299db61f95210c31737784242e7fef
+[16:14:40] OperaDriver: [operadriver/master] Printing message of exception - Andreas Tolf Tolfsen
+[16:14:40] OperaDriver has left #selenium
+[16:16:07] OperaDriver has joined #selenium
+[16:16:07] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/ad7e4e4...2942191
+[16:16:07] OperaDriver: [operadriver/master] Moving static method further down - Andreas Tolf Tolfsen
+[16:16:07] OperaDriver: [operadriver/master] Control window and current product defaulting to null - Andreas Tolf Tolfsen
+[16:16:07] OperaDriver has left #selenium
+[16:18:52] andreastt: Is it possible to do a run on Sauce with a custom server-side JAR?
+[16:28:27] farlan has joined #selenium
+[16:32:51] jimevans: jarib: running tests now. should be able to check in the ie standalone server changes in a bit.
+[16:35:23] nhirata has joined #selenium
+[16:36:13] jarib: jimevans: sounds good. i added cd:#71
+[16:36:18] selbot2: 03kka...@chromium.org open/new Should exit with non-zero exit code if port is already in use - https://code.google.com/p/chromedriver/issues/detail?id=71 [Type-Defect Priority-Low]
+[16:36:44] jfunk has joined #selenium
+[16:36:49] dmachi has joined #selenium
+[16:37:08] jarib: hmm, wonder if i can make the bot accept any project name
+[16:37:36] OperaDriver has joined #selenium
+[16:37:36] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/64557d7df245c634a2f8ff5f524a689b2fc08c01
+[16:37:36] OperaDriver: [operadriver/master] Avoiding the use of inner classes - Andreas Tolf Tolfsen
+[16:37:36] OperaDriver has left #selenium
+[16:40:24] travis-ci has joined #selenium
+[16:40:24] travis-ci: [travis-ci] jarib/selbot2#22 (master - 3f89a02 : Jari Bakken): The build passed.
+[16:40:24] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/d5dfe6a...3f89a02
+[16:40:24] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237079
+[16:40:24] travis-ci has left #selenium
+[16:40:52] tizzo has joined #selenium
+[16:40:53] selbot2 has joined #selenium
+[16:40:58] jarib: chromedriver#71
+[16:40:59] selbot2: 03kka...@chromium.org open/new Should exit with non-zero exit code if port is already in use - https://code.google.com/p/chromedriver/issues/detail?id=71 [Type-Defect Priority-Low]
+[16:41:04] jarib: selenium#71
+[16:41:05] selbot2: 03simon.m.stewart closed/wontfix Listen for events - https://code.google.com/p/selenium/issues/detail?id=71 [Type-Enhancement Priority-Medium Browser-All]
+[16:41:08] jarib: #71
+[16:41:08] selbot2: 03simon.m.stewart closed/wontfix Listen for events - https://code.google.com/p/selenium/issues/detail?id=71 [Type-Enhancement Priority-Medium Browser-All]
+[16:41:41] jarib: chromium#71
+[16:41:42] selbot2: 03all-bugs-test%chromium.org@gtempaccount.com closed/wontfix Searching with a tab in the omnibar does not work with google main search. - https://code.google.com/p/chromium/issues/detail?id=71 [Type-Bug Pri-2 OS-All Area-Unknown]
+[16:42:17] OperaDriver has joined #selenium
+[16:42:17] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/d9b5fb63ce2df6d90f49c2606c88628ef4228f63
+[16:42:17] OperaDriver: [operadriver/master] Run config for JavascriptTest - Andreas Tolf Tolfsen
+[16:42:17] OperaDriver has left #selenium
+[16:44:01] bluescreen10 has joined #selenium
+[16:47:58] Farlan_ has joined #selenium
+[16:51:11] lukeis has joined #selenium
+[16:51:11] selbot2: lukeis: note from dawagner about 15 hours ago: [01:24]  <selbot2> http://illicitonion.com/selogs/selenium/2012/05/03.txt 
+[16:52:40] travis-ci has joined #selenium
+[16:52:40] travis-ci: [travis-ci] jarib/selbot2#23 (master - 9eee00a : Jari Bakken): The build was broken.
+[16:52:40] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/3f89a02...9eee00a
+[16:52:40] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237152
+[16:52:40] travis-ci has left #selenium
+[16:52:41] selbot2: ["bad URI(is not URI?): https://code.google.com/feeds/issues/p/[travis-ci] jarib/selbot2/issues/full?q=id:23", "/usr/lib/ruby/1.9.1/uri/common.rb:176:in `split'"]
+[16:55:28] llaskin: :log
+[16:55:29] selbot2: http://illicitonion.com/selogs/selenium/2012/05/03.txt
+[16:55:34] llaskin: nice
+[16:55:50] jarib: heh
+[16:55:53] llaskin: :note selbot2 :log
+[16:55:54] selbot2: http://illicitonion.com/selogs/selenium/2012/05/03.txt
+[16:55:56] llaskin: lol
+[IRC logfile - Started Thu May  3 17:02:21 2012]
+[17:02:21] bluescreen10 has joined #selenium
+[17:06:08] travis-ci has joined #selenium
+[17:06:08] travis-ci: [travis-ci] jarib/selbot2#24 (master - 37c5601 : Jari Bakken): The build was fixed.
+[17:06:08] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/9eee00a...37c5601
+[17:06:08] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237225
+[17:06:08] travis-ci has left #selenium
+[17:06:09] selbot2: ["bad URI(is not URI?): https://code.google.com/feeds/issues/p/[travis-ci] jarib/selbot2/issues/full?q=id:24", "/usr/lib/ruby/1.9.1/uri/common.rb:176:in `split'"]
+[17:07:05] travis-ci has joined #selenium
+[17:07:05] travis-ci: [travis-ci] jarib/selbot2#25 (master - 414d16b : Jari Bakken): The build passed.
+[17:07:05] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/37c5601...414d16b
+[17:07:05] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237233
+[17:07:05] travis-ci has left #selenium
+[17:07:06] selbot2: ["bad URI(is not URI?): https://code.google.com/feeds/issues/p/[travis-ci] jarib/selbot2/issues/full?q=id:25", "/usr/lib/ruby/1.9.1/uri/common.rb:176:in `split'"]
+[17:09:53] jleyba has joined #selenium
+[17:10:47] travis-ci has joined #selenium
+[17:10:47] travis-ci: [travis-ci] jarib/selbot2#26 (master - 3db5f9b : Jari Bakken): The build passed.
+[17:10:47] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/414d16b...3db5f9b
+[17:10:47] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237244
+[17:10:47] travis-ci has left #selenium
+[17:11:44] selbot2 has joined #selenium
+[17:11:50] jarib: there
+[17:11:55] jarib: chromedriver#71
+[17:11:56] selbot2: 03kka...@chromium.org open/new Should exit with non-zero exit code if port is already in use - https://code.google.com/p/chromedriver/issues/detail?id=71 [Type-Defect Priority-Low]
+[17:11:59] jarib: #71
+[17:12:03] selbot2: 03simon.m.stewart closed/wontfix Listen for events - https://code.google.com/p/selenium/issues/detail?id=71 [Type-Enhancement Priority-Medium Browser-All]
+[17:12:09] jarib: watir/watir-webdriver#71
+[17:12:09] selbot2: 03flairset closed How to save image from Page ? - http://github.com/watir/watir-webdriver/issues/71 [blocked-by-webdriver]
+[17:13:16] andreastt: Does it work for OperaDriver?
+[17:13:23] andreastt: operasoftware/operadriver#18
+[17:13:23] selbot2: 03ajayk closed Changes to .classpath and OperaWebElement - http://github.com/operasoftware/operadriver/issues/18 []
+[17:13:27] andreastt: \o/
+[17:13:40] andreastt: operadriver#18
+[17:13:40] selbot2: ["404 Resource Not Found", "/usr/lib/ruby/gems/1.9.1/gems/rest-client-1.6.1/lib/restclient/abstract_response.rb:48:in `return!'"]
+[17:13:52] jarib: i should probably rescue that
+[17:14:14] Dude-X: is 'rescue' a catch exception in ruby/
+[17:14:36] jarib: yes
+[17:15:01] jarib: raise=throw, rescue=catch
+[17:15:24] andreastt: And ensure=finally
+[17:15:43] selbot2 has joined #selenium
+[17:15:44] jarib: operadriver#18
+[17:16:02] travis-ci has joined #selenium
+[17:16:02] travis-ci: [travis-ci] jarib/selbot2#27 (master - bd2e108 : Jari Bakken): The build passed.
+[17:16:02] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/3db5f9b...bd2e108
+[17:16:02] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1237272
+[17:16:02] travis-ci has left #selenium
+[17:16:12] jarib: ok, enough bot hacking for today
+[17:16:51] llaskin: begin = try
+[17:16:59] jarib: if someone wants to dive into ruby, i'll accept patches that grab issues from the mozilla/webkit trackers ;)
+[17:17:48] bsilwal has joined #selenium
+[17:18:15] andreastt: We'll get an open tracker soon too.
+[17:18:19] bsilwal: How do i handle modal dialog using php? Any facebook binder user in house ? 
+[17:18:45] jarib: andreastt: nice.
+[17:20:02] _kip has joined #selenium
+[17:24:34] detro has joined #selenium
+[17:27:23] dmachi1 has joined #selenium
+[17:28:38] bsilwal has joined #selenium
+[17:31:44] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Adding --host option to IEDriverServer.exe so that the user can specify the network adapter on which to bind the server. | https://code.google.com/p/selenium/source/detail?r=16775 | http://seleniumhq.org/ci.jsp?r=16775
+[17:32:21] Dude-X: jimevans: does -host take the ip address, or you can say -host lan0
+[17:32:35] Dude-X: or whatever names micrsoft uses
+[17:32:37] jimevans: no, it takes the IP address. 
+[17:32:45] jimevans: that's what the mongoose web server requires.
+[17:32:48] Dude-X: ok
+[17:33:29] llaskin: bsilwal: you probably have to switch to the modal frame
+[17:33:43] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Making .NET unit tests more friendly to non-Windows operating systems (using Mono). | https://code.google.com/p/selenium/source/detail?r=16776 | http://seleniumhq.org/ci.jsp?r=16776
+[17:34:18] Dude-X: jimevans: does that mean we have to install mono on linux if we care about running all tests?
+[17:34:20] OperaDriver has joined #selenium
+[17:34:20] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/3fb7c4a44cc20a849319e8d2cb0c7455054059a4
+[17:34:20] OperaDriver: [operadriver/master] Respecting @FreshDriver annotation - Andreas Tolf Tolfsen
+[17:34:21] OperaDriver has left #selenium
+[17:34:28] bsilwal: llaskin: thanks will give it a try. 
+[17:34:40] llaskin: i am assuming it is in an iframe
+[17:34:46] llaskin: if not, you will have to switch_to that window handle
+[17:34:49] llaskin: i don't use FB Binder
+[17:34:50] OperaDriver has joined #selenium
+[17:34:50] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/d1f7e36eb590e34624db814aa255da169317cccd
+[17:34:50] OperaDriver: [operadriver/master] Only override settings in suppliers if they have default value - Andreas Tolf Tolfsen
+[17:34:50] OperaDriver has left #selenium
+[17:34:50] jimevans: Dude-X: you have to install mono on linux to run the .NET bindings at all.
+[17:35:17] Dude-X: have people setup IE in wine to test .net bindings?
+[17:35:20] Dude-X: or firefox
+[17:35:36] jimevans: Dude-X: no idea. and i'm not supporting it even if they did.
+[17:35:51] Dude-X: shouldn't have too….
+[17:35:53] stephend has joined #selenium
+[17:35:58] jimevans: (i guarantee MSFT wouldn't support IE in that configuration)
+[17:36:38] jimevans: the change I made to the tests was strictly to not hard-code backslashes in the path to the test web server jar for the unit tests.
+[17:37:13] jimevans: .net bindings are broken on non-windows mono right now anyway.
+[17:37:26] jimevans: actually, i take that back. chrome might work.
+[17:37:36] jimevans: firefox is most definitely broken.
+[17:38:09] retornam has joined #selenium
+[17:38:12] jimevans: there's a bug in the zip library we use to unpack and install the firefox extension (hard-coded backslashes, as it turns out)
+[17:38:38] jimevans: i submitted a patch like a good boy, but i despair there will be any positive outcome from that.
+[17:38:54] jimevans: time to fork, i guess.
+[17:39:31] retornam has joined #selenium
+[17:40:09] mikeheme_ has joined #selenium
+[17:40:43] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Trivial refactor in the constructors of "service-based" drivers for .NET bindings. | https://code.google.com/p/selenium/source/detail?r=16777 | http://seleniumhq.org/ci.jsp?r=16777
+[17:46:16] OperaDriver has joined #selenium
+[17:46:16] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/d1f7e36...3095316
+[17:46:16] OperaDriver: [operadriver/master] Reset settings storage when requesting a fresh driver - Andreas Tolf Tolfsen
+[17:46:16] OperaDriver: [operadriver/master] Wrong assertion when idle is disabled, fixing - Andreas Tolf Tolfsen
+[17:46:16] OperaDriver has left #selenium
+[17:46:43] selbot2: 03james.h.evans.jr@gmail.com less than 10 seconds ago - JimEvans: Removing unneeded FxCop message suppressions in .NET bindings. | https://code.google.com/p/selenium/source/detail?r=16778 | http://seleniumhq.org/ci.jsp?r=16778
+[17:47:04] jimevans: sooo… did we decide we're turning on the standalone server as the default for the next release?
+[17:47:31] jimevans: s/standalone server/ie standalone server/
+[17:49:42] llaskin: firefox standalone server coming soon?
+[17:50:04] jimevans: llaskin: shhhh… :)\
+[17:50:25] llaskin: seriously?  I sorta hope not tbh
+[17:50:27] jimevans: someday, i expect. don't know if i'd expect it "son"
+[17:50:33] jimevans: or "soon" even
+[17:50:37] jimevans: why not?
+[17:50:55] jimevans: especially if it comes from mozilla and not us, it seems like a better approach.
+[17:52:05] andreastt: \o/
+[17:52:11] versatiletech has joined #selenium
+[17:52:32] andreastt: Managed to reduce the run time for the OperaDriver tests from 6 min 18 sec to 2 min 35 sec.
+[17:52:59] jimevans: andreastt: awesome! o/
+[17:53:41] andreastt: Browsers are _slow_ to start.
+[17:53:43] llaskin: is there a way to send_keys without sending an enter command after?
+[17:53:59] jimevans: llaskin: huh?
+[17:54:13] llaskin: i want to fill in a field
+[17:54:19] llaskin: but not send the :enter command after
+[17:54:28] llaskin: (which closes a populating dropdown)
+[17:54:34] jimevans: then don't send the :enter keystroke. :)
+[17:54:37] llaskin: so I just want to type "hello"  not "hello\n"
+[17:55:29] jimevans: afaik, the driver doesn't modify whatever keys you send in...
+[17:55:52] llaskin: ur right
+[17:55:53] llaskin: huzzah
+[17:56:13] tessarakt2 has joined #selenium
+[17:56:19] jimevans: even a blind squirrel finds a nut once in awhile.
+[17:56:36] jimevans: right. that's lunch. back in awhile.
+[17:58:13] pnitin has joined #selenium
+[17:59:18] sfbrian has joined #selenium
+[IRC logfile - Started Thu May  3 18:02:49 2012]
+[18:02:49] stackedsax1: anyone run android emulators with -no-gui option?
+[18:03:34] stackedsax1: I mean, I can run them with that option, just wondered if tests would still work even though a human couldn't see them
+[18:05:34] andreastt: Note to self: Don't trust ant to be smart, and always clean your directory before testing.
+[18:06:14] andreastt: stackedsax1: AFAIK the AndroidDriver doesn't require native events, so that should be fine.
+[18:06:55] stackedsax1: thanks
+[18:09:35] rcg has joined #selenium
+[18:10:49] rcg has left #selenium
+[18:15:24] sassda has joined #selenium
+[18:19:01] OperaDriver has joined #selenium
+[18:19:01] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/e8c7adb37dde40d7563dbd324bdf32cfe28fc103
+[18:19:01] OperaDriver: [operadriver/master] Increasing the handshake timeout for slow systems - Andreas Tolf Tolfsen
+[18:19:01] OperaDriver has left #selenium
+[18:23:08] Spanktar has joined #selenium
+[18:28:04] RossPatterson has joined #selenium
+[18:29:33] nsussman has joined #selenium
+[18:31:26] testingb0t has joined #selenium
+[18:32:54] Odd_Bloke has joined #selenium
+[18:36:25] perrick has joined #selenium
+[18:38:27] pa has joined #selenium
+[18:39:21] perrick: hi folks
+[18:40:25] perrick: I'm trying to get text from a div, but the call throws an invalid operation exception. What could be the cause of this? Never seen it on that method before
+[18:40:50] Dude-X: what version of selenium/language binding/browser etc
+[18:41:38] perrick: Selenium 2.21 C# Chromedriver Windows
+[18:42:23] jimevans: perrick: are you doing it in a single call (like driver.FindElement(By.Id("foo")).Text) ?
+[18:42:40] Dude-X: can you pastebin/gist your code snippet
+[18:43:18] perrick: No, I get a list of elements using findelements and then call Text on an element in the list.
+[18:43:27] perrick: Could it be stale?
+[18:43:48] Dude-X: then you should get a StaleElementReferenceError/Exception
+[18:44:06] perrick: Yes
+[18:44:08] jimevans: i trust it fails on the call to the .Text property?
+[18:44:15] perrick: Yes it does
+[18:44:27] perrick: This just in: it does not fail in firefox driver
+[18:44:51] jimevans: chromedriver.exe must be returning a non-compliant error response.
+[18:45:31] jimevans: might be interesting to see the tail end of your chromedriver.log.
+[18:45:46] perrick: i'll check it out
+[18:45:56] jimevans: though if you're going to share that, you should do so via :gist
+[18:45:57] selbot2: Please paste >3 lines of text to https://gist.github.com
+[18:49:08] perrick: The chromedriver text file is empty
+[18:49:47] perrick: Which is curious
+[18:50:21] perrick: It should be in the same directory as chromedriver.exe, yes?
+[18:50:34] jimevans: that's my understanding.
+[18:50:58] Dude-X: i've never seen the chromedriver log anything
+[18:51:06] Dude-X: but i suppose there's a switch to enable logging or something
+[18:51:47] jimevans: it'd be a command-line switch to chromedriver.exe.
+[18:52:00] llaskin: jimevans: how close are you to Sanford?
+[18:52:11] llaskin: http://i371.photobucket.com/albums/oo157/Furyataurus/007-15.jpg
+[18:53:12] Dude-X: that's asshat to the extreme that poster
+[18:53:25] jimevans: llaskin: tampa is a fair distance away from sanford. almost all the way across the state.
+[18:53:38] llaskin: i did not make, nor do i own that poster
+[18:53:43] llaskin: its actually a gun target:-P
+[18:54:33] OperaDriver has joined #selenium
+[18:54:33] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/a10c3ef50ac54f7f9e3d5d11db760deceee6dce3
+[18:54:34] OperaDriver: [operadriver/master] Added annotation for ensuring correct Scope services for running tests - Andreas Tolf Tolfsen
+[18:54:34] OperaDriver has left #selenium
+[18:54:58] Dude-X: i know it's a gun target; but that's f'ed up
+[18:55:04] lukeis: perrick: chromedriver.log usually ends up in the directory you ran the test from (so usually in your project dir) not the directory where the .exe is (in my experience at least)
+[18:55:27] jimevans: we
+[18:56:06] jimevans: we're busy in tampa getting ready for the republican national convention. i'm really, really not looking forward to it.
+[18:56:23] jimevans: and it's got nothing to do with politics. :)
+[18:56:57] OperaDriver has joined #selenium
+[18:56:57] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/d965274357e7f3e5966f64d2f43fec8d579eb83a
+[18:56:57] OperaDriver: [operadriver/master] New test setup doesn't like BeforeClass very much - Andreas Tolf Tolfsen
+[18:56:57] OperaDriver has left #selenium
+[18:57:01] perrick: I'll check it out
+[18:58:35] kkania: perrick: chromedriver puts the log in your cwd, but if that's not writable it throws it in a temp dir.  you can specify where it logs via a --log-path switch, which you can set with the Java ChromeDriverService.Builder
+[18:58:59] kkania: perrick: it shouldn't be empty if you're using a release from this year, let me know if you find otherwise
+[18:59:30] kkania: perrick: it should at lesat log all the commands it processes
+[18:59:53] perrick: okay, it is definately not logging, I'll try to get it configured
+[IRC logfile - Started Thu May  3 19:00:29 2012]
+[19:00:29] jimevans: perrick: for now, start the chromedriver.exe outside of your tests, and use the RemoteWebDriver class to run your code.
+[19:00:46] jimevans: (the .NET ChromeDriverService isn't as functional as the java one)
+[19:12:03] perrick: Would setting up the remote web driver fix the non-compliant error response, or just enable the logging?
+[19:12:09] papegaaij has joined #selenium
+[19:12:16] jimevans: no, just enabling logging.
+[19:12:25] perrick: I don't know a lot about chromedriver
+[19:17:47] OperaDriver has joined #selenium
+[19:17:47] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/e43d2dcc7ea5bbd1a4fdc999d97fd04dd820a4a1
+[19:17:47] OperaDriver: [operadriver/master] Ensure that browser is running; having a driver instance object doesn't guarantee the browser is running - Andreas Tolf Tolfsen
+[19:17:47] OperaDriver has left #selenium
+[19:18:21] OperaDriver has joined #selenium
+[19:18:21] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/0c1e7b21d56df069055a14cab72d6f0a98320b81
+[19:18:21] OperaDriver: [operadriver/master] Using static import for assertion - Andreas Tolf Tolfsen
+[19:18:21] OperaDriver has left #selenium
+[19:21:08] OperaDriver has joined #selenium
+[19:21:08] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/b5d81184cd318a02c17b35b11c6a872f53306433
+[19:21:08] OperaDriver: [operadriver/master] Condition is the wrong way around: We want to check that we have service name but no version - Andreas Tolf Tolfsen
+[19:21:08] OperaDriver has left #selenium
+[19:21:42] andreastt: There all failing tests fixed on Mac and GNU/Linux.  I'm going to leave Windows for tomorrow.
+[19:22:56] OperaDriver has joined #selenium
+[19:22:56] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/14fe6cb3232a8ec86ad72817c04880c4a096a942
+[19:22:56] OperaDriver: [operadriver/master] This single test fail for some reason on GNU/Linux - Andreas Tolf Tolfsen
+[19:22:56] OperaDriver has left #selenium
+[19:23:01] AutomatedTester has joined #selenium
+[19:24:27] Dude-X has left #selenium
+[19:25:55] perrick: So I must have had an old version of chromedriver. I redownloaded chromedriver.exe and now I have a log and no error. Nice!
+[19:26:20] andreastt: Great.  I've made OperaDriver crash Opera because it's too fast.
+[19:26:32] andreastt: I should look into slowing it down.
+[19:29:41] Dude-X has joined #selenium
+[19:36:03] tizzo has joined #selenium
+[19:45:00] stackedsax1: lukeis: was #2874 your issue?
+[19:45:01] selbot2: 03 open/new AndroidDriver getScreenshotAs() returns partial screenshot image for scaled pages - https://code.google.com/p/selenium/issues/detail?id=2874 [Type-Defect Priority-Medium Component-WebDriver Browser-Android]
+[19:45:43] lukeis: nope, that's a different luke
+[19:45:54] lukeis: i'm Inman-Semerau (hence the -is)
+[19:45:54] stackedsax1: kk
+[19:46:10] stackedsax1: cool
+[19:46:31] stackedsax1: I'm running into the same issue as this guy:
+[19:46:31] stackedsax1: http://translate.google.com/translate?hl=en&sl=zh-CN&tl=en&u=http%3A%2F%2Fseleniumcn.cn%2Fsimple%2F%3Ft3365.html
+[19:46:45] stackedsax1: was looking for people who might have seen the same issue
+[19:48:20] AutomatedTester: lukeis a hard worker
+[19:48:26] AutomatedTester: lukeis a good host
+[19:48:52] lukeis: thx AutomatedTester  ;) (and yes, i know you get a kick out of my handle)
+[19:49:03] AutomatedTester: small things
+[19:49:37] llaskin: lukeis likes to go by Santosh.Baby
+[19:50:20] stackedsax1: I think I can only do something like "stackedsax a question" with my nick
+[19:50:27] AutomatedTester: argg where is a googler when you need them
+[19:50:56] tizzo_ has joined #selenium
+[19:52:35] AutomatedTester: anyone know how to run the Java tests from the IDE
+[19:52:37] stackedsax1: ah, this might be my problemo:
+[19:52:39] stackedsax1: "Note: An Android emulator bug prevents WebDriver from running on emulators on platforms 2.3 (Gingerbread)."
+[19:52:48] stackedsax1: this still current?
+[19:53:04] jimevans: stackedsax1: yep. use a real device.
+[19:53:19] jimevans: (or so i'm told)
+[19:53:51] AutomatedTester: jimevans: have you implemented fileupload over remote?
+[19:54:01] jimevans: nope.
+[19:54:11] stackedsax1: jimevans: real device?  like an actual handheld device?  
+[19:54:22] jimevans: stackedsax1: yes. exactly
+[19:54:35] nsussman has joined #selenium
+[19:54:43] stackedsax1: jimevans: surely this just means I should run the emulator on something other than the 2.3.3 image
+[19:55:08] stackedsax1: like, 2.2 or 3.0
+[19:55:35] stackedsax1: the very next line of the document says: "$./emulator -avd my_android &"
+[19:55:49] stackedsax1: which suggests I should continue using the emulator
+[19:56:32] jimevans: maybe so. i don't run on android often enough to really know what i'm talking about. i've just often heard here in the channel that the answer to the question you asked is that "the driver works fine on an actual device"
+[19:57:31] AutomatedTester: jarib: yt?
+[19:57:33] stackedsax1: that would be terrible news
+[IRC logfile - Started Thu May  3 20:03:36 2012]
+[20:03:36] chainey has joined #selenium
+[20:05:33] chainey has left #selenium
+[20:09:13] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Correcting .NET docs CSS sheet ref. Fixes issue #3738 | https://code.google.com/p/selenium/source/detail?r=16779 | http://seleniumhq.org/ci.jsp?r=16779
+[20:13:02] kyconquers: when using *google-chrome is selenium using a specific version of google-chrome or the latest installed version?
+[20:15:09] jarib: AutomatedTester: i am
+[20:15:15] jarib: :last 10
+[20:15:33] AutomatedTester: jarib: have you done the fileupload stuff?
+[20:15:50] jarib: what specifically?
+[20:16:12] AutomatedTester: send_keys doing a file upload to the remote server
+[20:16:21] jarib: yeah
+[20:16:23] jarib: i have
+[20:16:35] jarib: r14081
+[20:16:38] selbot2: 03jari.bakken 6 months ago - JariBakken: Add support for file uploads to the remote server in Ruby. | https://code.google.com/p/selenium/source/detail?r=14081 | http://seleniumhq.org/ci.jsp?r=14081
+[20:17:09] barancev|2 has joined #selenium
+[20:17:59] AutomatedTester: jarib: do I need to add my original string to what is returned?
+[20:19:54] jarib: not sure i understand what you mean
+[20:20:31] AutomatedTester: what is returned is the path to where the zip was unzipped
+[20:20:38] AutomatedTester: but thats not the path to the file
+[20:21:20] davehunt: AutomatedTester: can't you just specify not to store directory structure when zipping the file
+[20:21:43] jarib: AutomatedTester: huh, it should return the path to the file I think
+[20:21:54] jarib: yeah, i think it depends on how you zip the file
+[20:22:43] jarib: the zip should only have the file as an entry (no directories)
+[20:23:11] AutomatedTester: ahh 
+[20:23:15] AutomatedTester: ok, me goes to fix
+[20:25:14] ksummerlin has joined #selenium
+[20:25:41] jimevans: hi ksummerlin!
+[20:25:54] ksummerlin: hi jim
+[20:26:12] jimevans: i've been looking at your code.
+[20:26:39] jimevans: i'm not sure i like the idea of using the LoadableComponentException for control flow.
+[20:27:30] ksummerlin: Right. I wasn't 100% happy with it either. And actually in later versions I tried changing it to WebDriverException
+[20:27:38] ksummerlin: in the catch
+[20:27:57] jimevans: no, i mean, i don't like the idea of using any exception for flow control.
+[20:28:10] jimevans: i know the java implementation does it, but i don't agree with it.
+[20:28:13] ksummerlin: Right. Me either
+[20:28:38] jimevans: so what if we turned IsLoaded into a boolean property instead? what does that do?
+[20:29:52] ksummerlin: In most cases I think it means implementations of IsLoaded() will have to catch the ElementNotFoundException a lot, or use FindElements() instead.
+[20:30:02] ksummerlin: but that seems OK to me
+[20:30:45] bluescreen10 has joined #selenium
+[20:30:48] jimevans: take a look here: https://gist.github.com/2588496
+[20:31:26] jimevans: a couple of notes: i renamed your Get() method to Load(), and got rid of the Run() method. then I renamed your Load() method to ExecuteLoad()
+[20:33:10] jimevans: note that i didn't update the documentation comments yet.
+[20:33:34] ksummerlin: That looks good to me, certainly reads better than the Java version IMHO
+[20:33:59] jimevans: you're right about the exception handling in the IsLoaded property, though.
+[20:34:08] jimevans: i need to think on that a minute.
+[20:34:32] jarib: jimevans: in ruby i solved it by adding #unable_to_load_message for people to override
+[20:34:55] ksummerlin: right
+[20:35:01] jarib: i think that's the idea behind the java design
+[20:35:12] jarib: for people to customize the exception
+[20:35:52] ksummerlin: Yeah in the Java version they discuss using Assert.XXX to throw an Error
+[20:36:26] jimevans: let me take a swing at this. give me a second.
+[20:37:09] jarib: i'd probably do #throw_unable_to_load or something if i was to do that again, so people could customize the exception type as well as the message
+[20:42:35] ksummerlin: jarib: I'll note that in the future I should take a look at the other language ports not just the Java version. That's a good thought.
+[20:47:02] jimevans: so it seems to me the biggest concern is that the check to see if the component is loaded might involve an exception, and i agree it's probably not the best use experience to make users catch the exceptions in their implementation of IsLoaded.
+[20:50:24] ksummerlin: I agree. I like returning boolean from IsLoaded, but I don't like the idea of the exceptions just falling through if someone forgets to catch WebDriverException inside the IsLoaded property.
+[20:50:31] jimevans: right.
+[20:50:51] jimevans: i think i'm onto something. let me play with it. new gist forthcoming.
+[20:50:52] hanneso has joined #selenium
+[20:51:02] jimevans: i hate the method names that i'm coming up with, but we can change those.
+[20:53:11] Dude-X: is there a javascript way of doing element.getAttribute()?
+[20:53:24] Dude-X: i have a particular flaky function
+[20:57:34] jimevans: alright. recheck the gist https://gist.github.com/2588496
+[20:58:26] jimevans: so inheritors must implement ExecuteLoad() to actually load the component, and ChangeMyNameToSomethingMeaningful() to check whether the component is loaded.
+[20:58:36] simonstewart has joined #selenium
+[20:58:56] jimevans: We'd also provide HandleLoadError() to give them the opportunity to handle the exception received upon load.
+[IRC logfile - Started Thu May  3 21:00:35 2012]
+[21:00:35] ksummerlin: OK, so it separates the exceptions during the IsLoaded check and the actual execution of Load().
+[21:00:56] jimevans: yeah, i think that's a little better.
+[21:01:34] jimevans: since the standard "does this element exist" check relies heavily on catching an exception,
+[21:01:40] jibay__ has joined #selenium
+[21:01:50] jimevans: that gives us a little cover.
+[21:02:55] mdgreenfield1 has joined #selenium
+[21:03:43] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Allow the state of the keyboard to be persisted and reused if necessary in the atoms | https://code.google.com/p/selenium/source/detail?r=16780 | http://seleniumhq.org/ci.jsp?r=16780
+[21:04:10] ksummerlin: Sure I can see the advantages of this pattern. I'm trying to work through in my head the SlowLoadableComponent now to see if there are any problems from that angle.
+[21:04:43] selbot2: 03simon.m.stewart less than 20 seconds ago - SimonStewart: Update the inputs.js script to use the newly persisted state of the keyboard. | https://code.google.com/p/selenium/source/detail?r=16781 | http://seleniumhq.org/ci.jsp?r=16781
+[21:05:06] mdgreenfield1 has left #selenium
+[21:05:32] llaskin: thank god for ever riding find_element
+[21:06:58] jimevans: simonstewart: that looks very promising. :)
+[21:07:07] simonstewart: You're about to get an email
+[21:07:09] simonstewart: :)
+[21:07:18] jimevans: hah! 
+[21:07:35] jimevans: you, sir, are a gentleman and a scholar. i owe you a pint or several.
+[21:07:36] AutomatedTester: simonstewart: howdy! how is Chicago?
+[21:07:49] simonstewart: Turns out the conference is in the 'burbs
+[21:07:54] simonstewart: Chicago is lovely
+[21:08:02] simonstewart: But I'm not quite there 
+[21:10:53] simonstewart: OK jimevans, check your inbox
+[21:10:58] jimevans: roger that.
+[21:11:11] AutomatedTester: simonstewart: there is a pair of Californians coming over week 21 May
+[21:11:17] simonstewart: ok
+[21:11:22] AutomatedTester: would you be able to do supper one night?
+[21:11:25] simonstewart: I should be back in London then :)
+[21:11:39] simonstewart: Probably. I'd need to check with The Wife
+[21:12:06] AutomatedTester: simonstewart: totally understandable
+[21:12:12] simonstewart: Ha!
+[21:13:14] AutomatedTester: simonstewart: at least come over to the office for a bit that week
+[21:13:22] simonstewart: Of course!
+[21:13:27] simonstewart: What day were you thinking of supper?
+[21:14:02] AutomatedTester: simonstewart: not Monday
+[21:14:07] simonstewart: k
+[21:14:19] simonstewart: Tuesday or Wednesday normally work ok
+[21:14:24] AutomatedTester: cool
+[21:14:34] AutomatedTester: Pencil it in and I will finalise
+[21:14:55] simonstewart: ok
+[21:16:01] simonstewart: Pencilled
+[21:18:25] Farlan_ has left #selenium
+[21:25:45] stackedsax has joined #selenium
+[21:26:31] stackedsax: hmm, I might not have been connected...
+[21:26:32] stackedsax: is the extra-google-webdriver in the android sdk the same as installing the android apk into an emulator?
+[21:27:00] Dude-X: what's the javascript way of doing element.getAttribute('style')
+[21:33:29] mreedell has joined #selenium
+[21:35:17] lukeis: Dude-X: heh ;) it's element.getAttribute('style')
+[21:35:56] Dude-X: lukeis:  i want to do an executeScript, something is really for this test;
+[21:36:00] Dude-X: don't know
+[21:36:21] Dude-X: don't know why it's so flaky for this particular instnace
+[21:36:40] lukeis: execute_script("return arguments[0].getAttribute('style')", element)
+[21:37:53] lukeis: you do however in javascript have the ability to access the style properties (what is currently set on the element because css can override style)  with element.style.(stylename)
+[21:39:01] lukeis: but that's the same as element.value_of_css_property('stylename')
+[21:39:13] Dude-X: ah
+[21:50:55] stockton has joined #selenium
+[21:51:45] ksummerlin has joined #selenium
+[21:54:46] ksummerlin: LASTLOG
+[21:54:52] ksummerlin has left #selenium
+[21:55:37] ksummerlin has joined #selenium
+[21:58:27] joar has joined #selenium
+[IRC logfile - Started Thu May  3 22:19:28 2012]
+[22:19:28] Dude-X: turns out i've been working on the wrong problem
+[22:19:38] jimevans has left #selenium
+[22:19:40] Dude-X: the test is failing not beause i can't the attribute right
+[22:19:56] Dude-X: but the click on a tinymce widget is not going through
+[22:20:03] Dude-X: it pays to pay attention to the test!
+[22:20:47] testingb0t1 has joined #selenium
+[22:42:35] santiycr has joined #selenium
+[22:43:29] versatiletech has joined #selenium
+[22:51:05] brettporter has joined #selenium
+[22:52:42] ksummerlin has left #selenium
+[IRC logfile - Started Thu May  3 23:04:11 2012]
+[23:04:11] kallisti has joined #selenium
+[23:04:12] kallisti has joined #selenium
+[23:14:34] cMical has joined #selenium
+[23:15:39] stackedsax: :help
+[23:16:20] stackedsax: :seen jimevans
+[23:16:21] selbot2: jimevans was last seen about 1 hour ago, leaving.
+[23:16:54] stackedsax: :note jimevans update on android emulator: version 4.x seems to work just fine
+[23:16:55] selbot2: ok!
+[23:17:25] kallisti: hm, oh.
+[23:17:39] kallisti: my Firefox preferences parser doesn't ignore comments.
+[23:18:19] stackedsax: I posed a question earlier about android emulator and why it wasn't working
+[23:18:43] stackedsax: the docs actually told me that 2.3 doesn't work — and now that I'm using 4.x, I can confirm that that does work
+[23:19:28] stackedsax: I'll send a patch for the docs saying that 4.x does work if anyone thinks it would be helpful
+[23:20:07] mashiara has joined #selenium
+[23:21:41] ian_mac has joined #selenium
+[23:27:00] AutomatedTester: stackedsax: androiddriver only works with ICS
+[23:29:17] stackedsax: AutomatedTester: well, I'm running it with one of the 4.0 targets
+[23:29:33] stackedsax: is there a specific target I should use?
+[23:30:25] stackedsax: this is with -no-window, btw
+[23:31:48] AutomatedTester: AndroidDriver needs to have 4.0. You will get some really weird and wonderful things happening without it
+[23:32:09] stackedsax: yes, as I discovered
+[23:32:31] stackedsax: I was suggesting we update the docs to actually say that
+[23:32:43] stackedsax: the docs merely say that 2.3 is not supported
+[23:32:54] AutomatedTester: stackedsax: if you have a patch then I will apply it
+[23:32:56] stackedsax: which is different from "must be 4.0"
+[23:33:07] stackedsax: I'll get you one, one sec
+[23:33:17] stackedsax: is there any other stipulation there?
+[23:33:20] AutomatedTester: also if you havent signed the :cla can you do that too?
+[23:33:20] selbot2: http://goo.gl/qC50R
+[23:33:32] stackedsax: just 4.0, right?  there are two 4.0 images to use
+[23:34:17] AutomatedTester: 4.0.x support
+[23:34:28] AutomatedTester: anything higher
+[23:38:20] cMical has joined #selenium
+[23:41:43] stackedsax: I thought the wiki was in trunk somewhere
+[23:41:53] santiycr: :note dawagner did you guys try out the new IEDriverServer in Sauce?
+[23:41:53] selbot2: ok!
+[23:42:20] stackedsax: no, my bad, found it
+[23:45:32] AutomatedTester: stackedsax: I am going to be finishing shortly for the day
+[23:45:41] AutomatedTester: since its nearly midnight
+[23:45:58] AutomatedTester: just leave me a note with the issue and I will apply
+[23:46:42] sassda has left #selenium
+[23:46:58] stackedsax: cool, will do
+[23:48:39] jarib: ooo, rubymotion looks shiny
+[23:48:45] selbot2: 03david.burns@theautomatedtester.co.uk less than 20 seconds ago - DavidBurns only write the filename to the archive and not replicate the folder structure | https://code.google.com/p/selenium/source/detail?r=16782 | http://seleniumhq.org/ci.jsp?r=16782
+[23:50:43] AutomatedTester: http://code.google.com/p/selenium/issues/detail?id=3803
+[23:52:34] AutomatedTester: jarib: whats ruby motion
+[23:52:42] AutomatedTester: is it another version of ruby?
+[23:53:10] jarib: AutomatedTester: http://rubymotion.com/
+[23:53:21] jarib: compiles ruby to machine code for iOS
+[23:53:43] AutomatedTester: nice
+[23:53:50] AutomatedTester: is that allowed for the App Store
+[23:53:58] jarib: (made by the guy who used to do macruby @ apple)
+[23:54:02] jarib: yeah. it compiles to native code
+[23:54:26] AutomatedTester: cool
+[23:54:52] jarib: only downside is it's commercial
+[23:55:10] jarib: $200
+[23:55:30] AutomatedTester: it shows $160 for me
+[23:55:55] jarib: yeah, there's a early-bird discount
+[23:56:14] AutomatedTester: wtf, i would buy it in $
+[23:56:22] AutomatedTester: $10 cheaper
+[23:56:47] AutomatedTester: jarib: has google changed their SSL certificate?
+[23:57:14] lukeis: there's always a surcharge for not being american ;)
+[23:57:16] jens__ has joined #selenium
+[23:57:22] jarib: AutomatedTester: not sure, but i've seen those warnings as well
+[23:58:15] AutomatedTester: https://gist.github.com/1e518e029cb5e463412f
+[23:58:19] AutomatedTester: thats what I am getting
+[23:58:49] jarib: yeah, same
+[23:59:00] jarib: should ask the googlers

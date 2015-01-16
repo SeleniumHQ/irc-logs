@@ -1,0 +1,1037 @@
+2011-05-26T00:00:21  <binken> it's easy in Webdriver
+2011-05-26T00:00:32  <binken> in the Selenium 1.0 API
+2011-05-26T00:00:40  <binken> you should use getxpathcount
+2011-05-26T00:00:42  <binken> first
+2011-05-26T00:00:59  <binken> Then dynamic generate the xpath for each one
+2011-05-26T00:03:45  <artknish> Thanks, binken. I'll try that. I'm using the Python client driver (1.0.3)
+2011-05-26T00:04:51  *** freynaud_ has joined #selenium
+2011-05-26T00:09:07  <artknish> So is there a way to get, say, the 3rd match of the xpath expression supplied?
+2011-05-26T00:11:43  *** bebef_1987 has joined #selenium
+2011-05-26T00:13:03  *** rbalent has joined #selenium
+2011-05-26T00:15:48  <binken> if you have table has three trs
+2011-05-26T00:15:59  <binken> you can use //table/tr[3]
+2011-05-26T00:16:04  <binken> you can use //table/tr[2]
+2011-05-26T00:24:15  <artknish> Sorry, getting a little confused here. I want to select an anchor tag which is like this: <a onclick="func(<number>, 12, <number>)>. I'm using the xpath "//a[contains(@onclick, 'func') and contains(@onclick, '12')]. But it's also selecting <a onclick="func(<number>, 13, 12)>. So that's my problem.
+2011-05-26T00:25:02  <binken> is there any parent tag for the link?
+2011-05-26T00:25:07  <amitev> hi all
+2011-05-26T00:25:23  <amitev> idea what is the purpose of finding one WebElement fron another (like findElement(...).findElement(...)) ?
+2011-05-26T00:26:41  <artknish> Yes, all these anchors  are in a separate rows in their own <td>s.
+2011-05-26T00:27:00  <binken> findelement(table).findelement(tr).findelement(td)
+2011-05-26T00:27:17  <binken> so you can use the parent tag to find the link
+2011-05-26T00:27:37  <binken> like //table/tr[3]/td[1]/a
+2011-05-26T00:28:04  <artknish> No, because the element I want can be in any row.
+2011-05-26T00:28:39  <artknish> What I need is a contains() that can take some kind of pattern matching text.
+2011-05-26T00:29:14  <artknish> or some functions that can return the values of all the onclick attributes' values.
+2011-05-26T00:29:54  <binken> getattribute
+2011-05-26T00:30:03  <binken> function
+2011-05-26T00:31:52  <artknish> But wouldn't this also return the first locator that matches it?
+2011-05-26T00:32:33  *** jobicoppola has quit IRC
+2011-05-26T00:33:10  <binken> there is function called getalllinks method
+2011-05-26T00:59:21  *** bebef_1987_ has joined #selenium
+2011-05-26T01:01:06  *** bebef_1987 has quit IRC
+2011-05-26T01:01:18  *** bebef_1987_ is now known as bebef_1987
+2011-05-26T01:02:26  *** sburjan has quit IRC
+2011-05-26T01:03:19  *** sburjan has joined #selenium
+2011-05-26T01:09:06  *** freynaud_ has quit IRC
+2011-05-26T01:09:22  *** vrockai has joined #selenium
+2011-05-26T01:25:18  *** susin has joined #selenium
+2011-05-26T01:25:42  <susin> when will Selenium 2.0 RC be available for download?
+2011-05-26T01:29:21  *** freynaud_ has joined #selenium
+2011-05-26T01:40:19  *** pngl has joined #selenium
+2011-05-26T01:40:38  <pngl> Is it possible to check that specific Ajax requests are sent using selenium?
+2011-05-26T01:43:14  <freynaud_> pngl: If the request is supposed to update the page, then you can check that. If it does a server call, selenium isn't the right tool to check the server. i'm checking the result of the request in my test directly. If the request is supposed to update a DB field for instance, i check that.
+2011-05-26T01:44:31  <jarib> freynaud_: wow, nice video
+2011-05-26T01:44:35  <jarib> that's awesome
+2011-05-26T01:44:57  <pngl> freynaud_: Thank you. Although it could check that the browser *sends* a request.
+2011-05-26T01:45:02  <freynaud_> it requires  small change in the java FF driver to pass the param
+2011-05-26T01:45:17  <freynaud_> but i'll have more argument to convince Simon after i have the video :p
+2011-05-26T01:45:20  <jarib> what i don't get is how --display works
+2011-05-26T01:45:31  <jarib> if it works with chrome but isn't part of chrome's command line flags
+2011-05-26T01:45:39  <jarib> is --display interpreted by the shell?
+2011-05-26T01:45:42  <freynaud_> yes
+2011-05-26T01:45:52  <jarib> huh, interesting
+2011-05-26T01:46:01  <freynaud_> by default linux runs the program you launch in $DISPLAY
+2011-05-26T01:46:09  <jarib> that i know
+2011-05-26T01:46:11  <freynaud_> which is the current one usually
+2011-05-26T01:46:20  <freynaud_> but you can target the one you want with that
+2011-05-26T01:46:35  <freynaud_> i have my server on 0
+2011-05-26T01:46:39  <jarib> i just didn't know the shell would mess with the program's arguments like that
+2011-05-26T01:46:54  <freynaud_> i didn't know either
+2011-05-26T01:47:01  <freynaud_> i found it by chance ^^
+2011-05-26T01:47:21  <freynaud_> actually after you told me about the tighvnc stuff
+2011-05-26T01:47:25  <jarib> though
+2011-05-26T01:47:27  <jarib> if i do:
+2011-05-26T01:47:28  <jarib> $ ruby -e 'p ARGV' -- --display
+2011-05-26T01:47:28  <jarib> ["--display"]
+2011-05-26T01:47:37  <jarib> the argument isn't removed from what the program sees
+2011-05-26T01:47:56  <jarib> so a bit confusing
+2011-05-26T01:48:09  <jarib> also, i don't think the c++ chrome driver invokes a shell to launch chrome
+2011-05-26T01:48:49  <freynaud_> i think the best will be to document what i do with firefox
+2011-05-26T01:48:56  <freynaud_> and send it to the chrome guys
+2011-05-26T01:49:09  <freynaud_> i'm sure they'll find  a way
+2011-05-26T01:49:35  <susin>  when will Selenium 2.0 RC be available for download?
+2011-05-26T01:49:49  <freynaud_> pngl: your test <-> selenium <-> you browser
+2011-05-26T01:50:12  <freynaud_> the ajax request is issues from the browser to the server. Selenium doesn't see it
+2011-05-26T01:50:23  <pngl> freynaud_: ok
+2011-05-26T01:53:23  *** freynaud_ has quit IRC
+2011-05-26T01:53:53  <artknish> Does Selenium RC 1.0 support XPath 2.0?
+2011-05-26T02:00:24  <susin> artknish: is the RC out already?
+2011-05-26T02:00:36  <jarib> RC as in remote control, not release candidate
+2011-05-26T02:00:42  <jarib> oh, that's going to be confusing..
+2011-05-26T02:02:38  <binken> when release candidate  will be released
+2011-05-26T02:03:55  <jarib> binken: AFAIK there's only one blocker left
+2011-05-26T02:03:58  <jarib> so whenever that is fixed
+2011-05-26T02:05:05  <binken> haha very good news :)
+2011-05-26T02:07:48  *** ammar01 has quit IRC
+2011-05-26T02:12:18  <binken> Haha, time to off work
+2011-05-26T02:12:23  <binken> See you guys later :)
+2011-05-26T02:13:48  *** binken has quit IRC
+2011-05-26T02:15:40  *** ammar01 has joined #selenium
+2011-05-26T02:22:02  *** Ivog has joined #selenium
+2011-05-26T02:31:50  *** Ivog has quit IRC
+2011-05-26T02:38:46  *** Ivog has joined #selenium
+2011-05-26T02:50:36  *** lisak has joined #selenium
+2011-05-26T02:54:05  <lisak> anybody familiar with htmlUnit, do you know how to create Page object from String ?
+2011-05-26T02:56:31  <lisak> sorry for offtopic :)
+2011-05-26T02:57:41  *** susin has quit IRC
+2011-05-26T02:58:00  <AutomatedTester> a page object from a string?
+2011-05-26T02:58:23  <AutomatedTester> not sure I understand the question
+2011-05-26T02:59:41  *** aquarius1973 has joined #selenium
+2011-05-26T02:59:44  <lisak> AutomatedTester, http://stackoverflow.com/questions/6136435/how-to-create-htmlunit-page-object-from-string
+2011-05-26T03:00:07  <lisak> they seem to knowingly restrict this possibility
+2011-05-26T03:01:04  <AutomatedTester> a page object is a design pattern to help represent a web page
+2011-05-26T03:01:17  <AutomatedTester> i dont understand why you would want to make one from a string
+2011-05-26T03:01:32  <lisak> the String contains html page representation
+2011-05-26T03:01:35  <AutomatedTester> yay, SO is being slow
+2011-05-26T03:01:55  <AutomatedTester> so you build it on the fly
+2011-05-26T03:03:39  *** dmachi has quit IRC
+2011-05-26T03:03:50  *** dmachi has joined #selenium
+2011-05-26T03:04:01  <lisak> AutomatedTester, don't know what you mean ... use a parser ?
+2011-05-26T03:04:42  <AutomatedTester> lisak: so all your PO methods and that are created as well?
+2011-05-26T03:05:30  <AutomatedTester> DOM traversal and Page Objects is 2 different things
+2011-05-26T03:05:51  <AutomatedTester> :wiki page objects
+2011-05-26T03:05:52  <selbot2> 1: JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - http://code.google.com/p/selenium/wiki/JsonWireProtocol
+2011-05-26T03:05:52  <selbot2> 2: ChromeDriverInternals: Everything you ever wanted to know about the Chrome driver but were afraid to ask. - http://code.google.com/p/selenium/wiki/ChromeDriverInternals
+2011-05-26T03:05:52  <selbot2> 3: PageObjects: The Page Object pattern represents the screens of your web app as a series of objects - http://code.google.com/p/selenium/wiki/PageObjects
+2011-05-26T03:06:39  <lisak> I'm talking about htmlUnit. not selenium
+2011-05-26T03:06:44  <lisak> :)
+2011-05-26T03:07:04  <AutomatedTester> so you're talking about HTMLPage and not page objects then?
+2011-05-26T03:07:16  <lisak> yes, htmlUnit HTMLPage
+2011-05-26T03:07:20  <AutomatedTester> btw, Page Objects isnt a selenium thing
+2011-05-26T03:07:27  <AutomatedTester> like I said, its a design pattern
+2011-05-26T03:07:48  <lisak> I know. I didn't mean Page objects at all
+2011-05-26T03:09:17  <lisak> I'm using webdriver, but I do some additional tests and I just have the page already (in string representation) instead of getting it from server .. and I need to create HtmlUnit  HtmlPage
+2011-05-26T03:11:20  <AutomatedTester> right :)
+2011-05-26T03:12:21  <AutomatedTester> so you dont want webdriver to get the source for you?
+2011-05-26T03:14:09  *** mubbashir has joined #selenium
+2011-05-26T03:14:14  <lisak> AutomatedTester, no, this doesn't concern webdriver, I just hopped people know htmlUnit here :_
+2011-05-26T03:14:26  <lisak> I have problems with mailing list subscription
+2011-05-26T03:14:45  <AutomatedTester> doesnt htmlunit have a irc channel?
+2011-05-26T03:14:50  <lisak> no
+2011-05-26T03:14:57  <lisak> I suppose
+2011-05-26T03:14:59  <lisak> I was searching
+2011-05-26T03:15:35  <AutomatedTester> there is one on freenode but only has 1 person in it
+2011-05-26T03:16:32  *** samitbadle has joined #selenium
+2011-05-26T03:32:05  *** andialbrecht is now known as andialbrecht_
+2011-05-26T03:35:18  *** jimevans has joined #selenium
+2011-05-26T03:46:08  <freynaud> Hi jimevans:
+2011-05-26T03:50:11  <selbot2> Samit.Badle@gmail.com less than a minute ago - SamitBadle: Bumping versions for Selenium IDE release - http://code.google.com/p/selenium/source/detail?r=12256
+2011-05-26T03:51:32  <jimevans> freynaud: hi. what's up?
+2011-05-26T03:55:58  *** mario-go` is now known as mario-goulart
+2011-05-26T03:56:01  <freynaud> it's all broken :)
+2011-05-26T03:56:05  <freynaud> http://code.google.com/p/selenium/issues/detail?id=1700
+2011-05-26T03:56:18  <freynaud> do you think it can be video driver related ?
+2011-05-26T03:56:41  <freynaud> that would be horrible to have a specific card / driver as a resquirement for screenshots
+2011-05-26T03:57:10  <jimevans> it would be horrible if that's the case. every machine i've used, the code works as it should.
+2011-05-26T03:57:20  <AutomatedTester> damn these people and their long pages
+2011-05-26T03:57:29  <jimevans> yeah! :)
+2011-05-26T03:59:15  <jimevans> the screenshot code currently in the project is based on what nirvdrum did for snapsie.
+2011-05-26T03:59:37  <freynaud> have you tried on a plain winXP ?
+2011-05-26T03:59:51  <freynaud> without any of the dev stuff installed
+2011-05-26T04:00:29  <jimevans> not yet. i've also not tried it in a VM, which may throw all bets off.
+2011-05-26T04:00:29  <freynaud> for snapsie, there was some stuff to register, have you removed that entirely ?
+2011-05-26T04:00:48  <freynaud> i have the problem on my main machine
+2011-05-26T04:00:50  <freynaud> no VM
+2011-05-26T04:00:52  <jimevans> stuff to register? in the registry?
+2011-05-26T04:01:21  <freynaud> regsvr32 Snapsie.dll
+2011-05-26T04:01:43  <jimevans> no, we're not actually using the snapsie.dll. there's nothing to add to the registry.
+2011-05-26T04:02:37  <selbot`> New news from builds: IDE-JAVA-9 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-JAVA-9>
+2011-05-26T04:02:54  <freynaud> k
+2011-05-26T04:03:54  <jimevans> snapsie works on your machine, then?
+2011-05-26T04:03:58  <selbot`> New news from builds: IDE-PHP-13 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PHP-13> || IDE-PY-7 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PY-7>
+2011-05-26T04:03:58  <freynaud> yes
+2011-05-26T04:04:03  <jimevans> hmm.
+2011-05-26T04:04:13  <freynaud> it's not perfect, I see some lines where the scrolling happens
+2011-05-26T04:04:32  <freynaud> and it means i need to inject the JS and all that
+2011-05-26T04:04:53  <jimevans> wait, snapsie scrolls? i thought the whole point was so that we *didn't* scroll anymore.
+2011-05-26T04:04:54  <freynaud> i deleted everything as soon as you committed you proper full screen implementation
+2011-05-26T04:05:08  <freynaud> the original snapsie does
+2011-05-26T04:05:21  <jimevans> and kevin's modified one?
+2011-05-26T04:05:40  <freynaud> kevin's doesn't afaik
+2011-05-26T04:06:17  <jimevans> ok, then the question is: does kevin's modified snapsie.dll work in your environment?
+2011-05-26T04:06:26  <freynaud> never tried
+2011-05-26T04:06:43  <jimevans> if yes, then we've got some investigation to do; if no, then we've hit a limitation of the screenshot mechanism.
+2011-05-26T04:11:15  *** RossPatterson has joined #selenium
+2011-05-26T04:13:41  <jimevans> ok gotta run take the kids to school. back in awhile.
+2011-05-26T04:13:45  *** jimevans has left #selenium
+2011-05-26T04:16:47  <lisak> AutomatedTester, it looks you can instantiate java classes with non-public constructor from outside in groovy :_) http://stackoverflow.com/q/6136435/306488
+2011-05-26T04:18:01  *** celm has quit IRC
+2011-05-26T04:19:12  *** sburjan has quit IRC
+2011-05-26T04:19:14  <selbot`> New news from builds: IDE-EDITOR-118 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-118> || IDE-PERL-7 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PERL-7>
+2011-05-26T04:20:40  <selbot`> New news from builds: IDE-RB-9 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-RB-9>
+2011-05-26T04:23:19  *** red^ is now known as reddeviL
+2011-05-26T04:23:52  *** sburjan has joined #selenium
+2011-05-26T04:30:58  *** stepheneb has joined #selenium
+2011-05-26T04:41:31  <amitev> barancev: hello
+2011-05-26T04:46:43  <selbot`> New news from builds: IDE-GRV-11 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-GRV-11>
+2011-05-26T04:47:40  *** miker2 has joined #selenium
+2011-05-26T04:50:45  <selbot`> New news from builds: IDE-CSHARP-8 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-CSHARP-8>
+2011-05-26T04:53:36  *** curseg has joined #selenium
+2011-05-26T04:56:45  <selbot`> New news from builds: IDE-IDE-96 was SUCCESSFUL : Dependant of IDE-CSHARP-8 <http://xserve.openqa.org:8085/browse/IDE-IDE-96>
+2011-05-26T05:01:53  *** stepheneb has quit IRC
+2011-05-26T05:03:07  <selbot2> Samit.Badle@gmail.com less than 20 seconds ago - selenium-ide-1.0.11 - http://code.google.com/p/selenium/source/detail?r=12257
+2011-05-26T05:08:49  *** Ivog has quit IRC
+2011-05-26T05:11:09  *** cburroughs` has joined #selenium
+2011-05-26T05:13:16  *** samitbadle has quit IRC
+2011-05-26T05:16:09  *** mbeierl has joined #selenium
+2011-05-26T05:32:10  <selbot2> Samit.Badle@gmail.com less than a minute ago - SamitBadle: Bumping Selenium IDE versions for next release - http://code.google.com/p/selenium/source/detail?r=12258
+2011-05-26T05:39:50  *** Ivog has joined #selenium
+2011-05-26T05:40:54  <selbot`> New news from builds: IDE-EDITOR-119 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-119>
+2011-05-26T05:48:25  *** cgoldberg has joined #selenium
+2011-05-26T05:48:54  *** bebef_1987 has quit IRC
+2011-05-26T05:49:55  *** Ivog has quit IRC
+2011-05-26T05:49:59  *** Ivog_ has joined #selenium
+2011-05-26T05:55:19  *** soc42 has joined #selenium
+2011-05-26T05:55:41  *** stepheneb has joined #selenium
+2011-05-26T06:03:42  *** stepheneb has quit IRC
+2011-05-26T06:04:14  *** Ivog_ has quit IRC
+2011-05-26T06:06:58  <selbot`> New news from builds: IDE-IDE-97 was SUCCESSFUL : Dependant of IDE-EDITOR-119 <http://xserve.openqa.org:8085/browse/IDE-IDE-97>
+2011-05-26T06:09:04  *** soc42 has quit IRC
+2011-05-26T06:09:43  *** soc42 has joined #selenium
+2011-05-26T06:11:53  *** rbalent has quit IRC
+2011-05-26T06:12:24  *** rbalent has joined #selenium
+2011-05-26T06:14:43  *** rbalent has quit IRC
+2011-05-26T06:14:57  <mario-goulart> jarib: it seems that the 302 code for redirection was also the cause the the "Client error: 405 Method Not Allowed" error that I was getting yesterday with firefox.
+2011-05-26T06:15:13  <mario-goulart> of the*
+2011-05-26T06:21:13  *** soc42 has quit IRC
+2011-05-26T06:24:31  *** bebef_1987 has joined #selenium
+2011-05-26T06:28:23  *** Ivog has joined #selenium
+2011-05-26T06:30:37  *** soc42 has joined #selenium
+2011-05-26T06:36:38  *** Ivog has quit IRC
+2011-05-26T06:46:19  *** eranm has joined #selenium
+2011-05-26T06:46:48  <eranm> hello
+2011-05-26T06:46:51  <eranm> AutomatedTester: how's it going?
+2011-05-26T06:47:07  <AutomatedTester> hey eranm
+2011-05-26T06:47:09  <AutomatedTester> busy old day
+2011-05-26T06:47:22  <AutomatedTester> getting the work side of things done
+2011-05-26T06:47:45  <AutomatedTester> have a new VM that I am still setting up
+2011-05-26T06:49:13  <AutomatedTester> how was your flight?
+2011-05-26T06:49:33  <eranm> Not bad, not bad at all.
+2011-05-26T06:49:36  <eranm> Landed a couple of hours ago
+2011-05-26T06:49:46  <eranm> To discover that (yet again) the commit of the new Gecko 2 SDK to trunk failed
+2011-05-26T06:49:56  <AutomatedTester> hmm
+2011-05-26T06:50:07  <eranm> It's a huge commit
+2011-05-26T06:50:08  *** Mephian1 has quit IRC
+2011-05-26T06:50:25  <eranm> so if this one fails again I'll commit the linux, windows and mac ones separately
+2011-05-26T06:50:34  *** Mephian has joined #selenium
+2011-05-26T06:57:15  <AutomatedTester> days like today I wish i had corporate speed internet into my house
+2011-05-26T06:58:15  <eranm> Do you WFH permanently?
+2011-05-26T06:58:44  <AutomatedTester> eranm: yup
+2011-05-26T06:59:03  *** Ivog has joined #selenium
+2011-05-26T06:59:13  <AutomatedTester> i live out in the middle of no where, there are no co-working areas
+2011-05-26T06:59:35  <AutomatedTester> saves on travel though ;)
+2011-05-26T07:01:11  <eranm> Indeed, that's one serious benefit
+2011-05-26T07:01:33  *** QAguy has joined #selenium
+2011-05-26T07:01:34  <eranm> Are you with Virgin as an ISP?
+2011-05-26T07:01:49  <AutomatedTester> no, locked into a deal from before I started
+2011-05-26T07:01:58  <AutomatedTester> plus thinking of moving home
+2011-05-26T07:02:05  <AutomatedTester> normally its ok
+2011-05-26T07:02:15  <AutomatedTester> its only when I need to download a lot it annoys me
+2011-05-26T07:03:15  <eranm> Perhaps you're being throttled, may be worth calling up your ISP and complaining. I've heard it sometimes does wonders to your downlink speeds :)
+2011-05-26T07:05:07  *** sburjan has quit IRC
+2011-05-26T07:05:08  <AutomatedTester> might be worth doing that
+2011-05-26T07:09:36  <eranm> I'm unpacking, but I'm around here if anybody has questions
+2011-05-26T07:10:13  <eranm> I'm pushing the new Gecko SDK, the changes required to make the native component of the Firefox extension compile on the Gecko 2 SDK will soon follow
+2011-05-26T07:10:51  <eranm> I was hoping to push the release tomorrow, but there's this blocking issue with Selenium RC. If you want to send me a patch to try out, I"d be happy to
+2011-05-26T07:11:20  *** XCulver has joined #selenium
+2011-05-26T07:12:48  <pngl> Is it possible to upload files in IO with selenium 2?
+2011-05-26T07:12:57  <pngl> :s/IO/IE
+2011-05-26T07:13:03  <AutomatedTester> yes
+2011-05-26T07:17:18  *** adamgoucher has quit IRC
+2011-05-26T07:18:33  <AutomatedTester> eranm: checking out the code to my new vm
+2011-05-26T07:19:54  *** stepheneb has joined #selenium
+2011-05-26T07:25:38  *** Ivog has quit IRC
+2011-05-26T07:27:59  *** mubbashir has quit IRC
+2011-05-26T07:28:05  *** yg has joined #selenium
+2011-05-26T07:29:01  <yg> hello is somebody there?
+2011-05-26T07:30:18  <AutomatedTester> nobody is here
+2011-05-26T07:32:52  <eranm> Not even one.
+2011-05-26T07:33:06  <AutomatedTester> nope, nobody...
+2011-05-26T07:34:15  <AutomatedTester> *sigh* trunk is big
+2011-05-26T07:34:43  <wilhelm> yg: The correct lyrics are “Is there anybody out there?”, repeated four times.
+2011-05-26T07:35:08  <ato> :yt is anybody out there?
+2011-05-26T07:35:09  <selbot2> PINK FLOYD - Is there anybody out there? - http://www.youtube.com/watch?v=aHN6AViJAvI&feature=youtube_gdata
+2011-05-26T07:35:42  <eranm> AutomatedTester: it's about to get bigger *grin*
+2011-05-26T07:36:03  <AutomatedTester> eranm: did you strip the linux stuff of symbols?
+2011-05-26T07:36:07  <ato> eranm: What evilness are you planning?
+2011-05-26T07:36:25  <eranm> I'm checking in the Gecko 2 SDK for Mac, Linux and Windows
+2011-05-26T07:36:29  <eranm> so we can build the extension for Firefox 4
+2011-05-26T07:36:45  * ato cries.
+2011-05-26T07:36:49  *** andytinkham has joined #selenium
+2011-05-26T07:36:57  <eranm> AutomatedTester: turns out that libxul.so was not stripped in in Gecko SDK 1.9 as well
+2011-05-26T07:37:04  <eranm> so I'm not really sure why it's 263MB in size
+2011-05-26T07:37:30  <AutomatedTester> the old VP of Engineering spotted it had cruft
+2011-05-26T07:37:37  <AutomatedTester> dunno what they are going to do about it
+2011-05-26T07:38:06  <eranm> I'm thinking of adding a script that will download the SDK for you and unpack it
+2011-05-26T07:38:25  <eranm> Easy to do in Linux, less trivial in Mac / Windows (no wget by default)
+2011-05-26T07:38:42  <ato> The repo is 454M now.
+2011-05-26T07:38:57  <AutomatedTester> o hai Firefox 7
+2011-05-26T07:40:02  <eranm> jarib: what's the easiest way to combine a script that fetches and unpacks a dependency into the ruby-based build system? is there a wget-like ruby library that we can incorporate?
+2011-05-26T07:40:54  <yg> can anybody tell me how can i switch from 1tab to another and check that with selenium? (in perl)
+2011-05-26T07:41:26  <eranm> yg, I take it you're using Selenium 1, because Selenium 2 does not support multiple tabs (at  least not on Firefox)
+2011-05-26T07:41:55  <yg> for the java-server?
+2011-05-26T07:42:11  <AutomatedTester> for Firefox its not supported in Se1 and Se2
+2011-05-26T07:42:58  <yg> in which browser it's supported?
+2011-05-26T07:43:40  <AutomatedTester> *maybe* chrome
+2011-05-26T07:43:52  <AutomatedTester> but you switch window and it switches tab
+2011-05-26T07:44:35  <yg> how can i handle such cases?
+2011-05-26T07:46:07  <yg> one more question: in selenium ide you can choose how quickly the test will execute, is it possible to choose that with an option in perl script?
+2011-05-26T07:47:16  <AutomatedTester> yg: you can do setSpeed but that is not recommended
+2011-05-26T07:47:27  <yg> why not?
+2011-05-26T07:47:28  <AutomatedTester> your test should have decent wait methods
+2011-05-26T07:47:52  <AutomatedTester> because if your site becomes slow or on a slow connection, you will need to tweak the speed
+2011-05-26T07:47:56  <AutomatedTester> thats bad practise
+2011-05-26T07:48:50  <yg> the only reason why i want to use it: i changed the DISPLAY to windows machines and i can't see all the tests so quickl (just for testing one time)
+2011-05-26T07:49:15  <yg> for automatic tests i will switched off that
+2011-05-26T07:50:44  <yg> my $sel = Test::WWW::Selenium->new( host => $host, .... and then setSpeed = ???,
+2011-05-26T07:51:07  <AutomatedTester> something like that
+2011-05-26T07:51:08  <yg> or $sel->setSpeed=???
+2011-05-26T07:51:10  *** santiycr has quit IRC
+2011-05-26T07:51:15  <AutomatedTester> i dont know the perl syntax
+2011-05-26T07:52:07  <selbot2> eran.mes@gmail.com about 1 hour ago - EranMes: Adding Gecko SDK 2 for Windows, Mac and Linux. Trimmed sdk/lib/ from all distributions as it is essentially the same as lib/ - http://code.google.com/p/selenium/source/detail?r=12259
+2011-05-26T07:52:12  *** esteele|away has quit IRC
+2011-05-26T07:53:31  <eranm> Yes! My huge commit went through.
+2011-05-26T07:53:33  *** jimevans has joined #selenium
+2011-05-26T07:53:43  <eranm> Morning jimevans
+2011-05-26T07:53:53  <jimevans> hi eranm.
+2011-05-26T07:56:12  <eranm> jimevans: did you have a chance to look at why file upload tests are failing on IE8 on WinXP?
+2011-05-26T07:56:36  <jimevans> i didn't realize they were.
+2011-05-26T07:57:23  <jimevans> are they failing on your local machine?
+2011-05-26T07:58:07  <eranm> Yes
+2011-05-26T07:58:09  <eranm> On a VM
+2011-05-26T07:58:17  <eranm> Let me fire it up and tell you exactly which one
+2011-05-26T07:58:42  <jimevans> running the tests from the command line?
+2011-05-26T08:00:27  <eranm> yes
+2011-05-26T08:00:57  <jimevans> do you have visual studio on that vm?
+2011-05-26T08:01:37  <yg> the command set_speed_ok does not work, but it is in ide avalaible
+2011-05-26T08:02:56  <yg> ah sorry my mistake
+2011-05-26T08:05:19  *** vrockai has quit IRC
+2011-05-26T08:06:35  *** |izzie has quit IRC
+2011-05-26T08:08:00  <eranm> jimevans: yes
+2011-05-26T08:08:03  <eranm> VS2008
+2011-05-26T08:08:14  <selbot`> New news from builds: S2JS-TESTS-12 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-12>
+2011-05-26T08:08:49  *** eranm_ has joined #selenium
+2011-05-26T08:09:12  <jimevans> eranm: silly thought, but double-check to make sure you don't have the VS Development Web Server running.
+2011-05-26T08:09:20  <jimevans> it'd be an icon in your system tray.
+2011-05-26T08:12:06  <selbot2> james.h.evans.jr@gmail.com less than 10 seconds ago - JimEvans: Updating Mixed Platforms configuration, and changing test website development server port - http://code.google.com/p/selenium/source/detail?r=12260
+2011-05-26T08:12:32  *** eranm has quit IRC
+2011-05-26T08:12:32  *** eranm_ is now known as eranm
+2011-05-26T08:13:59  *** antlong has joined #selenium
+2011-05-26T08:15:50  *** santiycr has joined #selenium
+2011-05-26T08:16:27  *** andytinkham has quit IRC
+2011-05-26T08:22:40  *** yg has quit IRC
+2011-05-26T08:26:26  <jimevans> eranm: were you able to check to see if WebDev.WebServer.exe is running on your XP machine? (task manager is your best bet to see this)
+2011-05-26T08:26:34  <eranm> Not yet
+2011-05-26T08:26:41  <eranm> Rebooting, I'll check that as soon as I get back
+2011-05-26T08:26:53  <eranm> Will be able to provide a proper exception
+2011-05-26T08:26:54  <jimevans> if you're rebooting, then it won't be running.
+2011-05-26T08:26:54  <eranm> brb
+2011-05-26T08:27:21  <eranm> I hardly think I had it running in the first place - it's a windows XP vm and the only thing I installed on it is VS2008
+2011-05-26T08:28:23  <jimevans> it runs only in the context of a VS session.
+2011-05-26T08:28:25  <jimevans> it's a shot-in-the-dark.
+2011-05-26T08:29:30  <jimevans> never mind. you're talking about running the java tests, so what i'm chasing down is a moot point anyway.
+2011-05-26T08:31:40  <selbot`> New news from builds: S2J-FXLX-194 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-194>
+2011-05-26T08:38:21  *** eranm has quit IRC
+2011-05-26T08:42:24  *** lisak has quit IRC
+2011-05-26T08:43:15  *** curseg has quit IRC
+2011-05-26T08:43:32  *** curseg has joined #selenium
+2011-05-26T08:52:33  <AutomatedTester> is eranm coming back?
+2011-05-26T08:52:45  *** secoif has quit IRC
+2011-05-26T08:53:24  *** secoif has joined #selenium
+2011-05-26T08:55:18  <jimevans> AutomatedTester: I assume so, but I've no idea.
+2011-05-26T08:56:28  *** curseg1 has joined #selenium
+2011-05-26T08:58:12  <AutomatedTester> i hate setting up a new vm
+2011-05-26T08:59:08  *** pnitin has quit IRC
+2011-05-26T08:59:25  *** curseg has quit IRC
+2011-05-26T08:59:29  <AutomatedTester> :wiki buildingwebdriver
+2011-05-26T08:59:30  <selbot2> 1: BuildingWebDriver: Instructions on how to build WebDriver - http://code.google.com/p/selenium/wiki/BuildingWebDriver
+2011-05-26T08:59:30  <selbot2> 2: CheckOut: Getting hold of the source in order to build WebDriver - http://code.google.com/p/selenium/wiki/CheckOut
+2011-05-26T09:00:18  *** retornam has joined #selenium
+2011-05-26T09:04:08  *** eranm has joined #selenium
+2011-05-26T09:05:35  <eranm> jimevans: running the tests now. Will have a proper stack trace in 15 minutes at least :)
+2011-05-26T09:05:43  <jimevans> ok good.
+2011-05-26T09:10:27  <AutomatedTester> eranm: forgot i needed to install the world to get crazybuild running
+2011-05-26T09:10:33  <AutomatedTester> so on the last item
+2011-05-26T09:10:37  <AutomatedTester> java
+2011-05-26T09:15:13  <eranm> Aye?
+2011-05-26T09:15:50  *** Spanktar has joined #selenium
+2011-05-26T09:20:04  <AutomatedTester> then will see if my new Windows VM reproduces your rc issue
+2011-05-26T09:20:10  <AutomatedTester> but first its supper time
+2011-05-26T09:20:12  <AutomatedTester> bbl
+2011-05-26T09:20:19  <jarib> eranm: no easy way to add new ruby deps at the moment
+2011-05-26T09:20:43  <jarib> simon wants us to bundle it in the jruby jar
+2011-05-26T09:21:11  <jarib> though i have some just packaged as standalone jars as well (in third_party/jruby/*.jar)
+2011-05-26T09:21:20  <jarib> the latter is a lot easier to create
+2011-05-26T09:21:40  <jarib> though if you want, i could update the jruby-complete.jar to the latest jruby + add whatever you need
+2011-05-26T09:22:10  <jarib> jimevans: still having some issues with flaky implicit waits on IE
+2011-05-26T09:22:19  <jarib> though it doesn't seem to happen if i run the test in isolation
+2011-05-26T09:22:39  <eranm> what I want is for the build system to discover you don't have the Gecko SDK on your machine, download the right one and unpack it into third_party
+2011-05-26T09:22:45  <jarib> ah
+2011-05-26T09:22:49  <jarib> i misunderstood
+2011-05-26T09:23:04  <eranm> But I understand that for this I need to write some ruby code to do that and integrate it into our build rules
+2011-05-26T09:23:19  <jarib> that should be simple
+2011-05-26T09:23:33  <eranm> The question is, if there's some convenient library to fetch a URL and save it to a file.
+2011-05-26T09:23:50  <jarib> you can use net/http (from ruby's stdlib)
+2011-05-26T09:23:59  <jarib> i'll get you an example for a large download
+2011-05-26T09:24:28  <dawagner> I have actual XP and Win7 machines kicking about, if anyone wants help reproing anything?
+2011-05-26T09:24:48  <jarib> dawagner: ./go //rb:ie-test
+2011-05-26T09:25:11  <dawagner> Preferred OS version?
+2011-05-26T09:25:19  <dawagner> (And any particular IE version?)
+2011-05-26T09:25:24  <jarib> about 50% of the time you'll see the implicit wait test fail
+2011-05-26T09:25:34  <jarib> it has happend to me on both xp and win 7
+2011-05-26T09:25:40  <jarib> with IE 8 and IE 9
+2011-05-26T09:26:08  <jarib> so actually, i do know it's reproducable
+2011-05-26T09:26:19  <jarib> but if you want something to do, go ahead :)
+2011-05-26T09:27:32  <dawagner> Well, tests are failing without IE actually spawning for me...
+2011-05-26T09:28:05  <jimevans> guys, i'll try to hop on later to help debug these issues, but i've got to take patty back to the emergency room.
+2011-05-26T09:28:20  <jimevans> think there may be complications from her spinal tap on monday
+2011-05-26T09:28:34  <dawagner> Best wishes to her!
+2011-05-26T09:28:47  *** sfbrian has joined #selenium
+2011-05-26T09:28:48  <jarib> jimevans: hope it works out well
+2011-05-26T09:29:05  <jimevans> dawagner: make sure you set your protected mode settings. at present the ie driver aborts if PM settings aren't the same for all zones.
+2011-05-26T09:29:40  *** jimevans has left #selenium
+2011-05-26T09:30:38  <eranm> dawagner: do you have FF4 on any of the Windows machines, as the default browser? If so, go test_selenium should reproduce the issue with alerts making the tests hang
+2011-05-26T09:31:01  <dawagner> I'll install it :)
+2011-05-26T09:32:43  <dawagner> jarib: Got the implicit wait failure!
+2011-05-26T09:33:53  <jarib> ok, good
+2011-05-26T09:34:04  <jarib> then it's not just me
+2011-05-26T09:35:00  <eranm> dawagner: when are you starting, btw?
+2011-05-26T09:35:19  <dawagner> eranm: July 4th :) Any idea whether you'll be in the country!/
+2011-05-26T09:36:03  <eranm> At the moment it looks like I'll be in the UK. But you never know what the day will bring...
+2011-05-26T09:36:16  <jarib> eranm: https://gist.github.com/993495
+2011-05-26T09:36:19  <dawagner> heh cool :)
+2011-05-26T09:39:16  *** antlong has quit IRC
+2011-05-26T09:39:49  *** andytinkham has joined #selenium
+2011-05-26T09:40:01  <dawagner> Our tests rely on yahoo.com? Hmm...
+2011-05-26T09:40:14  <dawagner> selenium:firefox-rc-test passed fine for me
+2011-05-26T09:47:56  *** shadowolf2 has joined #selenium
+2011-05-26T09:49:42  *** shadowolf_ has quit IRC
+2011-05-26T09:55:04  *** bebef_1987 has quit IRC
+2011-05-26T09:58:10  <AutomatedTester> dawagner: is that your first day? 4 July
+2011-05-26T09:59:21  <dawagner> AutomatedTester: Yeah
+2011-05-26T09:59:55  <AutomatedTester> i am visiting eBay at the end of that week
+2011-05-26T10:00:03  <AutomatedTester> visiting freynaud
+2011-05-26T10:00:06  <phdaemon> hey guys
+2011-05-26T10:00:27  <phdaemon> quick question: im getting this XHR ERROR: URL Response_Code = -1 Error_Message = Request Error.
+2011-05-26T10:00:32  <phdaemon> even tho the link works.
+2011-05-26T10:01:03  <phdaemon> The link redirects me to another page (as it should) and Selenium is throwing a fit through the RC server.... anyone encountered something like this before?
+2011-05-26T10:02:00  *** Nirdosh has joined #selenium
+2011-05-26T10:03:51  <selbot2> berrada@google.com half a minute ago - DouniaBerrada: Implementing BrowserConnection for Android. - http://code.google.com/p/selenium/source/detail?r=12261
+2011-05-26T10:04:36  *** cakehero has joined #selenium
+2011-05-26T10:10:06  <selbot2> berrada@google.com half a minute ago - DouniaBerrada: Adding BrowserConnectio to android client - http://code.google.com/p/selenium/source/detail?r=12262
+2011-05-26T10:11:33  *** mashiara has quit IRC
+2011-05-26T10:12:02  <eranm> dawagner: Where is Firefox 4 installed on your machine?
+2011-05-26T10:13:02  <dawagner> eranm: C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+2011-05-26T10:13:08  <dawagner> On Windows 7 x64
+2011-05-26T10:15:33  *** shadowolf2 has quit IRC
+2011-05-26T10:15:33  *** pngl has quit IRC
+2011-05-26T10:15:33  *** AutomatedTester has quit IRC
+2011-05-26T10:15:34  *** esto has quit IRC
+2011-05-26T10:16:27  *** shadowolf2 has joined #selenium
+2011-05-26T10:16:27  *** pngl has joined #selenium
+2011-05-26T10:16:27  *** AutomatedTester has joined #selenium
+2011-05-26T10:16:27  *** esto has joined #selenium
+2011-05-26T10:17:37  *** brettporter has quit IRC
+2011-05-26T10:18:12  *** pnitin has joined #selenium
+2011-05-26T10:33:48  <eranm> dawagner: do you have Firefox 3 installed anywhere else on the system?
+2011-05-26T10:34:07  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Building the native component of the Firefox extension using Gecko 2 SDK. Check-in includes compiled binaries for Windows, Linux. The I18nTest was disabled as there are incompatibilites with Gecko 2. - http://code.google.com/p/selenium/source/detail?r=12263
+2011-05-26T10:36:11  <selbot`> New news from builds: S2J-FXLX-195 was SUCCESSFUL (with 643 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-195>
+2011-05-26T10:36:15  *** damienka has joined #selenium
+2011-05-26T10:38:12  <dawagner> eranm: Nope, got overwritten when 4 was installed
+2011-05-26T10:39:44  <ato> jarib: Has there been any talk recently about how to deal with vendor specific extensions to WebDriver?
+2011-05-26T10:40:02  <ato> I believe you suggested an interface-style approach?
+2011-05-26T10:41:41  <jarib> i don't think it's been discussed. i remember suggesting that for the watir api, not really sure what would make sense in java
+2011-05-26T10:42:42  <jarib> this would be a good question for the selenium-dev list
+2011-05-26T10:43:21  <ato> I think we're approaching the point where I feel like I'm just cluttering up the API.
+2011-05-26T10:43:45  <ato> We've exposed preferences, cookies, version stuff, getters for paths, products, etc.
+2011-05-26T10:43:48  <eranm> ato: on which extensions are you working?
+2011-05-26T10:44:32  <eranm> Preferences we're trying to fit into the DesiredCapabilities approach (which is just a key,value map and is browser-specific already)
+2011-05-26T10:44:36  <ato> eranm: Well, as I said, cookies, preferences, utilities (version, paths, pid, &c.)
+2011-05-26T10:45:20  <eranm> What's lacking from the existing cookies API? Do you allow setting cookies on domains not visited yet?
+2011-05-26T10:45:33  *** pngl has quit IRC
+2011-05-26T10:45:45  <ato> Ah, I suppose cookies is a part of the official API.
+2011-05-26T10:47:02  *** tunabum has quit IRC
+2011-05-26T10:48:00  <eranm> jarib: thanks for the code snippet!
+2011-05-26T10:48:30  <eranm> I think only the utilities bit does not fit well with the existing API
+2011-05-26T10:50:47  *** reddeviL is now known as red^
+2011-05-26T10:51:07  <ato> eranm: We've also added an entire API for interacting with the browser UI which is quite extensive.
+2011-05-26T10:51:18  <ato> eranm: Although at the moment that's in a separate OperaDesktopDriver.
+2011-05-26T10:54:18  *** melter has quit IRC
+2011-05-26T10:56:14  *** melter has joined #selenium
+2011-05-26T10:56:31  <selbot`> New news from builds: S2J-FXLX-196 was SUCCESSFUL (with 642 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-196>
+2011-05-26T10:58:59  <AutomatedTester> yay! buildings on my new vm
+2011-05-26T10:59:13  <AutomatedTester> only 28 hrs from start to finish
+2011-05-26T10:59:20  <AutomatedTester> start of download of VM
+2011-05-26T10:59:34  <dawagner> AutomatedTester: Vagrant?
+2011-05-26T10:59:57  <AutomatedTester> dawagner: its on mbp so need to use Mozilla ones
+2011-05-26T11:03:38  *** QAguy has quit IRC
+2011-05-26T11:04:22  <AutomatedTester> dawagner: so I am assuming Simon is about for your first week
+2011-05-26T11:04:44  <AutomatedTester> or are you at the whim of the HR people when you get assimilated?
+2011-05-26T11:05:14  <dawagner> Who knows!? I *hope* Simon's around, but I wouldn't put it past him to be in Australia or something
+2011-05-26T11:05:21  *** rpk has joined #selenium
+2011-05-26T11:05:47  <dawagner> Pretty sure my first day is written off, I would guess the first week is fairly HRy (certainly was last time, but then, as I've gone through at least some of it already, maybe I can duck out of a bit...)
+2011-05-26T11:06:05  <AutomatedTester> you moving to London or doing the commute?
+2011-05-26T11:06:30  <dawagner> I'm actually packing up all my stuff as we speak :)
+2011-05-26T11:06:36  <AutomatedTester> cool
+2011-05-26T11:06:53  <dawagner> Cool, also, dull
+2011-05-26T11:07:00  <dawagner> :p
+2011-05-26T11:07:17  <AutomatedTester> maybe I can convince freynaud to pay for supper for me on eBay and we can do a liquid meal on the Thursday :D
+2011-05-26T11:07:43  <dawagner> Love to! Whereabouts are eBay?
+2011-05-26T11:07:56  <AutomatedTester> eranm: mutha chuffer, the RC tests pass on my new VM
+2011-05-26T11:08:13  <dawagner> Where have they actually failed?
+2011-05-26T11:08:16  <AutomatedTester> for firefox
+2011-05-26T11:08:32  <AutomatedTester> dawagner: apparently we cant override alerts in Se1
+2011-05-26T11:08:43  <AutomatedTester> but I cant see it so cant attempt to fix it
+2011-05-26T11:08:52  <dawagner> For whom? Has anyone actually seen it!?
+2011-05-26T11:09:03  *** damienka has quit IRC
+2011-05-26T11:09:08  <AutomatedTester> apparently so
+2011-05-26T11:09:17  *** QAguy has joined #selenium
+2011-05-26T11:09:25  <AutomatedTester> its apparently a blocker
+2011-05-26T11:09:56  <dawagner> Got a bug report somewhere?
+2011-05-26T11:10:04  <AutomatedTester> eranm: ^^
+2011-05-26T11:10:20  <AutomatedTester> i think #1418 is part of the issue
+2011-05-26T11:10:21  <selbot2>  closed/fixed Mac+Chrome - Non printable keys not working properly - http://code.google.com/p/selenium/issues/detail?id=1418
+2011-05-26T11:10:27  <AutomatedTester> oh thats not it
+2011-05-26T11:10:31  <AutomatedTester> #1416
+2011-05-26T11:10:32  <selbot2>  open/new selenium beta ignores path [with fix] - http://code.google.com/p/selenium/issues/detail?id=1416
+2011-05-26T11:10:46  <AutomatedTester> *sigh* i cant remember
+2011-05-26T11:10:52  <AutomatedTester> jarib: do you know?
+2011-05-26T11:11:21  <jarib> nope
+2011-05-26T11:11:51  <AutomatedTester> apparently it only happens in win7
+2011-05-26T11:11:55  <AutomatedTester> with fx4
+2011-05-26T11:12:01  <AutomatedTester> other than that I have no idea
+2011-05-26T11:13:34  <dawagner> How curious!
+2011-05-26T11:13:55  <jarib> hmm
+2011-05-26T11:14:03  <jarib> i have a new vm with win7 and fx4
+2011-05-26T11:14:10  <jarib> go test_selenium?
+2011-05-26T11:14:24  <dawagner> jarib: That's what eranm told me to do :)
+2011-05-26T11:14:34  <jarib> and it passed?
+2011-05-26T11:14:39  <dawagner> Yep
+2011-05-26T11:15:05  <jarib> guess it's time to release then!
+2011-05-26T11:15:13  <dawagner> :D
+2011-05-26T11:15:51  <dawagner> AutomatedTester/jari: Were yours x86 or x64 OSs? (Not that it *should* matter, as it's an x86 process either way...)
+2011-05-26T11:16:34  <jarib> x86 here
+2011-05-26T11:16:43  <jarib> i'm running the target now
+2011-05-26T11:16:53  *** soc42 has quit IRC
+2011-05-26T11:19:45  <dawagner> Mine was x64
+2011-05-26T11:20:03  <jarib> i think AutomatedTester's is x86
+2011-05-26T11:21:46  *** admc has joined #selenium
+2011-05-26T11:22:47  <jarib> perhaps it's a 4.0.0 issue?
+2011-05-26T11:24:59  <dawagner> Could be, I'm 4.0.1
+2011-05-26T11:26:14  <jarib> so ami
+2011-05-26T11:30:43  <rpk> Hey, can anyone help me troubleshoot calling clear on a text input?  I think my ExpectedCondition block is incorrect as well, which jarib suggested yesterday.
+2011-05-26T11:31:31  <jarib> rpk: show us the code? http://gist.github.com
+2011-05-26T11:31:33  <rpk> Oh, and Selenium officially got picked today at our planning meeting over Oracle OATS, so thanks for all the help in the last two days.
+2011-05-26T11:31:51  <jarib> :D cool
+2011-05-26T11:31:57  <RossPatterson> w00t
+2011-05-26T11:32:14  <jarib> that's nice to hear, considering your hostname :)
+2011-05-26T11:33:50  <rpk> https://gist.github.com/993756
+2011-05-26T11:35:16  <rpk> Oh, and ignore the random characters at the bottom... firefox crashed when I tried to submit and I switched to chrome to post the gist, and apparently switching focus failed.
+2011-05-26T11:37:12  <jarib> rpk: the code looks ok. didn't you say that adding a sleep didn't solve your clear() problem yesterday?
+2011-05-26T11:37:23  <rpk> Yeah, adding a sleep didn't help either
+2011-05-26T11:37:43  <jarib> is this on Windows?
+2011-05-26T11:38:26  <rpk> Application is hosted on ubuntu inside weblogic, I've run it both locally (through firefox driver) and through the hub I had set up (both firefox and chrome).
+2011-05-26T11:38:31  <rpk> Its all java though.
+2011-05-26T11:38:56  <jarib> so the browser is running on linux?
+2011-05-26T11:38:57  <dawagner> rpk: What's going wrong with it?
+2011-05-26T11:39:02  <rpk> Unfortunately I don't have an externally accessible ip, so I can't make the app available (its just a demo app)
+2011-05-26T11:39:10  <rpk> jarib: oh, sorry, the remote machine was windows
+2011-05-26T11:39:16  <jarib> right
+2011-05-26T11:39:34  <rpk> dawagner: Calling clear on the field isn't clearing it.  However, sendKeys works just fine
+2011-05-26T11:40:10  <jarib> rpk: you may want to try turning off native events; windows is the only platform where it's enabled by default
+2011-05-26T11:40:30  <rpk> Shouldn't that not affect my tests in ubuntu?
+2011-05-26T11:40:49  <rpk> I will though if it'd be helpful, just point me at how to do it
+2011-05-26T11:40:54  <jarib> oh, so it fails also when the browser is running on ubuntu?
+2011-05-26T11:41:04  <rpk> Yeah
+2011-05-26T11:41:08  <jarib> ah, ok
+2011-05-26T11:41:10  <jarib> forget that then
+2011-05-26T11:41:25  <dawagner> Just to check, timeRemaining is the only element you're actually trying to clear, right?
+2011-05-26T11:42:04  <rpk> let me try again.  My machine (ubuntu 11.04) has the webserver running in weblogic, the app is using gwt, and I've tested locally (firefox 4.01) and remotely (through hub, server on my ubuntu machine, node is a windows XP machine in (firefox and chrome 13.x)
+2011-05-26T11:42:15  <rpk> timeRemaining is the only element, yeah.
+2011-05-26T11:42:52  <rpk> It definitely finds it, each set of values has a series of 1s after the original values.  XD
+2011-05-26T11:43:14  *** larrys has quit IRC
+2011-05-26T11:43:20  <rpk> I can remove the for loop and WebElement List if that'd be helpful
+2011-05-26T11:43:31  <dawagner> bizarre. Looks exactly right...
+2011-05-26T11:44:06  <rpk> Yeah, I'm guessing it has to be some problem with gwt.  Should I try writing a test against like google.com, and calling clear on that?
+2011-05-26T11:44:14  <dawagner> Ooh wait
+2011-05-26T11:44:25  <dawagner> What kind of element is the timeRemaining?
+2011-05-26T11:44:45  <jarib> perhaps it's a super special GWT text field
+2011-05-26T11:45:04  <jarib> made up of 233 <div>s
+2011-05-26T11:45:07  <dawagner> I'm hoping it's an actual <input type="text" />, though it's gwt so I doubt it :P
+2011-05-26T11:46:19  <rpk> Let me grab the html for you.
+2011-05-26T11:46:53  <rpk> <input disabled="disabled" id="gwt-debug-remainingSpinner" class="gwt-TextBox" type="text">
+2011-05-26T11:47:02  <dawagner> Woo! that'd be the reason
+2011-05-26T11:47:04  <rpk> Its inside a td for some disturbing reason
+2011-05-26T11:47:05  <dawagner> 		        	return d.findElement(By.id("gwt-debug-remainingSpinner")).getText().equals("");
+2011-05-26T11:47:06  <rpk> too
+2011-05-26T11:47:06  <dawagner> Needs to be
+2011-05-26T11:47:12  <dawagner> 		        	return d.findElement(By.id("gwt-debug-remainingSpinner")).getAttribute("value").equals("");
+2011-05-26T11:47:14  <dawagner> Give that a go
+2011-05-26T11:47:33  <jarib> ah
+2011-05-26T11:47:35  <jarib> right.
+2011-05-26T11:47:59  <jarib> well. if it's a <td>, .clear() won't work
+2011-05-26T11:48:08  <dawagner> This is the most common gotcha I've experienced.  And why I'd quite like to find a nice solution... Bleugh
+2011-05-26T11:48:32  <rpk> Its just chilling, and I'm guessing timed out
+2011-05-26T11:48:45  <jarib> rpk: you can try typing "ctrl-a, backspace" into the element
+2011-05-26T11:48:51  <rpk> yeah, it timed out after waiting, I'm guessing clear never did anything
+2011-05-26T11:48:53  <jarib> dawagner can show you the java syntax to do that
+2011-05-26T11:48:57  <jarib> :)
+2011-05-26T11:48:57  <rpk> jarib: why wouldn't clear work though?
+2011-05-26T11:49:22  <rpk> dawagner: and is there a specific reason why getText doesn't ... get the text?
+2011-05-26T11:49:24  *** Mephian has quit IRC
+2011-05-26T11:49:47  <jarib> rpk: it gets the innerText of the element
+2011-05-26T11:49:50  *** Mephian has joined #selenium
+2011-05-26T11:50:10  <rpk> jarib: but wouldn't that not make sense for input elements?
+2011-05-26T11:51:35  <jarib> rpk: consider <div id="a">name: <input id="b" value="foo"></div>
+2011-05-26T11:51:42  <dawagner> By the way, the java for that is element.sendKeys(Keys.CONTROL, "a", Keys.BACK_SPACE);
+2011-05-26T11:51:45  <rpk> Also, just curious, wouldn't it make sense to add a "setText" method that did clear + sendKeys?
+2011-05-26T11:51:55  <jarib> rpk: what would you expect .getText() to return?
+2011-05-26T11:52:23  <jarib> on either element?
+2011-05-26T11:52:44  <rpk> jarib: if the id b was the element selected, I would expect the text that currently appears in that input
+2011-05-26T11:52:50  <jarib> and if a?
+2011-05-26T11:53:01  <dawagner> rpk: I tend to end up with a setText method of my own, but there are too many options for events for us to give a sensible default; either we backspace through them all, or we select and backspace (control may have special meaning?), or we clear with javascript, or...?
+2011-05-26T11:53:09  <rpk> If a, I would expect the entire innerhtml
+2011-05-26T11:53:27  <dawagner> By "the entire innerhtml" does that include "foo" or not?
+2011-05-26T11:53:38  <jarib> so a.getText() == 'name <input id="b" value="foo">' ?
+2011-05-26T11:53:59  <rpk> Yeah, I think so, whatever would be consistent with say the same jquery call
+2011-05-26T11:55:35  <rpk> dawagner: I think clear with javascript would honestly be the best approach for people using a setText function.  They expect that whatever text was there is now replaced with the new text.  Similar to the java approach in swing.
+2011-05-26T11:56:02  <rpk> (but I've only been using it for two days, so what do I know)
+2011-05-26T11:56:15  <jarib> rpk: jquery would give you "name: "
+2011-05-26T11:56:47  *** tunabum has joined #selenium
+2011-05-26T11:56:53  <jarib> and then if b.getText() == "foo", it's just super inconsistent
+2011-05-26T11:56:56  <rpk> jarib: I suppose I expect that then?  I think consistency with javascript functionality of the same names in jquery / prototype would be the correct implementation
+2011-05-26T11:57:43  <jarib> rpk: jquery gives you an empty string if you call .text() on a text field
+2011-05-26T11:58:09  *** larrys has joined #selenium
+2011-05-26T11:58:35  <rpk> jarib: but don't they provide val()?  You don't expose that, or equivalent functionality
+2011-05-26T11:58:39  <jarib> so for this exact example, webdriver behaves exactly like jquery ;)
+2011-05-26T11:58:56  <jarib> what is .getAttribute("value") if not equivalent functionality?
+2011-05-26T11:59:03  <rpk> XD lol, its been way too long since I've gotten to use Javascript
+2011-05-26T11:59:08  <rpk> jarib: its a pain
+2011-05-26T11:59:29  <jarib> heh
+2011-05-26T11:59:51  <jarib> if you want a jquery-like API in java, then that can easily be built on top of webdriver
+2011-05-26T11:59:53  <rpk> Its also unintuitive.  For such a commonly performed task, I would think you'd want to expose a method fascilitating it
+2011-05-26T11:59:59  <rpk> facilitating^
+2011-05-26T12:00:09  <jarib> we intentionally try to keep the API minimal
+2011-05-26T12:00:27  <dawagner> jarib: We also try to keep it intuitivie ;)
+2011-05-26T12:00:32  <rpk> jarib: yeah, I get that.  It just makes it a bit harder to use.
+2011-05-26T12:00:44  <jarib> dawagner: i don't think it's unintuitive ;)
+2011-05-26T12:00:56  <rpk> I mean, even adding a Value option, and people had to switch to use that, would be more reasonable
+2011-05-26T12:01:08  <rpk> jarib: can't type check the getAttribute method either.
+2011-05-26T12:01:12  <dawagner> It's come up with every person I've introduced to WebDriver, on the first day ;)
+2011-05-26T12:01:43  <rpk> (I don't mean to offend anyone at all, obviously this is your project and you can do whatever you want with it :) )
+2011-05-26T12:01:49  <jarib> AutomatedTester, dawagner: i've got a hanging alert
+2011-05-26T12:02:01  <jarib> eranm: ^
+2011-05-26T12:02:46  <dawagner> rpk: What type checking do you want? getAttribute returns a (nullable) String...
+2011-05-26T12:02:47  <jarib> rpk: actually WebElement.getValue() was recently deprecated ;)
+2011-05-26T12:03:03  *** jimevans has joined #selenium
+2011-05-26T12:03:22  <rpk> dawagner: You can't type the parameter
+2011-05-26T12:03:23  <dawagner> (And no offence at all; it's a problem we'd like to fix, we just don't have an obvious answer :))
+2011-05-26T12:03:28  *** curseg1 has left #selenium
+2011-05-26T12:03:30  <rpk> err, type check the parameter for it
+2011-05-26T12:03:52  <rpk> where if you provided getValue(), I can be sure that I didn't type in "valeu" by mistake.
+2011-05-26T12:04:03  <dawagner> Aah fair :)
+2011-05-26T12:04:21  <rpk> It just seems like it would be a super common thing (interacting with input fields) that it'd be worth it to expose utility methods for it
+2011-05-26T12:04:45  <rpk> even if its just aliasing getAttribute
+2011-05-26T12:05:10  <jarib> i did suggest adding an Input class to the support package last time this came up
+2011-05-26T12:05:22  <rpk> oh that'd be pretty sweet as well.
+2011-05-26T12:05:41  <dawagner> What methods would you expect on it?
+2011-05-26T12:05:45  <rpk> maybe a forms class as well
+2011-05-26T12:05:56  <rpk> err, rather, a form class instead of an input class.
+2011-05-26T12:05:58  <dawagner> (And how easily would it be discoverable?)
+2011-05-26T12:06:06  <dawagner> This sounds a lot like watir... :P
+2011-05-26T12:06:28  <rpk> dawagner: never used watir (we turned watir down, not mature enough, lacked grid 2.0)
+2011-05-26T12:06:56  *** tunabum has quit IRC
+2011-05-26T12:07:10  <rpk> but I think it would be easier to say, "Go look at the forms class for that kind of functionality" than explain getAttribute.  If you included it in your tutorial / examples, it'd be very obvious as well.
+2011-05-26T12:09:32  <rpk> Anyways, does anyone have a guess as to why clear doesn't work?  The ctrl-a + delete combo obviously does, but I'll look like an idiot demoing that to our VP in two days after I said that Selenium was probably 1 to 2 years ahead of OATS.
+2011-05-26T12:11:12  <rpk> (which it is, the lack of browser and OS support from OATS is just ridiculous, and I'd hate to find out what the ajax / wait blocking support is like in OATS)
+2011-05-26T12:11:15  <barancev> looks like r12261 or r12262 is broken -- AndriodDriver.java has compilation errors
+2011-05-26T12:11:17  <selbot2> berrada@google.com about 2 hours ago - DouniaBerrada: Implementing BrowserConnection for Android. - http://code.google.com/p/selenium/source/detail?r=12261
+2011-05-26T12:12:14  *** pnitin has quit IRC
+2011-05-26T12:12:41  <barancev> The type AndroidDriver must implement the inherited abstract method LocationContext.setLocation(Location)
+2011-05-26T12:13:23  *** tunabum has joined #selenium
+2011-05-26T12:13:33  <jimevans> Just checking in gang.
+2011-05-26T12:13:54  <jimevans> dawagner: Did you get your IE tests working?
+2011-05-26T12:14:30  * jimevans can haz wi-fi in the ER
+2011-05-26T12:14:37  <dawagner> jimevans: Yeah, the protected mode got them working, reproduced jari's problem
+2011-05-26T12:14:49  <jimevans> Groovy.
+2011-05-26T12:15:50  <barancev> r12261, to be more specific - a new interface LocationContext added to AndriodDriver, but its methods are not implemented
+2011-05-26T12:15:52  <selbot2> berrada@google.com about 2 hours ago - DouniaBerrada: Implementing BrowserConnection for Android. - http://code.google.com/p/selenium/source/detail?r=12261
+2011-05-26T12:16:47  <dawagner> jarib: Does clear require an element not be disabled?
+2011-05-26T12:17:08  <jarib> jimevans: so probably if you run `go //rb:ie-test`, you should see one of the implicit wait tests failing
+2011-05-26T12:18:13  <jarib> dawagner: surprisingly, no
+2011-05-26T12:18:23  <jarib> at least not with synthesized events
+2011-05-26T12:18:25  <jarib> (os x)
+2011-05-26T12:19:19  <jarib> rpk: i've written a watir implementation on top of webdriver, it does work with grid 2
+2011-05-26T12:19:22  <jarib> https://github.com/jarib/watir-webdriver
+2011-05-26T12:21:01  <jimevans> jarib: Ok. I'll give it a shot when I can.
+2011-05-26T12:21:13  <eranm> barancev: that's right, I've told that to Dounia
+2011-05-26T12:21:21  <rpk> jarib: oh yeah, I should have realized that both selenium and watir moving on top of webdriver meant they would both support grid.
+2011-05-26T12:21:40  <jimevans> What do the ruby tests do that .NET doesn't I wonder.
+2011-05-26T12:21:47  *** freynaud_ has joined #selenium
+2011-05-26T12:22:02  <jarib> good question.
+2011-05-26T12:22:02  <dawagner> rpk: I'm afraid without (ideally minimal) HTML and javascript to reproduce, we're unlikely to find a solution... Does https://gist.github.com/993870 work for you?
+2011-05-26T12:22:25  <jimevans> The .NET implicit wait tests have been remarkably stable.
+2011-05-26T12:22:37  <jarib> jimevans: this is the failing test http://code.google.com/p/selenium/source/browse/trunk/rb/spec/integration/selenium/webdriver/timeout_spec.rb#12
+2011-05-26T12:22:45  <jarib> IIRC it doesn't fail in isolation though
+2011-05-26T12:22:50  <rpk> dawagner: I might be able to extract just the html + javascript that went into that page.
+2011-05-26T12:23:04  <eranm> jarib: is the hanging alert during selenium 1 tests?
+2011-05-26T12:23:09  <jarib> eranm: correct
+2011-05-26T12:23:15  <dawagner> rpk: It would definitely be handy :)
+2011-05-26T12:24:10  <rpk> Hmm, perhaps I'll try clear on a gwt demo page if I can find one.  And if that works, I'll just blame the programmers who put together the demo application I'm using.
+2011-05-26T12:24:31  <dawagner> :D
+2011-05-26T12:25:19  <rpk> dawagner: that gist, should I be incorporating it into my test?  the before / after part?
+2011-05-26T12:25:57  <dawagner> rpk: It's a standalone java app with its own page to test against
+2011-05-26T12:26:17  <dawagner> (Seeing whether clear works in general for you)
+2011-05-26T12:26:25  <rpk> oh ok, yeah. i'll check, just a moment.
+2011-05-26T12:27:22  *** freynaud_ has quit IRC
+2011-05-26T12:28:06  <jimevans> jarib: I'll analyze the differences at some point, maybe this weekend.
+2011-05-26T12:28:06  <phdaemon>  Response from Selenium RC server for testComplete().
+2011-05-26T12:28:06  <phdaemon> XHR ERROR: URL = [URL] Response_Code = -1 Error_Message = Request Error.
+2011-05-26T12:28:15  <phdaemon> Im getting that error when tyring to run a test
+2011-05-26T12:28:22  <phdaemon> however, if i put in the URL on the browser directly it works
+2011-05-26T12:28:23  *** freynaud_ has joined #selenium
+2011-05-26T12:28:33  <phdaemon> Its an https address and Accept all certs is enabled.
+2011-05-26T12:28:41  <phdaemon> can anyone direct me in the right direction please?
+2011-05-26T12:29:07  <rpk> dawagner: Before: 1 After:    ... looks like it worked.
+2011-05-26T12:29:08  <phdaemon> Also, this is using RC and Grid
+2011-05-26T12:30:43  <dawagner> rpk: That's reassuring, at least...Must be some weird gwt thing... (Although lots of Google teams use WebDriver to test gwt apps, so it must be a pretty strange edge case!)
+2011-05-26T12:31:07  <dawagner> Definitely going to need a repro case to fix, though!
+2011-05-26T12:31:13  <rpk> I'm trying to runit against their demo page, but its impossible because they don't have ids exposed
+2011-05-26T12:31:36  <dawagner> Where's the demo page?
+2011-05-26T12:31:38  <RossPatterson> Right, that's why I hate GWT.
+2011-05-26T12:31:49  <rpk> RossPatterson: we hate GWT too.
+2011-05-26T12:31:54  <dawagner> Can work out whaever xpath is needed to find the correct element, and find it that way
+2011-05-26T12:32:03  <rpk> dawagner: yeah, I'm working on it
+2011-05-26T12:32:05  <dawagner> (Not for a real test, but for a demo!)
+2011-05-26T12:32:34  * dawagner is so glad he decided not to use GWT for his current pet project :)
+2011-05-26T12:33:14  <rpk> yeah, someone actually said "and we might be able to wrap jquery objects with gwt" today, I almost threw up in my mouth
+2011-05-26T12:34:38  <rpk> no way
+2011-05-26T12:34:45  <rpk> it works on the gwt page, surprise surprise.
+2011-05-26T12:35:25  <rpk> So, I assume someone screwed up the html / js somehow...
+2011-05-26T12:35:48  <dawagner> I'm curious as to how...!
+2011-05-26T12:36:04  <rpk> I'll try and get a reproducable example, though I'm not sure if I'll be able to strip out enough of the page in order to share it publically anywhere.
+2011-05-26T12:36:11  <rpk> publicly^
+2011-05-26T12:36:41  *** freynaud_ has quit IRC
+2011-05-26T12:38:28  * dawagner should probably get back to packing up his life - good luck stripping, rpk!
+2011-05-26T12:38:39  *** yairgo has joined #selenium
+2011-05-26T12:39:10  <eranm> jimevans: http://pastebin.com/JB21Fy7a is the failure on WinXP with IE
+2011-05-26T12:39:57  *** freynaud_ has joined #selenium
+2011-05-26T12:40:05  <jarib> jimevans: got it to fail in isolation, here's how to run only that spec: https://gist.github.com/993911
+2011-05-26T12:40:11  <jarib> may need a few tries to reproduce though.
+2011-05-26T12:42:02  *** freynaud_ has quit IRC
+2011-05-26T12:42:36  <selbot2> jari.bakken half a minute ago - JariBakken: Timeouts should be sent as ints, not floats. - http://code.google.com/p/selenium/source/detail?r=12264
+2011-05-26T12:42:56  <jarib> (that didn't help btw)
+2011-05-26T12:44:23  *** RossPatterson has quit IRC
+2011-05-26T12:46:23  *** dawagner has left #selenium
+2011-05-26T12:47:23  *** tunabum has quit IRC
+2011-05-26T12:47:55  *** freynaud_ has joined #selenium
+2011-05-26T12:47:57  <jimevans> eranm: so looks like the driver thinks the element is invisible. Never seen that one in that particular test.
+2011-05-26T12:48:01  *** freynaud_ has quit IRC
+2011-05-26T12:48:42  <eranm> jarib: did you have any luck finding the cause of the alert blocking Selenium RC?
+2011-05-26T12:48:46  <jimevans> Bear in mind that I'm mobile and do not have access to source or a debugger.
+2011-05-26T12:49:32  <eranm> jimevans: I see
+2011-05-26T12:50:36  <jarib> eranm: to be honest i have no idea where to begin, debugging RC
+2011-05-26T12:51:19  *** adamgoucher has joined #selenium
+2011-05-26T12:51:32  <selbot`> New news from builds: S2RB-WDUNIT-102 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-102>
+2011-05-26T12:51:46  <eranm> jarib: same here. adamgoucher, perhaps you have a clue where to start debugging RC? there's the issue with alerts blocking Selenium RC tests on FIrefox 4
+2011-05-26T12:51:48  <eranm> on Windows
+2011-05-26T12:52:08  *** freynaud_ has joined #selenium
+2011-05-26T12:52:41  <AutomatedTester> jimevans: hope your wife gets better soon
+2011-05-26T12:52:48  <adamgoucher> isnt that more in javascript/selenium-core than rc?
+2011-05-26T12:52:52  *** miker2 has quit IRC
+2011-05-26T12:54:42  *** stepheneb has quit IRC
+2011-05-26T12:55:02  *** freynaud_ has quit IRC
+2011-05-26T12:55:20  <jimevans> AutomatedTester: Me too. They're going to do something called a "blood patch".
+2011-05-26T12:55:25  <phdaemon> adamgoucher
+2011-05-26T12:55:30  <phdaemon> can i PM you?
+2011-05-26T12:55:39  <adamgoucher> sure
+2011-05-26T12:56:21  *** admc has quit IRC
+2011-05-26T12:58:11  <jimevans> AutomatedTester: Thanks for the well-wishes though.
+2011-05-26T13:00:22  <adamgoucher> umm, yuck to blood patch http://en.wikipedia.org/wiki/Epidural_blood_patch
+2011-05-26T13:02:15  <rpk> Ok, so I think I got closer to figuring it out.  Basically, someone defined only 'change' for the text input, and most likely failed to handle the null / "" case (whatever clear is effectively doing), and instead just catches and returns false
+2011-05-26T13:02:37  <jarib> adamgoucher: what would you do at this point? http://files.jaribakken.com/tmp/hang.png
+2011-05-26T13:03:27  <rpk> Of course, I can't confirm any of this because gwt is impossible to debug, and the "c.apply" function apparently no longer exists at this execution time.
+2011-05-26T13:03:37  *** freynaud_ has joined #selenium
+2011-05-26T13:04:26  <adamgoucher> jarib: likely swear a bit
+2011-05-26T13:04:27  <adamgoucher> :)
+2011-05-26T13:04:36  <jarib> ok, i'll try
+2011-05-26T13:04:58  <jarib> hmpf, it's still hanging
+2011-05-26T13:06:28  <rpk> People want to know if you would accept changes from us.  How is this generally approached?
+2011-05-26T13:06:28  <jimevans> adamgoucher: True, but the alternative is serious pain due to low level of cerebrospinal fluid. Yuck either way.
+2011-05-26T13:07:01  <rpk> (by us I mean our Oracle division)
+2011-05-26T13:07:15  <adamgoucher> jimevans: i passed out during my wife's epidural with the boy was born. needles [to others] is yuck. needles into spines is double plus yuck
+2011-05-26T13:07:22  <jarib> rpk: you'll need to sign a CLA
+2011-05-26T13:07:43  <jarib> but we do love patches of course
+2011-05-26T13:07:59  <rpk> CLA?
+2011-05-26T13:08:11  <jarib> Contributor's License Agreement
+2011-05-26T13:08:42  <rpk> you don't already have one with Oracle?
+2011-05-26T13:09:11  *** freynaud_ has quit IRC
+2011-05-26T13:10:15  <jarib> rpk: maybe google does, but i'm quite certain selenium doesn't
+2011-05-26T13:10:15  *** shadowolf2 is now known as shadowolf_
+2011-05-26T13:10:55  <rpk> oh, thats unfortunate, our business unit probably can't get one, we're not important enough.
+2011-05-26T13:11:00  *** freynaud_ has joined #selenium
+2011-05-26T13:11:16  <jarib> rpk: we (as in the selenium project) has just joined the SFC, so all of this is a bit up in the air at the moment
+2011-05-26T13:11:22  <jarib> i'm not the best person to ask
+2011-05-26T13:11:28  <rpk> However, there are several business units using Watir or Selenium throughout Oracle, you should maybe try approaching them.
+2011-05-26T13:11:46  <rpk> I'm sure you'd get quite a few bug fixes / feature improvements submitted over time
+2011-05-26T13:12:13  <jarib> we have used google's CLA (http://code.google.com/legal/individual-cla-v1.0.html) so far, but it's been rewritten for the SFC
+2011-05-26T13:12:33  <jarib> so it won't have that google stamp in the future.
+2011-05-26T13:12:42  *** cburroughs` has quit IRC
+2011-05-26T13:14:00  <jarib> that's for individual contributions though, i have no idea how it works for companies
+2011-05-26T13:14:12  <adamgoucher> jarib: so it seems like ff4 changed the way they draw alerts -- though i suspect you know that allready :)
+2011-05-26T13:15:04  <jarib> yeah, i've noticed
+2011-05-26T13:15:51  *** davehunt|away has quit IRC
+2011-05-26T13:15:57  *** davehunt|away has joined #selenium
+2011-05-26T13:16:03  <jarib> updated the screenshot with the error console
+2011-05-26T13:17:46  <AutomatedTester> eranm: solved the rc issue?
+2011-05-26T13:18:51  *** artknish has quit IRC
+2011-05-26T13:19:21  <freynaud_> jimevans: the screenshot problem is linked to XP for me
+2011-05-26T13:20:06  <freynaud_> on the same machine hardware i can reproduce the issue on XP ( 32 )but not win7 ( 64)
+2011-05-26T13:20:06  <jimevans> Ok. I believe it.
+2011-05-26T13:20:41  <freynaud_> this is still a bit annoying as I prefer xp :p
+2011-05-26T13:20:45  <eranm> AutomatedTester: haven't had time to look at it, was submitting the native events
+2011-05-26T13:20:55  <AutomatedTester> ok
+2011-05-26T13:20:57  <freynaud_> lower memory footprint, so better for a grid
+2011-05-26T13:21:03  <AutomatedTester> still cant repro this bug
+2011-05-26T13:21:57  <eranm> dawagner also couldn't reproduce it
+2011-05-26T13:22:09  <eranm> The XP machine I'm testing on is a VM, which is extremely slow
+2011-05-26T13:22:14  <eranm> I wonder if that has anything to do wih it
+2011-05-26T13:22:16  <eranm> with it
+2011-05-26T13:22:53  <barancev> eranm: do you mean slowness?
+2011-05-26T13:23:08  <eranm> Yes
+2011-05-26T13:23:20  <eranm> AutomatedTester suggested it may have something to do with the alert being overridden
+2011-05-26T13:23:39  <eranm> and that we have to periodically check it's overridden and if not, override it
+2011-05-26T13:23:45  <eranm> do  I understand correctly, ?
+2011-05-26T13:23:49  <jimevans> freynaud_: However, in the initial report of #1700, the it indicates reproduce on win7
+2011-05-26T13:23:50  <selbot2> james.h....@gmail.com open/new InternetExplorerDriver screenshot probllem - http://code.google.com/p/selenium/issues/detail?id=1700
+2011-05-26T13:23:57  <AutomatedTester> eranm: thats it
+2011-05-26T13:24:14  <eranm> AutomatedTester: Do you have a pointer to the code where we should be doing it?
+2011-05-26T13:24:18  <AutomatedTester> but I dont want to change the code and break something without failing code
+2011-05-26T13:24:26  <jarib> i have it failing here
+2011-05-26T13:24:30  <AutomatedTester> i think its in selenium-api.js
+2011-05-26T13:24:33  <jarib> it seems quite consistent
+2011-05-26T13:24:44  <jarib> if you wrote a patch i'd be happy to test it out
+2011-05-26T13:24:46  <AutomatedTester> jarib: your personal machine?
+2011-05-26T13:24:50  <freynaud_> jimevans: 32 vs 64 maybe ?
+2011-05-26T13:25:00  <jarib> AutomatedTester: in a Win7 VM on my mac
+2011-05-26T13:25:03  <barancev> hardly do, I've intel i7 box and get this error
+2011-05-26T13:25:30  <AutomatedTester> arggg svn up is killing my machine
+2011-05-26T13:25:35  <AutomatedTester> i blame eranm
+2011-05-26T13:25:37  <AutomatedTester> :D
+2011-05-26T13:25:59  <jarib> AutomatedTester: http://files.jaribakken.com/tmp/hang.png
+2011-05-26T13:26:04  <freynaud_> jimevans: do you use 32b machines ?
+2011-05-26T13:26:13  <barancev> not VM, but real hard i7 box with 8GB RAM - and hanging alerts
+2011-05-26T13:26:54  <AutomatedTester> jarib: i wouldnt expect an error in the console
+2011-05-26T13:27:07  <AutomatedTester> current code thinks its worked but failed
+2011-05-26T13:27:16  <eranm> jarib has a draft for a ruby code snippet that can download files. Once the release goes out, I want to remove the SDK from our repository and have the script fetch it
+2011-05-26T13:28:32  <rpk> What is currently blocking rc1?
+2011-05-26T13:29:33  <eranm> rpk: An issue with Selenium RC with Firefox 4 / Windows
+2011-05-26T13:29:53  <eranm> Alerts are popping up and blocking the tests
+2011-05-26T13:30:07  <eranm> AutomatedTester: if you can produce a patch, even a blind one, it will provide jarib and me a starting point.
+2011-05-26T13:30:12  <rpk> Yeah, ok, I saw that on the google group a few days ago.
+2011-05-26T13:30:20  <AutomatedTester> ok
+2011-05-26T13:30:33  <AutomatedTester> still svn up'ing
+2011-05-26T13:31:01  <AutomatedTester> eranm: off topic, did you do conscription?
+2011-05-26T13:31:16  <AutomatedTester> in the army
+2011-05-26T13:31:43  <eranm> Oh, yes
+2011-05-26T13:32:04  <AutomatedTester> *slightly more scared of eranm now*
+2011-05-26T13:32:06  <eranm> Was a software engineer, though, don't have any war stories :)
+2011-05-26T13:32:12  *** mbeierl has quit IRC
+2011-05-26T13:32:19  <AutomatedTester> less scared of eranm now
+2011-05-26T13:32:39  <jarib> eranm, AutomatedTester: i can do a git bisect to find out what commit caused it
+2011-05-26T13:32:55  <AutomatedTester> jarib: the issue is the browser, not our code
+2011-05-26T13:32:59  <jarib> ah
+2011-05-26T13:33:05  <jarib> :(
+2011-05-26T13:33:06  <eranm> Exactly, I don't think it ever worked in FF4
+2011-05-26T13:33:18  <AutomatedTester> its this stupid inner/outer window thing
+2011-05-26T13:34:02  <AutomatedTester> so we need to check the wrappedJSObject isnt empty, if it is, then try override alert again
+2011-05-26T13:34:17  <AutomatedTester> well thats my thinking
+2011-05-26T13:34:48  <jimevans> freynaud_: I do use 32bit OS, mostly for compat testing.
+2011-05-26T13:34:50  <jarib> could we do the same as r11615?
+2011-05-26T13:34:52  <selbot2> simon.m.stewart 2 months ago - SimonStewart: Getting the AlertsTest and ChildrenFindingTest working on Firefox 4. We take the easy way out by ensuring that the browser always opens window rather than tab modal alerts. This isn't perfect, but since we don't allow tabs to open it's a reasonable compromise for now - http://code.google.com/p/selenium/source/detail?r=11615
+2011-05-26T13:35:01  <jarib> i.e. set "prompts.tab_modal.enabled", "false"
+2011-05-26T13:35:44  <AutomatedTester> no
+2011-05-26T13:35:58  <AutomatedTester> or maybe...
+2011-05-26T13:36:05  <AutomatedTester> might be worth a try
+2011-05-26T13:36:08  <jarib> the commit does have a bunch of other stuff though
+2011-05-26T13:36:14  <jarib> i can try
+2011-05-26T13:36:31  *** rpk has left #selenium
+2011-05-26T13:36:36  <eranm> That would be most helpful, jarib
+2011-05-26T13:36:37  <jarib> anyone know where this is configured for RC?
+2011-05-26T13:36:48  <jimevans> freynaud_: But to be fair, I've not done extensive screenshot testing on that.
+2011-05-26T13:36:49  <AutomatedTester> the other stuff in there is how Mozmill controls alerts
+2011-05-26T13:36:55  <jimevans> Gotta go.
+2011-05-26T13:37:01  *** jimevans has left #selenium
+2011-05-26T13:37:06  *** admc has joined #selenium
+2011-05-26T13:38:48  *** dhemery has joined #selenium
+2011-05-26T13:39:16  <AutomatedTester> jarib: opening idea now
+2011-05-26T13:39:39  <AutomatedTester> bloody hell IDEA kills my MBP
+2011-05-26T13:41:06  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Reverting r12261 as it is breaking the build on Mac and Windows. - http://code.google.com/p/selenium/source/detail?r=12265
+2011-05-26T13:43:47  <barancev> wow! all tests passed in FF4 on Win7! native events are implemented!
+2011-05-26T13:45:39  <AutomatedTester> jarib: there is browserlaunchers in java/server/src/org/openqa/selenium/server/
+2011-05-26T13:45:46  <AutomatedTester> i think one of those has the info
+2011-05-26T13:46:21  <jarib> AutomatedTester: found it
+2011-05-26T13:46:45  <jarib> LauncherUtils.generatePacAndPrefsJs()
+2011-05-26T13:50:41  <barancev> jarib: AutomatedTester: in 2.0b3 alerts hang too, so that must be browser problem, yes
+2011-05-26T13:51:02  <AutomatedTester> barancev: which API
+2011-05-26T13:51:22  <barancev> AutomatedTester: 1.0, of course
+2011-05-26T13:51:36  <jarib> running tests now
+2011-05-26T13:51:40  <jarib> we'll see.
+2011-05-26T13:52:06  <AutomatedTester> barancev: thats what we are talking about, when you put "too" it suggests more than what we are speaking about
+2011-05-26T13:53:17  <AutomatedTester> pesky day job getting in the way
+2011-05-26T13:54:06  <barancev> AutomatedTester: it was a confirmation that you are right, there is no need to do bisect and search a patch that introduced this problem
+2011-05-26T13:54:58  <AutomatedTester> zomg... too many files in an svn up
+2011-05-26T13:55:30  <barancev> +112MB to trunk today
+2011-05-26T13:57:40  *** red^ is now known as reddeviL
+2011-05-26T13:58:28  <eranm> Yes, that's thanks to the Gecko 2 SDK
+2011-05-26T13:59:06  <jarib> guess downloading gecko will break simon's beloved airplane build ;)
+2011-05-26T13:59:46  <eranm> We do quite a lot of work on airplanes, it's not such an implausible scenario
+2011-05-26T14:00:03  <eranm> but having to build once before going on the plane is a reasonable requirement, I'd say
+2011-05-26T14:00:14  * jarib nods
+2011-05-26T14:00:32  <jarib> what if i just want to use prebuilds?
+2011-05-26T14:02:20  <eranm> I think it'll also work, because the compilation fails
+2011-05-26T14:02:32  <jarib> but it will still download gecko
+2011-05-26T14:03:20  <jarib> would be nice to be able to tell the build i always want to fall back
+2011-05-26T14:03:27  <jarib> perhaps not in this iteration of crazyfun though :P
+2011-05-26T14:04:02  * jarib is still compiling Se 1
+2011-05-26T14:04:31  <jarib> i made the mistake of doing a clean build
+2011-05-26T14:04:38  *** santiycr has quit IRC
+2011-05-26T14:04:47  <jarib> which in one sense speaks to how much i trust crazyfun
+2011-05-26T14:04:52  <jarib> argh
+2011-05-26T14:04:54  <jarib> still hangs.
+2011-05-26T14:05:19  *** dhemery has quit IRC
+2011-05-26T14:05:24  <jarib> oh, hold on
+2011-05-26T14:05:32  <jarib> the preference isn't right
+2011-05-26T14:06:00  <eranm> jarib: crazyfun was meant to be a stop-gap solution
+2011-05-26T14:06:02  *** stepheneb has joined #selenium
+2011-05-26T14:07:06  <jarib> eranm: i know, but the fact that we've been working on http://code.google.com/p/crazy-fun/ doesn't bode well for what i had hoped would happen
+2011-05-26T14:07:06  <selbot2> berrada@google.com half a minute ago - DouniaBerrada: Removing duplicate caps in android client. - http://code.google.com/p/selenium/source/detail?r=12266
+2011-05-26T14:07:15  <jarib> if you catch my drift :)
+2011-05-26T14:07:25  * jarib stops being impatient
+2011-05-26T14:07:50  <eranm> indeed
+2011-05-26T14:08:13  <jarib> anyone know why this didn't take? https://gist.github.com/994105
+2011-05-26T14:08:43  <jarib> oh
+2011-05-26T14:08:48  <jarib> i set it to a string :P
+2011-05-26T14:09:05  <jarib> let's try this again
+2011-05-26T14:16:04  <jarib> ok, changing the preference doesn't help
+2011-05-26T14:16:11  <jarib> AutomatedTester: back to you
+2011-05-26T14:16:50  <AutomatedTester> ok, ill try patch it tomorrow
+2011-05-26T14:21:40  <eranm> AutomatedTester: do you know where Selenium 1 is overriding the window.alert? If I understand correctly, it's this method that's not properly overridden with Firefox 4
+2011-05-26T14:22:03  <AutomatedTester> its in the selenium core stuff
+2011-05-26T14:22:12  <AutomatedTester> i dont know off the top of my head
+2011-05-26T14:22:58  <AutomatedTester> selenium*.js
+2011-05-26T14:23:01  <AutomatedTester> one of those
+2011-05-26T14:23:35  <jarib> eranm: selenium-browserbot.js:704
+2011-05-26T14:24:19  <eranm> thanks
+2011-05-26T14:24:52  *** cakehero has quit IRC
+2011-05-26T14:26:21  <jarib> afk for a while
+2011-05-26T14:27:25  <AutomatedTester> later
+2011-05-26T14:27:29  <AutomatedTester> off to sleep
+2011-05-26T14:31:03  <selbot`> New news from builds: S2J-FXLX-197 was SUCCESSFUL (with 642 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-197>
+2011-05-26T14:31:14  <eranm> night AutomatedTester
+2011-05-26T14:32:04  *** AutomatedTester has quit IRC
+2011-05-26T14:36:38  <eranm> I'm off as well. ttyl!
+2011-05-26T14:36:41  *** eranm has quit IRC
+2011-05-26T14:50:48  *** brettporter has joined #selenium
+2011-05-26T14:50:50  *** brettporter has joined #selenium
+2011-05-26T14:50:55  *** QAguy has quit IRC
+2011-05-26T15:00:26  <bkkb> Can sauce on demand connect to your local app?  Some of the documentation leads me to believe it can... anyone know for sure?
+2011-05-26T15:02:20  <nDuff> bkkb, yes, they can tunnel back
+2011-05-26T15:03:09  <bkkb> Cool, so I keep getting an error: 2011-05-26 15:08:46,836 - Could not connect to 127.0.0.1:3001 ([Errno 111] Connection refused)
+2011-05-26T15:03:09  <bkkb> 2011-05-26 15:08:46,837 - !! Your tests will fail while your network can not get to 127.0.0.1:3001.
+2011-05-26T15:03:42  <bkkb> Probably because my app doesn't run on 127.0.0.1:3001, instead it runs on a fake domain I setup with my hosts file, it has to run on that domain or my app wont work
+2011-05-26T15:03:42  *** dmachi has quit IRC
+2011-05-26T15:03:53  *** dmachi has joined #selenium
+2011-05-26T15:04:26  <bkkb> But I tried changing config.application_host = '127.0.0.1'  to config.application_host = 'MyFakeDomain.com' and it just doesn't seem to work
+2011-05-26T15:04:42  <bkkb> nDuff: any idea what config settings I need to get it to work in the above scenario?
+2011-05-26T15:06:46  <nDuff> bkkb, 'fraid not -- we had a consultant in setting it up for us, and I haven't dug into the implementation (mostly as we aren't using it).
+2011-05-26T15:07:11  <bkkb> nDuff: reasonably priced and helpfull?  Would love to have their contact info
+2011-05-26T15:12:54  *** XCulver has quit IRC
+2011-05-26T15:15:37  *** esteele has joined #selenium
+2011-05-26T15:19:40  *** curseg has joined #selenium
+2011-05-26T15:24:40  <jarib> bkkb: you want to look into Sauce Connect
+2011-05-26T15:24:44  <jarib> that's the tunnel
+2011-05-26T15:24:53  <jarib> it's pretty easy to use
+2011-05-26T15:25:24  <bkkb> jarib: oh man not another component! :)  Yeah i was actually looking at that right now
+2011-05-26T15:26:11  <bkkb> jarib: i'm making progress though, my earlier issues were related to not running rails generate sauce:install and arke spec:selenium:sauce
+2011-05-26T15:26:23  <bkkb> s/arke/rake
+2011-05-26T15:26:53  <bkkb> at least some of my earlier issues
+2011-05-26T15:30:53  *** mouseOverThis has joined #selenium
+2011-05-26T15:31:12  <mouseOverThis> Hello
+2011-05-26T15:31:56  * ato moves his mouse over mouseOverThis.
+2011-05-26T15:33:18  <mouseOverThis> I have been reading about support for pattern matching in locators.  I would like to do something like storeXpathCount //div[@id='tooltip_[0-9]'] to count and store tooltips "_0 through _9"
+2011-05-26T15:33:42  <mouseOverThis> Is this possible and am I just going about it incorrectly?
+2011-05-26T15:34:30  <mouseOverThis> under the conditions of my page, 0 through 9 may not always be present.
+2011-05-26T15:38:04  *** cgoldberg has quit IRC
+2011-05-26T15:43:25  *** freynaud_ has quit IRC
+2011-05-26T15:54:06  <selbot2> jari.bakken less than 20 seconds ago - JariBakken: Bring the Ruby implicit wait tests in sync with Java/.NET. - http://code.google.com/p/selenium/source/detail?r=12267
+2011-05-26T15:57:22  <selbot`> New news from builds: S2RB-WDUNIT-103 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-103>
+2011-05-26T16:10:51  *** jonatha__ has joined #selenium
+2011-05-26T16:11:12  *** jonathanrwallace has quit IRC
+2011-05-26T16:15:41  *** jonatha__ has quit IRC
+2011-05-26T16:20:06  *** jonathanrwallace has joined #selenium
+2011-05-26T16:21:36  <selbot2> berrada@google.com less than a minute ago - DouniaBerrada: Implementing BrowserConnection in Android. - http://code.google.com/p/selenium/source/detail?r=12268
+2011-05-26T16:23:29  *** yairgo has quit IRC
+2011-05-26T16:24:46  *** mouseOverThis has quit IRC
+2011-05-26T16:35:42  *** esteele has quit IRC
+2011-05-26T16:44:12  *** miker2 has joined #selenium
+2011-05-26T16:48:19  *** miker2 has quit IRC
+2011-05-26T16:48:40  *** andytinkham has quit IRC
+2011-05-26T16:55:17  *** miker2 has joined #selenium
+2011-05-26T17:03:57  *** miker2 has quit IRC
+2011-05-26T17:23:17  *** retornam has quit IRC
+2011-05-26T17:25:03  *** binken has joined #selenium
+2011-05-26T17:26:43  *** miker2 has joined #selenium
+2011-05-26T17:29:47  *** sfbrian has quit IRC
+2011-05-26T17:37:18  *** esteele has joined #selenium
+2011-05-26T17:42:40  *** Spanktar has quit IRC
+2011-05-26T17:54:38  *** esteele has left #selenium
+2011-05-26T18:03:49  *** dreuxl has quit IRC
+2011-05-26T18:18:05  *** curseg has quit IRC
+2011-05-26T18:47:44  *** admc has quit IRC
+2011-05-26T18:51:13  <binken> Morning All
+2011-05-26T18:51:47  *** miker2 has quit IRC
+2011-05-26T18:59:50  *** binken has quit IRC
+2011-05-26T19:49:18  *** binken has joined #selenium
+2011-05-26T19:52:50  *** eghm has joined #selenium
+2011-05-26T19:53:23  *** eghm_ has quit IRC
+2011-05-26T20:59:41  *** |izzie has joined #selenium
+2011-05-26T21:42:59  *** jobicoppola has joined #selenium
+2011-05-26T21:45:33  *** pnitin has joined #selenium
+2011-05-26T22:11:20  *** jobicoppola has quit IRC
+2011-05-26T22:12:21  *** jobicoppola has joined #selenium
+2011-05-26T22:27:46  *** krosenvold1 has joined #selenium
+2011-05-26T22:27:52  *** retornam has joined #selenium
+2011-05-26T22:27:56  *** krosenvold1 has left #selenium
+2011-05-26T22:28:10  *** retornam has quit IRC
+2011-05-26T22:41:27  *** jobicoppola has quit IRC
+2011-05-26T23:11:53  *** stepheneb has quit IRC
+2011-05-26T23:23:01  *** Brabra has joined #selenium
+2011-05-26T23:24:42  *** Blablaba has joined #selenium
+2011-05-26T23:26:00  *** |izzie has quit IRC
+2011-05-26T23:28:37  *** reddeviL is now known as red^
+2011-05-26T23:33:37  *** eghm has quit IRC
+2011-05-26T23:35:43  *** eghm has joined #selenium
+2011-05-26T23:44:56  *** trishk has left #selenium
+2011-05-26T23:47:55  *** sburjan has joined #selenium
+2011-05-26T23:56:51  <selbot`> New news from builds: S2RB-WDUNIT-103 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-103> || S2J-FXLX-197 was SUCCESSFUL (with 642 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-197> || S2RB-WDUNIT-102 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-102> || S2J-FXLX-196 was SUCCESSFUL (with 642 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-196> || S2J-FXLX-195 was SUCCESSFUL (with 643 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-195> || S2J-FXLX-194 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-194> || S2JS-TESTS-12 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-12> || IDE-IDE-97 was SUCCESSFUL : Dependant of IDE-EDITOR-119 <http://xserve.openqa.org:8085/browse/IDE-IDE-97> || IDE-EDITOR-119 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-119> || IDE-IDE-96 was SUCCESSFUL : Dependant of IDE-CSHARP-8 <http://xserve.openqa.org:8085/browse/IDE-IDE-96> || IDE-CSHARP-8 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-CSHARP-8> || IDE-GRV-11 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-GRV-11> || IDE-RB-9 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-RB-9> || IDE-EDITOR-118 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-118> || IDE-PERL-7 has FAILED : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PERL-7> || IDE-PHP-13 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PHP-13> || IDE-PY-7 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-PY-7> || IDE-JAVA-9 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-JAVA-9> || S2J-FXLX-193 was SUCCESSFUL (with 643 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-193> || S2J-FXLX-192 was SUCCESSFUL (with 643 tests) : Updated by berrada@google.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-192> || S2RB-WDUNIT-101 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-101> || S2J-FXLX-191 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-191> || IDE-IDE-95 was SUCCESSFUL : Dependant of IDE-EDITOR-117 <http://xserve.openqa.org:8085/browse/IDE-IDE-95> || IDE-EDITOR-117 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-117> || S2J-FXLX-190 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-190> || S2JS-TESTS-10 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-10> || S2JS-TESTS-9 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-9> || S2J-FXLX-189 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-189> || S2J-FXLX-188 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-188> || S2J-FXLX-187 was SUCCESSFUL (with 643 tests) : Updated by francois.reynaud <http://xserve.openqa.org:8085/browse/S2J-FXLX-187>

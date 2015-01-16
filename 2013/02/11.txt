@@ -1,0 +1,912 @@
+[IRC logfile - Started Mon Feb 11 00:00:07 2013]
+[00:00:07] plightbo_work has joined #selenium
+[00:06:44] p_l has joined #selenium
+[00:32:30] kaawee_ has joined #selenium
+[00:33:16] gabrielrotbart has joined #selenium
+[00:38:55] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 01:08:20 2013]
+[01:08:20] phishy has joined #selenium
+[01:12:11] nirvdrum has joined #selenium
+[01:17:47] plightbo_work has joined #selenium
+[01:23:18] apokalyps: He says he didnt mention it until it was a thing
+[01:23:18] apokalyps: like he says then when it started to look like something that might happen he told mel and she said "why are you only telling me now?"
+[01:23:24] apokalyps: errrp
+[01:23:51] apokalyps: bad terminal.
+[01:26:45] mreedell-work has joined #selenium
+[01:56:35] plightbo_work has joined #selenium
+[01:57:38] mreedell-work has joined #selenium
+[01:58:43] llaskin has left #selenium
+[IRC logfile - Started Mon Feb 11 02:14:48 2013]
+[02:14:48] smccarthy has joined #selenium
+[02:24:54] gabrielrotbart has joined #selenium
+[02:28:43] phishy has joined #selenium
+[02:35:18] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 03:14:33 2013]
+[03:14:33] plightbo_work has joined #selenium
+[03:54:09] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 04:07:41 2013]
+[04:07:41] phishy has joined #selenium
+[04:34:08] plightbo_work has joined #selenium
+[04:45:58] rananda has joined #selenium
+[04:59:32] DarkRift has joined #selenium
+[IRC logfile - Started Mon Feb 11 05:08:13 2013]
+[05:08:13] SamuraiJack has joined #selenium
+[05:14:14] plightbo_work has joined #selenium
+[05:35:18] rananda has joined #selenium
+[05:35:19] rananda: ?
+[05:54:22] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 06:09:24 2013]
+[06:09:24] dogarrhea has joined #selenium
+[06:09:28] dogarrhea: cool
+[06:09:51] dogarrhea: firefox hangs for 5 hours waiting for some request when I can clearly see a              driver.manage().timeouts().implicitlyWait(11, TimeUnit.SECONDS); line in my code
+[06:10:01] dogarrhea: why can't selenium just not be buggy
+[06:11:23] dogarrhea: if they can't promise cross platform/version support it's pretty much useless
+[06:11:24] barancev: dogarrhea: do you have a reproduction scenario? which version of selenium and browser do you use?
+[06:11:58] barancev: :log
+[06:11:58] selbot2: http://illicitonion.com/selogs/selenium/2013/02/10.txt | http://illicitonion.com/selogs/search
+[06:13:24] dogarrhea: this is going to take so much time to replicate.. it took 5 hours when i was afk and i see the red "webdriver" thing in the lower right and it's "waiting for blahblahblah site....."
+[06:13:34] dogarrhea: but i am on 18.01
+[06:13:40] dogarrhea: i've had stability issues with selenium forever.
+[06:14:09] dogarrhea: it's fine though
+[06:14:46] dogarrhea: whenever the stupid test hangs, i have a chron/task scheduler job that closes the browser, the test catches the error and goes back a few times and then skips the test if the problem keeps occuring
+[06:14:51] dogarrhea: so stupid and hackey
+[06:16:52] barancev: 18 is the browser version. which version of selenium do you use?
+[06:17:05] dogarrhea: yep it happened again. 
+[06:17:24] dogarrhea: it's stuck on "Transferring data from www.amicusrx.com..." 
+[06:17:32] dogarrhea: not doing anythi9ng. it's more than 11 seconds now
+[06:18:41] barancev: so it hangs in get? or click? when loading a new page, right?
+[06:19:04] dogarrhea: i'm only getting
+[06:19:37] dogarrhea: well, that's not true, i'm searching for //a
+[06:19:50] dogarrhea: but usually when it's searching for links i can see the red webdriver blinking in the lower right hand corner
+[06:21:15] dogarrhea: still transferring.
+[06:22:26] barancev: if it is in get, try to use "unstable" page loading strategy, see the very last chapter in :wiki FirefoxDriver
+[06:22:27] selbot2: 1: 03FirefoxDriver: Information about the Firefox Driver - https://code.google.com/p/selenium/wiki/FirefoxDriver
+[06:23:15] barancev: but 1) it was broken before 2.29, you need 2.29 to use unstable page loading strategy
+[06:23:52] gabrielrotbart has joined #selenium
+[06:24:46] barancev: hmm... I was going to write 2), but I see you use implicit waits, so just 1)
+[06:34:35] plightbo_work has joined #selenium
+[06:39:15] dogarrhea: so basically it's a selenium bug
+[06:39:30] dogarrhea: i don't see any stack trace or anything
+[06:39:59] barancev: basically, the browser can't reach readyState = "complete" and selenium waits
+[06:42:17] barancev: "unstable" page loading strategy allows selenium to act when readyState = "interactive" that means "the page is rendered and a user can interact with it, but some elements are still loading"
+[06:42:48] dogarrhea: these are internals right?
+[06:45:34] barancev: these are two different solutions of the :google halting problem
+[06:45:35] selbot2: Halting problem - Wikipedia, the free encyclopedia: http://en.wikipedia.org/wiki/Halting_problem
+[06:46:08] barancev: (applied to page loading)
+[06:51:12] rananda has joined #selenium
+[06:54:33] flyinprogramer has joined #selenium
+[06:55:45] rananda has joined #selenium
+[IRC logfile - Started Mon Feb 11 07:15:11 2013]
+[07:15:11] plightbo_work has joined #selenium
+[07:16:50] dogarrhea: it's not the halting problem :/
+[07:17:12] dogarrhea: way to twist a bug out of proportion into an attempt to say it's an unsolvable problem
+[07:17:33] dogarrhea: if i see a "Transferring from blah blah blah" for over 10 seconds
+[07:17:36] dogarrhea: it should turn off
+[07:17:41] dogarrhea: that's not the halting fucking problem
+[07:17:47] dogarrhea: it's just a message.
+[07:18:27] dogarrhea: you see a message for 10 seconds? turn off. done
+[07:18:45] dogarrhea: we aren't writing code to monitor firefox code to see if it's done. 
+[07:18:55] dogarrhea: "scan c++ for possible infinite loop"
+[07:18:57] dogarrhea: no way
+[07:23:37] dogarrhea: if selenium is trying to solve the halting problem then that tells me i shouldn't be using it anyways
+[07:23:46] barancev: dogarrhea: why do you think your definition of "page loading complete" is right? most people don't want to halt, they want all resources to be loaded to the page, even if it takes more than 10 sec
+[07:24:03] dogarrhea: whatever time it takes, that's when it should stop
+[07:24:14] dogarrhea: and since i specified 11 seconds in my code and it's not stopping, it's a bug
+[07:24:43] barancev: and you're free to not use selenium, I hope nobody oblige you to do so :)
+[07:25:14] dogarrhea: but yea, halting problem and selenium are not even in the same league
+[07:25:22] dogarrhea: you will get an F in your computing course.
+[07:29:55] Osleg has joined #selenium
+[07:43:22] jeichar has joined #selenium
+[07:45:17] millenium has joined #selenium
+[07:50:58] Osleg has joined #selenium
+[07:54:03] phishy has joined #selenium
+[07:56:02] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 08:03:22 2013]
+[08:03:22] papegaaij has joined #selenium
+[08:11:26] samphippen has joined #selenium
+[08:20:18] Ardesco has joined #selenium
+[08:29:53] rbalent has joined #selenium
+[08:36:52] plightbo_work has joined #selenium
+[08:48:49] amitev has joined #selenium
+[08:51:48] jamesoram has joined #selenium
+[08:52:01] samphippen has joined #selenium
+[08:55:04] zeljkof has joined #selenium
+[IRC logfile - Started Mon Feb 11 09:00:13 2013]
+[09:00:13] rananda has joined #selenium
+[09:09:08] Hronom has joined #selenium
+[09:11:09] Manoj_ has joined #selenium
+[09:16:15] alex__ has joined #selenium
+[09:17:36] zac_sel has joined #selenium
+[09:18:10] plightbo_work has joined #selenium
+[09:18:55] stan has joined #selenium
+[09:18:58] ThePeach has joined #selenium
+[09:29:23] Bebe_sel has joined #selenium
+[09:42:11] davehunt has joined #selenium
+[09:50:32] samphippen has joined #selenium
+[09:56:26] medwards has joined #selenium
+[09:59:14] ^A^kira has joined #selenium
+[09:59:24] Bebe_sel has joined #selenium
+[09:59:35] plightbo_work has joined #selenium
+[IRC logfile - Started Mon Feb 11 10:05:48 2013]
+[10:05:48] jamesoram has joined #selenium
+[10:19:17] eutheria has joined #selenium
+[10:19:56] eutheria: how do you send a ctrl+a i tried this element.sendKeys(KeyState.chord(Keys.CONTROL, "a")); however KeyState doesn't appear to have a .chord method
+[10:23:48] eutheria: oh it is Keys not KeyState
+[10:29:49] dawagner has joined #selenium
+[10:39:08] Bebe_sel has joined #selenium
+[10:41:17] plightbo_work has joined #selenium
+[10:43:29] ^A^kira has joined #selenium
+[10:44:35] AutomatedTester: :spec
+[10:44:35] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[10:45:51] Ardesco: morning
+[10:45:54] Ardesco: snow where you are?
+[10:46:05] Ardesco: (just stopped here)
+[10:46:23] AutomatedTester: no snow at all
+[10:46:27] AutomatedTester: not even raining
+[10:46:49] Ardesco: we got 3-4 inches settled on the roads
+[10:47:09] AutomatedTester: wow
+[10:47:29] Ardesco: well roads are clearing up fast with all the 4x4 stomping over them
+[10:47:32] Ardesco: :)
+[10:48:11] AutomatedTester: live in Chelsea Tractor-ville?
+[10:48:36] Ardesco: no, near farmers and types who should have 4x4's
+[10:48:37] Ardesco: :)
+[10:49:04] AutomatedTester: :)
+[10:49:27] *AutomatedTester lives near farms but there are a number with 4x4 and they never look dirty
+[10:49:28] Ardesco: farmers are great, they are out spreading grit and ploughing the roads when it gets really bad
+[10:49:50] AutomatedTester: I even see people slow down to go up a slope in a Land Rover
+[10:49:51] Ardesco: heh
+[10:50:01] Ardesco: *sigh*
+[10:50:05] AutomatedTester: slope onto a driveway
+[10:50:18] Ardesco: people should have a 4x4 licenese to drive them
+[10:50:24] AutomatedTester: I saw one when walking the boy and pointed a laughed at the people
+[10:51:12] samphippen has joined #selenium
+[10:51:18] Ardesco: i'm sure there are far more idiots on the road nowdays
+[10:51:24] *Ardesco must be getting old
+[10:51:26] AutomatedTester: definitely
+[10:57:06] alkemist has joined #selenium
+[IRC logfile - Started Mon Feb 11 11:03:00 2013]
+[11:03:00] samphippen has joined #selenium
+[11:10:37] Ardesco: snowing again :/
+[11:11:35] Phil37 has joined #selenium
+[11:13:23] brettporter has joined #selenium
+[11:22:56] plightbo_work has joined #selenium
+[11:27:20] zeljkof has joined #selenium
+[11:27:27] simonstewart has joined #selenium
+[11:28:10] simonstewart: Greetings!
+[11:28:42] Phil37: salutations
+[11:28:50] AutomatedTester: oh hai
+[11:30:37] simonstewart: About to print out the spec so I can read it
+[11:30:40] simonstewart: Also, finding a red pen
+[11:31:28] davehunt: simonstewart: marking the homework? :)
+[11:32:39] simonstewart: Basically. Except some of the coursework is mine
+[11:34:52] andreastt: I'm in “killing an accountant seems like a pretty good idea” mode now.
+[11:35:17] *AutomatedTester is glad he has never had to deal with one
+[11:35:19] AutomatedTester: ever
+[11:35:21] *andreastt attempts to fill in unintelligible overtime forms
+[11:35:40] AutomatedTester: what is this overtime thing you talk of?
+[11:35:52] Phil37: play sudoku instead on the forms
+[11:35:57] Phil37: they only check your name anyway
+[11:36:03] andreastt: AutomatedTester: It's so-called voluntary.
+[11:36:10] simonstewart: I need to get an accountant
+[11:36:40] andreastt: I feel like Dilbert when dealing with Opera accounting.
+[11:37:35] andreastt: I have to print the form, sign it, scan it, upload to a web portal that doesn't support Opera, then deliver a carbon copy to my manager to sign, then give that to them.
+[11:38:13] andreastt: I wonder if I can file overtime for filling out overtime forms?
+[11:38:52] Phil37: you can but the forms are a nightmare
+[11:40:04] *AutomatedTester is doing a project proposal document...
+[11:40:14] AutomatedTester: its just as fun
+[11:42:02] simonstewart: This spec is 31 pages of A4 long.
+[11:42:05] simonstewart: Furrfu
+[11:42:11] simonstewart: But I now have a working printer
+[11:42:17] simonstewart: Just need a red pen.
+[11:45:20] barancev has joined #selenium
+[11:47:12] barancev: AutomatedTester: mozilla broke firefox, selenium does not want to work with FF19
+[11:47:26] farlan has joined #selenium
+[11:48:02] ^A^kira has joined #selenium
+[11:51:48] AutomatedTester: barancev: are you going to give me as little information as simonstewart?
+[11:51:54] AutomatedTester: "it doesnt connect"
+[11:52:45] AutomatedTester: also I would be surprised if Mozilla broke Firefox
+[11:52:58] barancev: AutomatedTester: that's the only I know -- no error messages on the console, nothing, it just can't load firefox plugin
+[11:53:21] AutomatedTester: by firefox plugin do you mean webdriver?
+[11:53:22] barancev: try go test_firefox with 19th
+[11:53:29] barancev: yes, webdriver plugin
+[11:53:48] AutomatedTester: ok
+[11:53:50] barancev: sorry, a moment...
+[11:53:50] simonstewart: What does the error console say?
+[11:53:58] AutomatedTester: btw we have an addon not a plugin
+[11:54:07] AutomatedTester: plugin == things like flash
+[11:54:37] barancev: I'm wrong
+[11:54:56] barancev: It can load the webdriver addon to the browser
+[11:55:11] barancev: the following line does not work:
+[11:55:25] barancev: handle = Components.classes['@googlecode.com/webdriver/fxdriver;1'].createInstance();
+[11:55:35] AutomatedTester: sigh...
+[11:55:46] AutomatedTester: that error is meaningless...
+[11:55:53] AutomatedTester: i'll look later
+[11:55:58] barancev: Error: NS_ERROR_XPC_CI_RETURNED_FAILURE: Component returned failure code: 0x80570015 (NS_ERROR_XPC_CI_RETURNED_FAILURE) [nsIJSCID.createInstance]
+[11:56:00] AutomatedTester: I have paid work that needs doing today
+[11:56:42] barancev: I've downgraded to FF18 -- all is OK again
+[11:56:51] bcave has joined #selenium
+[11:57:34] samphippen has joined #selenium
+[11:59:42] bcave: hi all. we've been using selenium for a couple of years now, and have recently overhauled one of our UI's, implementing it with a whole new set of libraries that uses a lot of javascript. backbone, underscore, handlebars, etc. finding it hard to use selenium with the new UI
+[IRC logfile - Started Mon Feb 11 12:00:56 2013]
+[12:00:56] bcave: for example: go to log in page, enter credentials and submit. There is client-side validation that the fields are being completed, but the validators are failing. it seems like the js doesn't register selenium's "type" on the components, and when I try submit the login form, I get a message complainig (for example) that the username field needs to be completed.
+[12:01:06] bcave: while I can see that the value has been entered
+[12:01:22] simonstewart: lunch. biab
+[12:01:51] bcave: is this something that others have come across? a common problem? I know that it could probably be resolved by looking into the validation, but thats all handled by MVC defaults of the libraries, and I don't really want to go fiddling around with that
+[12:03:12] AutomatedTester: bcave: is this with WebDriver?
+[12:04:28] plightbo_work has joined #selenium
+[12:08:33] Ardesco: if it's any help (which it may not be) what I'm working on now is using underscore and handlebars and we aren't seeing those issues
+[12:08:52] Ardesco: this is using WebDriver API though
+[12:16:47] detronizator: hi, did anyone see this topic? https://groups.google.com/d/topic/selenium-developers/dXm14YBGXVs/discussion
+[12:17:23] detronizator: it's the 3rd time I have to come back to the implementation of "click" and I'd love to know your opinion guys
+[12:18:45] AutomatedTester: detronizator: what were you moaning about the other day about GhostDriver
+[12:19:07] detronizator: AutomatedTester: moaning?
+[12:19:51] AutomatedTester: yes
+[12:20:14] AutomatedTester: you said something about PhantomJS is a real browser to and I shouldnt think otherwise
+[12:20:16] detronizator: I don't follow, sorry. Here this question is about clicking and on which instances we "wait" for possible page loads
+[12:20:46] detronizator: AutomatedTester: come on, don't be a dick :) I'm serious here
+[12:21:04] AutomatedTester: I just wanted to know what you were on about
+[12:21:17] AutomatedTester: its in the :log somewhere
+[12:21:17] selbot2: http://illicitonion.com/selogs/selenium/2013/02/11.txt | http://illicitonion.com/selogs/search
+[12:21:45] detronizator: AutomatedTester: Ah - I was just nagging about you not mentioning PhantomJS as a browser of which the dev team provides the WireProtocol implementation
+[12:21:50] detronizator: like FF, Chrome and Opera
+[12:21:52] detronizator: that's all
+[12:22:10] detronizator: but of course PhantomJS is NOT a commercial browser, hence it's a "nagging" more than an actual "complaint"
+[12:22:21] jleyba has joined #selenium
+[12:22:45] detronizator: AutomatedTester: that said, the click topic is way more important
+[12:28:31] zeljkof has joined #selenium
+[12:30:18] farlan has joined #selenium
+[12:35:41] ha6aha6a has joined #selenium
+[12:46:02] plightbo_work has joined #selenium
+[12:50:30] kaawee_ has joined #selenium
+[12:51:17] RossPatterson has joined #selenium
+[12:51:17] ChanServ has altered RossPatterson's mode: +o
+[12:56:47] ^A^kira has left #selenium
+[12:56:57] ^A^kira has joined #selenium
+[12:57:55] AutomatedTester: detronizator: what does the spec say?
+[12:58:58] AutomatedTester: Ardesco: got snow now
+[12:59:02] AutomatedTester: really big flakes
+[12:59:10] Ardesco: stopped again here
+[12:59:14] AutomatedTester: but the ground is wet so its not sticking
+[12:59:19] detronizator: AutomatedTester: there is a link there that points to the Doc
+[12:59:27] detronizator: the Java doc
+[12:59:34] detronizator: the spec, let me fetch the link
+[12:59:37] AutomatedTester: detronizator: right but that wasnt my question
+[IRC logfile - Started Mon Feb 11 13:00:15 2013]
+[13:00:15] detronizator: it says "Click on an element."
+[13:00:16] detronizator: LOL
+[13:00:43] AutomatedTester: :spec
+[13:00:44] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[13:01:56] detronizator: ah, the webdriver specs. reading now...
+[13:02:59] detronizator: AutomatedTester: based on the specs you guys wrote
+[13:03:12] detronizator: there is NO MENTION of waiting for page load events or stuff like that
+[13:03:14] detronizator: right?
+[13:03:25] *AutomatedTester is looking
+[13:04:20] alkemist has joined #selenium
+[13:06:43] AutomatedTester: the java docs in my opinion are wrong
+[13:07:18] AutomatedTester: since it causes a page load to happen we should wait
+[13:10:56] AutomatedTester: in FirefoxDriver we force things into new windows instead of tabs and attach listeners to the window
+[13:11:43] AutomatedTester: detronizator: I will raise a bug for us to not how we should handle it
+[13:13:13] *simonstewart trundles off to the list
+[13:13:49] simonstewart has joined #selenium
+[13:13:53] simonstewart: detronizator: where did you send this email?
+[13:18:04] simonstewart: Blimey. This spec is quite long
+[13:18:17] AutomatedTester: simonstewart: yup
+[13:18:27] AutomatedTester: and we still have empty sections
+[13:18:45] simonstewart: And, it turns out, a lot of places where I need to make corrections
+[13:19:01] simonstewart: And someone needs to revisit the way we determine how something is defined as being visible
+[13:19:44] AutomatedTester: in what respect?
+[13:20:51] simonstewart: We wrote it before a slew of bug reports came in
+[13:21:02] simonstewart: The stuff on CSS transforms you looked at might well play into it
+[13:21:56] simonstewart: There are also a lot of places where we refer to ErrorsLikeThis when we mean "errors like this"
+[13:23:17] simonstewart: And we have references to "Command Response" which makes no sense
+[13:23:21] simonstewart: Oh well
+[13:24:56] aweiteka has joined #selenium
+[13:25:36] AutomatedTester: simonstewart: I have added CSS Transforms in but that part needs doing
+[13:25:48] farlan1 has joined #selenium
+[13:26:07] AutomatedTester: simonstewart: CSS Transforms also break location of elements too
+[13:26:41] AutomatedTester: found it looking at a visibility bug 
+[13:27:28] plightbo_work has joined #selenium
+[13:30:52] DarkRift has joined #selenium
+[13:30:53] DarkRift has joined #selenium
+[13:33:41] AutomatedTester: here comes the snow!!!!
+[13:35:22] barancev: simonstewart: btw, I have a question about visibility
+[13:35:31] barancev: and overflow:hidden
+[13:35:55] barancev: let's suppose there is a link (<a>) inside a div with overflow:hidden, and the link is out of view (e.g. it has margin > the size of parent div)
+[13:36:28] AutomatedTester: the link is not visible then
+[13:36:35] barancev: it is invisible, on the first sight
+[13:36:46] barancev: but a user can switch between links with TAB key
+[13:36:56] barancev: and it can switch to the "invisible" link and at the moment it gets the focus it becames visible
+[13:37:28] barancev: the browser automatically scrolls the content of overflow:hidden block to make the link visible
+[13:37:40] barancev: it is even possible to click it with the mouse after this
+[13:38:21] AutomatedTester: barancev: got a test page showing that?
+[13:38:26] barancev: sure
+[13:38:29] barancev: a moment...
+[13:39:12] ddary has joined #selenium
+[13:39:23] barancev: :gist
+[13:39:24] selbot2: Please paste >3 lines of text to https://gist.github.com
+[13:39:50] barancev: AutomatedTester: https://gist.github.com/barancev/4754474
+[13:40:06] samphippen has joined #selenium
+[13:40:25] barancev: open the page and click TAB twice to make the second link focused
+[13:42:10] AutomatedTester: barancev: I cant seem to make that second link visible
+[13:42:57] barancev: let me create a screencast
+[13:43:31] softmanpetro has joined #selenium
+[13:43:46] AutomatedTester: barancev: firefox doesnt show the link
+[13:43:54] AutomatedTester: chrome does
+[13:44:02] AutomatedTester: Opera doesnt
+[13:44:12] barancev: FF does, wait a minute, i'll show
+[13:47:40] llaskin has joined #selenium
+[13:49:58] mreedell-work has joined #selenium
+[13:50:20] barancev: AutomatedTester: http://www.screencast.com/t/5cTLIqaN
+[13:50:43] barancev: in Opera I can't navigate with the keyboard, is it ever possible?
+[13:51:51] barancev: IE shows the hidden link, but you need more that two TAB clicks, because it starts from the addressbar, not from the first link on the current page
+[13:52:13] AutomatedTester: barancev: I cant get that to happen for me
+[13:52:14] barancev: four TABs (addressbar, search, first link, second link)
+[13:52:53] barancev: can you switch to the first link? what happens when you click TAB again?
+[13:53:04] barancev: am I use a wrong Firefox?
+[13:53:08] barancev: :)
+[13:53:19] AutomatedTester: I cant tab to the links
+[13:53:25] AutomatedTester: are you using an addon?
+[13:54:06] bluescreen10 has joined #selenium
+[13:55:15] barancev: lots of
+[13:55:17] barancev: but..
+[13:55:33] barancev: do you want to say that FF is not accessible with just the keyboard?
+[13:55:43] barancev: no mouse no surf?
+[13:59:26] barancev: found info about Opera -- Shift-Left, Shift-Right to move to the prev/next link
+[IRC logfile - Started Mon Feb 11 14:00:26 2013]
+[14:00:26] barancev: Opera does not scroll, when a "hidden" link gets the focus it is hidden, but if I press Enter it becomes visible and the browser follows the link
+[14:00:35] barancev: so it's kinda clikc
+[14:00:39] barancev: so it's kinda click
+[14:00:58] barancev: verdict: all the browser allow a user to navigate this "hidden" link
+[14:07:11] barancev: AutomatedTester: are you on MacOS? found an interesting link: http://www.456bereastreet.com/archive/200906/enabling_keyboard_navigation_in_mac_os_x_web_browsers/
+[14:07:45] barancev: "It seems a bit strange, but if I create a new user profile in Firefox 3, keyboard navigation works without further configuration. If I create a new Mac OS X user, however, keyboard navigation does not work until I add accessibility.tabfocus in about.config."
+[14:08:00] plightbo_work has joined #selenium
+[14:08:05] cgoldberg has joined #selenium
+[14:09:42] AutomatedTester: barancev: If you did find_element(By.ID, 'body').send_keys(TAB + TAB + TAB + Return) what happens?
+[14:10:47] stan has joined #selenium
+[14:11:04] detronizator: AutomatedTester: simonstewart : sorry guys, was away for lunch
+[14:11:34] detronizator: AutomatedTester: so, FF does wait and you think I should wait too, correct?
+[14:11:44] AutomatedTester: looking
+[14:12:06] barancev: AutomatedTester: driver.findElement(By.tagName("body")).sendKeys(Keys.TAB + Keys.TAB + Keys.RETURN)
+[14:12:11] barancev: works as expected
+[14:12:31] detronizator: but in other words you are saying we should ALWAYS wait, at every click, for a possible pageload
+[14:12:31] barancev: it scrolls, the link gets visible and "clicked"
+[14:12:41] detronizator: simonstewart: which email are you talking about?
+[14:14:27] AutomatedTester: sorry my internet is playing up
+[14:15:59] barancev: well, I understand what do you mean...
+[14:16:04] barancev: :gist
+[14:16:05] selbot2: Please paste >3 lines of text to https://gist.github.com
+[14:16:42] apokalyps has left #selenium
+[14:16:53] barancev: https://gist.github.com/barancev/4754648 -- this code prints false and then true, it's exactly what a user does and observes
+[14:17:23] barancev: I love selenium :)
+[14:21:24] barancev: jarib: yt?
+[14:25:41] RossPatterson: simonstewart: The new spec Shadow DOM stuff begs for a pointer to the Shadow DOM spec in the Normative References section.
+[14:31:05] jarib: barancev: hi
+[14:34:01] barancev: jarib: I want you to implement in Ruby binding a change similar to 4d3f89c5937c
+[14:34:02] selbot2: 03barancev 5 days ago - getText() on a closed alert should throw an exception (Ruby binding should be changed too) | https://code.google.com/p/selenium/source/detail?r=4d3f89c | http://dashboard.ci.seleniumhq.org/#/revision/4d3f89c
+[14:35:14] jarib: aye
+[14:37:00] barancev: I'm not a rubyist and I don't know how to implement it as a "property" (like in python/c#), not a method
+[14:37:21] jarib: no worries, i'll have it done in a second
+[14:37:58] jarib: ruby doesn't distinguish between methods and properties
+[14:38:05] jarib: it's always a method call
+[14:39:12] stan has joined #selenium
+[14:42:51] simonstewart has joined #selenium
+[14:43:21] simonstewart: RossPatterson: you're right. And that's why I have a pull request to Respec.js to allow that to happen
+[14:47:59] plightbo_work has joined #selenium
+[14:51:49] annette has joined #selenium
+[14:51:54] annette has left #selenium
+[14:54:58] Selenium-Git has joined #selenium
+[14:54:58] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/JeprYg
+[14:54:58] Selenium-Git: 13selenium/06master 14bffaa5e 15Jari Bakken: JariBakken: Alert#text should raise on closed alert.
+[14:54:58] Selenium-Git has left #selenium
+[14:55:06] jarib: barancev: there we go. thanks for letting me know!
+[14:55:22] simonstewart: RossPatterson: https://github.com/darobin/respec/pull/142
+[14:55:29] barancev: thanks!
+[14:56:07] davehunt has joined #selenium
+[14:56:23] nirvdrum has joined #selenium
+[14:58:37] james_o has joined #selenium
+[14:58:59] Ardesco_ has joined #selenium
+[IRC logfile - Started Mon Feb 11 15:00:20 2013]
+[15:00:20] RossPatterson: simonstewart: Interesting ... so respec limits you in terms of what you can cite?
+[15:00:53] AutomatedTester: RossPatterson: i dont think it means to
+[15:00:56] simonstewart: It has a bibliography you can refer to 
+[15:01:09] RossPatterson: Ah.  Much more understandable.
+[15:01:43] simonstewart: Jeepers. That cookie section needs work
+[15:03:28] phishy has joined #selenium
+[15:03:49] simonstewart: I particularly like the way that approximately half the commands list the session id as a parameter when it's already a field on the Command
+[15:03:58] dhpe has joined #selenium
+[15:03:58] jleyba has joined #selenium
+[15:03:59] *simonstewart facepalms
+[15:03:59] jleyba has joined #selenium
+[15:04:36] h8R has joined #selenium
+[15:05:05] simonstewart: jleyba: on a bus?
+[15:05:48] simonstewart: "emulated natively"
+[15:07:29] simonstewart: "The the"
+[15:07:48] AutomatedTester: simonstewart: be nice...
+[15:08:24] simonstewart: I may have written some of this
+[15:08:40] simonstewart: I've got a busy afternoon of text editing ahead
+[15:08:55] AutomatedTester: you edited the cookie stuff before...
+[15:08:58] AutomatedTester: iirc 
+[15:09:04] AutomatedTester: but still... be nice...
+[15:09:37] simonstewart: :)
+[15:10:58] simonstewart: We also appear to have some quirkiness around parameters. Sometimes we use "Array.<string>" and sometimes "string[]". Oh, and we use DOMString and string without rhyme or reason. That should be fixed by the end of the day. :)
+[15:11:00] simonstewart: By me. 
+[15:11:12] simonstewart: I'm not expecting anyone else to do those changes :)
+[15:11:13] fatguylaughing has joined #selenium
+[15:12:15] simonstewart: I'm not touching 14.3.2.1 today.
+[15:14:17] millenium_ has joined #selenium
+[15:15:02] simonstewart: Review: finished. Now to implement the changes.
+[15:25:54] rpereira_ has joined #selenium
+[15:26:53] plightbo_work has joined #selenium
+[15:30:56] eutheria: so i run a test, i've written something badly and the test fails, so i correct the script and rerun, however selenium is blocked, i have to wait x seconds for the browser to be closed
+[15:31:20] eutheria: question, how can i run multiple instances of a browser? or reduce the time for the browser to close
+[15:33:13] Manoj_: eutheria: you can try running in parallel using TestNg or use Selenium GRID
+[15:33:50] eutheria: yes i am using both of these
+[15:34:04] eutheria: testng and selenium grid
+[15:34:29] eutheria: the grid waits such a long time to kill a browser before opening a new one
+[15:46:42] dawagner has joined #selenium
+[15:49:44] jeichar has joined #selenium
+[15:52:05] freynaud has joined #selenium
+[15:52:50] smccarthy has joined #selenium
+[15:55:17] jimevans has joined #selenium
+[15:55:58] jimevans: g'day everybody
+[15:56:22] simonstewart: g'day
+[IRC logfile - Started Mon Feb 11 16:05:54 2013]
+[16:05:54] plightbo_work has joined #selenium
+[16:10:43] davehunt has joined #selenium
+[16:11:55] dogarrhea has joined #selenium
+[16:12:13] dogarrhea: wow. so bad.  even after I CLOSE firefox completely, selenium is still waiting for something.
+[16:12:43] simonstewart: How are you closing selenium?
+[16:12:48] dogarrhea: click X button
+[16:13:00] intchanter-work has joined #selenium
+[16:13:35] dogarrhea: is this really the quality of selenium?
+[16:13:51] simonstewart: I was just about to help
+[16:13:51] dogarrhea: specify time out in driver to 11 seconds + unstable or - unstable and it just freezes
+[16:14:11] simonstewart: That comment just makes me want to focus on other things
+[16:14:13] dogarrhea: simonstewart i  have probably tried what you would be about to suggest no doubt
+[16:14:25] dogarrhea: so feel free
+[16:14:26] rbalent has joined #selenium
+[16:14:29] *simonstewart disengages from conversation
+[16:14:54] dogarrhea: the developer should probably stop playing with legos angry birds and q-tips anyways and focus on fixing bugs
+[16:15:12] simonstewart: I'm currently working on the spec
+[16:15:15] simonstewart: :P
+[16:15:22] dogarrhea: i'm talking about Jason whoever
+[16:15:33] dogarrhea: it seems pretty mickey mouse to a lot of people
+[16:15:44] simonstewart: ?
+[16:15:50] Archdude has joined #selenium
+[16:16:18] dogarrhea: you haven't seen the "angry birds playing robot" video?
+[16:16:27] dogarrhea: its basically a qtip attached to some 9 volt motor
+[16:16:35] simonstewart: Ah! That. Jason Huggins thing?
+[16:16:38] simonstewart: Yeah. I've seen it
+[16:16:38] jimevans: always a good time when alex joins the conversation.
+[16:16:39] dogarrhea: that's hardly an angry birds playing robot
+[16:16:57] dogarrhea: notice all the thumbs down on it
+[16:17:07] RossPatterson: dogarrhea: Be nice.
+[16:17:17] dogarrhea: I am simply stating facts
+[16:17:28] simonstewart: I think you're missing the point about it: by having it, he's managed to drive a lot of attention to his other work
+[16:17:56] dogarrhea: by demonstrating that his other work might also be mickey mouse?
+[16:20:24] dukeatcoding has joined #selenium
+[16:20:36] dukeatcoding: hey guys
+[16:20:45] dukeatcoding: how do i define the capabilities of a node
+[16:20:48] dukeatcoding: when i start it ?
+[16:21:27] simonstewart: It's an argument to the remote webdriver constructor
+[16:22:59] dogarrhea: anyways, i'll wait for selenium 7
+[16:23:05] dogarrhea: it'll take that long before things become stable
+[16:23:32] simonstewart: Grief
+[16:23:48] jimevans: god, i love when dogarrhea (alex) comes to visit.
+[16:24:04] plightbo_work has joined #selenium
+[16:24:22] simonstewart: Who is he?
+[16:26:14] jimevans: a major troll who drops in from time to time, adds nothing of note to the conversation, insultingly dumps on selenium, and leaves.
+[16:26:32] jimevans: but this isn't the only community he does it too.
+[16:26:37] jimevans: s/too/to/
+[16:26:53] simonstewart: Wow.
+[16:27:55] llaskin: jim yea he is hilarious
+[16:28:01] llaskin: he's fun to feed on occasion
+[16:28:38] *llaskin waits patiently for Santicyr
+[16:28:44] detronizator: Ignore shitty heads like that. Most probably, such a dickhead is probably connected with 2 accounts just for the pleasure to read the reaction.
+[16:28:48] bluescreen10 has joined #selenium
+[16:29:37] jimevans: i believe his real name is alex, surname possibly chen, living in LA.
+[16:32:14] cgoldberg: for every vocal troll, there's dozens of lurkers who appreciate all the work that goes into open source :) 
+[16:32:47] Phil37: cant we appreciate both
+[16:36:29] dude-x has joined #selenium
+[16:37:29] Ardesco: I suggest you release Selenium 7 next week
+[16:37:36] Ardesco: ;)
+[16:37:58] bluescreen100 has joined #selenium
+[16:37:59] Ardesco: or have a Selenium 8 release page hidden away
+[16:38:23] Ardesco: so next time he comes in you can say, DUH get with the program you are years behind, heres the Selenium 8 download
+[16:39:16] Phil37: make the next release selenium 360
+[16:39:19] freynaud has left #selenium
+[16:39:54] SamuraiJack has joined #selenium
+[16:40:36] gdennis has joined #selenium
+[16:44:18] JackDandy has joined #selenium
+[16:44:51] Ardesco: I think Selenium 8 is where it's at
+[16:45:01] Ardesco: You could also add a new strap line
+[16:45:12] Ardesco: Selenium 8 - Now supports touch events (badly)
+[16:45:22] plightbo_work has joined #selenium
+[16:45:28] Ardesco: Bring it in line with Windows
+[16:45:32] Ardesco: ;)
+[16:46:16] dude-x: intchanter: good morning; during the weekend i took a look at your branch
+[16:46:26] freynaud has joined #selenium
+[16:48:05] jimevans: Ardesco: i went through a version renumbering exercise for exactly that reason while at MSFT.
+[16:48:35] Ardesco: heh
+[16:49:49] barancev has joined #selenium
+[16:49:55] sfbrian has joined #selenium
+[16:50:13] jimevans: yep, version numbers for office applications all jumped to 7 for Office 95. access went from 2, powerpoint went from 3, and excel went from 5, all to 7, because the next version of word was going to be v7. :)
+[16:52:29] Ardesco: well we wouldn't want to confuse all the customers with varying version numbers would we now
+[16:52:31] Ardesco: :)
+[16:57:33] intchanter-work: dude-x: I have it importing successfully now, and started trying to run the tests, but I may have an invalid environment.
+[16:58:20] intchanter-work: Also a traceback when I try to instantiate webdriver.Firefox()
+[16:58:37] dude-x: intchanter-work: i have a request. Can you take the work you did on your fork and do it on a branch?
+[16:59:48] dude-x: intchanter-work: it will make it easier to handle the updates from the main mirror otherwise we will pollute the history with our work and the work of the main committers
+[IRC logfile - Started Mon Feb 11 17:01:28 2013]
+[17:01:28] barancev: jimevans: a quesion about Browser.cpp: we have two different ways to wait for readyState = complete, https://code.google.com/p/selenium/source/browse/cpp/IEDriver/Browser.cpp#394 and https://code.google.com/p/selenium/source/browse/cpp/IEDriver/Browser.cpp#433
+[17:01:42] barancev: are they equivalent? I doubt
+[17:02:42] barancev: I've tried to change the second une (with strings) to use ready_state != READYSTATE_COMPLETE
+[17:03:16] jimevans: barancev: two different object types. one is IHTMLDocument2, one is IWebBrowser2.
+[17:03:34] dukeatcoding: does anbody of you have a little shell script
+[17:03:39] dukeatcoding: for starting the selenium hub
+[17:03:44] dukeatcoding: with prohibits multiple startups ?
+[17:03:47] barancev: and this change fixed #4822
+[17:03:49] selbot2: 03 open/new Internet Explorer WebDriver test hangs while executing click action - https://code.google.com/p/selenium/issues/detail?id=4822 [Type-Defect Priority-Medium Browser-IE]
+[17:04:29] barancev: jimevans: I mean -- are they "functionally equivalent", my investigation shows they are not, but I'm not sure I'm right
+[17:05:00] jimevans: barancev: they're not functionally equivalent. they're not meant to be. they're testing for two different conditions.
+[17:05:22] jimevans: it's unfortunate that they have similar names, but they're not the same thing.
+[17:06:16] barancev: aha, they check state of the browser, and the document, I see
+[17:06:52] barancev: thanks!
+[17:06:56] jimevans: np
+[17:11:33] lukeis has joined #selenium
+[17:12:43] dukeatcoding: anybody using .sh script to start the hub ?
+[17:14:26] nirvdrum: dukeatcoding: Yeah.  What's up?
+[17:15:39] intchanter-work: dude-x: I only have a couple of hours today, but I'll see what I can do.  Any help with tracking down the issues is appreciated in the meantime.
+[17:16:27] dude-x: intchanter-work: great! when i get home this evening I'll clone your repo and then work on resolving the issues your'e having
+[17:16:44] dude-x: hmm i should have clone it Saturday ....
+[17:16:49] dukeatcoding: @nirvdrum do you prevent multiple startup in your script ?
+[17:17:10] nirvdrum: No.  I just don't start up more than once :-P
+[17:17:11] intchanter-work: With luck I may have the branch ready by then.  Is Dude-X_ your home IRC?
+[17:17:15] dukeatcoding: hehe
+[17:17:21] dukeatcoding: i start the server via a php script
+[17:17:22] dude-x: intchanter-work: yeah
+[17:17:30] nirvdrum: I think the second one would fail anyway, since it wouldn't be able to bind to the port.
+[17:17:32] dukeatcoding: which is stupid atm ;) and startsup every time
+[17:17:45] dukeatcoding: another thing i am looking for right now are 
+[17:17:49] dukeatcoding: hub control commands like
+[17:17:55] dukeatcoding: ?cmd=shutDownSeleniumServer
+[17:17:58] dukeatcoding: is there a list somewhere
+[17:18:02] dukeatcoding: didn't found one so far
+[17:18:21] nirvdrum: Turning this into an upstart script wouldn't be too hard.  But I don't think that would prevent multiple instances either.  It just would give you a standard tool for starting up.
+[17:18:49] nirvdrum: That isn't really a hub command.  That's an RC server command that the hub also responds to.
+[17:18:59] dukeatcoding: the thing is i probably will run multiple instance in the future
+[17:19:00] nirvdrum: I have no idea what else is available.
+[17:19:01] dukeatcoding: on different ports
+[17:19:05] nirvdrum: Why?
+[17:19:08] dukeatcoding: so only scanning for selenium hub processes
+[17:19:11] dukeatcoding: wont do it
+[17:19:29] dukeatcoding: I want to have seperate grids with dedicated machines and special configs
+[17:20:04] nirvdrum: You could just segregate a single grid with different capabilities.
+[17:20:40] dukeatcoding: but i want to ensure that Person A doesn't run test on the machine Person B does
+[17:21:01] dukeatcoding: I have build a system which can boot machines with about 1200 configurations
+[17:21:21] nirvdrum: Well, have fun with that :-P
+[17:21:22] dukeatcoding: and i created a java class to boot a specific grid
+[17:21:26] dukeatcoding: configuration on demand
+[17:21:33] dukeatcoding: works fine ;)
+[17:21:46] Phil37: ye well i can eat a whole steak without pooping
+[17:21:47] dukeatcoding: when i put a rotating port for the hub
+[17:21:49] dukeatcoding: its no problem
+[17:22:00] dukeatcoding: Phil37: you are cool
+[17:22:01] dukeatcoding: ;)
+[17:22:02] dukeatcoding: lol
+[17:22:05] Phil37: i know.
+[17:22:16] dukeatcoding: so there must be a list of server commands anywhere
+[17:22:20] dukeatcoding: or do i have to dig into the code
+[17:22:34] nirvdrum: dukeatcoding: I don't doubt it would work.  That's just an awful lot of infrastructure to manage.
+[17:22:49] dukeatcoding: jep
+[17:22:55] dukeatcoding: but people pay for it , so what ;)
+[17:23:11] dukeatcoding: and i have a hughe hardware playground ;)
+[17:23:11] nirvdrum: And you could achieve what you want through grid plugins.
+[17:23:25] dukeatcoding: where do i find them ?
+[17:23:28] nirvdrum: Nifty.  I take it you're one of the commercial services floating around?
+[17:23:28] dukeatcoding: is there a listing
+[17:23:40] dukeatcoding: not really
+[17:23:55] nirvdrum: No idea.  Try www.seleniumhq.org.
+[17:24:00] dukeatcoding: its mostly for our exiisting costumers
+[17:24:04] nirvdrum: But there's really no "hub commands"
+[17:24:05] simonstewart: Right.
+[17:24:20] dukeatcoding: jep you don't find anything
+[17:24:21] nirvdrum: *there are
+[17:24:23] dukeatcoding: on seleniumhq
+[17:24:23] simonstewart: Just pushed a pretty large series of edits to the webdriver spec to the mercurial repo
+[17:24:27] simonstewart: And am now off home
+[17:24:35] simonstewart: G'night one and all
+[17:24:36] simonstewart has left #selenium
+[17:25:01] nirvdrum: dukeatcoding: If you want custom commands for your hub, you're better off adding a servlet that provides whatever API you want.
+[17:25:04] nirvdrum: Pretty simple to do.
+[17:25:42] nirvdrum: The RC commands are legacy. And as you can see, not very well documented.  I really don't even know if there's more than just the one you found.
+[17:35:20] freynaud has joined #selenium
+[17:38:28] dukeatcoding: hehe
+[17:38:30] dukeatcoding: me neither
+[17:38:44] dukeatcoding: i was wondering ... the html frontend in all is not very attractive
+[17:38:48] dukeatcoding: but nobody seems to care about
+[17:43:13] intchanter-work: dude-x: https://github.com/intchanter/selenium/tree/py23 exists now.  It has a few merge commits in it, but those shouldn't be an issue for when it merges back to main, right?
+[17:44:13] lukeis: intchanter-work: it would be nice to do a `git rebase origin master` to get rid of those
+[17:44:42] lukeis: intchanter-work: also when you pull new changes you should pass the rebase option:  `git pull --rebase`
+[17:45:05] intchanter-work: Ooh, good info, thanks!
+[17:46:23] dude-x: yes, rebasing is what we need to do
+[17:48:27] dude-x: intchanter-work: I will write up a workflow for the git commands to use
+[17:48:59] Todd has joined #selenium
+[17:50:13] llaskin: does andy tinkham ever stop in anymore?
+[17:50:29] lukeis: :seen andytinkham
+[17:50:30] selbot2: I haven't seen andytinkham.
+[17:50:43] lukeis: :)
+[17:51:57] freynaud has joined #selenium
+[17:53:04] jimevans: RossPatterson: yt?
+[17:53:41] intchanter-work: dude-x: I think I have my local repo cleaned up properly, so I'm going to blow away the one I have on github and recreate it.
+[17:53:57] dude-x: intchanter-work: sounds good to me
+[17:55:34] RossPatterson: jievans Yup.
+[17:55:58] RossPatterson: jimevans: Yup.  Whazzup?
+[17:56:09] Spanktar has joined #selenium
+[17:56:32] jimevans: RossPatterson: i think your xpath in https://groups.google.com/d/msg/selenium-users/Y3Cx1IEzYpw/-YMYsLVUKyUJ has a bug. i've posted a reply, but i'm not certain i'm right.
+[17:57:51] jimevans: but i'm off to grab lunch. brb.
+[17:58:26] RossPatterson: We're both right.  It depends on which element Mike Hill wants to act on.  Your XPath identifies the <SPAN>, mine the <BUTTON>.  Knowing JavaScript frameworks, he might really want a <DIV> six miles away from both of those :-(
+[IRC logfile - Started Mon Feb 11 18:01:32 2013]
+[18:01:32] albinadatsukova has joined #selenium
+[18:03:49] _kW has joined #selenium
+[18:08:23] jeichar has joined #selenium
+[18:13:49] stephend has joined #selenium
+[18:19:19] zeljkof has joined #selenium
+[18:28:58] jimevans: i guess i've never seen //element[element] before. :)
+[18:30:38] RossPatterson: XPath is almost Turing-complete :-)
+[18:31:00] RossPatterson: //x[y] means "An <X> that contains a <Y>".
+[18:31:42] dude-x: i've seen that. only confuses me when i first see it.
+[18:31:55] dude-x: it bothers me when i see comments like "only this xpath works"
+[18:32:08] dude-x: which makes me think "LOLwut"
+[18:32:23] RossPatterson: XPath is like regular expressions.  A programmer has a problem and thinks ...
+[18:32:48] *RossPatterson mumbles something about great power and something or other
+[18:33:19] Manoj has joined #selenium
+[18:33:40] jimevans: "//now[@he='has'][2]/problems"
+[18:34:49] llaskin: any saucers around?
+[18:42:04] jleyba_ has joined #selenium
+[18:44:00] RossPatterson: :-)
+[18:48:33] *dude-x thinks of war of the worlds...
+[18:52:41] intchanter-work: Splitting into branches allows me to confirm that there's something about my environment that's causing tests to fail both with and without the py23 changes.
+[18:52:56] intchanter-work: "org.apache.tools.ant.BuildException: Test org.openqa.selenium.javascript.ClosureTestSuite failed"
+[18:54:29] intchanter-work: The build page in the wiki doesn't mention this one.  Any tips for finding how my environment is broken?
+[18:55:34] jcarr has joined #selenium
+[IRC logfile - Started Mon Feb 11 19:01:36 2013]
+[19:01:36] barancev: intchanter-work: it's a javascript test broken, not the environment
+[19:02:05] intchanter-work: Oh, good (for that one).
+[19:02:33] intchanter-work: Over the weekend, I was getting a hang and bail on SmallTests.  Is that also a test fail, or might that be environment?
+[19:03:54] dude-x: unfortunately sometimes the committers might leave the project in a bad state on the master branch
+[19:04:24] lukeis: who? us? never ;_
+[19:04:24] dude-x: however, on a good day, you should only need to run go once
+[19:04:31] dude-x: and just run go py_test
+[19:05:50] intchanter-work: Ooh, maybe I can skip the broken tests.
+[19:06:29] barancev: if you want to skip tests run go release
+[19:06:58] intchanter-work: I don't see a py_test target.
+[19:07:30] dude-x: test_py
+[19:07:37] dude-x: let me check
+[19:07:49] riotz has joined #selenium
+[19:08:03] freynaud has joined #selenium
+[19:08:08] dude-x: hmm my notes are out of date :/
+[19:08:28] dude-x: it could be .go //py_test or .go //test_py
+[19:08:29] intchanter-work: test_py is doing something.  :-)
+[19:08:33] dude-x: cool
+[19:12:49] sassda has joined #selenium
+[19:24:15] _kW has joined #selenium
+[19:33:16] DarkRift has joined #selenium
+[19:33:17] DarkRift has joined #selenium
+[19:33:58] admc has joined #selenium
+[19:34:34] cgoldberg has joined #selenium
+[19:36:23] mreedell-work has joined #selenium
+[19:37:38] detronizator_hom has joined #selenium
+[19:39:58] farlan has left #selenium
+[19:47:06] jleyba_ has joined #selenium
+[IRC logfile - Started Mon Feb 11 20:02:04 2013]
+[20:02:04] Todd has joined #selenium
+[20:04:51] jimevans: AutomatedTester or lukeis: yt?
+[20:05:02] lukeis: yes
+[20:05:17] riotz has joined #selenium
+[20:05:30] jimevans: where in the python bindings can i find the exact code that does an http request in the remote implementation?
+[20:06:06] lukeis: http://code.google.com/p/selenium/source/browse/py/selenium/webdriver/remote/remote_connection.py
+[20:06:27] jimevans: lukeis: ty.
+[20:06:32] lukeis: np
+[20:07:53] lukeis: jimevans: line 323 btw i think is what you're asking for
+[20:07:54] Selenium-Git has joined #selenium
+[20:07:55] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/9vix5g
+[20:07:55] Selenium-Git: 13selenium/06master 14a70a7bc 15Alexei Barantsev: Fixing a test that opens a new window: switch to this window, close it and...
+[20:07:55] Selenium-Git has left #selenium
+[20:08:17] jimevans: lukeis: yeah, i found what i was looking for.
+[20:08:20] jimevans: thanks again.
+[20:08:22] lukeis: cool
+[20:10:32] jarib has joined #selenium
+[20:11:15] jimevans: in java and ruby, what's the default timeout for an http request given the http libraries we use in those language bindings?
+[20:11:20] intchanter-work: Tests run the same on the py23 branch as on master under Python 2.7.3.
+[20:12:17] intchanter-work: I'm running from a python 3.2.3 virtualenv, though.  Where does that get overridden to use python2?
+[20:13:27] intchanter-work: And do we want test_py to run under both?
+[20:20:50] intchanter-work: Or only both if both are available?
+[20:23:21] dude-x: intchanter: changing how the tests are run might be harder, i will wait for the new crazy fun....
+[20:23:36] dude-x: intchanter: since we use py.test we might want to look at setting up tox.ini
+[20:23:49] dude-x: intchanter-work: ^
+[20:24:06] dude-x: intchanter-work: actually tox might be the solution for testing both python 2 and python3
+[20:24:11] cmcgraw has joined #selenium
+[20:24:53] intchanter-work: Ooh, that looks like a cool project.
+[20:25:34] lukeis: I don't know how to use virtualenv, but is there a command line arg to set the version of python?
+[20:25:41] dude-x: yes
+[20:25:46] lukeis: what is it?
+[20:26:08] dude-x: -python3 for python3 IIRC
+[20:26:44] dude-x: look at branch for the code i used
+[20:26:50] dude-x: my branch
+[20:27:45] lukeis: ok… well setting that somehow here:  http://code.google.com/p/selenium/source/browse/rake-tasks/crazy_fun/mappings/python.rb#171 maybe through an arg? (defined here:  http://code.google.com/p/selenium/source/browse/py/build.desc#49  )
+[20:28:05] lukeis: crazy fun… and I don't mean fun.
+[20:28:42] dude-x: it's the former…. i set that to -python3
+[20:29:59] dude-x: a unified python project should run both tests 
+[20:30:46] lukeis: are we planning on keeping 2.X? or just upgrading to 3? :)
+[20:31:02] intchanter-work: The work we're doing now should allow supporting 2.6+
+[20:31:07] lukeis: cool
+[20:31:15] dawagner has joined #selenium
+[20:31:26] intchanter-work: And in a single repo, probably.
+[20:31:33] dude-x: AT wants to support both;preferably one code base
+[20:31:42] lukeis: yes, that would be ideal
+[20:35:40] intchanter-work: dude-x: I'm headed out for the day, but may be able to look some more tonight.  All my changes are pushed to https://github.com/intchanter/selenium/tree/py23
+[20:36:03] dude-x: great
+[20:36:10] dude-x: this will be fun
+[20:36:24] intchanter-work: I'll ping you if I get a chance.  Thanks for doing most of the hard work beforehand.
+[20:36:55] Selenium-Git has joined #selenium
+[20:36:55] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 2 new commits to 06master: 02http://git.io/scNd1w
+[20:36:55] Selenium-Git: 13selenium/06master 14806b6c1 15Alexei Barantsev: Ignoring a test for HtmlUnit (window switching is not implemented)
+[20:36:55] Selenium-Git: 13selenium/06master 149684a3f 15Alexei Barantsev: Code linting (removed unused imports, local variables, fields, debug...
+[20:36:55] Selenium-Git has left #selenium
+[20:36:58] dude-x: some credit goes to others but thanks
+[20:39:19] AutomatedTester: woop, got selected for GTAC
+[20:39:48] dude-x: me too!
+[20:40:33] Todd has joined #selenium
+[20:41:54] dude-x: the moment you mentioned it AutomatedTester, i hit refresh on my gmail and got the confrimation
+[20:41:57] jost has joined #selenium
+[20:47:00] jarib: heh, i got rejected
+[20:47:34] jarib: i wonder what they based that on, since the form didn't really ask for any info
+[20:48:38] dude-x: probably they factor prior attendance, location, if you're a speaker or not
+[20:48:45] lukeis: ah, wait listed to gtac...
+[20:49:35] *AutomatedTester hugs jarib
+[20:49:47] AutomatedTester: its ok, Ill take photos
+[20:49:52] *jarib sobs
+[20:50:01] jarib: actually it's fine, i wouldn't have been able to attend anyway 
+[20:50:08] lukeis: oh, well… only one trip to the east coast this year then ;)
+[20:50:52] jimevans: jarib: ruby http client question above. :)
+[20:52:25] jarib: jimevans: 60 seconds in ruby 
+[20:53:04] jimevans: so in the case that an http command doesn't respond, the ruby bindings could take up to 3 minutes to throw an error?
+[20:53:07] jarib: that's the default for the HTTP client in ruby's stdlib
+[20:53:40] jimevans: (i'm looking in the ruby bindings' implementation of an http request to a wire protocol remote server)
+[20:53:46] jarib: 3 minutes? 
+[20:54:00] jarib: the connection will time out after 60 seconds
+[20:54:23] jimevans: there appears to be retry logic in the request method of Selenium::WebDriver::Remote::Http::Default
+[20:55:37] jarib: oh right. but that's only for those socket errors, not for the TimeoutError you'd get after 60 seconds
+[20:56:07] jimevans: ok. got it.
+[IRC logfile - Started Mon Feb 11 21:01:24 2013]
+[21:01:24] jarib: AutomatedTester: did you submit a talk?
+[21:01:30] AutomatedTester: jarib: I did
+[21:01:50] AutomatedTester: jarib: How to test a Mobile OS - David Burns and Malini Das
+[21:02:28] jarib: cool
+[21:05:41] sassda has joined #selenium
+[21:06:47] riotz has joined #selenium
+[21:07:48] jleyba_: What's the time table for the 2.30.0 release?
+[21:08:11] jimevans: jleyba_: dunno. 
+[21:08:17] barancev: btw, selenium does not work with FF19 
+[21:08:22] *jimevans goes off to look at the firefox release schedule
+[21:08:29] barancev: and FF19 release in a week
+[21:09:14] jimevans: then i guess we'd better get cracking on getting webdriver working with FF19. :)
+[21:09:23] jimevans: jleyba_: you volunteering to pick up the bacon?
+[21:09:38] jimevans: :)
+[21:09:41] jleyba_: Ha, nope :)
+[21:10:02] jleyba_: Trying to figure out how much time I have to fix SafariDriver bugs and prepare WebDriverJS for npm
+[21:13:36] barancev: #5060 -- that's what we have in FF19, I can confirm this
+[21:13:37] selbot2: 03 open/new webdriver doesn't work with Firefox 19 (beta) - https://code.google.com/p/selenium/issues/detail?id=5060 [Type-Defect Priority-Medium Status-Untriaged Browser-Firefox]
+[21:14:35] dacc has joined #selenium
+[21:14:55] dacc: any idea where to get selenium ide?  link is broken on the site: http://seleniumhq.org/projects/ide/
+[21:15:20] dacc: oh nm, found it
+[21:17:05] Todd has joined #selenium
+[21:23:05] jimevans: barancev: i think our maximum version for firefox in the extension package is 18 right now. that probably should change.
+[21:23:20] barancev: jimevans: it's 19.*
+[21:23:27] jimevans: oh, well, i'm wrong then.
+[21:24:12] barancev: https://code.google.com/p/selenium/source/browse/javascript/firefox-driver/extension/install.rdf
+[21:24:15] jimevans: which is entirely unremarkable.
+[21:24:19] barancev: this one, right?
+[21:24:37] jimevans: that's the one i was going to look at just after i made that statement.
+[21:26:38] smccarthy has joined #selenium
+[21:28:51] _kW has joined #selenium
+[21:29:30] kentor has joined #selenium
+[21:30:42] jleyba_ has joined #selenium
+[21:33:19] plightbo_work has joined #selenium
+[21:33:32] santiycr has joined #selenium
+[21:33:33] selbot2: santiycr: note from jimevans 4 days ago: ping me next time we're both in the channel simultaneously. 
+[21:34:46] santiycr: jimevans:  yt?
+[21:34:53] jimevans: santiycr: i am
+[21:35:45] jimevans: santiycr: i was wanting to discuss the IE10 tests in the CI environment.
+[21:35:54] sassda has joined #selenium
+[21:37:24] santiycr: jimevans: sure
+[21:37:33] santiycr: I'm pairing at sauce right now
+[21:37:45] santiycr: how much of a discussion do you want to have?
+[21:37:53] santiycr: we can skype later if needed
+[21:37:55] jimevans: so it looks like we're not able to set cookies in the IE10 environment, and i'm not sure why.
+[21:38:19] jimevans: the IE driver uses javascript to do it, so i wonder if there's a new IE10 setting that's biting us there.
+[21:39:50] santiycr: jimevans:  oh interesting
+[21:40:03] santiycr: the regedits that we apply to our boxes are actually open source
+[21:40:10] santiycr: I have a TODO to talk about these with you
+[21:40:45] santiycr: we made them for Se1 tests, I'm guessing some of them are not necessary anymore or maybe even counter productive for Se2
+[21:41:19] santiycr: jimevans:  https://gist.github.com/santiycr/870401
+[21:41:28] jimevans: looking now
+[21:42:51] jimevans: bear in mind i've done very very little work with IE10 because of the windows 8 requirement.
+[21:43:27] kaawee has joined #selenium
+[21:43:41] santiycr: oh, no worries
+[21:43:54] davehunt has joined #selenium
+[21:44:00] santiycr: we can maybe give you access to a long running vm if you need to debug stuff
+[21:44:58] barancev: santiycr: and implement IE debug logs, please :)
+[21:45:17] santiycr: barancev:  in my todo for this week :)
+[21:45:45] santiycr: today is crazy, as I took half of next week for a snowboarding trip, but I expect I'll catch up and be able to focus on that by Wed
+[21:46:24] barancev: santiycr: we are still gettings failures "custom selenium server can't start", you were going to implement a checksum of the downloaded server file, where I can see this property?
+[21:47:52] Todd has joined #selenium
+[21:49:33] santiycr: oh, I just logged it for now. But it means I can now go back and look at it myself
+[21:49:40] santiycr: can you give me some job ids?
+[21:49:43] santiycr: barancev:  ^
+[21:51:54] barancev: santiycr: https://saucelabs.com/jobs/751eebdc64d0480f91aae977b1f0654a
+[21:52:26] *santiycr looking
+[21:56:00] barancev: compare to any other job for the build 2916, e.g. https://saucelabs.com/tests/96b288a64e1746aab1b1a0d878806bb3
+[21:56:16] llaskin has joined #selenium
+[21:56:42] ha6aha6a has joined #selenium
+[21:57:25] ha6aha6a: i have a question about WebDriver. is it possible to get the html element that comes next after the one i am working on?
+[21:58:11] farlan has joined #selenium
+[IRC logfile - Started Mon Feb 11 22:00:11 2013]
+[22:00:11] sassda: you using css selectors?
+[22:00:54] santiycr: barancev:  tks
+[22:07:57] brettporter has joined #selenium
+[22:09:19] barancev: jimevans: a new interesting issue #5148 -- works locally, fails on selenium server
+[22:09:21] selbot2: 03 open/new dropdown button on iframe - https://code.google.com/p/selenium/issues/detail?id=5148 [Type-Defect Priority-Medium Browser-IE Component-Grid]
+[22:09:24] kentor: was anybody able to get selenium to work with browsermob proxy with ssl? all https sites are unaccessible..
+[22:09:37] jimevans: barancev: just saw that.
+[22:14:39] Ardesco_H has joined #selenium
+[22:14:42] santiycr: barancev:  bug in my hex printing, attempted to print in binary, will have to commit a fix, sry
+[22:15:10] zeljkof has joined #selenium
+[22:15:15] barancev: np
+[22:16:00] santiycr: at first glance, it looks like the md5 is the same
+[22:16:08] gdennis has left #selenium
+[22:16:22] santiycr: MD5 of the Selenium Jar: ?t?)*???g?       ?o?
+[22:16:24] santiycr: :)
+[22:16:32] santiycr: both jobs have the same 
+[22:16:47] santiycr: though I'll make it non binary for our next deploy
+[22:17:04] santiycr: I think at this point we can discard corrupted files being the problem
+[22:17:48] llaskin has joined #selenium
+[22:19:29] barancev: santiycr: opera is worrying me too -- https://saucelabs.com/jobs/6fb992bddca34d1aa9e15989deeb8c0f/selenium-server.log
+[22:19:55] barancev: issues with temporary profiles
+[22:24:56] llaskin has joined #selenium
+[22:26:03] dacc has left #selenium
+[22:31:58] jleyba_ has joined #selenium
+[22:32:56] Selenium-Git has joined #selenium
+[22:32:56] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/ZmIe6Q
+[22:32:56] Selenium-Git: 13selenium/06master 14f9e721d 15Alexei Barantsev: Deleting duplicated content of a test page
+[22:32:56] Selenium-Git has left #selenium
+[22:36:01] testingb0t has joined #selenium
+[22:36:19] bluescreen10 has joined #selenium
+[22:45:25] Selenium-Git has joined #selenium
+[22:45:25] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/7iZThA
+[22:45:25] Selenium-Git: 13selenium/06master 14a26a61a 15Jim Evans: Adding more diagnostics for failed HTTP requests in .NET bindings...
+[22:45:25] Selenium-Git has left #selenium
+[22:45:27] santiycr: barancev:  that's a legit bug in opera
+[22:46:03] santiycr: barancev:  how about making an issue tagged with opera and then linking to that log
+[22:47:26] barancev: ok, will do
+[22:48:42] jleyba__ has joined #selenium
+[22:53:35] Bracki has joined #selenium
+[IRC logfile - Started Mon Feb 11 23:01:21 2013]
+[23:01:21] jimevans has left #selenium
+[23:01:53] jcarr has joined #selenium
+[23:03:16] samphippen has joined #selenium
+[23:03:40] annette has joined #selenium
+[23:03:48] annette has left #selenium
+[23:04:00] jcarr has left #selenium
+[23:07:16] annette has joined #selenium
+[23:07:30] annette has left #selenium
+[23:21:42] pa has joined #selenium
+[23:32:19] Guest30455 has joined #selenium
+[23:33:47] annette has joined #selenium
+[23:35:47] Guest30455: hi everyone! wondering if anyone has run into this problem: I have jenkins setup with the selenium grid plugin and i have a mac/chrome and mac/firefox node registered to it. my simple test just starts the remote browser, does a get, and then closes the browser. when i start up a chrome browser, things work. when i start up a firefox browser, the firefox browser opens but the url never shows up in the address bar and it eventually times out
+[23:36:57] annette has left #selenium
+[23:38:11] mreedell has joined #selenium
+[23:52:08] llaskin has joined #selenium
+[23:57:49] fatguylaughing has joined #selenium
+[23:59:37] JackDandy has joined #selenium

@@ -1,0 +1,1007 @@
+[IRC logfile - Started Wed Jun  6 00:00:01 2012]
+[00:00:01] Dude-X: it just makes my blood boil when i look at the tests done by the outsource team
+[00:00:18] Dude-X: i feel the green monster inside of me roar
+[00:00:47] klrmn: green monster == hulk or jealousy?
+[00:01:06] Dude-X: hulk
+[00:01:17] klrmn: i figured that was the more likely case
+[00:01:31] gsnedders: green-eyed is the typical personification jealousy.
+[00:02:08] Dude-X: i wish i can tell my coworkers "i am going to stop following the stories for the sprint, and just refactor shitty tests all week"
+[00:03:16] lukeis: that doesn't help in the long wrong... point out everything that is wrong and make them redo it... then point out what is wrong with the redo and make them redo it till it's better :)
+[00:03:56] Dude-X: i've written style guides, and they follow things to the letter without thinking
+[00:04:05] Dude-X: but at least it's improved since then
+[00:04:58] Dude-X: perhaps i need to have them read about japanese philosophy about having things look pretty
+[00:05:48] Dude-X: when i started on this project, all i did was look at other existing tests, and copied that style; it wasn't hard and my predecessors had pretty good style 
+[00:05:55] Dude-X: and they were not even hard core developers
+[00:06:53] Dude-X: lukeis: is it a good idiom to click into an input box, then do sendkeys, then click away to a no-op element?
+[00:07:14] Dude-X: it seems that i have sleeps in areas where there is a lot of typing
+[00:14:35] lukeis: Dude-X: not really... sendKeys does the focus event... usually you should .clear() then .sendKeys() and if you want to blur the element then maybe click on the body or something (i have varying degrees of success doing blur and have to do different things on different pages)
+[00:14:51] stephend: lukeis: sorry, was in a meeting, and am off soon, but duly noted, and I'm sure they'll notice :-)
+[00:14:52] Dude-X: blur?
+[00:15:05] Dude-X: oh i see, make it kick off
+[00:15:11] Dude-X: make it fire an event
+[00:15:24] lukeis: blur is the event ;)
+[00:15:46] brettporter has joined #selenium
+[00:17:58] Dude-X: sweet i save 4 seconds from a test by taking out a sleep, i put a click after a sendkeys
+[00:18:00] Dude-X: that worked well
+[00:18:23] Dude-X: let's see if the CI build thinks it's stable
+[00:20:17] Dude-X: well i saved 4 seconds but my time is better spent refactoring this UNICODE(pile-of-poo)
+[00:46:52] dmachi has joined #selenium
+[IRC logfile - Started Wed Jun  6 01:06:51 2012]
+[01:06:51] stockton has joined #selenium
+[01:20:23] nirvdrum has joined #selenium
+[01:27:39] ian_mac has joined #selenium
+[01:39:40] ian_mac has joined #selenium
+[01:49:18] noahsussman has joined #selenium
+[IRC logfile - Started Wed Jun  6 02:00:12 2012]
+[02:00:12] stockton has joined #selenium
+[02:03:53] farlan has joined #selenium
+[02:12:24] Binken_ has joined #selenium
+[02:12:50] mreedell has joined #selenium
+[02:20:46] ian_mac has joined #selenium
+[02:30:14] noahsussman has joined #selenium
+[02:38:15] stockton has joined #selenium
+[02:57:32] mdgreenfield has joined #selenium
+[IRC logfile - Started Wed Jun  6 03:03:57 2012]
+[03:03:57] Jordan_ has joined #selenium
+[03:18:29] stackedsax1 has joined #selenium
+[03:36:19] stackedsax has joined #selenium
+[03:43:22] Binken_ has joined #selenium
+[03:44:55] Binken_: :log
+[03:44:56] selbot2: http://illicitonion.com/selogs/selenium/2012/06/06.txt
+[03:48:49] tunabum has joined #selenium
+[IRC logfile - Started Wed Jun  6 04:04:19 2012]
+[04:04:19] Jordan_ has joined #selenium
+[04:04:46] brettporter_ has joined #selenium
+[04:31:41] santiycr has joined #selenium
+[04:43:50] tunabum: :note dawagner I can see why i got caught in an infinite loop on windows.... http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxBinary.java#231  I can't believe this code has been there forever
+[04:43:50] selbot2: ok!
+[04:55:53] stockton has joined #selenium
+[IRC logfile - Started Wed Jun  6 05:09:28 2012]
+[05:09:28] Dude-X_: tunabum, ha
+[05:10:11] Dude-X_: actually the firefox driver in java some questionable parts
+[05:10:15] Dude-X_: has^
+[05:28:52] nitin__ has joined #selenium
+[05:45:31] kamoricks has joined #selenium
+[05:50:47] tunabum: :note dawagner -silent doesn't appear to work anymore on win xp... bug logged with mozilla https://bugzilla.mozilla.org/show_bug.cgi?id=761908
+[05:50:48] selbot2: ok!
+[05:51:40] tunabum: Dude-X: yep... many questionable things are in Selenium ;)
+[05:54:22] Dude-X_: a while back i was looking at how the port number was initialized in firefox driver in java; and saw that it pretty much ignored the property :O
+[05:54:28] kamoricks: I keep getting "Unable to locate element: {"method":"tag name","selector":"body"}", on pages which clearly have body tags. Any idea why this could be?
+[05:55:14] Dude-X_: is it full of ajax or active javascript like jquery?
+[05:55:23] Dude-X_: what other details can you impart?
+[05:56:11] kamoricks: Uh. Yes, it's very ajax-y, no, it doesn't time out, I'm using selenium-server-2.22 with Firefox 12.
+[05:57:17] kamoricks: I've had a lot of similar issues - 2.22 seems to work slightly different with the site than 2.21 did, and my tests keep breaking as a result. Perhaps the tests are simply too fragile.
+[05:57:46] Dude-X_: 2.22 does certainly have different characteristics 
+[05:58:01] Dude-X_: but i am stuck with 3.6 for now
+[05:58:16] kamoricks: 3.6 of what?
+[05:58:23] Dude-X_: firefox 3.6
+[05:58:40] Dude-X_: my project is using 2.17 and ff3.6 on linux
+[05:59:01] Dude-X_: i am testing 2.22 now; i see it as a way of improving the robustness of my tests
+[05:59:08] kamoricks: I need it to *work*, not have to redo my entire test suite every time a new version of firefox comes out and we have to make sure we support it.
+[05:59:13] Dude-X_: actually it helped expose some weak parts of my test
+[05:59:28] Dude-X_: well it's open source, free, evolving, etc
+[05:59:53] Dude-X_: and javascript by itself is frought with a lot of indeterminism
+[IRC logfile - Started Wed Jun  6 06:00:54 2012]
+[06:00:54] Dude-X_: i had one test that was testing huge swaths of invisible stuff in 2.17, 2.22 showed me that i had to add a few functions to expose the thing i was looking at
+[06:00:58] kamoricks: Not reassuring, when running tests. Anyway. It's a search for a body tag. It should either succeed or time out.
+[06:01:02] tunabum: i haven't come across anything like you're describing kamoricks have a link to a page to reproduce or can share an example html page?
+[06:04:34] kamoricks: tunabum: No, sorry. But can you think of any conditions <body> would not load? Only conditions I'm seeing are if the page refreshes before I request it, but that throws a different exception.
+[06:05:31] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS: trying to fix FF13 on windows xp... I seriously expect some of this to be reworked with respect to -silent flag not being an option on windows to be used anymore which probably will cause problems for users. Also adding timeout logic for windows checking the profile lock as to not sit forever in an infinite loop. | https://code.google.com/p/selenium/source/detail?r=17121 | ...
+[06:05:31] selbot2: ... http://seleniumhq.org/ci.jsp?r=17121
+[06:05:43] tunabum: maybe if you page is frame based?
+[06:06:11] tunabum: the main "page" often is just frameset tags and no body
+[06:06:55] tunabum: otherwise i'd need to see a page to reproduce :)
+[06:07:31] tunabum: :note dawagner see / review / modify r17121
+[06:07:31] selbot2: ok!
+[06:07:33] selbot2: 03luke.semerau@gmail.com 2 minutes ago - LukeIS: trying to fix FF13 on windows xp... I seriously expect some of this to be reworked with respect to -silent flag not being an option on windows to be used anymore which probably will cause problems for users. Also adding timeout logic for windows checking the profile lock as to not sit forever in an infinite loop. | https://code.google.com/p/selenium/source/detail?r=17121 | ...
+[06:07:33] selbot2: ... http://seleniumhq.org/ci.jsp?r=17121
+[06:13:07] Dude-X_: sweet my 2 hour test suite passed after failing for a few days. Awesome.
+[06:13:32] tunabum: awesome :) congrats
+[06:13:51] tunabum: now why the f is it 2 hours? ;)
+[06:14:00] Dude-X_: we have good coverage
+[06:14:12] Dude-X_: and some of it is is the terrible tests written by the outsource team
+[06:14:23] kamoricks: tunabum: Can I /msg you the link?
+[06:14:30] Dude-X_: they write long tests that test nothing.
+[06:14:41] tunabum: heh, i like how sometimes "good coverage" is duplicate coverage
+[06:14:52] Dude-X_: i've been told a few times to stop bad mouthing the outsource team
+[06:14:59] tunabum: kamoricks: sure... but i'm not going to be online much longer tonight, i can look into it tomorrow
+[06:15:16] tunabum: (is also known as lukeis if you find me tomorrow)
+[06:15:19] Dude-X_: we do have some "legacy" tests that could be refactored too :D
+[06:16:10] Dude-X_: i think i'll get one of the noobs to refactor this awful test
+[06:16:21] Dude-X_: it will put hair on their chest
+[06:16:51] Dude-X_: it will only give me more grey hairs if i work on it
+[06:17:05] Dude-X_: I have deleted tests and started from scratch 
+[06:25:09] tunabum: kamoricks: so... i was able to find by tag name "body" for that sample html... likely the JS and CSS that are included (that I don't have access to in your example) are probably influencing it somehow
+[06:27:23] kamoricks: tunabum: They... remove the body tag?
+[06:29:22] darius__w: can I force selenium server to listen on specified ip address?
+[06:30:04] tunabum: kamoricks: i doubt it... but javascript has been known to interfere with selenium before :) (firefox is purely Javascript based)
+[06:30:29] pnitin has joined #selenium
+[06:30:31] tunabum: darius__w: yes, i believe so... check out the -h (or -help)
+[06:31:38] tunabum: ok... i might be here, but i'm really not. night all folks.
+[06:31:40] kamoricks: tunabum: Oh joy of joys. Would it be more stable with, say, IE?
+[06:32:43] kamoricks: My code under test should not interfere with my test case.
+[06:35:40] testingb0t has joined #selenium
+[06:35:55] testingb0t1 has joined #selenium
+[06:58:58] foolx has joined #selenium
+[IRC logfile - Started Wed Jun  6 07:18:01 2012]
+[07:18:01] Alex0011 has joined #selenium
+[07:18:27] papegaaij has joined #selenium
+[07:19:19] chainey has joined #selenium
+[07:23:05] kamoricks: So I'm having this issue with detecting when a page has loaded after a "open" request. How can I tell when the page has changed?
+[07:23:41] kamoricks: I'm aware of the FAQ stating that "there's no real answer, but an implicit wait should be sufficient", but it's not sufficient, because certain test runs use the old page.
+[07:29:35] nhirata has joined #selenium
+[07:43:57] rbalent has joined #selenium
+[IRC logfile - Started Wed Jun  6 08:15:58 2012]
+[08:15:58] nhirata has joined #selenium
+[08:36:24] testingb0t has joined #selenium
+[08:44:54] robbim02 has joined #selenium
+[08:47:49] testingb0t has joined #selenium
+[08:54:58] jeichar has joined #selenium
+[IRC logfile - Started Wed Jun  6 09:06:03 2012]
+[09:06:03] olan has joined #selenium
+[09:10:52] kallisti has joined #selenium
+[09:11:04] teodosia has joined #selenium
+[09:16:47] nhirata has joined #selenium
+[09:25:17] AutomatedTester has joined #selenium
+[09:40:51] friskd has joined #selenium
+[09:47:57] joar has joined #selenium
+[09:49:04] Bebe has joined #selenium
+[09:55:04] Bebe_ has joined #selenium
+[09:56:31] kamoricks: So it seems like Selenium is working off of the "final" copy of the page, while "view source" gives me the "initial" copy of the page. How do you guys test stuff dependent on JQuery or the like?
+[09:56:51] kamoricks: I'm fairly sure our client-side templating engine is screwing with the tests.
+[09:58:35] dawagner has joined #selenium
+[09:58:36] selbot2: dawagner: note from andreastt 2 days ago: Have you had a look at the new ExpectedException rule in JUnit? 
+[09:58:36] selbot2: dawagner: note from lukeis about 11 hours ago: Firefox is all sorts of fun in trunk right now. after you look at what bob emailed the dev list about, let's see if you can get trunk running on win xp FF13 :-D 
+[09:58:36] selbot2: dawagner: note from tunabum about 5 hours ago: I can see why i got caught in an infinite loop on windows.... http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxBinary.java#231  I can't believe this code has been there forever 
+[09:58:36] selbot2: dawagner: note from tunabum about 4 hours ago: -silent doesn't appear to work anymore on win xp... bug logged with mozilla https://bugzilla.mozilla.org/show_bug.cgi?id=761908 
+[09:58:36] selbot2: dawagner: note from tunabum about 4 hours ago: see / review / modify r17121 
+[IRC logfile - Started Wed Jun  6 10:00:29 2012]
+[10:00:29] dawagner: andreastt: Yeah, I don't like it because it means you lose locality of exception; @Test(ExpectedException = WebDriverException.class) ... driver.get(...); driver.findElement(...) - which threw? Who knows!
+[10:00:58] dawagner: r17121
+[10:01:00] selbot2: 03luke.semerau@gmail.com about 4 hours ago - LukeIS: trying to fix FF13 on windows xp... I seriously expect some of this to be reworked with respect to -silent flag not being an option on windows to be used anymore which probably will cause problems for users. Also adding timeout logic for windows checking the profile lock as to not sit forever in an infinite loop. | https://code.google.com/p/selenium/source/detail?r=17121 | ...
+[10:01:00] selbot2: ... http://seleniumhq.org/ci.jsp?r=17121
+[10:01:38] dawagner: :note lukeis fscking firefox... So what actually happens when we launch without -silent? Presumably we need to kill ff?
+[10:01:39] selbot2: ok!
+[10:03:34] andreastt: dawagner: I agree.  Started using assertThat(e, instanceOf(MyException.class)) instead.
+[10:04:06] andreastt: Anyways.  I'm off to look at the new Opera offices, see you later!
+[10:04:34] dawagner: Have fun!
+[10:10:47] benadderson has joined #selenium
+[10:14:28] AutomatedTester: dawagner: I will read that post later
+[10:26:10] dawagner: AutomatedTester: It looks like it will be quite fun to use, actually :)
+[10:27:26] AutomatedTester: from the title it does ;)
+[10:27:39] AutomatedTester: sigh ... only 100 more emails to read through
+[10:30:28] *AutomatedTester tries a new todo philosophy
+[10:35:17] jibay has joined #selenium
+[10:43:02] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Ignore failing tests in Chrome.  Issue chromedriver:89 filed. | https://code.google.com/p/selenium/source/detail?r=17122 | http://seleniumhq.org/ci.jsp?r=17122
+[10:54:21] kamoricks: Selenium WebDriver uses the browser's xpath, correct? So I can use Firebug's "Copy XPath" to get the xpath for a current element, correct? So I can then query by xpath, and I should get an element, not an NoSuchElementWebDriverError, correct?
+[IRC logfile - Started Wed Jun  6 11:18:15 2012]
+[11:18:15] sburjan has joined #selenium
+[11:25:28] lfryc has joined #selenium
+[11:25:28] lfryc has joined #selenium
+[11:46:58] lfryc has joined #selenium
+[11:46:58] lfryc has joined #selenium
+[11:48:09] sburjan has joined #selenium
+[11:57:04] jimevans has joined #selenium
+[11:57:04] selbot2: jimevans: note from stackedsax about 13 hours ago: I hear your stern words against Windows services, but I think there needs to be a little more help for people on exactly what they SHOULD do as a scalable solution. 
+[IRC logfile - Started Wed Jun  6 12:24:00 2012]
+[12:24:00] ian_mac has joined #selenium
+[12:27:51] jarib: kkania: ping
+[12:28:33] nirvdrum has joined #selenium
+[12:41:02] selbot2: 03james.h.evans.jr@gmail.com less than 10 seconds ago - JimEvans: Adding code to zip the IE standalone server and to push it and the .NET bindings to googlecode during the release process. | https://code.google.com/p/selenium/source/detail?r=17123 | http://seleniumhq.org/ci.jsp?r=17123
+[12:45:32] selbot2: 03james.h.evans.jr@gmail.com less than 10 seconds ago - JimEvans: Correcting r17094 to correctly skip CSS selector tests for browsers that don't support CSS selectors natively (like IE6 and IE7). | https://code.google.com/p/selenium/source/detail?r=17124 | http://seleniumhq.org/ci.jsp?r=17124
+[12:46:54] dmachi has joined #selenium
+[IRC logfile - Started Wed Jun  6 13:00:04 2012]
+[13:00:04] worm has joined #selenium
+[13:01:42] AutomatedTester has joined #selenium
+[13:02:45] xtian_ has joined #selenium
+[13:04:47] worm: Hello, I'm testing this simple javascript function (http://pastebin.com/qTaVM6hh) using HtmlUnit webdriver and I discovered HtmlUnit does not send an HTTP request once the img is added to the body. Any workaround ? Note I didn't choose to use this method instead of things like XmlHttpRequest, see it as a technical constraint.
+[13:05:41] AutomatedTester: worm: sounds like a HTMLUnit bug
+[13:05:47] AutomatedTester: I suggest raising it with them
+[13:12:22] Ajay_ has joined #selenium
+[13:19:55] jimevans has joined #selenium
+[13:21:26] bluescreen10 has joined #selenium
+[13:28:23] codecab has joined #selenium
+[13:32:00] RossPatterson has joined #selenium
+[13:36:01] Jackneill has joined #selenium
+[13:36:01] Jackneill has joined #selenium
+[13:39:13] andreastt: New Opera offices looks nice.
+[13:39:23] andreastt: It's far from done, though.  And we're meant to move in on Monday.
+[13:39:50] andreastt: https://plus.google.com/photos/101070594446026106160/albums/5750900058701577073?authkey=CJyl8beq3c4s
+[13:40:16] nirvdrum: andreastt: Nice.
+[13:46:56] llaskin has joined #selenium
+[13:48:45] AutomatedTester: andreastt: whats the facebook logo doing in the backgroud
+[13:49:03] AutomatedTester: :P
+[13:49:19] *RossPatterson chuckles.
+[13:49:29] andreastt: AutomatedTester: We were joking about that earlier since they haven't put up any Opera logo yet, that there will be a huge Facebook logo greeting us there on Monday. d-:
+[13:50:09] mreedell has joined #selenium
+[13:53:18] llaskin: andreastt: did they buy?
+[13:53:31] andreastt: Not that I'm aware.
+[13:53:54] naeg has joined #selenium
+[13:56:45] jimevans: AutomatedTester: so did stephend ping you overnight?
+[13:57:21] AutomatedTester: jimevans: I have email, I have been off for a few days so just about to look into
+[13:57:39] AutomatedTester: I am building Firefox at the moment so when that is done I will start
+[13:58:34] jimevans: fair enough. just wanted to make sure *someone* among our Mozilla friends are following breakage of FirefoxDriver (java and .net) up in the wake of the Firefox 13 release.
+[IRC logfile - Started Wed Jun  6 14:00:26 2012]
+[14:00:26] AutomatedTester: jimevans: all I got was "its broken"
+[14:00:31] AutomatedTester: do you have any more info
+[14:01:10] jimevans: yeah, i do.
+[14:02:29] jimevans: so what happens is (as you know), we copy whatever profile into the temp directory, then launch firefox with the -silent switch to clean the profile and attempt to remove the lock file on the profile (.parentlock or parent.lock), which the language bindings poll to wait for it to disappear.
+[14:02:37] jimevans: the problem is that it never disappears.
+[14:02:55] jimevans: there are three possible problems, i don't know which is correct.
+[14:03:53] jimevans: (1) that firefox doesn't respect the XRE_PROFILE_PATH environment variable, (2) the -silent switch doesn't work correctly, or (3) the lock file isn't needed anymore, so it's ignored by firefox.
+[14:04:18] AutomatedTester: the python bindings dont poll for the lock file, never have
+[14:04:36] jimevans: right. both java and .net do, and always have. :)
+[14:05:14] jimevans: i confess that the .net implementation was fairly blindly copied from the java.
+[14:05:38] *AutomatedTester will have a look at MozRunner code and see what is done there
+[14:05:45] jimevans: thanks mate.
+[14:06:05] AutomatedTester: thats going to become the driver for Firefox code when we switch to marionette
+[14:06:41] jimevans: appreciate you looking into it. i just want to know what the *right* way to point to the custom profile is, and not have firefox think it was unexpectedly killed.
+[14:07:12] jimevans: (at least i *think* that's the logic for looking at the lock file)
+[14:07:27] cgoldberg has joined #selenium
+[14:07:36] AutomatedTester: wow... building firefox isnt kind to my machine
+[14:08:10] AutomatedTester: jimevans: silent used to launch and kill the browser so having it locked seems like it was wrong in the first place
+[14:08:28] AutomatedTester: but what do I know
+[14:09:10] cmcgraw has joined #selenium
+[14:11:42] jimevans: well, no matter how little it is, you still know more about that particular browser than i do. :)
+[14:12:12] *jimevans sometimes still longs for the day when it was possible for one person to know everything about a subject.
+[14:12:27] DataBeaver has left #selenium
+[14:12:36] AutomatedTester: jimevans: that was before my time
+[14:12:38] AutomatedTester: :P
+[14:13:00] jimevans: mine too. doesn't mean i still don't sometimes wish for it. :)
+[14:13:08] jimevans: brb
+[14:13:10] AutomatedTester: jimevans: Firefox is still building so will finish my emails first
+[14:13:35] farlan has joined #selenium
+[14:16:08] jimevans: take your time. 
+[14:22:39] jarib: AutomatedTester: ruby doesn't poll for the lock file either, and FF13 works fine from ruby, so I assume jim's problem #3 is the culprit
+[14:22:41] selbot2: 03jmle...@gmail.com closed/fixed finding a child element By.linkText fails in firefox driver. - https://code.google.com/p/selenium/issues/detail?id=3 [Type-Defect Priority-Medium]
+[14:22:56] AutomatedTester: jarib: I suspect so too
+[14:22:58] jarib: remove the lock file polling, and it should be fine.
+[14:23:00] hourback has joined #selenium
+[14:23:24] AutomatedTester: jarib: I wanted to make the change and test locally before suggesting that
+[14:23:52] jarib: good idea
+[14:24:20] AutomatedTester: but I started a clobber build earlier and still waiting...
+[14:24:30] jimevans: so does that mean the initial -silent launch of firefox is no longer necessary?
+[14:25:04] AutomatedTester: jimevans: python does that
+[14:25:12] AutomatedTester: it launches twice
+[14:25:33] AutomatedTester: but on the first launch python, and ruby from what jarib says, doesnt check for the lock file
+[14:25:47] noahsussman has joined #selenium
+[14:25:48] jarib: ruby does -silent as well, AFAIK it's necessary to make sure the profile is valid
+[14:26:30] jarib: i'm not sure why the lock file is polled.. should be enough to wait for -silent to exit
+[14:26:44] AutomatedTester: thats what I do jarib
+[14:27:06] jimevans: just another point of reference, the lock check is actually cased for Windows-only. i think there's a slight delay between the file system *actually* recognizing the file being deleted.
+[14:28:10] jimevans: lukeis made a change yesterday trying to fix the issue, but i think it got a bit conflated with the real issue.
+[14:29:11] jimevans: (since it's a hassle for most people to actually test on windows)
+[14:30:19] jarib: oh, windows only
+[14:30:26] *jarib didn't test ruby + FF13 on windows
+[14:30:31] jarib: let me try that
+[14:30:39] jimevans: heh. i *knew* that'd get through the cracks.
+[14:30:55] AutomatedTester: well from what I have heard from the webqa team its working with pure python code
+[14:31:03] AutomatedTester: the minute it goes to remote it breaks
+[14:31:14] jimevans: aaaaaaaand there go the native events failures.
+[14:32:08] AutomatedTester: yay! Firefox built, lets have a gander
+[14:32:35] jimevans: for the record, yes, removing the lock check does seem to work for firefox 13
+[14:32:41] jimevans: even on windows.
+[14:32:54] jarib: right
+[14:33:20] jimevans: what threw me is that -silent used to delete that file for you, now it doesn't
+[14:33:42] AutomatedTester: jimevans: like I said earlier, that sounds like a bug originally
+[14:35:07] jimevans: what does that file do, and how would firefox react to it's being deleted manually?
+[14:35:15] nhirata_ has joined #selenium
+[14:35:24] mltolun has joined #selenium
+[14:35:40] mltolun has joined #selenium
+[14:35:44] AutomatedTester: jimevans: its just to say the profile is in use
+[14:36:13] AutomatedTester: if you have 2 instances using it then bad things *could* happen
+[14:36:33] AutomatedTester: but if you delete it and one instance uses it, its fine, it will act like normal
+[14:37:21] jimevans: so manually deleting it should be fine, if it's actually something that needs deleting.
+[14:37:28] jimevans: (which i'm not convinced of)
+[14:38:05] AutomatedTester: jimevans: python and ruby dont poll or delete the file
+[14:38:17] AutomatedTester: so if we ignore it and poll the process we will be fine
+[14:38:55] jimevans: does that hold true for windows too?
+[14:39:13] stockton has joined #selenium
+[14:39:42] AutomatedTester: jimevans: python doesnt differentiate between platforms in this code
+[14:39:42] jimevans: i'd like to think that code wasn't put there for no good reason (prior experience notwithstanding)
+[14:40:06] AutomatedTester: jimevans: I wonder if the Java process handling is crap
+[14:40:15] AutomatedTester: and this is just a hack
+[14:40:34] jarib: my guess it was needed at some point before the ruby/python bindings were made
+[14:40:42] jimevans: that may be true. it could be a leftover artifact from an ancient firefox version too.
+[14:40:47] jarib: right
+[14:40:51] jimevans: (2.x perhaps)
+[14:41:18] jimevans: but that's pure speculation on my part
+[14:41:24] AutomatedTester: *sigh* I wish I had a SSD
+[14:41:34] jimevans: it does make things nice. :)
+[14:41:40] AutomatedTester: my HDD is thrashing about and my machine is acting slow
+[14:42:02] nirvdrum: AutomatedTester: That's just MacOS :-)
+[14:42:17] AutomatedTester: supposedly the new MBPs will be announced today
+[14:42:22] jimevans: do we have a guide to how to update the native events code for future firefox versions? we really need to be more proactive about that.
+[14:42:40] nirvdrum: Even after I had an SSD in my Mac it'd hit swap and thrash like crazy.
+[14:42:43] nirvdrum: It just did it faster.
+[14:42:56] AutomatedTester: jimevans: all I was given by eranm was a patch for previous updates
+[14:43:38] AutomatedTester: wow, running purge has helped
+[14:47:31] jimevans: well, let's give this the old college try...
+[14:48:19] *AutomatedTester is updating Firefox on his VM
+[14:48:28] AutomatedTester: so getting something to eat quickly
+[14:49:52] jimevans: so our current firefox version support policy is what, latest esr, n-1, and n where n is the most recent released build?
+[14:50:54] *AutomatedTester hopes os
+[14:50:56] AutomatedTester: so even
+[14:54:35] jimevans: what the hell is the appeal of running things as a windows service?!?!
+[14:56:28] AutomatedTester: adamgoucher: ^^
+[14:57:06] mltolun has left #selenium
+[14:57:08] adamgoucher: dunno. the appeal is i'm being paid to figure it out. i just run it as a console job
+[14:57:27] jimevans: it's not directed at adamgoucher, per se, i've just had several people mention trying to do it over the last couple of weeks.
+[14:58:03] adamgoucher: heh. even if it was, i'm mercenary enough to not care :D
+[14:58:35] jimevans: and doing anything where you're trying to send windows messages from a service process (particularly mouse and keyboard messages) is certainly a Bad Idea
+[14:59:02] hourback has left #selenium
+[14:59:13] AutomatedTester: well running as a service requires a real user who has access do the desktop
+[14:59:30] AutomatedTester: anything sort of that and "You are going to have a bad time"
+[14:59:48] jimevans: even though Windows makes you *think* it'll be okay because it has that little "allow to interact with the desktop" checkbox, it's still not what services were designed to do.
+[IRC logfile - Started Wed Jun  6 15:00:13 2012]
+[15:00:13] AutomatedTester: ahh for crying in a bucket....
+[15:01:21] adamgoucher: maybe i'll just use puppet to open a console and run a command.. wonder how i would do that.
+[15:01:47] AutomatedTester: Dear VM, Y U NO HAVE INTERNETZ
+[15:04:42] nsussman has joined #selenium
+[15:05:10] adamgoucher: jimevans: i dont suppose that the bit about the native apis and services is tucked away in the docs somewhere?
+[15:05:25] jimevans: in our docs? no.
+[15:05:57] jimevans: there are many threads on msdn's message forum that talk about how it's flat-out dangerous to have services that interact with the desktop.
+[15:06:08] jimevans: dangerous == security hole
+[15:06:30] jimevans: services run in session 0; end-user processes don't.
+[15:08:40] adamgoucher: this sounds like an faq -- dont do it!
+[15:08:48] jimevans: "running selenium as a service considered harmful"
+[15:09:42] AutomatedTester: adamgoucher: but if its Microsoft thing, should we add it to our FAQ?
+[15:10:17] adamgoucher: yes. because people are looking for it at the se context. even if its a link that says 'and here is why'
+[15:10:41] AutomatedTester: adamgoucher: ok but that opens up a can of worms
+[15:11:05] AutomatedTester: any time someone wants to do something and its bad for operating system X we need to update our FAQ
+[15:11:34] jimevans: i'm guessing the main reason people want to do this is because they want the server to start automatically when the machine starts. there are other mechanisms that windows provides for this.
+[15:11:48] adamgoucher: i think that this is a small enough, but common enough, scenario that its not too back a can of worms
+[15:12:13] adamgoucher: jimevans: yup. which is why i'm using puppet
+[15:12:28] mdgreenfield has joined #selenium
+[15:13:29] jimevans: indeed. that's exactly the correct approach.
+[15:13:51] jimevans: hmpf. well that didn't work.
+[15:14:00] jimevans: let's update the path to the correct one and try again.
+[15:15:14] adamgoucher: of course, now i have to figure out the magic manifests for it...
+[15:15:52] jimevans: sending an email to the mailing list with simply "bump" in the body is likely to make me *not* want to help you out of spite.
+[15:15:52] AutomatedTester: why do you need puppet? to push the server there too?
+[15:15:53] jarib: adamgoucher: puppet on windows?
+[15:16:09] AutomatedTester: windows is making me sad
+[15:16:34] jimevans: AutomatedTester: how come?
+[15:16:53] AutomatedTester: my VM cant see my MBP
+[15:17:03] jimevans: ah. that sucks.
+[15:17:05] AutomatedTester: and diagnosing is proving to be painful
+[15:17:27] jimevans: i think i'm suffering from acute selenosis.
+[15:17:35] jimevans: (too much selenium)
+[15:17:43] jimevans: :D
+[15:17:48] AutomatedTester: right...
+[15:17:55] AutomatedTester: It can see my MBP
+[15:17:59] AutomatedTester: but cant see the internet
+[15:18:04] AutomatedTester: W.T.F!
+[15:18:05] brokenthumbs has joined #selenium
+[15:18:38] opapo has joined #selenium
+[15:18:38] jimevans: AutomatedTester: disable/reenable the network adapter within the VM? that sometimes works for me.
+[15:19:10] adamgoucher: jarib: agent on windows, yes
+[15:19:30] AutomatedTester: jimevans: when I made it bridge, instead of share, then it starts working
+[15:19:36] adamgoucher: AutomatedTester: to push to the server, and to monitor that the process is behaving, yes
+[15:19:59] drnikki has joined #selenium
+[15:21:07] adamgoucher: jimevans: well, too much selenium in horses causes hair loss, so you might be onto something there...
+[15:21:20] jimevans: cows too.
+[15:21:30] jimevans: which is even more appropriate.
+[15:21:33] AutomatedTester: adamgoucher: you saying jimevans has a long face?
+[15:21:48] jimevans: i've been eating too much loco weed.
+[15:21:57] jimevans: (note: that's a real thing)
+[15:22:14] AutomatedTester: jimevans: only available in northern cuba?
+[15:22:21] AutomatedTester: I mean Florida :P
+[15:22:55] jimevans: hah!
+[15:23:50] jimevans: okay, third time's a charm?
+[15:24:51] jimevans: jeez, the entitlement of some people!
+[15:25:02] jimevans: last user comment on #3984
+[15:25:03] selbot2: 03 closed/workingasintended SafariDriver interaction is slow - https://code.google.com/p/selenium/issues/detail?id=3984 [Type-Defect Priority-Medium Component-WebDriver Browser-Safari]
+[15:25:12] llaskin: jimevans: be careful of the bath salt cannibals
+[15:25:32] jimevans: i hear that's good stuff. really opens your mind.
+[15:33:00] AutomatedTester: I love how flat the ruby and python bindings are
+[15:33:18] AutomatedTester: java always feels like I am going down a rabbit hole
+[15:33:47] jimevans: our native dll build stuff for firefox is a pain in the ass.
+[15:34:15] llaskin: yay ruby!
+[15:34:33] mdgreenfield has left #selenium
+[15:34:51] dawagner: jimevans: Is there a way we can check in each language "If in session 0: Crash out"?
+[15:34:53] jimevans: i really dislike the .net firefox driver architecture. i should really bug the guy that designed that.
+[15:35:06] jimevans: dawagner: dunno. good question.
+[15:35:17] melter has joined #selenium
+[15:35:21] jimevans: oh, and hi! didn't know you were around today.
+[15:35:32] dawagner: Hello! :p
+[15:35:50] dawagner: Indeed, our Jubilee celebrations were limited to but a four-day weekend
+[15:37:04] llaskin: did yo usee the onion article on the jubilee?
+[15:37:19] dawagner: Nope...
+[15:37:43] llaskin: http://www.theonion.com/articles/diamond-jubilee-marred-by-drunken-queen-elizabeth,28422/
+[15:38:09] stackedsax has joined #selenium
+[15:38:20] dawagner: Nice
+[15:38:35] AutomatedTester: i do like our little hacks
+[15:40:25] jimevans: there she is! ohai gecko! (not being sarcastic here, it's a good thing)
+[15:40:26] pnitin has joined #selenium
+[15:43:32] jimevans: aw dammit. ray bradbury died.
+[15:45:56] llaskin: :(
+[15:45:58] llaskin: great writer
+[15:49:47] QAGuy has joined #selenium
+[15:49:50] Dude-X: angry crank though
+[15:49:59] Dude-X: Also F 451 should have been called C 451 :p
+[15:50:31] AutomatedTester: hurray, testing my lock patch
+[15:50:44] *AutomatedTester goes to get supper ready for when the boy gets home
+[15:51:50] stackedsax has joined #selenium
+[15:51:57] nirvdrum: Dude-X: The title wouldn't have made sense then.
+[15:52:46] Dude-X: paper burns at 451 Celcius. at 451 F it gets browned
+[15:52:50] Dude-X: but i never read the book
+[15:53:26] nirvdrum: Sure about that?  The whole point of the title was F 451 was the point at which paper would ignite.
+[15:56:12] Siph0n has joined #selenium
+[15:57:02] Dude-X: just google burning point of paper
+[15:58:41] jimevans: from wikipedia: For paper, there is considerable variation between sources, partially because it takes longer for the combustion of paper to start at lower temperatures.
+[15:59:21] Dude-X: does any kind of paper burn at 451 F?
+[15:59:22] lfryc has joined #selenium
+[15:59:22] lfryc has joined #selenium
+[15:59:31] Dude-X: or in the range of?
+[IRC logfile - Started Wed Jun  6 16:04:19 2012]
+[16:04:19] jimevans: anyone know anything about chrome.manifest files in firefox extensions?
+[16:05:24] AutomatedTester: jimevans: I know a little
+[16:06:14] AutomatedTester: jimevans: they tell Firefox where to find certain files
+[16:06:49] jimevans: yeah, i'm going to research it myself. thank the gods for mdn, right?
+[16:08:30] AutomatedTester: yup
+[16:08:57] xirkus has joined #selenium
+[16:08:59] AutomatedTester: jimevans: in the case of marionette they tell Firefox where the marionette JS files are
+[16:09:07] AutomatedTester: for more context
+[16:09:47] jimevans: AutomatedTester: i'm actually looking at the webdriver extension, which has version comparisons for which binary-component to load, and i want to make sure i get the version comparisons right.
+[16:11:22] jimevans: i don't suppose eranm's around?
+[16:11:29] AutomatedTester: dawagner: ^
+[16:11:37] dawagner: jimevans: He is, I'll poke him this way
+[16:12:09] AutomatedTester: so LinkedIn apparently got hacked 
+[16:12:11] jimevans: hey! i got native events working in firefox on windows!
+[16:12:15] llaskin: AutomatedTester: oh?
+[16:12:16] llaskin: how so?
+[16:12:24] AutomatedTester: llaskin: its all over the news
+[16:12:33] jimevans: er, firefox 13!
+[16:12:35] AutomatedTester: well UK news at least
+[16:12:43] llaskin: yep
+[16:12:52] llaskin: looks like its time to change my passwd
+[16:13:00] AutomatedTester: unsalted passwords too
+[16:13:09] AutomatedTester: school bot errors
+[16:13:27] jimevans: dawagner: is it time to put FF12 and FF13 jobs in the CI server?
+[16:13:37] jimevans: (assuming sauce has them available)
+[16:13:47] jarib: i think they just got 12
+[16:14:00] eranm has joined #selenium
+[16:14:11] kenck has joined #selenium
+[16:14:11] eranm: Right
+[16:14:45] jimevans: eranm: hi!
+[16:14:58] eranm: Hello
+[16:15:57] jimevans: so firefox 13 is out, and i'd really like to avoid the large number of emails that we got with firefox 12 that said "my native events don't work with the latest firefox"
+[16:16:21] jimevans: i think i've sussed out how to update the extension, but i'd like to get your review of it.
+[16:16:43] eranm: Gladly
+[16:17:53] jimevans: what's the best way to get you a patch?
+[16:18:26] jimevans: everything looks straightforward except for the changes to the chrome.manifest file. i'm getting hung up on the version comparisons.
+[16:18:51] eranm: You could use codereview.appspot.com for the patch
+[16:19:46] eranm: the manifest file changes should be trivial: previous native library  is >= 12 and <13, current version of the native library is >= 13 
+[16:20:41] jimevans: the confusing bit is there's some 'a1' version numbers there. i'm not sure how important they are.
+[16:21:03] eranm: If the first release was an alpha then it'd be there
+[16:22:45] kkania: jarib: what's up
+[16:23:53] stephend has joined #selenium
+[16:24:47] AutomatedTester: stephend: we think we know whats up with FF13 
+[16:25:15] stephend: good :)
+[16:25:36] AutomatedTester: stephend: its the Java code for starting up Firefox
+[16:25:46] AutomatedTester: it does stuff that neither Python nor ruby do
+[16:26:41] AutomatedTester: and I found the nicest hack in the code
+[16:26:51] stephend: heh
+[16:27:00] *AutomatedTester gets a URL
+[16:28:41] jcrza: Is selenium easily distinguishable from any other user agent?
+[16:28:43] AutomatedTester: http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxBinary.java?r=16915#232
+[16:28:47] jcrza: I'm automating something I probably shouldn't be..
+[16:28:55] AutomatedTester: if profile is there sleep until its gone
+[16:29:04] AutomatedTester: then sleep until its gone again
+[16:29:20] stephend: ah
+[16:34:32] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Enabling native events for Firefox 13 on Windows. Includes updated prebuilts. Linux prebuilts to follow. | https://code.google.com/p/selenium/source/detail?r=17125 | http://seleniumhq.org/ci.jsp?r=17125
+[16:34:43] jimevans: eranm: have at it!
+[16:35:06] jarib: kkania: just thought i'd mention http://watirmelon.com/2012/06/06/setting-text-in-chromedriver-rather-slow/ - i guess it's a tradeoff between realism and speed, where chromedriver has more accurate emulation of keyboard input, but perhaps you'd like to look through that code path for bottlenecks
+[16:35:46] kkania: jarib: yes, I think there's some easy gains to be made there, although its not high on my list right now
+[16:35:49] jarib: oddly enough, setting the nativeEvents option makes typing faster
+[16:35:53] jarib: no worries
+[16:36:12] kkania: jarib: thanks for the heads up, i'll file an issue so i don't forget
+[16:36:39] jarib: great
+[16:38:06] jimevans: :note lukeis we're getting firefox 13 native events and the launching problems looked at. should consider pushing a new release relatively soon to get support for firefox 13 out there.
+[16:38:07] selbot2: ok!
+[16:42:03] AutomatedTester: https://wiki.mozilla.org/PaperToy
+[16:42:11] baijum has joined #selenium
+[16:43:13] AutomatedTester: jimevans: I found the issue with Firefox 13
+[16:43:19] AutomatedTester: and its dawagner's fault
+[16:43:25] jimevans: heh.
+[16:43:30] jimevans: okay, enlighten me.
+[16:43:43] AutomatedTester: I think its down to r17100
+[16:43:45] selbot2: 03dawagner 3 days ago - DanielWagnerHall: Properly respect DesiredCapabilities passed to the FirefoxDriver constructor | https://code.google.com/p/selenium/source/detail?r=17100 | http://seleniumhq.org/ci.jsp?r=17100
+[16:44:02] AutomatedTester: but I just noticed a hack I thought I removed
+[16:44:07] AutomatedTester: 1 sec please caller
+[16:45:34] dawagner: What did I break?
+[16:45:49] AutomatedTester: dawagner: Firefox 13 isnt launching in Java
+[16:45:56] dawagner: How did I break it? ;)
+[16:46:01] AutomatedTester: works in Python and Ruby
+[16:46:09] AutomatedTester: r17100 I *think*
+[16:46:11] selbot2: 03dawagner 3 days ago - DanielWagnerHall: Properly respect DesiredCapabilities passed to the FirefoxDriver constructor | https://code.google.com/p/selenium/source/detail?r=17100 | http://seleniumhq.org/ci.jsp?r=17100
+[16:46:23] AutomatedTester: I am investigating so dont fret young sir
+[16:46:56] dawagner: Let me know; I can't see how that would change anything (unless there's a problem encoding the firefox profile to shunt across the wire or something, but I can launch 12, so I can't see it being a problem)
+[16:47:17] AutomatedTester: yea apparently something has changed in FF13
+[16:47:32] jimevans: AutomatedTester: i'm not so sure. .NET suffers from the same problem.
+[16:47:34] AutomatedTester: i saw bsilverberg mention something in the mailing list and went looking
+[16:47:49] AutomatedTester: jimevans: removing my hack and we will see
+[16:48:13] AutomatedTester: hack removed and it still works
+[16:48:36] AutomatedTester: hmmm
+[16:48:45] *AutomatedTester does a clean just in case
+[16:48:51] AutomatedTester: brb
+[16:52:13] AutomatedTester: wow compiling is such a time sync
+[16:52:22] AutomatedTester: s/sync/sink
+[16:54:30] lukeis has joined #selenium
+[16:54:30] selbot2: lukeis: note from dawagner about 7 hours ago: fscking firefox... So what actually happens when we launch without -silent? Presumably we need to kill ff? 
+[16:54:31] selbot2: lukeis: note from jimevans 16 minutes ago: we're getting firefox 13 native events and the launching problems looked at. should consider pushing a new release relatively soon to get support for firefox 13 out there. 
+[16:55:02] AutomatedTester: dawagner: if you start firefox with silent it will die on its own
+[16:55:15] AutomatedTester: you just need to poll the process till its dead
+[16:55:53] noahsussman has joined #selenium
+[16:56:15] lukeis: awesome :) ... but the question is how far off is CI from running... or who wants to volunteer which browser versions / os combinations to run the tests?
+[16:56:31] Dude-X: in 2.22 if you call driver.get() and as a result of navigating away it triggers a javascript alert, the command to sleep causes an unhandled modal dialog error
+[16:56:35] Dude-X: worked fine in 2.17
+[16:56:43] lukeis: AutomatedTester: but "firefox -silent" should actually start firefox right?
+[16:56:55] AutomatedTester: lukeis: start the Firefox process
+[16:57:03] lukeis: yeah
+[16:57:03] AutomatedTester: the UI may/may not appear
+[16:57:10] lukeis: ok :)
+[16:57:22] A_J_ has joined #selenium
+[16:57:28] AutomatedTester: lukeis: python and ruby arent suffering from this -silent bug
+[16:57:30] lukeis: windows the process wasn't getting started ;) ... thus my bug
+[16:57:39] lukeis: python isn't
+[16:57:47] lukeis: was ruby confirmed not using -silent?
+[16:57:57] lukeis: or just cause it's not polling for the lock files
+[16:58:07] AutomatedTester: its not polling for lock files
+[16:58:17] AutomatedTester: python and ruby startup is very very similar
+[16:58:47] QAGuy: Hey guys. Hoping someone can help me. I can't get the safari driver to work on my machine just like described here #4012. I have the latest version of selenium 2.22, I have installed the extension but it just hangs as described in the issue. Has anyone else seen this?
+[16:58:48] selbot2: 03 open/new Safari 5.1 : org.openqa.selenium.WebDriverException: Executor has not been started yet - https://code.google.com/p/selenium/issues/detail?id=4012 [Type-Defect Priority-Medium Component-WebDriver Browser-Safari]
+[16:59:12] QAGuy: I'm on a MAC 10.6.8 with the latest Safari
+[16:59:50] pash1k has joined #selenium
+[IRC logfile - Started Wed Jun  6 17:00:34 2012]
+[17:00:34] skiphuffman has joined #selenium
+[17:01:02] skiphuffman: Getting a weird error:  WebDriverException: Message: u'resource /org/openqa/selenium/firefox/webdriver.json relative to org.openqa.selenium.firefox.FirefoxProfile not found.' ; Stacktrace: Method checkArgument threw an error in Preconditions.java
+[17:01:34] skiphuffman: But only when I run the test from one node. from another one it runs fine.  They are running the same version of python, selenium and webdriver.
+[17:01:42] Guest13955 has joined #selenium
+[17:02:21] lukeis: AutomatedTester: so my bug sounds like it is invalid
+[17:02:37] AutomatedTester: lukeis: it *could* be...
+[17:02:43] Guest13955: Question: Is there a way  to, in Java, have WebDriver run the commands contained in the HTML files saved by SeleniumIDE?
+[17:03:01] AutomatedTester: Guest13955: not at the moment
+[17:03:14] lukeis: AutomatedTester: except that it doesn't clean up the lock files
+[17:03:27] AJ__ has joined #selenium
+[17:03:46] AutomatedTester: lukeis: I have never, and jarib included, seen the need to do it
+[17:04:31] Guest13955: AutomatedTester: Thank you.
+[17:05:07] AutomatedTester: lukeis: I dont know why that code is in the Java bindings
+[17:05:17] lukeis: it's been there *forever*
+[17:05:17] AutomatedTester: jimevans said his is an exact copy
+[17:05:34] lukeis: so, at some point a long long time ago simon cared about it
+[17:05:41] lukeis: likely it can be removed altogether then
+[17:05:51] AutomatedTester: yea
+[17:06:06] lukeis: probably something for FF3.0-
+[17:06:37] AutomatedTester: ok I have to go
+[17:06:42] AutomatedTester: the boy is home
+[17:06:42] Dude-X: o/
+[17:06:49] AutomatedTester: I will be back in a few hours
+[17:07:42] skiphuffman: Any logs I can look at to get more detail about that failure?
+[17:09:32] jimevans: my working theory re: firefox launching code is that it was needed for some ancient version of firefox. like 2.x or even in the 3.0 timeframe.
+[17:09:56] stackedsax has joined #selenium
+[17:10:05] lukeis: dawagner: are we just waiting on santi for getting the CI back up?
+[17:10:30] *lukeis really dislikes not having that
+[17:10:44] Dude-X: it's 9:10 am in california
+[17:10:51] jimevans: :ci status
+[17:10:52] selbot2: 16 building | 13 successful | 3 unstable | 0 failing | 1 aborted
+[17:10:58] lukeis: yes, i'm very aware Dude-X  ;)
+[17:11:20] jimevans: the CI build was mostly green this morning, with the notable exception of firefox.
+[17:11:22] lukeis: jimevans: the jobs are disabled
+[17:11:26] jimevans: s/some firefox/
+[17:11:35] jimevans: ummm… no, 
+[17:11:55] lukeis: ok... aparently not :)
+[17:11:57] jimevans: i had them kick off builds in response to two changes I checked in this morning.
+[17:12:22] lukeis: ah, then hopefully they run and don't hit the 2hr limit ;)
+[17:12:43] lukeis: that's what's been failing... they get killed at 2hrs
+[17:13:12] jimevans: the firefox windows native events tests have been failing.
+[17:13:23] jimevans: but everything else seems to be running pretty smoothly.
+[17:13:50] skiphuffman: ok, looks like there is a bit of a crisis in selenium land.  I come back and make a pest of myself in an hour or so.
+[17:16:13] *lukeis likes to see things start working again when i'm not looking... looks like santi may have fixed the problem
+[17:23:37] df34 has joined #selenium
+[17:28:34] Mkop has joined #selenium
+[17:30:54] dawagner: lukeis: It's up right now; the slow network blip appears to have mostly resolved itself, I just forgot to bring it back up before now
+[17:31:50] lukeis: see jim, i wasn't crazy ;)
+[17:31:57] nhirata has joined #selenium
+[17:32:05] lukeis: is it bad that I have to reassure my of that?
+[17:32:13] lukeis: s/my/myself/
+[17:33:08] lukeis: dawagner: how hard is it to add a ff12 job? (and well, drop the FF11 one). Santi said sauce has FF12 now
+[17:33:37] teodosia has left #selenium
+[17:33:45] dawagner: It's trivial; I assumed they didn't have it, because it's not on http://saucelabs.com/docs/ondemand/browsers/env/java/se2/mac
+[17:34:25] *dawagner will make sure his jenkins automation scripts are up to date and set it up
+[17:35:38] stockton has joined #selenium
+[17:37:25] lukeis: if you check the log... santi said it was there (at 22:29:15) http://illicitonion.com/selogs/selenium/2012/06/04.txt   :-D
+[17:37:40] *lukeis again had to reassure myself i wasn't crazy
+[17:39:42] stephend_ has joined #selenium
+[17:40:45] Spanktar has joined #selenium
+[17:45:06] santiycr has joined #selenium
+[17:48:20] lukeis: ok... so FF13 on my linux box when running test synthesized just keeps opening new blank windows... dawagner any merit to what bob emailed the dev list?
+[17:49:42] lukeis: jimevans: did you test FF13 against the dotnet bindings only or java too?
+[17:50:02] Dude-X: i had that happen with 2.17 with FF12; 2.22 fixed the issue with FF12;
+[17:50:20] Dude-X: but it makes me wonder if the bindings are loading the native events module even if it's not used
+[17:50:22] Dude-X: err enabled
+[17:50:33] dawagner: lukeis: I haven't read the email, I will do now... Selenium is adding ff12 configs, though :)
+[17:50:44] lukeis: nice
+[17:50:57] *dawagner still loves watching browsers doing stuff
+[17:51:59] lukeis: Dude-X: appears to have regressed.... since FF12 is doing the same thing :)
+[17:52:52] Dude-X: alright
+[17:53:14] jimevans: lukeis: i tested only against .NET, because I didn't change the java bindings to be able to launch ff13.
+[17:54:22] dawagner: It would explain why some of the ff configs are timing out on CI
+[17:54:55] dawagner: Which implies Windows+Native is failing, Win+Synth isn't, Linux isn't, Mac isn't
+[17:55:10] dawagner: OHAI GECKO
+[17:55:34] selbot2: 03luke.semerau@gmail.com less than 20 seconds ago - LukeIS: -silent is ok... we just don't need to check for the profile lock to disappear anymore | https://code.google.com/p/selenium/source/detail?r=17126 | http://seleniumhq.org/ci.jsp?r=17126
+[17:58:13] sfbrian has joined #selenium
+[17:58:15] Dude-X: GECKO1.9.13 - NOW DOWNLOADING THE INTERNET ...
+[17:59:46] jimevans: did eranm get the prebuilts for linux firefox native events checked in?
+[IRC logfile - Started Wed Jun  6 18:00:10 2012]
+[18:00:10] lukeis: nope... looks like i've got them locally modified... which i think i could check in ;)
+[18:00:43] *lukeis doesn't trust myself yet on the prebuilts though
+[18:01:13] jimevans: lukeis: depends. are you able to run firefox 13 with native events?
+[18:01:21] jimevans: on linux i mean?
+[18:01:26] jimevans: if so, you're good to go.
+[18:01:28] lukeis: i can't run FF yet cause of other issues on trunk ;)
+[18:02:02] Guest13955 has left #selenium
+[18:02:58] eranm: still building
+[18:05:28] dawagner: Awesome, I'm now seeing the problems caused by my commit on my mac, which I wasn't when I made the commit
+[18:05:31] dawagner: Investigating
+[18:07:03] selbot2: 03eran.mes@gmail.com less than 20 seconds ago - EranMes: Updating the prebuilt binaries to support native events on Firefox 13, running on Linux. | https://code.google.com/p/selenium/source/detail?r=17127 | http://seleniumhq.org/ci.jsp?r=17127
+[18:07:29] lukeis: dawagner: so, can we revert r17100 or do you want time to look into 'fixing' it?
+[18:07:32] selbot2: 03dawagner 3 days ago - DanielWagnerHall: Properly respect DesiredCapabilities passed to the FirefoxDriver constructor | https://code.google.com/p/selenium/source/detail?r=17100 | http://seleniumhq.org/ci.jsp?r=17100
+[18:07:45] lukeis: cause reverting it locally gets my tests running again
+[18:08:15] sassda has joined #selenium
+[18:09:28] dawagner: Feel free to revert
+[18:09:39] lukeis: k
+[18:09:41] dawagner: It was only helping me with a side-project :)
+[18:13:17] dawagner: Ok, I have a fix
+[18:13:33] dawagner: But want to tidy it up, feel free to revert in the mean time
+[18:15:25] jeichar_ has joined #selenium
+[18:18:01] dawagner: lukeis: If you haven't reverted, don't bother, I'm about to fix
+[18:18:16] lukeis: k... i was just trying to get through the tests :)
+[18:21:32] selbot2: 03luke.semerau@gmail.com less than 20 seconds ago - LukeIS: adding third_party/gecko-13 folder with ignores, why are we doing it this way and not just ignoring the whole folder? ... is just going with the status quo | https://code.google.com/p/selenium/source/detail?r=17128 | http://seleniumhq.org/ci.jsp?r=17128
+[18:23:30] dawagner: lukeis: Feel free to remove the geckos and set up a good ignore!
+[18:24:02] *lukeis thinks i should ;)
+[18:27:32] selbot2: 03dawagner less than 20 seconds ago - DanielWagnerHall: Don't send non-JSON-convertable capabilities over the wire. | https://code.google.com/p/selenium/source/detail?r=17129 | http://seleniumhq.org/ci.jsp?r=17129
+[18:27:43] dawagner: Your firefoxes should work now 
+[18:28:32] lukeis: sorry everyone you're gonna have to download gecko... again ;)
+[18:28:32] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS: removing 'empty' gecko- folders from third_party and just ignoring gecko-* | https://code.google.com/p/selenium/source/detail?r=17130 | http://seleniumhq.org/ci.jsp?r=17130
+[18:29:53] dawagner: ^^ was me
+[18:30:00] dawagner: Also cleared the jenkins queue
+[18:30:06] lukeis: thx dawagner ... running again... and Oh hai gecko 
+[18:30:18] lukeis: this is going to take a while.... 
+[18:33:07] testingb0t has joined #selenium
+[18:34:53] friskd_ has joined #selenium
+[18:37:29] skiphuffman: All Right.  I am back to cause trouble again.
+[18:37:47] skiphuffman: The error I am getting is this:  WebDriverException: Message: u'resource /org/openqa/selenium/firefox/webdriver.json relative to org.openqa.selenium.firefox.FirefoxProfile not found.' ; Stacktrace: Method checkArgument threw an error in Preconditions.java
+[18:37:54] skiphuffman: My selenium version is 2.21.1
+[18:38:27] lukeis: java?
+[18:38:30] skiphuffman: The very same process.  As in downloaded from the same svn repository into an equally blank directory, works on a different machine.
+[18:38:53] skiphuffman: Should not be any intentional java in there.
+[18:39:00] skiphuffman: All selenium and python.
+[18:39:02] lukeis: ok
+[18:39:19] skiphuffman: Managed by Robot Framework, but that shouldn't really matter.
+[18:39:37] lukeis: care to update to 2.22.1? :)
+[18:39:52] skiphuffman: Is that a "stable"? 
+[18:40:10] skiphuffman: If so, I could talk the guy who maintains the test node to install it.
+[18:40:20] skiphuffman: (It isn't hard and he sits next to me)
+[18:40:31] skiphuffman: But we really don't want beta on a production test system
+[18:40:52] lukeis: that's stable
+[18:41:11] lukeis: and will let you run ff12
+[18:41:23] lukeis: (and 13 even with Remote)
+[18:41:37] skiphuffman: Shiny.  
+[18:41:49] skiphuffman: But I don't think that is my problem
+[18:41:51] lukeis: and 2.21 was actually up to 2.21.3
+[18:42:01] skiphuffman: The actual test is running on a remote node.
+[18:42:09] skiphuffman: Same one for both launching machines.
+[18:42:13] skiphuffman: Same hub too.
+[18:42:33] lukeis: are you passing in a custom profile?
+[18:42:37] skiphuffman: Nope.
+[18:42:39] lukeis: k
+[18:42:52] skiphuffman: webdriver.Firefox
+[18:43:09] skiphuffman: I do change the Platform name before passing it in.
+[18:43:10] Siph0n| has joined #selenium
+[18:43:18] skiphuffman: But I make the same change for both of them.
+[18:43:26] lukeis: webdriver.Remote you mean? :)
+[18:44:34] skiphuffman: Yeah
+[18:45:16] QAGuy: Hey guys. If anyone is interested bit.ly is looking for selenium testers (for web and mobile). I know the Sr. p of engineering over there and he asked if I knew anyone. Figure I'll broadcast it out here and see if anyone is interested. IF you are let me know. 
+[18:45:27] QAGuy: the gig is in NYC
+[18:45:46] skiphuffman: webdriver.Remote(--huburl---, capabilities)
+[18:46:09] Dude-X: QAGuy: can i use this offer as leverage for a raise at my job?
+[18:46:23] QAGuy: Dude-X: That's totally up to you ;)
+[18:46:26] skiphuffman: And the "capabilities" is Webdriver.firefox with the platform changed.
+[18:46:56] QAGuy: He is a friend of mine so I'm asking around as a favor to him
+[18:47:06] lukeis: if you're not passing in a profile... then I would guess that there's a problem on the remote system creating the temporary profile
+[18:48:33] skiphuffman: So why does it have a problem /every time/ when the test is launched from my test node, but /never/ when launched from my desktop?
+[18:48:40] jleyba has joined #selenium
+[18:52:51] lukeis: dawagner: so, when the suite runs i see testShouldFollowMetaRedirects fail... but run individually it passes... yay
+[18:53:03] dawagner: yay
+[18:53:32] lukeis: and I still get one leftover firefox instance at the end too
+[18:54:10] lukeis: my windows xp vm is significantly slower... tests still running :)
+[18:54:10] skiphuffman: Here is my entire connection method:  https://gist.github.com/2883562
+[18:54:29] skiphuffman: hub name changed to protect ..... i dunno, someone.
+[18:56:34] lukeis: skiphuffman: so, when you run it from your desktop you're passing in the same parameters you would when launched from the node?
+[18:57:58] skiphuffman: Yup.  Running the very same job with the same command line.
+[18:58:11] jimevans: dawagner: not to put too fine a point on the matter, but shouldn't the firefox 11 native events tests fail in the CI build? we support versions current (13 at present), current - 1 (12 at present), and last ESR release (10 for now). am i missing something, or does it matter?
+[18:59:02] lukeis: we shouldn't make them fail... if they happen to pass I thought that was ok ;)
+[18:59:13] lukeis: but we don't care if they fail
+[18:59:45] jimevans: that's fine, but i guess i'm wondering what's the point of running them in CI if we know they're going to fail?
+[IRC logfile - Started Wed Jun  6 19:00:06 2012]
+[19:00:06] lukeis: i think dawagner just hasn't gotten around to deleting them yet :)
+[19:00:27] jimevans: (maybe they pass after all, i don't know, but i'm just wondering)
+[19:01:01] lukeis: santiycr: when's FF13 coming to sauce ;) ... i don't like having to run all the tests locally
+[19:01:12] santiycr: heh
+[19:01:23] santiycr: lukeis: sorry, been swamped lately
+[19:01:30] santiycr: can't wait to make this happen automatically
+[19:01:35] jimevans: lukeis: are you thinking about a release schedule, since you're the bacon holder?
+[19:01:51] lukeis: if we have a green build today, i'm releasing
+[19:02:00] *jimevans does a double-take
+[19:02:06] jimevans: okay, guess i'd better get ready!
+[19:02:21] lukeis: today or tomorrow
+[19:02:31] lukeis: i have many meetings today, so outlook is bleak
+[19:02:45] lukeis: so far FF is looking good though for java
+[19:03:34] jimevans: .net should be good to go after my next couple of commits. Firefox 13 successfully runs for .NET.
+[19:03:39] dawagner: jimevans: Yes, absolutely, but AFAIK we haven't dropped 11 and added 13 support yet
+[19:03:47] dawagner: (I haven't been watching commits that closely, though)
+[19:04:14] jimevans: evan and i updated native events for firefox to include 13.
+[19:04:30] dawagner: aha
+[19:04:32] lukeis: s/evan/eran/
+[19:04:33] dawagner: Then yes, absolutely
+[19:04:43] jimevans: lukeis: thanks.
+[19:05:00] jimevans: touch-typing without confirming what's on the screen. :)
+[19:06:02] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Removing unneeded polling for parent.lock file on anonymous profile in temp directory. | https://code.google.com/p/selenium/source/detail?r=17131 | http://seleniumhq.org/ci.jsp?r=17131
+[19:06:02] selbot2: 03jmleyba@gmail.com less than 10 seconds ago - JasonLeyba: Tag the SafariDriver as @Beta so user's stop expecting it to be as | https://code.google.com/p/selenium/source/detail?r=17132 | http://seleniumhq.org/ci.jsp?r=17132
+[19:06:41] jimevans: now, the next question is… should i completely deprecate and remove the embedded server in the .NET IE driver...
+[19:06:51] jleyba: Do it
+[19:06:53] dawagner: +1
+[19:07:15] jimevans: well okay then. 
+[19:08:58] skiphuffman: Any suggestions of logs I could look at?
+[19:10:26] QAGuy has joined #selenium
+[19:12:11] AJ__ has joined #selenium
+[19:12:35] lukeis: skiphuffman: if you start the server, on the remote node that is running the testing, start it with an additional parameter: "-log <logfilename>.txt" 
+[19:12:38] *dawagner has been hacking together a selenium test profiler :) http://illicitonion.com/seprofiler/chart.html try clicking on one of the findElement bars
+[19:12:56] dawagner: (Obviously the UI is somewhat lacking, I'm just playing.  And please don't look at the code!)
+[19:14:30] skiphuffman: will do
+[19:14:48] lukeis: how do you go back after clicking dawagner ? (just reloads the page...)
+[19:15:05] dawagner: Right now, you reload the page
+[19:15:17] lukeis: and don't click on the last item in the chart ;)
+[19:15:17] dawagner: Soon, you will press back, or press the "go back up a level" button
+[19:15:29] dawagner: Yeah, the charts API is "interesting"
+[19:15:39] dawagner: If an event handler throws, the event loop just locks.
+[19:16:54] lukeis: ok... so all tests passed on FF13 on linux for me... on XP i had one test fail, but seems to be an anomaly, just like the one failure i had in linux
+[19:17:04] jleyba: dawagner: event loop doesn't lock, it aborts
+[19:17:21] jleyba: locked event loop == unresponsive script message from the browser
+[19:17:44] dawagner: Fair enough :)
+[19:21:04] skiphuffman: bah, I have the selenium stuck kind of deep in my code. Gotta figure out how to pass that parameter.
+[19:23:08] skiphuffman: Actually I don't see where I can pass a parameter like that.  I load the webdriver library into my own code and just call libraries.
+[19:23:30] skiphuffman: Is there somewhere else I can set up logging?  Perhaps when I instantiate the selenium webdriver object?
+[19:24:03] lukeis: you're not using the standalone-server?
+[19:24:27] lukeis: if that's the case then you just need to use log4j in your java code
+[19:25:26] skiphuffman: Oh!  the server
+[19:25:35] skiphuffman: Yeah, I can add the parameter there.
+[19:26:03] jimevans: sonuvabitch, not building the IE native components really reduces the time and size of the .net build
+[19:27:18] lukeis: meeting time...
+[19:30:02] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Removing the embedded IE server from the .NET bindings. From now on, you *must* use the IE standalone server with .NET. | https://code.google.com/p/selenium/source/detail?r=17133 | http://seleniumhq.org/ci.jsp?r=17133
+[19:30:22] jimevans: okay, there it is. now if we can get the java bindings to do the same (maybe in 2.24)
+[19:31:03] selbot2: 03james.h.evans.jr@gmail.com less than 10 seconds ago - JimEvans: Bumping .NET assembly version numbers to 2.23.0 for impending release. | https://code.google.com/p/selenium/source/detail?r=17134 | http://seleniumhq.org/ci.jsp?r=17134
+[19:34:47] skiphuffman: Well, I found a new way to make it fail
+[19:35:12] skiphuffman: But I doubt it is relevant.  (Don't try to start your selenium hub in an ssh session.)
+[19:35:20] jeichar has joined #selenium
+[19:41:36] testingb0t1 has joined #selenium
+[19:48:27] AutomatedTester has joined #selenium
+[19:52:00] Ardesco has joined #selenium
+[19:55:16] kallisti has joined #selenium
+[19:55:17] kallisti has joined #selenium
+[19:56:18] AutomatedTester: why does safari driver compile when doing FirefoxDriver?
+[19:57:55] skiphuffman: Ok, I have added a log to my gist here:  https://gist.github.com/2883562  I'll look it too, but any input from lukeis or anyone else would be welcome.
+[19:58:39] MadMerlin|work_ has joined #selenium
+[19:58:44] brokenthumbs has joined #selenium
+[IRC logfile - Started Wed Jun  6 20:01:52 2012]
+[20:01:52] *jimevans sighs heavily
+[20:02:07] jimevans: jarib: yt?
+[20:02:35] jeichar has joined #selenium
+[20:03:38] AutomatedTester: jimevans: wassup mate
+[20:04:02] jimevans: i just saw a watir-webdriver email on watir-general that made me sad.
+[20:04:19] AutomatedTester: link? you can PM if you want
+[20:04:45] jimevans: oh, i'll link to it… https://groups.google.com/forum/?fromgroups#!topic/watir-general/cT9yaL_UI5s
+[20:05:04] AutomatedTester: slow building selenium is slow
+[20:05:07] jimevans: it's basically a "we don't block on element click, and i don't like that. boo hoo hoo"
+[20:05:26] worm has joined #selenium
+[20:06:09] llaskin: Dear Ben,
+[20:06:20] llaskin: We urge you to spend time reading the docs and understand how Watir works.
+[20:06:23] llaskin: Sincerely,
+[20:06:24] llaskin: Watir
+[20:06:53] jeichar has joined #selenium
+[20:10:05] jimevans: llaskin: that's great, except that the behavior changed between watir and watir-webdriver. the click() method has different semantics between the two.
+[20:10:30] llaskin: i know
+[20:10:32] llaskin: i'm just trollin
+[20:10:46] AutomatedTester: s/trolling/being me
+[20:10:57] llaskin: true
+[20:14:58] jimevans: #3392 has people beginning to be pushy about wanting a change to webdrive.r
+[20:14:59] selbot2: 03dawagner@gmail.com open/accepted Allow capability to specify auto-dismiss behaviour on UnhandledAlertException - https://code.google.com/p/selenium/issues/detail?id=3392 [Type-Enhancement Priority-Medium Component-WebDriver]
+[20:17:19] skiphuffman: I don't see that that log recorded anything useful.
+[20:18:21] jimevans: there's a whole lotta green on the CI server. :D
+[20:18:44] skiphuffman: Any process would have started with a login with an id starting with cdnuu.  I don't see that string in the file at all
+[20:19:07] santiycr has joined #selenium
+[20:19:13] *jimevans wishes he could set up an IE6 test environment.
+[20:19:40] jleyba: jimevans: tag a version as IE6 supported and move on
+[20:19:48] jleyba: that browser is too hold for you to waste resources supporting
+[20:20:26] jimevans: jleyba: i don't disagree, but we *do* have tests for it in the CI build, and two of the atoms tests fail on IE6.
+[20:20:33] jimevans: i'd just like to figure out why.
+[20:21:24] jimevans: and if you can convince simonstewart that we can officially drop IE6 support, i'll gladly do so.
+[20:21:59] AutomatedTester: lukeis: so you fixed FF13?
+[20:22:38] jimevans: jleyba: however, that does give me a reasonable thing to begin a public dialog about.
+[20:22:52] jimevans: here i come, twitter! (and the dev mailing list)
+[20:23:43] jleyba: jimevans: I guess this means I'll have to abandon the cause -> http://www.saveie6.com
+[20:24:17] jimevans: jleyba: yep.
+[20:25:18] jeichar has joined #selenium
+[20:25:32] rbalent has joined #selenium
+[20:25:33] rbalent has joined #selenium
+[20:27:38] jleyba: with the advanced interactions api, if you do a keyDown(SHIFT), does that key stay down until you do keyUP?
+[20:27:55] jleyba: (does the keyDown persist across action chains)
+[20:28:49] AutomatedTester: kkania: ping
+[20:30:49] jimevans: jleyba: i don't think so. i believe it's persisted down for a single chain, and there's an implicit key release when the chain ends. but i'm guessing from mostly faulty memory.
+[20:31:27] AutomatedTester: jimevans: is your FF13 working?
+[20:31:31] AutomatedTester: with your commit?
+[20:31:39] jimevans: AutomatedTester: works a treat.
+[20:31:52] jimevans: native events and all.
+[20:31:55] AutomatedTester: cool
+[20:32:06] *AutomatedTester gives lukeis the evil eye
+[20:33:39] AutomatedTester: so can I leave a comment on a bug with "this is an awful bug report" when they have just left the template and not added anything?
+[20:35:32] jleyba: I think so
+[20:35:38] jimevans: AutomatedTester: i certainly don't have a problem with that.
+[20:36:50] lukeis has joined #selenium
+[20:37:33] skiphuffman: AutomatedTester,  No, you should try to fix the bug.  I mean you are psicyc, aren't you?
+[20:37:52] AutomatedTester: i must be, i worked out what you tried to type :P
+[20:38:10] skiphuffman: or perhaps psychic.
+[20:38:26] skiphuffman: Come on.  Most of the letters were there.
+[20:38:31] skiphuffman: Some in the right order.
+[20:39:02] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Bumping IEDriverServer version resource to 2.23.0.0 in preparation for impending release. No prebuilt binaries associated with this change. | https://code.google.com/p/selenium/source/detail?r=17135 | http://seleniumhq.org/ci.jsp?r=17135
+[20:40:04] AutomatedTester: skiphuffman: like I said, I worked it out without any prompting so I must be :D
+[20:46:25] llaskin1 has joined #selenium
+[20:48:10] jeichar_ has joined #selenium
+[20:59:07] hugs has joined #selenium
+[IRC logfile - Started Wed Jun  6 21:01:37 2012]
+[21:01:37] olan has joined #selenium
+[21:06:35] jeichar has joined #selenium
+[21:10:39] jezuz has joined #selenium
+[21:14:54] lfryc has joined #selenium
+[21:14:54] lfryc has joined #selenium
+[21:17:31] nimeacuerdo has joined #selenium
+[21:18:04] elopio has joined #selenium
+[21:19:49] jibay_ has joined #selenium
+[21:21:03] kkania: AutomatedTester:pong
+[21:21:45] AutomatedTester: kkania: issue #4041 was fixed some time back
+[21:21:47] selbot2: 03 closed/duplicate WebElement in Python bindings file upload won't work on Windows. - https://code.google.com/p/selenium/issues/detail?id=4041 [Type-Defect Priority-Medium Status-Untriaged] (duplicate of https://code.google.com/p/selenium/issues/detail?id=3906)
+[21:21:54] AutomatedTester: you may need to organise a code refresh
+[21:23:57] stockton has joined #selenium
+[21:25:10] friskd has joined #selenium
+[21:28:05] nsussman has joined #selenium
+[21:28:14] tunabum has joined #selenium
+[21:28:17] Dude-X: hey AutomatedTester, have to refactor python expected conditions but it should work where you can type webdriver_wait(driver, 10).until(expectedCondtion.presence_of_element(*locator))
+[21:28:29] Dude-X: but it's almost ready to be included
+[21:29:19] AutomatedTester: Dude-X: ok, if I am not around tunabum/lukeis could possibly look at it
+[21:29:27] Dude-X: right now luke is the point man
+[21:29:30] Dude-X: yeah
+[21:30:28] nirvdrum has joined #selenium
+[21:37:15] AutomatedTester: kkania: I wasnt meaning you were adding noise, just thought if you are using your own fork you might need to update it
+[21:37:43] kkania: AutomatedTester: yes i know, its just that i felt bad
+[21:40:47] alexglow has joined #selenium
+[21:46:36] AutomatedTester: laters aligators
+[21:46:43] farlan has left #selenium
+[21:47:00] Dude-X: o/
+[21:47:20] kamoricks has joined #selenium
+[21:52:36] stockton has joined #selenium
+[IRC logfile - Started Wed Jun  6 22:07:40 2012]
+[22:07:40] nimeacuerdo: hi there
+[22:08:00] nimeacuerdo: having fun with a grid issue
+[22:11:41] testingb0t has joined #selenium
+[22:11:58] nimeacuerdo: a "Error forwarding the new session Error forwarding the request Read timed out"
+[22:13:16] nimeacuerdo: which are really two exceptions traces in one: an IO exception captured and then relaunched as a GridException
+[22:13:37] nimeacuerdo: while performing a forwardNewSessionRequestAndUpdateRegistry(session)
+[22:13:42] nimeacuerdo: with 2.22
+[22:13:55] nimeacuerdo: hub with two nodes, 1 IE on each
+[22:14:43] nimeacuerdo: and always happening when requesting a new session from the client side
+[22:15:22] nimeacuerdo: so, looking for the root cause
+[22:16:43] gsnedders has left #selenium
+[22:17:46] jimevans: i'm starting to lean toward an ultimatum...
+[22:18:25] jimevans: the first selenium release on or after 27 August 2012 will be the final release of IE6 support in webdriver.
+[22:19:26] jleyba: jimevans: I like it
+[22:19:54] jimevans: 27 August 2012 is the 11th anniversary of the release of IE6. :)
+[22:25:44] jimevans: right. later.
+[22:25:45] jimevans has left #selenium
+[22:33:11] kamoricks has joined #selenium
+[22:44:52] stackedsax has joined #selenium
+[22:56:00] noahsussman has joined #selenium
+[22:57:35] lukeis has joined #selenium
+[IRC logfile - Started Wed Jun  6 23:07:58 2012]
+[23:07:58] lukeis: :ci status
+[23:08:00] selbot2: 0 building | 25 successful | 5 unstable | 0 failing | 1 aborted
+[23:08:41] eghm: nice
+[23:09:22] lukeis: :seen jimevans
+[23:09:23] selbot2: jimevans was last seen 44 minutes ago, leaving.
+[23:19:57] lukeis: lotsa green... but IE6 and 9 test failures. I don't think anyone has looked at them yet, have they? :)
+[23:22:09] Dude-X: jim should EOL IE6 it's on anniversary
+[23:24:11] jimevans has joined #selenium
+[23:26:51] lukeis: hi jim
+[23:27:13] *lukeis was going to look at the IE test failures, have you looked at any already?
+[23:28:05] polygonum has joined #selenium
+[23:29:19] jarib: heh
+[23:29:44] jarib: someone emailed selenium-developers with simon's email as the subject :P
+[23:30:01] lukeis: i saw that... i took as it's just for him to read ;)
+[23:33:51] jarib: i'm amazed at some of the emails
+[23:34:35] jarib: language barrier or not, " Can you please help me to how to use IE 2.22 server in"
+[23:34:38] jarib: webdriver framework
+[23:35:01] tessarakt2 has joined #selenium
+[23:35:03] tessarakt2: Hey!
+[23:35:06] jarib: yo
+[23:35:35] tessarakt2: I am trying to use the executeScript function of the FirefoxDriver
+[23:35:42] jarib: ok?
+[23:36:00] tessarakt2: but I get: "org.openqa.selenium.WebDriverException: null (WARNING: The server did not provide any stacktrace information)"
+[23:36:15] tessarakt2: any idea?
+[23:36:23] lukeis: means your script that you sent to execute has a javascript error in it
+[23:36:28] jarib: :gist the full stacktrace
+[23:36:29] selbot2: Please paste >3 lines of text to https://gist.github.com
+[23:37:27] tessarakt2: http://nopaste.linux-dev.org/?50979 - that is not really more meaningful than what I just wrote
+[23:37:44] tessarakt2: but the hint that the JS has an error is good - so I will look at that
+[23:38:40] jarib: the error message really should be better if that's the case
+[23:38:57] lukeis: you can quickly see if if you just "try { <your js here> } catch (e) { return e; }"
+[23:39:02] lukeis: jarib: yes... i agree
+[23:40:56] jarib: if a JS execption is thrown in firefox, the exception should be a JavascriptException and the message should include the JS exception message
+[23:41:01] jarib: at least that's what i'm seeing here
+[23:42:24] tessarakt2: one moment
+[23:43:20] lukeis: jarib: i haven't seen that one bubble up before :)
+[23:43:39] tessarakt2: ok, I have to do some more research
+[23:43:43] tessarakt2: thanks for now
+[23:46:20] lukeis: jimevans: yt?
+[23:46:30] jimevans: yes, sir, i am
+[23:46:46] jimevans: sorry, wasn't looking at the irc window.
+[23:46:51] lukeis: i ran the IE9 failure individually and it passed
+[23:46:59] lukeis: running the whole atoms together now
+[23:47:07] lukeis: next is IE6 ;)
+[23:47:13] lukeis: have you looked at any of them yet?
+[23:47:19] jimevans: the IE6 atoms failures are well-known.
+[23:47:24] lukeis: k
+[23:47:27] lukeis: acceptable then?
+[23:47:36] jimevans: yes, quite.
+[23:47:47] lukeis: cool and the IE9 one then?
+[23:48:20] jimevans: i'm pretty sure it's transient. i've seen it happen spontaneously before, then clear up on the next run
+[23:48:43] lukeis: and because late in the evening releases are never a good idea... since everything looks green I'll release first thing in the morning (my time... which is everyone else's afternoon)
+[23:49:00] jimevans: i'll be ready.
+[23:49:15] jimevans: let's quiesce the code. nobody check anything in!
+[23:49:16] jimevans: :)
+[23:49:16] lukeis: just double checking, prebuilts checked in?
+[23:49:19] tessarakt2: the script is http://nopaste.linux-dev.org/?50981 - it has been copied from an example mentioned here: http://mercenary-code.blogspot.de/2010/05/jscoverage-cobertura-and-selenium.html
+[23:49:22] jimevans: not yet.
+[23:49:25] jimevans: i need to do that.
+[23:49:26] dawagner has joined #selenium
+[23:49:28] lukeis: k
+[23:49:32] dawagner: Just found out my .crazyfun dir is 5.5GB.
+[23:49:36] jimevans: sorry. firefox prebuilts are. IE aren't
+[23:49:40] dawagner: And yet I STILL download a gecko every time I build.
+[23:49:59] lukeis: you do? that's weird
+[23:50:15] jimevans: i'll build the IE prebuilts and check in now.
+[23:50:19] jimevans: won't take a second.
+[23:50:30] lukeis: cool
+[23:51:25] jimevans: which will, of course, trigger a ci rebuild. :)
+[23:52:36] lukeis: I'll give myself the evening to review the history and come up with a change log
+[23:52:56] jarib: wait, release?
+[23:53:13] lukeis: dawagner jarib : i mentioned to jim, i'll reiterate for your benefit, I'll release first thing tomorrow morning (my time 9am PST)
+[23:53:29] lukeis: as long as everything stays green ;)
+[23:53:37] jarib: dawagner: do the checksums not match the ones in the Rakefile?
+[23:53:41] dawagner: What's going on with the IE server?
+[23:53:49] jarib: :ci
+[23:53:50] selbot2: Jenkins: http://sci.illicitonion.com:8080/ | Dashboard: http://selenium-ci.jaribakken.com/
+[23:54:05] dawagner: jarib: *shrug* I'll pay attention next time :)
+[23:54:24] lukeis: this is more the FF13 release... although I'm sure jim wanted to drop the dll's from support, that'll have to wait till 2.24 in java land
+[23:55:00] lukeis: unless you guys do it while i sleep :)
+[23:55:02] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Updating IE prebuilts and changelogs for 2.23.0 | https://code.google.com/p/selenium/source/detail?r=17136 | http://seleniumhq.org/ci.jsp?r=17136
+[23:55:24] jimevans: jim did drop the dlls from the .NET bindings of the IE driver. :)
+[23:55:30] *lukeis noticed that
+[23:55:49] jimevans: i was encouraged to do so by people on the channel, and i bowed to peer pressure.
+[23:55:51] jimevans: :D
+[23:55:55] tessarakt2: SyntaxError: invalid range in character class
+[23:55:57] lukeis: heh
+[23:55:59] tessarakt2: grrrr!
+[23:56:41] jimevans: dawagner, jarib: i added the new gecko sdks to the rakefile. i may have done something wrong.
+[23:56:49] jimevans: i did copy the checksums, though.
+[23:59:49] brettporter has joined #selenium

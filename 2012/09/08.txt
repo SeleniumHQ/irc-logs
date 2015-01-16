@@ -1,0 +1,174 @@
+[IRC logfile - Started Sat Sep  8 00:13:28 2012]
+[00:13:28] nyx114 has joined #selenium
+[00:13:50] nyx114 has joined #selenium
+[00:23:57] stephend has joined #selenium
+[00:33:04] jfunk_ has joined #selenium
+[00:44:51] sisook has joined #selenium
+[00:45:46] sisook: hello! does anyone know of known issues with Selenium 2,20,0 and Firefox 15 (webdriver)?
+[00:47:36] Dude-X: get selenium webdriver 2.25, but for native events, you might need to wait for 2.26
+[00:51:45] sisook: thanks.  i'll try it out
+[IRC logfile - Started Sat Sep  8 01:02:24 2012]
+[01:02:24] o3u has joined #selenium
+[01:04:52] stackedsax has joined #selenium
+[01:08:16] stackedsax1 has joined #selenium
+[01:19:22] stackedsax has joined #selenium
+[01:37:17] farlan has joined #selenium
+[01:52:51] farlan has left #selenium
+[IRC logfile - Started Sat Sep  8 02:04:17 2012]
+[02:04:17] adamgoucher: nice! specifying invalid xpath throws the invalid selector message from the se server
+[02:43:21] Siph0n has joined #selenium
+[02:45:18] stackedsax has joined #selenium
+[IRC logfile - Started Sat Sep  8 04:31:02 2012]
+[04:31:02] sassda has joined #selenium
+[04:32:38] sassda1 has joined #selenium
+[IRC logfile - Started Sat Sep  8 05:28:29 2012]
+[05:28:29] lucabox has joined #selenium
+[05:44:41] ian_mac has joined #selenium
+[IRC logfile - Started Sat Sep  8 07:25:58 2012]
+[07:25:58] toabctl has joined #selenium
+[IRC logfile - Started Sat Sep  8 08:02:02 2012]
+[08:02:02] towski has joined #selenium
+[08:26:37] o3u has joined #selenium
+[IRC logfile - Started Sat Sep  8 09:17:12 2012]
+[09:17:12] Archdude_ has joined #selenium
+[09:34:48] Swadq has joined #selenium
+[09:51:59] dmachi has joined #selenium
+[IRC logfile - Started Sat Sep  8 11:16:45 2012]
+[11:16:45] stephend has joined #selenium
+[11:22:57] barancev|2 has joined #selenium
+[11:26:07] Swadq has joined #selenium
+[IRC logfile - Started Sat Sep  8 13:01:16 2012]
+[13:01:16] cheezy has joined #selenium
+[13:14:05] ian_mac has joined #selenium
+[13:46:35] testingb0t1 has joined #selenium
+[13:57:40] darkrift has joined #selenium
+[13:57:40] darkrift has joined #selenium
+[IRC logfile - Started Sat Sep  8 14:15:31 2012]
+[14:15:31] stackedsax has joined #selenium
+[14:32:43] o3u has joined #selenium
+[14:47:40] freynaud has joined #selenium
+[IRC logfile - Started Sat Sep  8 15:08:42 2012]
+[15:08:42] mreedell has joined #selenium
+[15:25:28] o3u has joined #selenium
+[15:25:33] jibay has joined #selenium
+[15:32:52] mdgreenfield has joined #selenium
+[IRC logfile - Started Sat Sep  8 16:11:00 2012]
+[16:11:00] sburjan has joined #selenium
+[16:20:53] ancduval has joined #selenium
+[16:22:06] ancduval: Hi, I have a quick question about Selenium+Firefox when the page has no top <html> or <body> elements
+[16:23:42] Dude-X_: ok
+[16:23:59] Dude-X_: Selenium IDE?
+[16:24:26] ancduval: Selenium Webdriver: I get "WebDriverException: waiting for doc.body failed" if I try to run JavaScript on such a page. Example:
+[16:24:29] ancduval: http://pastebin.com/b31qd54a
+[16:24:35] darkrift has joined #selenium
+[16:24:36] darkrift has joined #selenium
+[16:25:05] ancduval: If I load a "normal" page (e.g. google.com) and try to execute JavaScript like "alert('hello');", it works
+[16:26:11] ancduval: So I think it has to do with the page NOT having any <html> or <body> elements, and I'm hoping there's a known way to handle this (just like there's a known way to work on a page with iFrames)
+[16:26:30] Dude-X_: well if a page doesn't have HTML it would probably be treated as a text file
+[16:27:06] Dude-X_: and as a text file you can get use driver.getPageSource or driver.page_source
+[16:28:44] Dude-X_: i think you need at least an <HTML> tag for javascript to be executed on a page
+[16:30:44] ancduval: Firefox seems to interpret it as HTML; FireBug shows the top-level element to be <window id="config" ...>. And Selenium mostly works with it:
+[16:30:59] ancduval: I can do stuff like driver.findElement(By.id("showWarningNextTime"));
+[16:31:25] ancduval: findElement works the same as on "normal" pages: returns the element if found, throws exception if not
+[16:33:18] ancduval: google wasn't very helpful (searching for "missing html" or "no body" shows hot to select body/html in selenium); so I was hoping this might be a known special case for Selenium
+[16:33:28] ancduval: s/hot/how
+[16:34:33] Dude-X_: is there any reason you want to run javascript on a nonstandard iframe?
+[16:34:44] Dude-X_: that's actually a bug in the design if it has elements to work with
+[16:35:56] ancduval: bit of a long story: I'm trying to completely automate installing a plugin in Firefox for a new user on Linux
+[16:36:38] ancduval: found out how to download the addon.xpi file, put it in the correct folder inside ~/.mozilla/firefox/extensions/
+[16:37:09] ancduval: but the next time the user starts Firefox, he gets a page with a checkbox and a Continue button, asking to activate that plugin
+[16:37:30] ancduval: That page ( about:newaddon?id={d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d} ) is very similar to about:config
+[16:38:10] ancduval: What I'm trying to do is checkbox = driver..findElementById(...); checkbox.click();
+[16:38:31] ancduval: but it fails because of some JavaScript exception in Firefox's default .js files which appear to run on that page
+[16:39:09] Dude-X_: you might be interacting with firefox's "chrome" which may not be accessible to webdriver
+[16:39:27] Dude-X_: if that's the case you may want to wait for Marionette in a few months to make that happen
+[16:39:56] ancduval: That error I'm getting when I try checkbox.click() looks like "'[JavaScript Error: "b is undefined" {file: "file:///tmp/anonymous1991281401670723705webdriver-profile/extensions/fxdriver@googlecode.com/components/synthetic_mouse.js" line: 2112}]' when calling method: [wdIMouse::move]"
+[16:40:07] ancduval: and if I look in that file, the problem is with:
+[16:40:40] ancduval: http://pastebin.com/RG3p5yPF
+[16:41:38] ancduval: So I was trying to either: 1) find a way to ignore that JS error and still click buttons/checkboxes from Selenium Webdriver, or 2) select & click them by running JavaScript in the page
+[16:41:57] Dude-X_: so then that only adds to my belief that you're interacting with firefox chrome
+[16:42:20] Dude-X_: think about it, would you want a website to secretly install extensions via javascript?
+[16:42:35] Dude-X_: you can try enabling native events
+[16:47:05] ancduval: If I understand this correctly, the Settings pages for the Chromium/Google Chrome browser (which, unlike Opera/Firefox, are shown in the browser not in a Pop-up Dialog) are different than "normal web pages you load", and project Marionette will allow FirefoxDriver to work on pages like "about:config" the same way ChromeDriver works on the browser preferences pages (i.e., the same as on website pages)?
+[16:48:03] Dude-X_: well marionette lets you interact with file download boxes, and other parts that are not exposed to the browser
+[IRC logfile - Started Sat Sep  8 17:07:46 2012]
+[17:07:46] lucabox has joined #selenium
+[17:08:22] ancduval: Dude-X, I think you've nailed it! 
+[17:08:53] ancduval: native events allow me to send a space character to controls (and select the checkbox)
+[17:09:58] Dude-X_: right, the OS controls the mouse and keyboard
+[17:10:00] Dude-X_: not Javascript
+[17:10:16] ancduval: the button still seems to want a click (not a Return/Space, but I'll see if I can work around that). Anyway, this helps, and thanks for mentioning Marionette: I'll check if that helps with my issue when it's out
+[17:10:37] Dude-X_: for Marionette to work get the latest nightly build
+[17:11:03] Dude-X_: Return/space should be functionally equialvent…
+[17:19:22] ancduval: ok, turns out I need to have another tab (or another browser window open), otherwise when I click (with native events) the confirm button and the current tab closes, the browser quits before the extension (adblock plus) is initialized (in a new tab that will pop up)
+[17:20:13] Dude-X_: the latest firefox (12 and up i believe) does not need to restart for some plugins
+[17:20:19] ancduval: (I've tested that by hand without selenium, so I'm pretty sure I can get this to work now, without marionette)
+[17:20:37] Dude-X_: 15 is not supported with native events yet
+[17:21:56] ancduval: I'm running Ubuntu & Debian (FF 14 and 10); hmm.. so what I'm doing here with native events isn't a perfect/stable thing then
+[17:22:36] Dude-X_: well, automating plugin installation is beyond the scope of webdriver
+[17:22:54] Dude-X_: it's much easier to just create a profile
+[17:22:59] Dude-X_: that has all the settings
+[17:23:51] ancduval: and you're right about no need to restart, but going to addons.mozilla.org and clicking "add to firefox" pops some confirmation windows; so then I looked at putting the .xpi in extensions/ , saw that FF still wants a confirmation but inside a browser page, so I thought Selenium might help here
+[17:24:05] Dude-X_: you can switch to alerts
+[17:24:19] Dude-X_: as long they're javascript alerts
+[17:24:34] Dude-X_: but i think browser alerts for add ons is a 'chrome' thing
+[17:25:06] Dude-X_: it's not tied to javascript
+[17:27:29] awilson820 has joined #selenium
+[17:29:24] ancduval: not sure I followed you about 'switching to alerts', but I'll keep trying a) multiple tabs/windows and b) check the nightly build, just to see if it helps
+[17:30:10] Dude-X_: there are alerts that can be produced by firefox (alert('blah')
+[17:30:14] Dude-X_: Webdriver can handle thiis
+[17:31:07] Dude-X_: there are modal dialog windows that firefox can produce that are not by javascript (file dialog box, open file dialog box, OS dialog box saying that firefox crashed); these are not controllable by Javascript
+[17:32:59] stackedsax has joined #selenium
+[17:33:11] ancduval: right; and probably the Install Add-On pop-up is an OS dialog box; btw, I know this is outside the scope of Selenium, but when a browser does something using exclusively HTML pages (like setting browser preferences in Google Chrome I can automate that with Selenium, which is great)
+[17:33:44] Dude-X_: yeah
+[17:34:36] Dude-X_: the problem with Marionette is that currently it's in the debug build of firefox, so it's seen more of a testing tool rather than a regular browser
+[17:37:27] ancduval: I've cooked up a few scripts to set ALL my preferences for all programs / window manager settings / etc. I use, so I can always delete my home dir (I always have separate data partitions) if I want to get back to a "clean" state, and have everything set up for me; or move to a different computer; I guess right now I'm trying to see how far I can actually take that
+[17:39:31] ancduval: guess it would be cool if exposing the "settings API" was part of most programs, including browsers, but probably most users would never need this
+[17:39:46] Dude-X_: automation hooks are also a security nightmare too
+[17:40:13] Dude-X_: IE with ActiveScript for example
+[17:40:27] Dude-X_: but that's a bit a little different because it hooked into the OS
+[17:42:27] ancduval: you mean if a browser exposes automation hooks to Selenium, Watir, etc. then 1) malicious apps running on the user's computer might acces them or 2) an implementation bug might be exploited by websites (like you mentioned with installing an extension via JS, behind the user's back)?
+[17:43:50] Dude-X_: yes
+[17:44:28] Dude-X_: right now Marionette is for debug builds of firefox because the security manager at Mozilla has to figure out what to do with it if they want to put it into regular Firefox
+[17:48:26] rbalent has joined #selenium
+[IRC logfile - Started Sat Sep  8 18:13:53 2012]
+[18:13:53] stephend has joined #selenium
+[18:14:46] ancduval: for the record, Native Events work great for these 'about:' pages I needed in Firefox. And if someone needs several tabs opened (the 'confirm extension' page I needed after placing an .xpi file in profile/extensions/ needs them) Native Events can do that with element.sendKeys(Keys.CONTROL + "t");
+[18:15:17] ancduval: thank you Dude-X
+[18:17:31] Dude-X_: wunderbar
+[18:36:45] awilson820 has joined #selenium
+[18:37:47] darkrift has joined #selenium
+[18:37:48] darkrift has joined #selenium
+[18:59:05] rbalent has joined #selenium
+[18:59:50] rbalent has joined #selenium
+[18:59:50] rbalent has joined #selenium
+[IRC logfile - Started Sat Sep  8 19:31:53 2012]
+[19:31:53] Swadq has joined #selenium
+[19:53:34] rbalent has joined #selenium
+[19:53:35] rbalent has joined #selenium
+[19:54:21] detronizator has joined #selenium
+[19:55:04] detronizator: Hey guys? 
+[19:55:24] detronizator: anyone aware of why the CrazyFunBuild crashes
+[19:55:29] detronizator: when I generate atoms
+[19:55:32] detronizator: like in here: https://github.com/detro/ghostdriver/blob/master/tools/atoms_build_dir/build.desc ?
+[19:55:51] detronizator: this is part of the GhostDriver atom building script
+[IRC logfile - Started Sat Sep  8 20:11:34 2012]
+[20:11:34] detronizator: Compiling //javascript/webdriver/atoms/inject:is_enabled as build/javascript/webdriver/atoms/inject/is_enabled.js
+[20:11:35] detronizator: java.lang.OutOfMemoryError: PermGen space
+[20:21:37] Swadq has joined #selenium
+[20:46:26] richardlavoie has joined #selenium
+[20:46:27] richardlavoie has joined #selenium
+[20:51:39] richardlavoie: detronizator, just out of curiosity, would ghostdriver support screenshots ?
+[20:58:04] DarkRift: ok, I think I've found my answer, thanks
+[IRC logfile - Started Sat Sep  8 21:33:54 2012]
+[21:33:54] toabctl has joined #selenium
+[21:41:06] toabctl has joined #selenium
+[21:52:03] dmachi1 has joined #selenium
+[IRC logfile - Started Sat Sep  8 22:24:26 2012]
+[22:24:26] richardlavoie has joined #selenium
+[22:24:26] richardlavoie has joined #selenium
+[22:28:05] detronizator: richardlavoie: yes
+[22:28:15] detronizator: one of the easiest thing to do was the screenshots indeed
+[IRC logfile - Started Sat Sep  8 23:11:04 2012]
+[23:11:04] richardlavoie has joined #selenium
+[23:11:04] richardlavoie has joined #selenium

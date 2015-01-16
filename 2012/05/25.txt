@@ -1,0 +1,1046 @@
+[IRC logfile - Started Fri May 25 00:03:11 2012]
+[00:03:11] *dawagner watches CI intently
+[00:14:02] kallisti has joined #selenium
+[00:14:02] kallisti has joined #selenium
+[00:21:40] dawagner: barancev: Javascript tests are starting to go green :)
+[00:21:56] barancev: I see, yes
+[00:30:11] dawagner: More builds going green...
+[00:34:38] jcrza has joined #selenium
+[00:47:53] warreng has joined #selenium
+[00:49:02] warreng: if i have a single chromedriver running multiple sessions (dozens) in a headless window (Xvfb), can all of those sessions be used in parallel? or are they essentially synchronous and one browser won't do anything until the next finishes?
+[00:50:01] ian_mac has joined #selenium
+[00:50:49] dawagner: warreng: You can run them in parallel all you want :)
+[00:50:56] dawagner: The limit is your machine's hardware
+[00:52:00] warreng: if i want 50 browsers, are there any advantages to running 50 Xvfbs, 50 chromedrivers and 50 chrome instances (i.e. 1 chrome, 1 chromedriver and 1 Xvfb) versus 1 Xvfb, 1 chromedriver and 50 instances?
+[00:53:44] dawagner: I'd experiment with your hardware, I don't know where the bottlenecks will be
+[00:54:27] dawagner: I tend to share one virtual display unless tests are actively interacting badly, and I've never seen Chrome have shared-display problems
+[00:55:25] dawagner: One ChromeDriver is probably cheaper than many chromedrivers
+[00:55:40] dawagner: But you may run in to contention somewhere :)
+[IRC logfile - Started Fri May 25 01:05:01 2012]
+[01:05:01] dawagner: :note jimevans there doesn't seem to be a prebuild of the IEDriverServer in trunk...
+[01:05:02] selbot2: ok!
+[01:05:39] dawagner: barancev: yt?
+[01:10:40] dawagner: barancev: Ok, still seeing could not connect problems...
+[01:11:02] dawagner: Seems to be restricted to individual sauce sessions
+[01:11:39] dawagner: I'll try whacking a big pile of instrumentation at the server side, and seeing what happens... Unfortunately, it seems to take a whole test run to get one failing case...
+[01:14:10] dawagner: :note santiycr It looks like something like 1/40 VMs you pull up can't connect to our HTTP server.  Could we commandeer a box from you to to play with, to work out whether the problem is my end, your end, or the middle?
+[01:14:12] selbot2: ok!
+[01:23:43] selbot2: 03nirvdrum@gmail.com less than 20 seconds ago - Point folks towards Selenium Grid 2. | https://code.google.com/p/selenium/source/detail?r=17015 | http://seleniumhq.org/ci.jsp?r=17015
+[01:29:29] BiggAl has joined #selenium
+[01:33:38] omaciel_ has joined #selenium
+[01:34:36] dregin1 has joined #selenium
+[01:36:51] Parabola_ has joined #selenium
+[01:37:18] jarib_ has joined #selenium
+[01:44:38] andialbrecht_ has joined #selenium
+[01:44:38] Odd_Bloke has joined #selenium
+[01:44:38] eghm has joined #selenium
+[01:44:38] xirkus has joined #selenium
+[01:44:38] marcuy has joined #selenium
+[01:44:38] Dude-X_ has joined #selenium
+[01:44:38] Getty has joined #selenium
+[01:44:38] xtian has joined #selenium
+[01:44:38] ian_mac has joined #selenium
+[01:44:38] jcrza has joined #selenium
+[01:44:38] kallisti has joined #selenium
+[01:44:38] dawagner has joined #selenium
+[01:44:38] MadMerlin|work_ has joined #selenium
+[01:44:38] joar has joined #selenium
+[01:44:38] snax has joined #selenium
+[01:44:38] tunabum_ has joined #selenium
+[01:44:38] brettporter has joined #selenium
+[01:44:38] Spanktar has joined #selenium
+[01:44:38] stephend has joined #selenium
+[01:44:38] stockton has joined #selenium
+[01:44:38] darius_w has joined #selenium
+[01:44:38] mattp_ has joined #selenium
+[01:44:38] KebabBob has joined #selenium
+[01:44:38] leev has joined #selenium
+[01:44:38] ub|k has joined #selenium
+[01:44:38] barancev has joined #selenium
+[01:44:38] JackDandy has joined #selenium
+[01:44:38] Ardesco has joined #selenium
+[01:44:38] ArmEagle has joined #selenium
+[01:44:38] elopio has joined #selenium
+[01:44:38] eanxgeek has joined #selenium
+[01:44:38] kkania has joined #selenium
+[01:44:38] melter has joined #selenium
+[01:44:38] andreastt has joined #selenium
+[01:44:38] bburton has joined #selenium
+[01:44:38] jyrkip has joined #selenium
+[01:44:38] selbot2 has joined #selenium
+[01:44:38] arnlaugsson has joined #selenium
+[01:44:38] Dude-X has joined #selenium
+[01:44:38] pa has joined #selenium
+[01:44:38] robinsmidsrod has joined #selenium
+[01:44:38] cube has joined #selenium
+[01:44:38] toxboi has joined #selenium
+[01:44:38] cinch has joined #selenium
+[01:44:38] NReijmersdal has joined #selenium
+[01:44:38] retornam has joined #selenium
+[01:44:38] Mox[NL] has joined #selenium
+[01:44:52] hugs has joined #selenium
+[01:44:54] hugs has joined #selenium
+[01:51:21] Dude-X_ has joined #selenium
+[01:51:21] marcuy has joined #selenium
+[01:51:21] xirkus has joined #selenium
+[01:51:21] eghm has joined #selenium
+[01:51:21] Odd_Bloke has joined #selenium
+[01:51:21] andialbrecht_ has joined #selenium
+[IRC logfile - Started Fri May 25 02:12:50 2012]
+[02:12:50] mreedell has joined #selenium
+[02:49:18] stephend_ has joined #selenium
+[02:50:29] ian_mac has joined #selenium
+[IRC logfile - Started Fri May 25 03:09:48 2012]
+[03:09:48] mreedell has joined #selenium
+[03:46:12] sassda has joined #selenium
+[03:48:40] stephend has joined #selenium
+[03:55:41] jobicoppola has joined #selenium
+[IRC logfile - Started Fri May 25 04:01:16 2012]
+[04:01:16] ian_mac has joined #selenium
+[04:06:52] baijum has joined #selenium
+[04:10:53] islands has joined #selenium
+[04:27:37] islands: hello, i am using selenium server 2.21 on ubuntu with phpunit.  taking the example of a login form, the only way i can get it to work is using the native php sleep function.  all calls to clickAndWait, waitForPageToLoad, openAndWait have no effect.  i also set setWaitForPageToLoad(true) but no effect.  any other ideas to try?  
+[04:28:20] islands: without the sleep function, subsequent calls are done on the login page, not the redirected page.
+[04:28:40] islands: if i do add the sleep function with, say, 5 seconds, it gives selenium enough time for the new page to load before moving on
+[04:28:45] islands: thanks
+[04:29:09] stephend has joined #selenium
+[IRC logfile - Started Fri May 25 05:02:24 2012]
+[05:02:24] Siph0n has joined #selenium
+[05:21:31] Ardesco^ has joined #selenium
+[05:44:25] webguynow has joined #selenium
+[05:45:22] webguynow: anyone here familiar with Se-IDE and using the contextMenu command ?
+[05:45:30] webguynow: I need to find out how it works
+[05:47:11] webguynow: it would be nice if it was able to simulate a rc to bring up a contextMenu, but I've never been able to get it to work - Must be missing something
+[05:50:40] stephend has joined #selenium
+[05:54:11] dmachi1 has joined #selenium
+[05:55:38] __gotcha has joined #selenium
+[05:55:38] __gotcha has joined #selenium
+[IRC logfile - Started Fri May 25 06:16:17 2012]
+[06:16:17] nitin__ has joined #selenium
+[06:18:28] tessarakt has joined #selenium
+[06:29:12] hanneso has joined #selenium
+[06:36:42] KebabBob has joined #selenium
+[06:49:39] barancev has joined #selenium
+[06:54:50] baijum has joined #selenium
+[IRC logfile - Started Fri May 25 07:18:43 2012]
+[07:18:43] jeichar has joined #selenium
+[07:22:47] papegaaij has joined #selenium
+[07:30:18] Alex0011 has joined #selenium
+[IRC logfile - Started Fri May 25 08:02:13 2012]
+[08:02:13] brokenthumbs has joined #selenium
+[08:05:02] Depado has joined #selenium
+[08:05:48] Depado: Hi there, does anyone use Selenium RC in Java ? I got a problem (which is not really one) and I can't solve it... Can someone give me some help ?
+[08:07:27] davehunt has joined #selenium
+[08:13:17] Depado: No ? Anyone ? Someone ? :B
+[08:14:17] andreast has joined #selenium
+[08:30:57] Depado: .___. Someone there ? i___i
+[08:31:33] stephend: I'm here, but we use Python, with WebDriver, sorry
+[08:32:00] Depado: Haw. It see. Never used RC ? Even in python ?
+[08:32:22] stephend: yes, we used RC, extensively
+[08:32:27] stephend: in Python
+[08:32:35] stephend: what's the issue?
+[08:32:57] benadderson has joined #selenium
+[08:33:12] Depado: Well I write 2 tests, but each time there is a new test executed, firefox is closed an reopened...
+[08:33:33] Depado: Though my DefaultSelenium is public and static.
+[08:33:47] Depado: I used setUp and tearDown functions so Selenium understands
+[08:34:01] Depado: But I don't get through this, that's why I'm stuck.
+[08:36:54] stephend: hrm, sorry
+[08:36:58] stephend: dunno
+[08:40:49] barancev: Depado: show you code (setUp and tearDown), use :gist
+[08:40:49] selbot2: Please paste >3 lines of text to https://gist.github.com
+[08:43:05] Depado: https://gist.github.com/2786443
+[08:43:08] Depado: Here it is =)
+[08:43:17] Depado: (thanks barancev for answering me ^^)
+[08:44:10] ElxRoman has joined #selenium
+[08:45:12] barancev: it's JUnit 3 test case, in this version setUp is executed before each test method (and tearDown -- after each test method)
+[08:45:22] barancev: i'
+[08:45:50] Depado: I already tried to put the annotations @AfterClass and @BeforeClass
+[08:46:20] barancev: and you have to use JUnit 4 test runner, too
+[08:46:25] Depado: And I got JUnit 4.10
+[08:46:35] Depado: How to use that ? ._.
+[08:48:39] barancev: remote 'extends TestCase'
+[08:49:21] barancev: add annotations
+[08:49:47] barancev: and try to run -- it'll show you if you're using JUnit 4 or not
+[08:50:22] Depado: Okay =)
+[08:51:20] barancev: don't forget to add @Test annotation, too
+[08:51:47] teodosia has joined #selenium
+[08:52:04] Depado: Still opens 2 firefox (I mean 2 times remote control+test)
+[08:52:40] Depado: And I can't use another version of JUnit 4 because it's in my pom.xml (using maven) so I don't have any other version of JUnit.
+[08:52:57] Depado: (And I'm using Junit 4.10)
+[08:55:59] Depado: barancev: https://gist.github.com/2786443 Is that what you wanted me to do ? 
+[08:56:23] barancev: *remove* extends TestCase!
+[08:57:31] Depado: Oooh okay xD You said "remote" xD
+[IRC logfile - Started Fri May 25 09:00:00 2012]
+[09:00:00] Depado: Now it gives me an initializationError. 
+[09:01:08] andreastt: Good morning!
+[09:02:57] Depado: andreastt: Good morning =)
+[09:03:59] rstrazhnyk has joined #selenium
+[09:05:02] riotz has joined #selenium
+[09:05:22] lfryc has joined #selenium
+[09:07:19] barancev: Depado: :gist the error
+[09:07:19] selbot2: Please paste >3 lines of text to https://gist.github.com
+[09:07:38] __gotcha has joined #selenium
+[09:08:34] Depado: barancev: I wasn't able to open my surefire report folder, now that's fixed. Let's give it another try.
+[09:09:27] Depado: YAY \o/
+[09:09:49] Depado: Thanks a lot. So that was not necessary to extend TestCase or SeleneseTestCase
+[09:10:39] xiaoli_a has joined #selenium
+[09:11:02] barancev: exactly, that's the sign to JUnit to use "old" runner
+[09:12:14] AutomatedTester has joined #selenium
+[09:12:38] barancev: AutomatedTester: hi!
+[09:13:29] barancev: andreastt: AutomatedTester: do you know what's the current state of the w3c specification?
+[09:13:33] Depado: barancev: So if I'm using JUnit 4 it will run with annotations even if I don't extend a testcase; That's good to know =D
+[09:13:55] Depado: And now, back to code coverage compatibility T-T
+[09:13:59] AutomatedTester: barancev: we are asking what is needed to publish a first working draft
+[09:14:03] Depado: Thanks a lot =)
+[09:14:12] jeichar has joined #selenium
+[09:14:33] barancev: may 2012 is the last-call point, according to the schelude, it's changed?
+[09:14:57] AutomatedTester: barancev: we didnt hit the october one so the may one doesnt matter
+[09:15:10] AutomatedTester: we still need to do FPWD
+[09:15:31] barancev: I see
+[09:15:49] barancev: there is a note in the document: "The group will document significant changes from this initial schedule on the group’s home page."
+[09:16:06] barancev: but this page is empty --- http://www.w3.org/testing/browser/
+[09:16:18] AutomatedTester: barancev: thats wilhelm
+[09:16:20] barancev: no stated changes in the schedule
+[09:16:59] barancev: would you please ask him to provide some updates to the schedule (a new plan)?
+[09:21:30] AutomatedTester: barancev: can you email the public list?
+[09:21:37] barancev: ok
+[09:21:46] AutomatedTester: the w3 testing list
+[09:22:58] barancev: http://lists.w3.org/Archives/Public/public-browser-tools-testing/ <-- this one?
+[09:24:38] AutomatedTester: :spec
+[09:24:38] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[09:25:08] AutomatedTester: http://lists.w3.org/Archives/Public/public-test-infra/
+[09:25:59] barancev: thanks!
+[09:28:03] Binken_ has joined #selenium
+[09:28:03] joar has joined #selenium
+[09:28:33] Binken_: :log
+[09:28:33] selbot2: http://illicitonion.com/selogs/selenium/2012/05/25.txt
+[09:28:38] Binken_: :log
+[09:28:38] selbot2: http://illicitonion.com/selogs/selenium/2012/05/25.txt
+[09:32:43] andreastt: I was just asked by a tester what a stacktrace is.  FML.
+[09:32:50] rbalent has joined #selenium
+[09:32:50] rbalent has joined #selenium
+[09:34:48] jeichar has joined #selenium
+[09:36:06] stephend: lol
+[09:38:54] andreastt has joined #selenium
+[09:42:07] zac_sel has joined #selenium
+[09:47:46] Depado: barancev: Thanks to you I written an other post on my blog. Because the fact is when you're using Selenium IDE and export in JUnit 4, your class DO extends SeleneseTestCase. Though it should not.
+[09:48:29] barancev: Depado: really? it's a bug, you'd write to the issue tracked too :)
+[09:48:40] jibay has joined #selenium
+[09:49:30] Depado: Yep just made a test. Open google, and export that test to JUnit 4, it is extending SeleneseTestCase ^^ Where do you want me to write it ? ._.
+[09:49:56] Depado: (by the way, give a look to my blog, it could be useful for users that use maven) http://noobdevelopper.tumblr.com/
+[09:50:52] dregin1: Isn't SeleneseTestCase deprecated for SeleneseTestBase?
+[09:52:03] barancev: Depado: :newissue
+[09:52:03] selbot2: https://code.google.com/p/selenium/issues/entry
+[09:52:44] barancev: dregin1: yes SeleneseTestCase is deprecated (as well as JUnit 3 :))
+[09:52:54] jarib has joined #selenium
+[09:55:01] dregin1: Grand job
+[09:55:06] *dregin1 is not losing his mind.
+[09:55:27] *Dregin IS losing his '1'
+[09:59:29] Depado: barancev: I reported the bug, although it's not really a bug ^^ 
+[09:59:30] *Depado applauses Dregin
+[IRC logfile - Started Fri May 25 10:00:02 2012]
+[10:00:02] Dregin: applauds*
+[10:00:04] Dregin: :P
+[10:00:16] Depado: Thanks my english is bad sometimes =D
+[10:00:26] Depado: (Ok, it's bad all the time D:=)
+[10:00:45] Dregin: Don't worry. I'm here to correct you all day long :P
+[10:00:58] Dregin: Free English lesson!
+[10:01:05] Dregin: I can teach you some Irish too while we're at it :P
+[10:03:22] Depado: YAY Irish !
+[10:03:34] Depado: Teach me how to order a beer in Irish ! \o/
+[10:04:07] robbim02 has joined #selenium
+[10:04:08] Bebe has joined #selenium
+[10:04:41] Dregin: Tabhair deoch dom, le do thoill.
+[10:04:56] Dregin: My written Irish is pretty bad ;_;
+[10:05:03] Dregin: but that means give me a drink, please.
+[10:09:20] Depado: Nice, I'll have to write this down.
+[10:23:26] Bebe has joined #selenium
+[10:29:17] testingb0t has joined #selenium
+[10:32:15] zac_sel has joined #selenium
+[10:39:00] nitin__ has joined #selenium
+[10:47:43] AutomatedTester: Dregin: I hear that "Can I have a beer?" works well in Ireland too :D
+[10:48:39] Depado: AutomatedTester: I heard that "Beer please" works fine in every english-spoken country. :o
+[10:48:53] AutomatedTester: :)
+[10:49:21] Depado: There is a bar near my house, where it is written how to order a beer in every single country of the world. Amazing. :D
+[10:55:56] Dregin: AutomatedTester: the most common approach is propping yourself against the bar and gazing longingly at the tap you want your pint to come from :P
+[10:56:31] Dregin: A load of craft beer pubs have started popping up around Dublin.
+[10:56:47] Dregin: You can get beer from LOADS of countries in them.
+[10:56:53] Dregin: Variety is the spice of life.
+[10:57:18] Dregin: And Sierra Nevada's Celebration..... but it's a seasonal beer and the local only have 2 kegs left until the end of the year ;_;
+[10:58:00] Depado: Well the pub I was talking about, has about 500 types of beer. I didn't try them all :(
+[IRC logfile - Started Fri May 25 11:12:41 2012]
+[11:12:41] dawagner has joined #selenium
+[11:13:50] rstrazhnyk: Nice to read talks about beer in Selenium chat :) Seems like everything other than beer is great too)
+[11:17:08] jeichar_ has joined #selenium
+[11:21:36] Depado: Beer... I can drink litters of that, not like vodka. xD
+[11:22:14] rstrazhnyk: Have anybody tried Lvivske beer from Ukraine? 
+[11:23:22] dawagner has joined #selenium
+[11:29:45] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Adding IEDriverServer prebuilds | https://code.google.com/p/selenium/source/detail?r=17017 | http://seleniumhq.org/ci.jsp?r=17017
+[11:31:20] dawagner: :log
+[11:31:20] selbot2: http://illicitonion.com/selogs/selenium/2012/05/25.txt
+[11:34:07] Dregin: Vodka's horrible, tbh.
+[11:34:19] hxmws has joined #selenium
+[11:35:36] hxmws: Hi All, Quick question for you experts. Is it possible with webdriver to retrieve something from a page? e.g. I'd like retrieve a booking number that is generated and displayed in the browser
+[11:38:22] andreastt: hxmws: Yes.
+[11:42:51] hxmws: andreastt, thanks i'll investigate to see if this is possible with selenium-webdriver for ruby
+[11:47:54] dawagner: :wiki Sauce
+[11:47:57] selbot2: 1: 03Sauce: Instructions for running tests against SauceLabs - https://code.google.com/p/selenium/wiki/Sauce
+[11:52:09] jimevans has joined #selenium
+[11:52:09] selbot2: jimevans: note from XRayCulver about 12 hours ago: thanks for the seperate IE Driver! 
+[11:52:10] selbot2: jimevans: note from dawagner about 11 hours ago: there doesn't seem to be a prebuild of the IEDriverServer in trunk... 
+[11:52:15] simonstewart has joined #selenium
+[11:52:27] jimevans: dawagner: ping
+[11:53:06] dawagner: jimevans: pong
+[11:53:31] jimevans: in response to your note, no there's not a prebuilt in trunk. it's distributed on the downloads page.
+[11:54:07] dawagner: How do we plan to ship a copy to Sauce?
+[11:54:09] jimevans: if, however, we absolutely *have* to have it in the prebuilt directory, i'm certainly not opposed to putting it there.
+[11:54:35] AutomatedTester: same way we ship chromedriver?
+[11:55:10] dawagner: AutomatedTester: That happens when they download a new version, which is "some time after a version is released"
+[11:55:13] jimevans: sauce provides a capability that lets us point to the download location of the IE driver.
+[11:55:15] dawagner: I would rather our tests ran before release
+[11:55:28] simonstewart: well, agreed
+[11:55:59] dawagner: jimevans: Yeah, but we need that location, and if we don't currently compile on Windows, that binary needs to exist somewhere...
+[11:56:25] jimevans: and http://selenium.googlecode.com/files/IEDriverServer_Win32_2.21.3.zip doesn't work?
+[11:56:34] dawagner: It does, but how often will it be updated?
+[11:56:49] dawagner: (And will we have to manually change things when it is updated?)
+[11:56:51] Alex0011 has joined #selenium
+[11:56:54] jimevans: that's the discussion we need to have, i suppose
+[11:56:57] jimevans: brb
+[IRC logfile - Started Fri May 25 12:02:16 2012]
+[12:02:16] selbot2: 03dawagner less than 10 seconds ago - DanielWagnerHall: Add IEDriver capability for Sauce | https://code.google.com/p/selenium/source/detail?r=17018 | http://seleniumhq.org/ci.jsp?r=17018
+[12:05:05] barancev: simonstewart: dawagner started to enrich WebDriverException with session id. I suggest to continue this and add runtime driver type in a similar manner
+[12:05:19] barancev: or do you have other ideas? you promised to think this out
+[12:06:27] simonstewart: I promised, but haven't yet
+[12:07:21] barancev: are you still against my siggestion (add runtime driver type in ErrorHandler when we throw an exception)
+[12:07:24] barancev: ?
+[12:07:37] barancev: and extract it from the trace if it is not set
+[12:07:41] simonstewart: I'm strongly against making an IPC
+[12:07:44] barancev: from the stacktrace
+[12:07:50] simonstewart: stacktrace would be best
+[12:08:57] barancev: IPC? what IPC? ErrorHandler creates a new exception object and adds a string to it -- the driver runtime type (not the link to the driver!)
+[12:09:17] simonstewart: sure
+[12:09:29] simonstewart: I'm not really in a good place to talk about this
+[12:09:36] simonstewart: I've got about three things going on at the same time
+[12:09:38] barancev: ok, later
+[12:09:41] simonstewart: And I want to concentrate
+[12:09:44] simonstewart: Thanks 
+[12:09:50] nitin__ has joined #selenium
+[12:10:02] hxmws: is it possible to retrieve 3rd party cookies when using webdriver? i've tried @browser.manage.all_cookies
+[12:10:19] simonstewart: only the currently visible cookies
+[12:12:42] hxmws: simonstewart, thanks for the quick response. when you say only currently visible does that mean that 3rd party cookies should be available if they are loaded in the page
+[12:22:42] davehunt has joined #selenium
+[12:23:32] jimevans has joined #selenium
+[12:23:55] jimevans: well that took rather longer than i expected
+[12:24:16] jimevans: plus my mbp froze...
+[12:24:35] jimevans: dawagner: so where were we?
+[12:25:06] *AutomatedTester got Firefox to cause a kernel panic on my MBP yesterday...
+[12:25:14] *AutomatedTester cant recreate it though...
+[12:27:28] foolx has joined #selenium
+[12:27:44] foolx: Hi guys! 
+[12:28:30] foolx: i have a little Problem, maybe someone can help me? I got an Element with div ID, that contains stuff i want to catch.
+[12:29:00] foolx: Is there any way of getting selenium to return some values for every element that is inside that div?
+[12:29:34] jimevans: AutomatedTester: do the python bindings expose the page load timeout?
+[12:30:40] AutomatedTester: jimevans: um dont think so
+[12:31:25] AutomatedTester: jimevans: I havent done it
+[12:31:41] jimevans: ok. thanks
+[12:31:58] AutomatedTester: how come/
+[12:35:28] AutomatedTester: I am off
+[12:35:30] AutomatedTester: laters guys
+[12:35:57] foolx: i pasted the DIV i want to analyse: http://pastebin.com/KDw1zv4i
+[12:36:23] AutomatedTester has joined #selenium
+[12:37:10] jimevans: dawagner: would it make it any easier if the IE standalone server were checked into prebuilts? It's no longer being released on the same schedule as the rest of the library.
+[12:38:41] foolx: repasted and croped out unneeded stuff (i think!) -> http://pastebin.com/bre5Mcbh
+[12:40:03] foolx: its a div with id "rahmenContent" inside there are several divs (class="fliesstext" or "fliesstext_aktiv")
+[12:40:12] barancev: jimevans: IEDriver.dll is built into server statically, so we have to update sever at the same time ass the dll, no?
+[12:40:46] simonstewart: For now, can't we run the IE tests with the magic turned on for the static DLL?
+[12:40:57] dawagner: jimevans: Yes, it would make it a lot easier [I checked one in so I could experiment, but I'm willing to remove it if we have a better answer :)]
+[12:41:12] foolx: I would like to get the internal information out of there for every one of those. Searching for class="ServerDesc","serverStatus","serverRecommended" and a way to get the correct button for each
+[12:41:50] jimevans: barancev: you can't build the .exe without building the .dll, and the .exe embeds the .dll. eventually, we should delete the .dll altogether, and only supply the .exe.
+[12:42:38] jimevans: simonstewart: we could, but it's a matter of setting a capability in the driver used by sauce, which is the same magnitude of code change as telling sauce where to get the standalone server.
+[12:42:57] jimevans: dawagner: then we'll just start checking into the prebuilt directory.
+[12:43:36] jimevans: i don't really care either way. the important bit is remembering to update the resource script so that the version reported on the console is correct.
+[12:44:47] barancev: what we really should think about is how to run debug server is sauce
+[12:44:54] barancev: to avoid connection issues
+[12:45:24] barancev: and to make tests faster
+[12:54:09] jimevans: way-hay! i just noticed IE 7-9 javascript tests are green! w00t!
+[12:54:30] testingb0t1 has joined #selenium
+[12:54:55] simonstewart: woot!
+[12:55:28] dawagner: jimevans: As of the next build, the IE tests should be using the exe
+[12:55:36] dawagner: Which will be as soon as these builds finish, and I restart the CI server
+[12:56:05] jimevans: dawagner: they should be using *which* .exe? they've already been using the one that santiycr downloaded internally to sauce.
+[12:56:17] jimevans: you can see that in the logs
+[12:56:19] dawagner: The one currently checked in to the prebuilds dir
+[12:56:25] jimevans: groovy.
+[12:56:47] jimevans: that'll help the pass rate of the IE java tests too, as long as they can connect back to the test web server.
+[12:56:51] dawagner: Yep
+[12:57:44] jimevans: it seems to me that's the cause of the large part of flakiness, that the browser on the sauce vm seems to occasionally have difficulty connecting back to the test web server (which is hosted on illicitonion.com).
+[12:57:57] dawagner: Yeah
+[12:58:09] dawagner: It's actually not hosted on illicitonion.com, that's just convenient DNS I have acess to
+[12:58:19] dawagner: I'm hoping to debug that with Santi this afternoon :)
+[12:58:19] simonstewart: We could always host the test web server on a google appengine site
+[12:58:23] simonstewart: Those things are stable
+[12:58:27] simonstewart: And always available
+[12:58:32] simonstewart: And it's easy to serve static content
+[12:58:46] jimevans: simonstewart: but it's not all static content.
+[12:59:25] *jimevans is thinking about the tests that call directly into a servlet like the page load timeout tests.
+[IRC logfile - Started Fri May 25 13:00:31 2012]
+[13:00:31] RossPatterson has joined #selenium
+[13:01:06] foolx: okay, found stuff, still not perfect, but getting "stuff" done ;) -> When i search via findElements(By.className("fliesstext"));, how can i tell selenium just to view inside of a DIV-Container?
+[13:01:11] jimevans: right. i'll be back in a bit.
+[13:01:13] jimevans has left #selenium
+[13:09:07] foolx: okay, very easy question: how can i get this "List<WebElement> allInstances = driver.findElements(By.id("instance_0"));" to work for instance_0/1/2/3/n? -> Or: How can i use a wildcard inside a findElements command?
+[13:15:12] nirvdrum has joined #selenium
+[13:15:45] simonstewart: foolx: you don't
+[13:16:27] hourback has joined #selenium
+[13:16:51] davehunt has joined #selenium
+[13:17:39] foolx: simonstewart: damn ;( but there should be a way to filter the results i got when using findElements or?
+[13:20:46] ElxRoman: foolx: you vsn use contains expression
+[13:20:56] ElxRoman: foolx: you can*
+[13:21:29] ElxRoman: foolx: driver.findElements(By.xpath(contains(@id,'instance')));
+[13:24:05] foolx: ElxRoman: sounds great, but he doesn't like contains... IntelliJ isn't helping much here
+[13:24:38] ElxRoman: foolx: my failt... driver.findElements(By.xpath("contains(@id,'instance')"));
+[13:25:11] ElxRoman: foolx: I forgot quotes
+[13:25:26] foolx: ElxRoman: not really, i should saw that.. ;)
+[13:26:58] ElxRoman: foolx: than i think there is no best ways to do this...
+[13:27:48] foolx: ElxRoman: but he still doesn't find what he should find. There are 4 ids he should find (instance_0 ... instance_3) instead he is returning nothing
+[13:29:45] ElxRoman: foolx: hm...
+[13:29:58] ElxRoman: foolx: can you show me the page?
+[13:30:12] foolx: the page itself not, but the code
+[13:30:23] foolx: http://pastebin.com/bre5Mcbh
+[13:38:17] foolx: ElxRoman: Found a working expression!
+[13:38:23] foolx: driver.findElements(By.cssSelector("div[id^='instance']"));
+[13:39:34] farlan has joined #selenium
+[13:39:53] jimevans has joined #selenium
+[13:42:58] hourback has left #selenium
+[13:48:06] mreedell has joined #selenium
+[13:48:39] WSelenium has joined #selenium
+[13:58:11] cmcgraw has joined #selenium
+[13:58:13] kinow has joined #selenium
+[IRC logfile - Started Fri May 25 14:01:05 2012]
+[14:01:05] dawagner: Test failure of the day: The *mock* of an external service didn't come up.
+[14:03:50] barancev: jenkins stopped?
+[14:04:02] simonstewart has left #selenium
+[14:04:37] dawagner: Oh arse yeah, note to self, when you bring down the server, bring it back up again afterwards
+[14:06:44] barancev: :)
+[14:07:05] cgoldberg has joined #selenium
+[14:09:01] seljenkinsbot has joined #selenium
+[14:11:01] foolx: one more thing: I have a WebElement -> i now want to get the text of one internal div class, this WebElement contains. I can use element.getText(); and will find what i am searching, but also all text of all other div classes inside the WebElement. How can i only get the Text of One Class? Thanks
+[14:12:45] jimevans: foolx: execute another findElement (element.findElement()) to locate the specific <div> you want the text of. then call getText() on that child element.
+[14:14:29] Siph0n has joined #selenium
+[14:15:45] sumxyz has joined #selenium
+[14:24:02] foolx: jimevans: Thanks, works like a charm! ;)
+[14:24:08] jimevans: np
+[14:24:36] mdgreenfield has joined #selenium
+[14:25:22] jimevans: the window sizing API - it refers to the size of the entire window, including browser chrome, right?
+[14:26:08] jimevans: nvm. that's how it's documented.
+[14:26:18] mdgreenfield has left #selenium
+[14:26:25] jimevans: i think i'm going to de-atomize that call in the IE driver.
+[14:30:57] ElxRoman: foolx: cool) but strange why my point doesn't work)
+[14:31:41] foolx: ElxRoman: jup, don't know, but happy it works. Almost finished with the stuff ;)
+[14:33:23] ElxRoman: foolx: again my fault) I know why driver.findElements(By.xpath(//div[contains(@id,'instance')]));
+[14:34:36] ElxRoman: foolx: need to look what I write at least one time:)
+[14:34:48] papegaaij has joined #selenium
+[14:40:28] foolx: ElxRoman: Seems to work 1:1 the same, is one of those faster than the other one?
+[14:40:55] barancev: dawagner: /mnt/jenkins/lib/android-sdk-linux/tools/ant/build.xml:568: Execute failed: java.io.IOException: Cannot run program "/mnt/jenkins/lib/android-sdk-linux/platform-tools/aapt": java.io.IOException: error=2, No such file or directory
+[14:41:11] ElxRoman: foolx: I heart css
+[14:42:09] foolx: ElxRoman: will keep both for now and when i see something going wrong or unstable, i can switch ;)
+[14:42:22] foolx: Now i just have to fix that stupid NullPointerException
+[14:42:33] ElxRoman: foolx: yep
+[14:42:36] ElxRoman: foolx: where?
+[14:43:37] foolx: ElxRoman: After creating my list of WebElements i take one Text in each element and transfer those to a List of Strings. The List sucks ;( 
+[14:44:28] foolx: ElxRoman: He tells me, that "instancesList.add(test.getText());" will produce a NullPointerException
+[14:45:16] ElxRoman: foolx: can you show me code?
+[14:45:19] davehunt has joined #selenium
+[14:46:40] foolx: ElxRoman: nothing easier: http://pastebin.com/1CCV5XEP
+[14:48:08] Jackneill has joined #selenium
+[14:48:12] ElxRoman: foolx: List<String> instancesList = null;
+[14:48:55] nhirata has joined #selenium
+[14:49:02] ElxRoman: foolx: List<String> instancesList = new ArrayList<String>(); maybe like this?
+[14:49:43] foolx: ElxRoman: Stupid me... | All out of nowhere, everything is fine ;)
+[14:50:07] ElxRoman: foolx: good...
+[14:50:27] ElxRoman: foolx: it helps? or some other issue?
+[14:50:35] Siph0n has joined #selenium
+[14:51:39] tessarakt has joined #selenium
+[14:51:50] foolx: ElxRoman: It totally destroyed the error ;) I now get my List<String> with my identifier for the right Elements. Now i just have to tweak the normal login-code to log into that server.
+[14:52:08] foolx: ElxRoman: but thats basic stuff, hopefully i won't run into another error there ;)
+[14:52:31] ElxRoman: foolx: bugs like our code)
+[14:52:47] foolx: ElxRoman: they do, they really do ;)
+[14:54:26] llaskin has joined #selenium
+[IRC logfile - Started Fri May 25 15:00:00 2012]
+[15:00:00] sumxyz has joined #selenium
+[15:00:57] dawagner: Grr! I just ssh'd in and SAW that the file exists!
+[15:02:17] dawagner: Ok, I've had this problem before, and I can't remember how it's solved
+[15:02:27] dawagner: What's the magic you do when bash says -bash: /mnt/jenkins/lib/android-sdk-linux/platform-tools/aapt: No such file or directory
+[15:02:31] dawagner: But ls shows it exists
+[15:04:45] llaskin: :ci status
+[15:04:47] selbot2: 0 building | 9 successful | 20 unstable | 0 failing | 1 aborted
+[15:04:56] llaskin: welp i guess its an improvement over yesterday
+[15:05:37] barancev: ha!
+[15:05:48] dawagner: Oh.  The server appears to have become 64-bit across a reboot.
+[15:06:08] jimevans: d'oh!
+[15:06:10] stockton has joined #selenium
+[15:06:16] dawagner: Wait, it *had* to be 64-bit before
+[15:06:22] dawagner: It has 32 gigs of RAM.
+[15:08:02] Dude-X: how much does PAE give you with a 32 bit OS
+[15:08:45] dawagner: Oh.  I just don't have ia-32 libs installed :)
+[15:08:54] dawagner: THAT is what the magic thing you need to do when that message comes up is
+[15:09:17] horsey has joined #selenium
+[15:10:09] hourback has joined #selenium
+[15:15:36] papegaaij has joined #selenium
+[15:16:10] seljenkinsbot has joined #selenium
+[15:16:55] brokenthumbs has joined #selenium
+[15:21:36] brokenthumbs has joined #selenium
+[15:24:52] krosenvold has joined #selenium
+[15:33:19] stephend has joined #selenium
+[15:34:53] barancev: is driver.close() sync or async command?
+[15:37:23] dawagner: barancev: I'd go with async
+[15:39:22] krosenvold has joined #selenium
+[15:52:35] jhegge has joined #selenium
+[15:56:49] selbot2: 03david.burns@theautomatedtester.co.uk less than 20 seconds ago - DavidBurns updated page loading tests for python | https://code.google.com/p/selenium/source/detail?r=17019 | http://seleniumhq.org/ci.jsp?r=17019
+[IRC logfile - Started Fri May 25 16:01:43 2012]
+[16:01:43] kenck has joined #selenium
+[16:05:20] qkslvrwolf has joined #selenium
+[16:06:28] qkslvrwolf: In the grid2 wiki page, it references implementing custom hooks to leverage virtual infrastructure
+[16:06:32] qkslvrwolf: is that actually set up yet?
+[16:06:39] qkslvrwolf: and if so, are there any docs about it?
+[16:07:26] llaskin: woot another selenium contract gig
+[16:07:28] llaskin: thats 2:-P
+[16:08:02] OtherJakeSays has joined #selenium
+[16:08:24] rstrazhnyk has joined #selenium
+[16:08:35] horsey: Hello, I need to benchmark the performance of my website (after we enabled a CDN). I want to be able to run Firefox on EC2 instances and measure load times. Is it possible with Selenium? 
+[16:11:28] barancev: horsey: https://browsermob.com/performance-testing
+[16:11:42] qkslvrwolf: In the grid2 wiki page, it references implementing custom hooks to leverage virtual infrastructure
+[16:11:45] qkslvrwolf: is that actually set up yet?
+[16:11:47] qkslvrwolf: and if so, are there any docs about it?
+[16:12:32] foolx: another question: I got 4 DIVs on my page. Each contains 2 DIVs (Text and a link). I can locate the 'right' DIV via the internal Text. I now have a WebElement pointing to the 1. Sub-DIV. ----> How can i now say: Take the next Sub-DIV and .click() that?
+[16:13:48] horsey: barancev: Any free options?
+[16:14:29] barancev: horsey: build a private cloud (that's not cheep, too, and not free, either :) )
+[16:14:51] qkslvrwolf: horsey, have you check jmeter?
+[16:14:59] qkslvrwolf: *checked
+[16:15:36] horsey: qkslvrwolf: Yes, I considered that option, but that is still not close to how a browser like FF would load a page. 
+[16:16:09] barancev: or, yes, use traditional tools like jmeter/grinder/multi-mechanize/etc
+[16:16:25] horsey: barancev: I am in a position to use AWS EC2, though.
+[16:17:32] stockton has joined #selenium
+[16:17:35] barancev: there is no free solution I know of that allows to build pert-testing orienden infrastructure in the cloud
+[16:17:56] foolx: Wasn't there an option to submit a webelement and Selenium would simply search the div for any submittable stuff?
+[16:18:01] barancev: to govern test generation, collect perf metrics and all
+[16:18:51] kallisti_ has joined #selenium
+[16:18:59] barancev: you can build your own, that's not for free, again :)
+[16:19:16] horsey: barancev: Agreed. :) 
+[16:19:32] horsey: I wonder what other people do.
+[16:20:24] barancev: horsey: may be 100 vusers is enought for you? in this case you have to pay only for cloud
+[16:20:34] barancev: it's free plan
+[16:20:53] horsey: Okay.
+[16:20:54] barancev: or 25 real browsers
+[16:21:11] barancev: it's not the same as 25 real users -- robots are much faster :)
+[16:21:34] barancev: 25 robotized brwsers = 250 humans
+[16:22:18] lukeis has joined #selenium
+[16:22:43] AJ__ has joined #selenium
+[16:22:45] barancev: free plain is not free/ of course, it's "pay as you go"
+[16:22:56] barancev: and limited
+[16:23:31] qkslvrwolf: does anyone have any idea bout hooks from grid?
+[16:23:48] qkslvrwolf: any way to spin up new virtual infrastructure to match incoming tests?
+[16:24:20] barancev: dawagner: https://saucelabs.com/jobs/c75a13a24a1942aa98213d991bd04f10 we are here again
+[16:25:21] barancev: qkslvrwolf: :google virtual lab management
+[16:25:22] selbot2: Using a Virtual Lab for Your Application Lifecycle: http://msdn.microsoft.com/en-us/library/dd997438.aspx
+[16:25:46] barancev: only one result? they are many :)
+[16:25:48] dawagner: barancev: Yeah, I saw
+[16:26:43] qkslvrwolf: barancev:  I already have a virtual environment, I need a way to get hooks from selenium.
+[16:27:10] qkslvrwolf: 'course, it ent microsoft, 'cause screw that.  :-)
+[16:27:54] AJ__: Does anyone know whether touchActions are supported in ipad/iphone?
+[16:28:11] qkslvrwolf: This line: "minimize the maintenance time for the grid by allowing you to implement custom hooks to leverage virtual infrastructure for instance" from this page: http://code.google.com/p/selenium/wiki/Grid2 is tantalizing.  I'd like to know more about it.
+[16:28:43] nitin__ has joined #selenium
+[16:28:53] jhegge1 has joined #selenium
+[16:31:36] AJ__: qkslvrwolf: During 2011 sel conf, Francious showed the demo where he started vms by using Grid 2.0 before and after sessions..
+[16:32:18] barancev: there are pluggable parts in the Grid, but documentation is... hmm... incomplete :)
+[16:33:03] qkslvrwolf: AJ__:  is the video online somewhere?
+[16:33:32] qkslvrwolf: barancev:  I'd be happy to document it if someone would be happy to help me bootstrap into it. :-)
+[16:33:49] qkslvrwolf: I've got the source, can anyone point me to an entry point for that sort of thing?
+[16:34:01] barancev: I saw slides of reynaud's presentation somewhere
+[16:34:17] AJ__: http://2011.seleniumconf.org/videos/
+[16:34:40] AJ__: And you can check his github for example - https://github.com/freynaud/grid-plugin-tutorial/wiki/Tutorial
+[16:34:49] AJ__: there is pretty good documentation here
+[16:36:26] qkslvrwolf: AWESOME.  Thank you.  
+[16:36:33] AJ__: And to confirm that its possible, here is the answer which Francios gave to my question in SO-http://stackoverflow.com/questions/6250268/how-to-maintain-selenium-grid
+[16:38:29] AJ__: Does anyone know about implementing touchactions in iPhoneDriver? 
+[16:38:33] qkslvrwolf: great.  that gets me started.  Thanks a lot...I wasn't finding these with my googling, although apparently I wasn't quite googling the right thing.
+[16:40:49] lukeis: AJ__: they don't exist ;)
+[16:41:11] lukeis: touch api has not been implemented (yet)
+[16:41:21] *lukeis hasn't started on it either
+[16:41:49] lukeis: hopefully i will by the end of summer
+[16:42:02] lukeis: anyone else is more than welcome to beat me to it ;)
+[16:43:02] AJ__: :) OK. Is it the same for WebElement.getLocation() also? That's also not working in iPhoneDriver..
+[16:43:45] dawagner: lukeis: It's your baby now!
+[16:43:57] hourback has left #selenium
+[16:44:01] *lukeis has two real ones already ;)
+[16:44:05] foolx: is there any way to tell WebDriver to select the "next" element and not the one you are using for searchparameter?
+[16:44:38] lukeis: AJ__: that's been implemented on the iOS side... i don't think the Java API was updated accordingly though
+[16:44:42] foolx: like WebElement webElement = driver.findElement(By.xpath("//div[@class='serverDesc' and text()='" + element + "']")); +3 Elements / or element with link afterwards?
+[16:45:26] Dude-X: use findElements
+[16:45:38] Dude-X: then loop throught the list of elements
+[16:46:16] Dude-X: or if you xpath, and you know you want the second then use an index in the xpath
+[16:46:52] foolx: Dude-X: but then i will just find any element where my searchstring is valid. my searchstring is unique, but the nextnext div contains a link that i would need
+[16:47:03] foolx: and that link is not unique ;(
+[16:47:43] AJ__: lukeis: ok. thanks for the info..
+[16:48:25] Dude-X: foolx: maybe can you paste a subset of the DOM in a pastie
+[16:49:04] qkslvrwolf: horsey, that link that AJ sent me also has a talk about automated web performance testing
+[16:49:07] qkslvrwolf: if you're still around
+[16:50:40] jhegge has joined #selenium
+[16:53:22] Ammar01 has joined #selenium
+[16:57:54] stephend has joined #selenium
+[IRC logfile - Started Fri May 25 17:00:38 2012]
+[17:00:38] foolx: Dude-X: sorry? you wanted to take a look onto the pagecode?
+[17:01:20] foolx: just tried to use webElement.findElement, but somehow that doesn't searches for siblings ;(
+[17:04:11] lukeis: foolx: can you show us some of the html markup and which elements you are trying to select? :gist
+[17:04:11] selbot2: Please paste >3 lines of text to https://gist.github.com
+[17:11:54] noahsussman has joined #selenium
+[17:14:02] cmcgraw has joined #selenium
+[17:14:11] foolx: lukeis: http://pastebin.com/bre5Mcbh
+[17:14:31] lukeis: ok, now which elements do you want?
+[17:15:18] foolx: i have to login onto each of those "instancePlay" classes, but i can't simply use webelements, but have to find the one element that equals a given string in class "serverDesc"
+[17:15:47] stephend_ has joined #selenium
+[17:16:38] foolx: my first idea was to find the element containing the given string (example: Germany 1) and then the third sibling -> but that doesn't work
+[17:17:14] Dude-X: foolx: just a snippet of the html as it appears in firebug (but not the actual html source since that is usually formatted in a dfferent way)
+[17:17:53] Dude-X: you can do driver.findElement('x').findElement('div/div')
+[17:18:11] foolx: simple like that? @('div/div')?
+[17:18:23] foolx: i am back in a sec (*goes testing*
+[17:18:25] Dude-X: well that's pseudocode
+[17:18:32] Dude-X: but you should use the proper locator
+[17:18:39] lukeis: heh
+[17:19:55] foolx: mhmm, okay, so i should be able to search inside my already found element?
+[17:20:11] foolx: i am starting with this: WebElement webElement = driver.findElement(By.xpath("//div[@class='serverDesc' and text()='" + element + "'][3]"));
+[17:20:20] foolx: WebElement webElement = driver.findElement(By.xpath("//div[@class='serverDesc' and text()='" + element + "']"));
+[17:20:31] foolx: (not with [3], that didn't work)
+[17:20:33] Dude-X: yes, given a webelement, calling findElement will only search the current node, and it's subchildren
+[17:20:57] foolx: Dude-X, so it can't find siblings right?
+[17:21:07] Dude-X: nopw
+[17:21:23] Dude-X: there's an xpath command to locate siblings
+[17:21:25] foolx: damn, because the only unique stuff i find, is a sibling of the link i am searching
+[17:21:40] lukeis: foolx: List<String>links = new ArrayList<String(); for (WebElement link : driver.findElements(By.cssSelector(".instancePlay a")) { links.add(link.getAttribute("href"); };  for (String link : links) { driver.get(link);  ...test the link.... }
+[17:21:40] Dude-X: but you should paste the html source as printed by an inspector like firebug
+[17:21:55] Dude-X: note he uses findElementS
+[17:23:33] Spanktar has joined #selenium
+[17:23:35] foolx: @Dude-X: I did, but i am unsure which inspector i use ;) But i had to extract a part of the source shown by the inspector
+[17:23:45] foolx: @lukeis: looks nice, will try that now
+[17:24:29] Dude-X: don't you use firebug, or chrome inspector, or IE inspector?
+[17:25:22] foolx: im using chrome, but i don't know whats the inspector called there
+[17:25:31] lukeis: it's installed by default ;)
+[17:25:38] lukeis: right click... inspect element
+[17:25:47] Dude-X: it's the built in inspector
+[17:26:00] Dude-X: firefox 11+ has one a built in one too
+[17:26:02] foolx: then i am using that one ;)
+[17:26:05] Dude-X: but i prefer firebug
+[17:26:31] lukeis: the built in firefox one doesn't do all the things that chrome/safari inspector and firebug do...
+[17:27:02] lukeis: which makes me wonder why mozilla even released it ;)
+[17:27:43] Dude-X: it's good for a quick and dirty inspection
+[17:28:13] lukeis: i only need that a small percentage of the time... so i will always need firebug anyways
+[17:28:28] jarib has joined #selenium
+[17:28:33] sumxyz has joined #selenium
+[17:29:28] foolx: @lukeis: Your code does collect all 4 Links right?
+[17:29:51] lukeis: it collects how many ever links are on the page that match that selector ;)
+[17:30:14] lukeis: if you say 4, i'll believe you :_
+[17:30:15] lukeis: :)
+[17:30:27] RossPatterson: Dude-X, foolx: " given a webelement, calling findElement will only search the current node, and it's subchildren" is only *mostly* correct.  In particular, element.findElement(By.xpath("//...")) will find anything in the page.  I still think it's wrong, but it's documented.
+[17:30:43] foolx: right, for this example, there are 4. but how can i assure, just to click the one, that is the sibling of mine server?
+[17:30:53] Dude-X: RossPatterson: i get conflicting points of view about this
+[17:31:14] Dude-X: but that does makes sense
+[17:31:24] lukeis: foolx: ohh, you only want "Germany 1" ?
+[17:31:52] RossPatterson: My point of view is by definition correct :-)
+[17:32:03] foolx: thats the problem, i not want only "Germany 1" (that would be easy), but i want the link next to the ServerDesc which text is like a string 
+[17:32:19] davehunt has joined #selenium
+[17:32:44] foolx: when the class is called with element = "Germany 1", i want the link next to "germany 1", when it is called with "USA 1" i want just that link.
+[17:32:51] mdgreenfield has joined #selenium
+[17:33:00] lukeis: driver.findElement(By.xpath("//div[.='Germany 1'/..//div[@class='instancePlay']//a")).click()
+[17:33:07] foolx: i already got a locator for the Germany 1 or USA 1 WebElement, but i don't find a way to move to the sibling
+[17:33:09] phase2 has joined #selenium
+[17:33:19] foolx: ah, that looks promising
+[17:33:39] lukeis: well, doesn't look like you need double slashes in there... but it'll work ;)
+[17:33:48] lukeis: (except the first one of course)
+[17:34:12] phase2: anyone awake that is familiar with C# selenium webdriver for IE?
+[17:34:25] lukeis: :ask
+[17:34:25] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[17:37:09] phase2: Whenever I use the Click() command in C# on IE9 I get this javascript error "No such interface supported"  I've looked around the net and found many people would get this for corrupted DLL's but I have since re-registered mine and the problem persists.
+[17:38:19] foolx: lukeis: mhmm, somehow it is not working
+[17:38:28] jimevans: phase2: can you :gist me a code sample that reproduces the error? 
+[17:38:28] selbot2: Please paste >3 lines of text to https://gist.github.com
+[17:39:12] mdgreenfield has left #selenium
+[17:39:55] phase2: jimevans: this includes the URL as well so you can test it yourself
+[17:40:17] jimevans: okay. waiting for the link...
+[17:40:18] phase2: https://gist.github.com/2789108
+[17:40:21] jimevans: thanks
+[17:40:42] jimevans: give me a second. i'm building something at the moment.
+[17:41:12] phase2: yeah, no problem
+[17:41:53] foolx: lukeis: http://pastebin.com/AgwhpKMP
+[17:42:27] foolx: the first webelement find the div containing the STRING element, that printout works, the second creates a "didn't find" error
+[17:42:49] barancev: phase2: jimevans: in Java, it does work
+[17:43:09] phase2: barancev: there a reason that in C# it wouldn't?
+[17:43:19] jimevans: at that level, none whatsoever.
+[17:44:28] llaskin: hey
+[17:44:37] llaskin: anyone here ever done a class on selenium CSS referencing?
+[17:44:50] stockton has joined #selenium
+[17:44:52] phase2: The command still works, I just get that javascript error, do you have erorr reporting turned on?
+[17:45:04] teodosia has left #selenium
+[17:45:18] jleyba has joined #selenium
+[17:45:52] barancev: phase2: what error? I hane no one on the console
+[17:46:06] barancev: but it wants me to install NetDocuments plugins
+[17:46:10] jleyba: Quick question for the other devs, if any are around - any objections to removing the SafariDriver from the distributed selenium jars?
+[17:46:31] barancev: jleyba: what's with safari?
+[17:46:45] jimevans: jleyba: in what way? removing the classes altogether?
+[17:46:54] phase2: barancev: "Message: No such interface supported"
+[17:47:00] jleyba: Users are trying to use it, hitting known issues
+[17:47:12] jleyba: My inbox is filling up with user queries for known issues on the tracker
+[17:47:15] jleyba: It's really getting annoying
+[17:47:32] jimevans: i don't doubt it.
+[17:47:37] barancev: jleyba: it's normal, they use FirefoxDriver and hit known issues, too :)
+[17:48:21] jleyba: Yes, but I don't get flooded with queries sent directly to my email
+[17:48:25] foolx: okay, i think i could use something like following-sibling: in xpath as locator, but i don't know how to use those predicates... anyone?
+[17:48:26] jleyba: Maybe I should just update my profile settings...
+[17:48:28] barancev: btw, can anybody look at #3734, it's very popular, lots of duplicates
+[17:48:30] selbot2: 03 open/needsclarification Clicking the link while pressing a key (using Actions) works as without pressing a key - https://code.google.com/p/selenium/issues/detail?id=3734 [Type-Defect Priority-Medium Component-WebDriver]
+[17:48:42] lukeis: jleyba: and to think I get some of those too and I didn't even write it ;)
+[17:48:45] jimevans: barancev: the problem is that if they follow the instructions on the wiki to get the thing built and installed, it still fails, because building it from trunk dpesmt
+[17:48:54] jimevans:  doesn't work with the shipping 2.21 jar.
+[17:50:14] barancev: I'm neutral about safari, +1 to remove if it is no ready
+[17:50:24] lukeis: foolx: i'm not sure why it's not working... can you install firepath addon and try it out in firefox?
+[17:51:09] foolx: lukeis: i will ;) But maybe we could try parent?
+[17:51:28] lukeis: parent?  ".." is shorthand for it
+[17:51:28] barancev: phase2: please open IE console (F12) and try to find more information about error - what javascript code causes it
+[17:52:25] foolx: lukeis: okay, then, could i say: webelement = alreadyknownelement.findelement(By.xpath(..));?
+[17:53:05] lukeis: ok... then it would be element.findElement(By.xpath("../div[@class='instancePlay']/a")
+[17:53:09] foolx: and afterwards webelement.findelement(By.xpath("linkstuff").click(); and would so find the link-sibling of my already known webelement?
+[17:53:37] barancev: jimevans: what instrtuction onthe wiki do you mean?
+[17:53:47] llaskin: luke, pm
+[17:53:59] jimevans: :wiki safaridriver
+[17:54:00] selbot2: 1: 03SafariDriver: Information about the Safari Driver - https://code.google.com/p/selenium/wiki/SafariDriver
+[17:54:14] dmachi has joined #selenium
+[17:54:19] jimevans: barancev: ^^ those
+[17:55:00] jleyba: barancev: the message protocol used by the SafariDriver changed after Se 2.21, so the extension built from head is incompatible with the 2.21 release
+[17:55:03] barancev: so they build only safari plugins and want it to work with the released selenium version, right? and it fails
+[17:55:28] barancev: but in 2.22 it should be fixed, no?
+[17:57:12] lukeis: update the wiki to tell them to checkout a particular revision of trunk (before the change) if they use 2.21
+[17:58:08] foolx: lukeis: IT DID WORK! Thanks a lot! 
+[17:58:21] lukeis: nice, np ;)
+[17:59:24] *lukeis -1 for removing the class... maybe somehow mark it as experimental? (or mark it as deprecated ;) )
+[IRC logfile - Started Fri May 25 18:01:12 2012]
+[18:01:12] lukeis: i think i *average* one user email directly to me a day. (so some days none and some days 5+)
+[18:02:40] barancev: getPageSource is not an atom?
+[18:07:01] jimevans: barancev: phase2 *did* find a legit bug in the IE driver.
+[18:07:43] barancev: jimevans: cool! why I can't see the error on the console?
+[18:08:06] barancev: jimevans: how do you catch it?
+[18:08:55] jimevans: turn on "Display a notification about every script error"
+[18:09:21] jimevans: Also, it only occurs when using the IE driver. you won't see it manually.
+[18:09:34] dmachi has joined #selenium
+[18:13:35] barancev: got it! "every script error" was off
+[18:13:51] jimevans: i know exactly where the issue is.
+[18:14:35] nirvdrum: lukeis: Did you hear back from Patrick on how that site is built?  I updated the docs last night and it didn't rebuild, so it's no longer working.
+[18:17:06] lukeis: nirvdrum: nope, i didn't hear back
+[18:24:53] dmachi has joined #selenium
+[18:39:51] sassda has joined #selenium
+[18:40:10] dmachi has joined #selenium
+[18:43:32] Dude-X: when you run selenium grid 2.0
+[18:43:40] Dude-X: how does grid know to fire up a new instance of firefox?
+[18:44:59] Dude-X: does each test have to call new  remoteWebdriver?
+[18:46:30] barancev: Dude-X: node creates a new FirefoxDriver instance on the request
+[18:46:58] Dude-X: barancev: so does that mean each test have to call new driver?
+[18:47:40] Siph0n has joined #selenium
+[18:47:40] barancev: do you want a new driver? or do you want to reuse?
+[18:47:45] Dude-X: currently i have junit spawn a single driver, and all tests from that single instance; i'm looking into how to parallelize my tests, and use remote web driver with grid 2.0
+[18:48:31] barancev: using grid is like running several drivers locally
+[18:48:56] barancev: (from the test coding point of view)
+[18:49:04] Dude-X: so I do have to create new instances of drivers
+[18:49:20] barancev: you run several tests in parallel, they use different RemoteWebDriver instances
+[18:49:47] barancev: each one governs a remote browser
+[18:50:03] Dude-X: okay that's an important part of the puzzle; initially i assumed that if i can get junit to run the tests in parallel, then each test will talk to the same driver
+[18:50:19] Dude-X: but that raised the question, how would the hub know to spawn a new instance?
+[18:50:32] Siph0n: Any reason u are using junit over Testng?
+[18:50:45] Dude-X: project was already like this when i came in
+[18:51:09] Dude-X: i wanted to have it in pure python since it's easier for QA devs to deal with than java
+[18:51:16] Dude-X: but my tech lead vetoed
+[18:51:21] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Updating Element::IsHiddenByOverflow() to correctly return false upon reaching the top-level document. | https://code.google.com/p/selenium/source/detail?r=17020 | http://seleniumhq.org/ci.jsp?r=17020
+[18:51:49] barancev: Dude-X: use groovy :)
+[18:51:50] Siph0n: K. I have a before annotation that has a new instance of a browser. So each class will have its own browser
+[18:52:02] Dude-X: i'm a python zealo— advocate
+[18:52:02] barancev: Dude-X: or jython
+[18:52:30] Siph0n: Than make sure your page objects know which driver to use.
+[18:52:33] Dude-X: my tech lead would veto Jython
+[18:53:31] noahsussman has joined #selenium
+[18:53:31] barancev: why? it's almost Java :)
+[18:54:10] Dude-X: Siph0n: bottom line for me is that if i do get junit to run tests in parallel i'd have to change the driver instantiation code so that each "thread" instantiates their own copy
+[18:54:16] Dude-X: currenlty driver is a singleton :O
+[18:54:46] barancev: yes, get rid of singletons to do parallelization
+[18:55:40] dmachi has joined #selenium
+[18:55:52] Siph0n: Yup :) but even if u do have 10 different drivers for 10 different tests, are u already passing the driver instance to the page object? That is if u use page objects.
+[18:56:41] Dude-X: i don't use the PageObject thingie in webdriver, but i do have page objects
+[18:56:51] Dude-X: as a general design pattern
+[18:57:13] Siph0n: Yea same here.
+[18:58:07] Dude-X: i do have a crude parallelization technique where i spawn 2-4 jvms
+[18:58:29] Dude-X: I might just stick with that and improve the test discovery scripts
+[18:58:57] warreng has joined #selenium
+[18:59:37] lukeis: Dude-X: i pool my drivers to run in parallel (locally the size is 3, but when run in grid mode it's much higher... but also grid does the pooling for you... it blocks the instantiation until it can give you an instance)
+[IRC logfile - Started Fri May 25 19:00:57 2012]
+[19:00:57] Dude-X: oh i see
+[19:01:40] Dude-X: i think i'll stick with my crude parallelization where I spawn 4 processes of the same tests but assigned different tests (and webservers)
+[19:01:59] Dude-X: this actually works well since i don't have to worry about concurrency issues on the webserver side
+[19:02:30] lukeis: heh ;) when you want real parallelization you'll have to think about it
+[19:02:34] Dude-X: my only problem with Java is that I have to learn about the whole infrastructure like ant, junit api, xml configuraiton
+[19:02:40] warreng has left #selenium
+[19:02:52] lukeis: ant... cringe
+[19:03:03] lukeis: <3 maven
+[19:03:16] lukeis: and well... testng too
+[19:03:17] Dude-X: which is why i like python, it's much easier to grok, and setup
+[19:03:29] Dude-X: we used to use maven on this project but switched to ivy
+[19:03:59] Dude-X: i thought maven only managed the dependencies of jars
+[19:04:14] Dude-X: does it also double duty as a script framework
+[19:04:16] lukeis: also helps you launch your build
+[19:04:30] Dude-X: interesting
+[19:04:40] lukeis: there's plugins
+[19:04:55] lukeis: surefire ;)  ~ to launch your tests
+[19:05:08] lukeis: and then all i have to do is `mvn test`
+[19:06:09] Dude-X: well for this project all i care is about maintaining the webdriver tests; everything else i leave to the developers
+[19:06:38] Dude-X: now if it was in python; I'd be more proactive in retooling things
+[19:06:39] lukeis: exactly... on my project i use maven for the tests... but we have to use ant for the real code
+[19:07:07] lukeis: jenkins build triggers the tests after the code build
+[19:07:17] Dude-X: when i look at the java code base, my eyes just glaze
+[19:07:19] Siph0n: I need to use the install phase to run my tests lol
+[19:07:31] Dude-X: currently all of our tests run in a single job in jenkins
+[19:07:33] barancev: :gist
+[19:07:33] selbot2: Please paste >3 lines of text to https://gist.github.com
+[19:07:45] Dude-X: but we're going to split webdriver tests separetly from everything else
+[19:08:09] Dude-X: i mean that our build does everything in one job
+[19:08:51] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Removing SetWindowPosition and SetWindowSize atoms from the IE driver. It's faster and more efficient to simply call the ::SetWindowPos API. | https://code.google.com/p/selenium/source/detail?r=17021 | http://seleniumhq.org/ci.jsp?r=17021
+[19:09:54] barancev: I have a problem running 'go test_javascript' -- https://gist.github.com/2789584
+[19:10:48] barancev: file TEST--javascript-atoms is empty, no more info about the error
+[19:10:50] selbot2: 03james.h.evans.jr@gmail.com 2 minutes ago - JimEvans: Updating IE prebuilts. | https://code.google.com/p/selenium/source/detail?r=17022 | http://seleniumhq.org/ci.jsp?r=17022
+[19:11:08] dmachi has joined #selenium
+[19:11:21] lukeis: Dude-X: heck the selenium CI  builds core and then triggers jobs ;)   so you can too :-D
+[19:14:23] davehunt has joined #selenium
+[19:23:25] farlan has left #selenium
+[19:25:01] hxmws has joined #selenium
+[19:26:28] dmachi has joined #selenium
+[19:33:04] Dude-X: heh
+[19:34:09] hxmws has left #selenium
+[19:36:34] nitin__ has joined #selenium
+[19:41:58] dmachi has joined #selenium
+[19:53:44] jimevans: lukeis: yt?
+[19:54:10] lukeis: yep
+[19:55:40] jimevans: so i'm following your discussion on the selenium-users list about wait timeouts and the guy who wants page load timeouts to work across element clicks.
+[19:56:24] lukeis: heh... you mean the guy who doesn't know how to ask his question? ;)
+[19:56:37] Siph0n has joined #selenium
+[19:56:40] lukeis: well... without appropriate detail anyways...
+[19:57:20] dmachi has joined #selenium
+[19:57:33] lukeis: oh... now i need to read his latest ramblings
+[IRC logfile - Started Fri May 25 20:00:08 2012]
+[20:00:08] Siph0n has joined #selenium
+[20:02:19] lukeis: jimevans: so... the guy gave no conetext in his thread *until now* about setting the page load timeout... i want to smack him
+[20:09:21] jimevans: so the real questions are: if you set a page load timeout, and you load a new page via executing WebElement.click() on a link that loads a new page, and the loading page would take a long time to "completely load", (1) does the page load timeout trigger the TimeoutException on the new page, and (2) what does the *next* command, say findElement() do?
+[20:12:45] dmachi has joined #selenium
+[20:12:50] lukeis: i would say the .click() should throw the timeout exception
+[20:13:17] lukeis: does it not? i would actually expect it to
+[20:13:50] *lukeis so glad i don't have sites to test where i need to deal with that ;)
+[20:14:37] barancev: click is async, no?
+[20:15:03] jimevans: barancev: theoretically, yes. but i don't know if that's true if native events are disabled.
+[20:16:09] nirvdrum has joined #selenium
+[20:16:09] lukeis: click is not async
+[20:16:10] barancev: the only situaltion it's not async that I know of are modal windows
+[20:16:24] lukeis: click blocks until the next page is loaded
+[20:16:48] barancev: lukeis: no it does not
+[20:16:53] lukeis: yes it does ;)
+[20:17:13] lukeis: what browser? 
+[20:17:21] *lukeis mainly uses FF and Chrome
+[20:17:41] jimevans: lukeis: umm, not really. we make a "best effort" to make it that way, but I can tell you for certain IE can't guarantee synchronicity after an element click.
+[20:18:11] jimevans: not with native events, anyway.
+[20:18:13] lukeis: yes, so for clicking on javascripty links it doesn't... but normal <a href="..."> it does
+[20:18:47] lukeis: i would have soooo many broken tests if click did not wait for the next page to load
+[20:19:06] lukeis: and for the cases it does not wait, i add my own waits
+[20:19:11] jimevans: lukeis: no, IE has a race condition that it is possible for the driver to lose for regular <a href='…'> links.
+[20:19:30] lukeis: ok, then i'm glad i don't really use IE ;)
+[20:19:44] jimevans: note that it doesn't lose them very often, but it *can* lose them.
+[20:20:15] jimevans: and that's rather the point of the explicit waits, that clicks are async.
+[20:20:37] RossPatterson: :yt elastica waking up
+[20:20:37] selbot2: Elastica - Waking Up - http://www.youtube.com/watch?v=WlOje4ly4hg&feature=youtube_gdata
+[20:20:50] lukeis: i thought the point was that because sometimes they are async the waits came to exist ;)
+[20:21:27] barancev: the waits come to exist because of ajax :)
+[20:21:28] jimevans: from the javadocs: "If click() causes a new page to be loaded via an event or is done by sending a native event then the method will *not* wait for it to be loaded and the caller should verify that a new page has been loaded. "
+[20:22:07] lukeis: that's not an accurate statement then
+[20:22:15] lukeis: chrome uses native events (always) and click blocks
+[20:22:30] jimevans: of course, this is immediately after the sentence that says click "will attempt to block until the page has loaded"
+[20:23:10] lukeis: heh ;)
+[20:23:19] jimevans: can you point me to the chromedriver code where they're sending native events? i'd like to steal some of their code.
+[20:23:48] lukeis: i don't know the source well enough to point
+[20:24:05] jimevans: last time i looked, they were synthesizing all events.
+[20:24:22] jimevans: and by synthesizing, i mean "not using OS-level event mechanisms"
+[20:24:36] jimevans: but it's been a long time since I looked.
+[20:24:54] lukeis: they might not be using OS level... maybe just application level ;)
+[20:24:57] jimevans: and that codebase has changed a ton.
+[20:25:26] *lukeis is talking out of my ass now, cause i don't know that code
+[20:25:38] jimevans: so the definition of "native events" it seems is somewhat flexible. :)
+[20:28:21] dmachi has joined #selenium
+[20:31:02] lukeis: so... back to the original question with aysnc clicking in mind... i still think only .click() should throw the exception and the next find element needs to have a wait added to it by the user /cc jimevans 
+[20:31:30] lukeis: oh
+[20:31:31] llaskin: :ci status
+[20:31:32] selbot2: 18 building | 9 successful | 5 unstable | 0 failing | 1 aborted
+[20:32:06] lukeis: so the user is basically screwed if they click a link that ends up being async and the following page takes forever to load
+[20:32:25] jimevans: that's the guy's point, i think.
+[20:32:33] lukeis: not really conveyed
+[20:32:47] lukeis: but in that case the wait should timeout
+[20:33:07] lukeis: if it really is a unique selector to the new page and not the old page (which he has yet to demonstrate)
+[20:33:10] dawagner: jimevans, lukeis: Can you tl;dr me the discussion?
+[20:33:36] lukeis: https://groups.google.com/d/msg/selenium-users/yV2AEZlvU_8/DzCrYLUnk54J
+[20:33:39] jimevans: i've got a meeting.
+[20:35:10] jimevans: dawagner: bottom line, though is set a page load timeout, then get to a new page by clicking on a link (<a href='…'>). user claims that the page will wait indefinitely in some cases.
+[20:36:29] jarib has joined #selenium
+[20:37:07] lukeis: jimevans: i don't think that's the case with the user though... 
+[20:37:12] lukeis: i don't believe him ;)
+[20:37:22] Dude-X: clicking doesn't block
+[20:37:30] lukeis: don't start with me people.
+[20:37:34] Dude-X: heh
+[20:37:39] Dude-X: i think shane is dim
+[20:37:49] jarib: jibay: IIRC the chrome native events setting only applies to typing
+[20:37:54] jarib: uh
+[20:37:59] jarib: jimevans: ^
+[20:38:04] jarib: jibay: sorry 
+[20:43:51] dmachi has joined #selenium
+[20:59:24] dmachi has joined #selenium
+[IRC logfile - Started Fri May 25 21:05:32 2012]
+[21:05:32] jimevans: right. well for me, it's pretty much academic. i don't actually care that much.
+[21:05:48] jimevans: i was just trying to be nice and help a user out.
+[21:05:50] jimevans: :)
+[21:06:16] jimevans: (well, and pick up some stackoverflow points)
+[21:07:28] *RossPatterson <3 points :-)
+[21:15:04] dmachi has joined #selenium
+[21:19:26] jarib: hmm, chrome actually does have a fair bit of code to do native mouse/keyboard stuff
+[21:20:19] jarib: though chromedriver appears to only use it for typing
+[21:22:22] jimevans: wtf, ci build?!?!
+[21:30:44] dmachi has joined #selenium
+[21:36:08] lukeis: there ya go jimevans, i upvoted you ;) (for more of those 'points')
+[21:36:27] jimevans: :D
+[21:37:29] barancev: how to understand which javascript test failed?
+[21:37:40] XRayCulver has joined #selenium
+[21:37:44] barancev: I run 'go test_javascript' and test log is an empty file
+[21:37:45] lukeis: i think i just feel i got trolled by the guy cause I had zero context on what he was talking about...
+[21:38:17] XRayCulver: when is 2.22 being released? i saw the release notes for it
+[21:38:30] lukeis: when the tests pass ;)
+[21:38:32] lukeis: :ci status
+[21:38:33] selbot2: 5 building | 11 successful | 16 unstable | 0 failing | 1 aborted
+[21:38:34] jimevans: XRayCulver: Not yet. :)
+[21:38:50] jimevans: we're having some CI challenges.
+[21:38:52] lukeis: 16 unstable means "outlook is bleak"
+[21:38:57] XRayCulver: ah
+[21:39:10] XRayCulver: just wanted to check and see
+[21:39:27] XRayCulver: had some time this afternoon to update my framework but i have other things i need to work on
+[21:39:49] lukeis: ahh, jimevans shouldn't we got back to pre 2.18 style of releasing? simon just calls out to all, all good? and then releases...
+[21:39:51] jimevans: XRayCulver: the IE standalone server becomes the default with .NET 2.22.
+[21:40:15] XRayCulver: jimevans: i saw. pretty excited about it and was witing for that release to use it
+[21:40:22] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Setting getPageSource to return an empty string if DOM is not available | https://code.google.com/p/selenium/source/detail?r=17023 | http://seleniumhq.org/ci.jsp?r=17023
+[21:40:27] XRayCulver: i know i can now but don't need it yet
+[21:40:52] XRayCulver: i'm out, have a good memorial day weekend(usa folks)
+[21:43:23] llaskin has left #selenium
+[21:44:30] barancev: select_test.html (in atoms) sends my IE9 to the background
+[21:46:13] dmachi has joined #selenium
+[21:46:46] erratic has joined #selenium
+[21:46:51] barancev: interesting.. when I run select_test.html manually it's green
+[21:47:05] barancev: but go test_javascript fails on this test
+[21:47:47] jleyba: barancev: Give me a sec to run the test so I have logs to reference :)
+[21:48:34] lawcab has joined #selenium
+[21:48:44] doubledragon has joined #selenium
+[21:49:33] jleyba: barancev: test_javascript is a suite.  you'll need to look for the logs of the actual target
+[21:49:36] doubledragon: what is the selenium 2.0 command for doubleclick? I am trying to work with the webdriver python bindings.
+[21:50:27] barancev: jleyba: where to look? where are these log files?
+[21:50:30] jleyba: barancev: build/test_logs/TEST--javascript-atom:test_ff.txt
+[21:50:41] jleyba: or :test_chrome.txt (depending on the target browser)
+[21:50:53] jleyba: sorry, build/test_logs/TEST--javascript-atoms:test_ff.txt
+[21:51:06] barancev: jleyba: I have TEST--javascript-atoms (without extension), and it's empty :(
+[21:51:27] barancev: zero size
+[21:52:29] lukeis: doubledragon:   from selenium.webdriver.common.action_chains import ActionChains;  ActionChains(driver).double_click(element).perform()
+[21:52:53] doubledragon: I'll try that
+[21:54:48] jleyba: barancev: What if you run it directly? //javascript/atoms:test:run
+[21:55:32] testingb0t has joined #selenium
+[21:57:09] barancev: jleyba: go //javascript/atoms:test_ie:run
+[21:57:11] barancev: the same
+[21:57:22] jleyba: oooohhh... IE
+[21:57:33] jleyba: Yeah... IE sucks, use a real browser :)
+[21:57:39] barancev: yeah, IE
+[21:57:52] barancev: real browser is green
+[21:58:07] jleyba: have you made local changes?
+[21:58:39] barancev: atoms? no
+[21:58:49] jleyba: i'm seeing all green for our copy of the atoms (ie7/8/9) (we aren't in sync with the selenium repo though)
+[IRC logfile - Started Fri May 25 22:00:23 2012]
+[22:00:23] *barancev is doing go clean build
+[22:01:44] dmachi has joined #selenium
+[22:04:09] jimevans: the CI build is green for IE atoms 7/8/9 too, under normal circumstances.
+[22:05:36] barancev: I want a green build too, locally :)
+[22:10:20] barancev: is it somewhere close to real? http://thenextweb.com/insider/2012/05/25/facebook-to-acquire-browser-maker-opera-maybe-heres-what-we-know/
+[22:12:41] lukeis: i hope not...
+[22:16:31] barancev: build/test_logs/TEST--javascript-atom:test_ff.txt -- what? : is not enabled in file names on Windows
+[22:17:16] dmachi has joined #selenium
+[22:32:52] dmachi has joined #selenium
+[22:33:09] jimevans: screw it. i give up.
+[22:33:23] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Removing colon from the log file name, it's not allowed on Windows. | https://code.google.com/p/selenium/source/detail?r=17024 | http://seleniumhq.org/ci.jsp?r=17024
+[22:34:01] barancev: now, I know what test failed -- testClickNoErrorAfterSelectWhenOnChangePreventsDefault
+[22:35:19] barancev: ‘Unspecified error’ message
+[22:36:18] jimevans: sow what happens if you run it using go debug-server?
+[22:39:31] barancev: jimevans: yes! this time I got it manually!
+[22:40:18] barancev: [object Error] message on console after this test failed
+[22:41:50] jcrza has joined #selenium
+[22:41:59] barancev: I've found the cause - it's IE copatibility mode
+[22:42:08] barancev: IE7 compatibility mode
+[22:42:32] barancev: or IE8
+[22:42:45] barancev: in standard IE9 it's green
+[22:43:05] barancev: (document compatibility mode, I mean)
+[22:45:19] Dude-X_: barancev, do you disable compatibility mode for intranets under IE?
+[22:47:23] barancev: well, I'm puzzle-headed
+[22:48:09] barancev: 1) compatibility mode - fail, IE mode - fail, IE8 mode - fail, IE9 mode - OK
+[22:48:22] dmachi has joined #selenium
+[22:48:25] barancev: compatibility mode - fail, IE7 mode - fail, IE8 mode - fail, IE9 mode - OK
+[22:48:50] jimevans: barancev: what does it do on *actual* IE7/8?
+[22:48:56] barancev: by default my browser starts in compatibility mode, and the test fails
+[22:49:12] Dude-X_: uncheck enable CM for intranet
+[22:49:28] barancev: don't know yet, I'm trying to make tests green in IE9 first
+[22:49:52] barancev: jimevans: in what document mode should they pass?
+[22:49:59] jimevans: i'd be far less worried about that that making it work on the actual browser.
+[22:50:16] jimevans: barancev: don't know. frankly don't care at this point. i'm just too discouraged.
+[22:51:25] jimevans: i'm going home. good luck everybody. i might be back on tuesday, i might not.
+[22:51:28] jimevans has left #selenium
+[22:51:56] Dude-X_: one problem i have at work is when testing our local web app with IE from a computer with a fresh install is that it will default to Comp. mode; this is wrong because our site is coded to use the proper code for IE7, and 8; by default IE is set to always use CM when on the same intranet; so if my default domain name is CompanyX.com, then anything at companyX.com is always going to use CM mode and in some cases get rendered incorrectly
+[22:52:58] barancev: Dude-X_: where is this option?
+[22:53:00] Dude-X_: we have to go into Compatiblilty View Settings and disable the intranet setting; it makes sense for large corps that use custom ActiveX intranets, but sucks for testing
+[22:53:22] Dude-X_: press ALT on the keyboard, select the last thing on the menu, look for Compatiblity View Settings
+[22:53:28] Dude-X_: it's the first checkbox among 3 choices
+[22:55:22] barancev: aha! localhost is in the list of the sites to use compatibility mode
+[22:56:15] Dude-X_: that qualifies as intranet
+[22:57:07] dmachi has joined #selenium
+[22:57:50] barancev: yaw! removed localhost from the list, and I'm green!
+[22:57:57] Dude-X_: :thumbs up:
+[22:58:01] barancev: Dude-X_: thanks!
+[22:58:19] lukeis: ah, i shoulda mentioned that, i ran into that the other day... glad you figured it out ;)
+[IRC logfile - Started Fri May 25 23:00:59 2012]
+[23:00:59] Dude-X_: hopefully next week 2.22 is released
+[23:01:11] lukeis: *hopefully*
+[23:01:56] barancev: CI is still in coma
+[23:02:00] Dude-X_: oh
+[23:02:24] Dude-X_: it's a 3 day weekend for americans
+[23:02:30] Dude-X_: maybe someone can take a crack at it
+[23:02:47] barancev: at least we know what's happening
+[23:03:07] Dude-X_: so what's wrong with the CI
+[23:04:02] barancev: sometimes sauce can't connect to debug server that runs dawagner-knows-here
+[23:04:18] lukeis: Dude-X_: hound daniel as much as you can ;)
+[23:04:23] barancev: and the whole sauce job shows failures
+[23:05:37] *Dude-X_ releases the hounds!
+[23:05:47] barancev: the more tests were unhappy to land into the job - the more failures
+[23:10:59] barancev: #3800 is becoming popular
+[23:11:00] selbot2: 03 open/new NPE in RemoteWebDriver:249 at findElements(String, String) - https://code.google.com/p/selenium/issues/detail?id=3800 [Type-Defect Priority-Medium]
+[23:11:23] barancev: today a customer of me shown me a very similar stack trace
+[23:12:58] dmachi has joined #selenium
+[23:15:04] _SjG_ has joined #selenium
+[23:17:17] _SjG_: I'm using the 2.21 release, but when I try (in interactive mode) to start Firefox on Mac OS, it fails with an "invalid path" error if I try passing any parameters to Firefox (e.g., specify profile). My Googling has not turned up a solution. Do I need to escape the parameters somehow?
+[23:19:56] _SjG_: e.g., http://pastebin.com/Gv1dyS5X
+[23:20:14] _SjG_: from the terminal, that command launches Firefox successfully
+[23:27:29] jarib has joined #selenium
+[23:28:35] dmachi has joined #selenium
+[23:32:41] jcrza has joined #selenium
+[23:34:11] jcrza has joined #selenium
+[23:34:54] jleyba has joined #selenium
+[23:37:25] dmachi has joined #selenium
+[23:39:38] nirvdrum has joined #selenium
+[23:44:54] bluescreen10 has joined #selenium
+[23:49:34] dmachi has joined #selenium

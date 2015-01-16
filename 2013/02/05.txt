@@ -1,0 +1,1332 @@
+[IRC logfile - Started Tue Feb  5 00:06:23 2013]
+[00:06:23] plightbo has joined #selenium
+[00:07:40] mreedell has joined #selenium
+[00:18:58] flyinprogramer has joined #selenium
+[00:18:59] KaibutsuX: AutomatedTester: yt?
+[00:22:48] flyinprogramer: using ruby bindings; is there a way to know if any navigation change has occurred after executing some code; for example in the beginning of the test i'm on Page A, then i run some code, how do I know if the code hasn't caused a refresh to occur
+[00:23:41] stackedsax1 has joined #selenium
+[00:23:46] KaibutsuX: a refresh to the same page?
+[00:23:59] KaibutsuX: I don't know if you can detect that, but you can use driver.current_url
+[00:24:28] flyinprogramer: yah it'd be a refresh to the same page
+[00:24:49] flyinprogramer: just trying to prove that my code is smart enough not to do a refresh, if that makes any sense...
+[00:24:52] lukeis: flyinprogramer: you can find an element on the page initially, if you attempt to get the text or an attribute on that element after a refresh it will throw a stale reference exception
+[00:25:21] flyinprogramer: lukeis: interesting 
+[00:27:48] flyinprogramer: lukeis: smart cookie - i can work with that
+[00:28:01] lukeis: :)
+[00:30:25] KaibutsuX: lukeis: you ever used browsermobproxy?
+[00:30:32] lukeis: nope
+[00:30:39] lukeis: well… not really
+[00:30:58] lukeis: i've run it, but never extracted a har
+[00:32:19] KaibutsuX: im just trying to figure out how to get the java process to die after I'm done with it
+[00:34:16] lukeis: kill kill kill die die die...
+[00:34:54] evanton has joined #selenium
+[00:35:35] flyinprogramer: KaibutsuX: kill -9 ?
+[00:35:37] evanton: is this a good place to ask a question about selenium python bindings or should I go to python channel?
+[00:36:02] flyinprogramer: evanton: this is general selenium, so its a fine place to ask
+[00:36:18] *lukeis knows a thing or two about selenium python...
+[00:36:33] flyinprogramer: KaibutsuX: i know a thing or two about browsermobproxy
+[00:36:57] flyinprogramer: are you trying to kill a process you spin up on the fly, or is it a proxy you start manually ?
+[00:37:05] KaibutsuX: I'm using AutomatedTester's Server python class
+[00:37:11] KaibutsuX: I think it's a windows issue
+[00:37:23] lukeis: there's your problem… using windows ;)
+[00:37:28] KaibutsuX: Server.start() calls subprocess.Popen('proxy.bat')
+[00:37:38] KaibutsuX: and server.stop() calls process.kill()
+[00:37:51] KaibutsuX: but the kill only kills a cmd.exe, not the child java.exe
+[00:38:05] KaibutsuX: so after starting 4 drivers, I'm using 4 javas with 32mB of ram each
+[00:38:06] flyinprogramer: yah, that seems like a poor implementation 
+[00:38:12] evanton: so I have a WebElement instance which I found by iterating over things and looking at their attributes (since the HTML code is horrible and they don't have unique IDs). Now how do I find the previous element?
+[00:38:22] KaibutsuX: I think it might be something with starting the bat file
+[00:38:22] evanton: I am using the python bindings
+[00:38:33] KaibutsuX: xpath
+[00:38:49] KaibutsuX: ele.find_element_by_xpath('../')
+[00:38:57] flyinprogramer: KaibutsuX: not sure how python keeps track of processes it starts, but it would seem process isn't point to the child process it forks
+[00:39:12] evanton: bah, lack of xpath knowledge bites my back again 
+[00:39:15] flyinprogramer: KaibutsuX: which you obviously know by now -- could you mod process to subprocess
+[00:39:17] evanton: KaibutsuX: thank you
+[00:39:27] KaibutsuX: yeah thats what it seems like, I'm about to create some bat files and see what happens
+[00:39:30] lukeis: KaibutsuX: https://github.com/AutomatedTester/browsermob-proxy-py/blob/master/browsermobproxy/server.py#L64  ;)
+[00:40:03] KaibutsuX: lukeis: for some reason every selenium related code has that line, but kill() is def available
+[00:40:12] KaibutsuX: maybe not prior to python2.5 I guess
+[00:40:25] lukeis: um, i think it fails on 2.7 too
+[00:40:43] lukeis: i don't think it's an attribute error, i think it's an OSError
+[00:40:50] lukeis: hmm… 
+[00:40:58] KaibutsuX: mine doesnt
+[00:41:04] KaibutsuX: im on 2.7.6
+[00:41:20] KaibutsuX: I have kill, terminate, pretty much everything
+[00:42:10] lukeis: windows is particularly painful when it comes to trying to kill a process via python… for whatever reason
+[00:42:27] KaibutsuX: yeah it's giving me the starting pid instead of the actual process
+[00:42:35] KaibutsuX: I'll see if I can't figure iot out
+[00:42:40] DarkRift has joined #selenium
+[00:42:41] DarkRift has joined #selenium
+[00:43:47] flyinprogramer: looks like theres been a lot of work done on the proxy lately, maybe it can handle nulls in the http stream...
+[00:44:03] flyinprogramer: #netscalar problems
+[00:45:36] xiaoli__ has joined #selenium
+[00:47:08] farlan has joined #selenium
+[00:49:07] flyinprogramer: and then i'd be disappointed 
+[00:49:39] flyinprogramer: org.apache.http.client.ClientProtocolException  <-- are a bad time
+[00:50:09] KaibutsuX: it's fucking windows
+[00:50:12] KaibutsuX: damnit
+[00:50:38] flyinprogramer: why are you starting a proxy for each connection?
+[00:50:49] flyinprogramer: why not just have the proxy run as a service all the time on a box ?
+[00:50:58] KaibutsuX: that's probably what I'm going to have to do
+[00:51:25] flyinprogramer: if you go that route, make sure to restart it every night or so, as it doesn't reclaim ports in the port count
+[00:51:43] KaibutsuX: that would be a good reason why not do it that way then ;)
+[00:52:02] flyinprogramer: oh i agree, but when you're developing in windows...
+[00:52:03] KaibutsuX: this will be run on our farm of virtual machines with hundreds of tests running every day
+[00:52:19] flyinprogramer: yup - so i would restart it every so often
+[00:52:38] KaibutsuX: well I'll think about this more tomorrow, I'm out
+[00:52:46] flyinprogramer: good news is that it starts at 9091 -- so you have aways
+[IRC logfile - Started Tue Feb  5 01:03:51 2013]
+[01:03:51] kentor has joined #selenium
+[01:04:40] kentor: has anybody seen this before http://pastie.org/6049189 , am I compiling wrong versions of selenium/bmp ?
+[01:05:34] stackedsax has joined #selenium
+[01:15:44] smccarthy has joined #selenium
+[01:19:34] stackedsax has joined #selenium
+[01:21:15] aweiteka has joined #selenium
+[01:27:56] flyinprogramer: kentor: never seen that before
+[01:35:40] stackedsax has joined #selenium
+[01:46:06] DarkRift has joined #selenium
+[01:46:06] DarkRift has joined #selenium
+[IRC logfile - Started Tue Feb  5 02:25:37 2013]
+[02:25:37] santiycr: barancev:  yt?
+[02:45:04] Fyre has joined #selenium
+[02:53:42] xiaoli__ has joined #selenium
+[IRC logfile - Started Tue Feb  5 03:04:06 2013]
+[03:04:06] gabrielrotbart has joined #selenium
+[03:13:54] phishy has joined #selenium
+[03:16:51] plightbo has joined #selenium
+[03:20:03] stackedsax has joined #selenium
+[03:21:11] riotz has joined #selenium
+[03:34:39] tsukasa_ has joined #selenium
+[03:35:00] riotz has joined #selenium
+[03:36:09] brettporter has joined #selenium
+[03:37:34] smccarthy has joined #selenium
+[03:37:55] gabrielrotbart has joined #selenium
+[03:39:13] xiaoli__ has joined #selenium
+[03:40:02] xiaoli__ has joined #selenium
+[03:42:46] tsukasa_ has joined #selenium
+[03:44:54] txwikinger2 has joined #selenium
+[03:48:33] tsukasa_ has joined #selenium
+[03:51:17] tsukasa_ has joined #selenium
+[03:52:13] KaibutsuX has joined #selenium
+[03:52:24] admc1 has joined #selenium
+[03:57:10] sayd has joined #selenium
+[IRC logfile - Started Tue Feb  5 04:14:18 2013]
+[04:14:18] santiycr has joined #selenium
+[04:21:01] stephend has joined #selenium
+[04:29:06] nirvdrum has joined #selenium
+[04:37:01] awilson820 has joined #selenium
+[04:42:50] santiycr: :note lukeis hey, I think we solved the bug in iwebdrvier with hearts and pants being typed instead of special keys: https://github.com/jlipps/appium/commit/da124e45128b6ba9a271692f3dd22ec77656fe16
+[04:42:51] selbot2: ok!
+[IRC logfile - Started Tue Feb  5 05:17:04 2013]
+[05:17:04] plightbo has joined #selenium
+[05:34:30] girija_ has joined #selenium
+[05:36:07] riotz has joined #selenium
+[05:47:26] riotz has joined #selenium
+[IRC logfile - Started Tue Feb  5 06:02:40 2013]
+[06:02:40] SamuraiJack has joined #selenium
+[06:14:59] rananda has joined #selenium
+[06:27:49] barancev: santiycr: I'm here
+[IRC logfile - Started Tue Feb  5 07:09:30 2013]
+[07:09:30] millenium_ has joined #selenium
+[07:16:58] plightbo has joined #selenium
+[07:20:48] rananda has joined #selenium
+[07:40:04] simonstewart has joined #selenium
+[07:43:00] rananda has joined #selenium
+[07:43:02] jeichar has joined #selenium
+[07:43:13] detronizator_hom has joined #selenium
+[07:43:34] jeichar has joined #selenium
+[07:51:47] Michael_Wowro has joined #selenium
+[07:55:22] DarkRift has joined #selenium
+[07:55:22] DarkRift has joined #selenium
+[IRC logfile - Started Tue Feb  5 08:02:05 2013]
+[08:02:05] kaawee_ has joined #selenium
+[08:03:46] papegaaij has joined #selenium
+[08:10:07] freynaud has joined #selenium
+[08:14:05] zeljkof has joined #selenium
+[08:17:05] suodla has joined #selenium
+[08:24:20] Ardesco has joined #selenium
+[08:29:22] Hronom has joined #selenium
+[08:49:43] smoke__ has joined #selenium
+[08:57:20] freynaud has joined #selenium
+[IRC logfile - Started Tue Feb  5 09:02:37 2013]
+[09:02:37] medwards has joined #selenium
+[09:07:08] alkemist has joined #selenium
+[09:11:04] zac_sel has joined #selenium
+[09:13:33] stackedsax has joined #selenium
+[09:17:26] evanton has joined #selenium
+[09:18:00] davehunt has joined #selenium
+[09:18:14] evanton: I have firebug installed in firefox, but when selenium (python bindings) launch firefox, firebug is not available. Is it because selenium always launches firefox with an empty profile?
+[09:19:33] barancev: evanton: exactly
+[09:21:40] stan has joined #selenium
+[09:22:27] evanton: barancev: is there a way to have firebug in that firefox instance? 
+[09:24:41] barancev: :apidocs
+[09:24:42] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[09:25:23] barancev: fp = webdriver.FirefoxProfile()
+[09:26:19] barancev: fp.add_extension(extension='path to firebug.xpi')
+[09:26:52] barancev: browser = webdriver.Firefox(fp)
+[09:27:50] barancev: or may be browser = webdriver.Firefox(firefox_profile=fp)
+[09:28:14] evanton: oh nice, I shall dig the docs more for goodies
+[09:28:16] evanton: thank you
+[09:28:21] simonstewart has joined #selenium
+[09:32:17] gabrielrotbart has joined #selenium
+[09:44:01] freynaud has joined #selenium
+[09:44:36] sburjan has joined #selenium
+[09:48:09] rbalent has joined #selenium
+[09:48:09] rbalent has joined #selenium
+[09:52:02] Eleccy has joined #selenium
+[09:53:28] simonstewart: yo
+[09:55:02] freynaud has joined #selenium
+[09:55:38] freynaud has left #selenium
+[09:57:54] barancev has joined #selenium
+[IRC logfile - Started Tue Feb  5 10:05:14 2013]
+[10:05:14] samphippen has joined #selenium
+[10:08:01] annette has joined #selenium
+[10:09:04] annette has left #selenium
+[10:13:30] jamesoram has joined #selenium
+[10:17:16] jamesoram has joined #selenium
+[10:17:57] kaawee_ has joined #selenium
+[10:20:50] Phil37 has joined #selenium
+[10:37:52] ha6aha6a has joined #selenium
+[10:40:22] simonstewart has joined #selenium
+[10:49:41] samphippen has joined #selenium
+[10:51:27] medwards: barancev: keyboard shortcut got us to the js console safely, here's what we see https://www.evernote.com/shard/s253/sh/e769fb85-f225-4868-8566-922e433a7b60/951c1cb01e19df62637f998a5dd7dcb5 (this is the hanging on find_elements_by_name problem yesterday)
+[10:52:38] barancev: medwards: would you please remind the context
+[10:53:34] barancev: what operation was hanging?
+[10:53:36] barancev: do you see the same behaviour on another computer?
+[10:53:38] medwards: sure, my QA lead has selenium hang on certain find_elements_by_name calls
+[10:54:13] medwards: We're not able to repro on other computers, but no matter what are able to repro on her computer. Browser reinstalls and browser reinstalls with new versions seem to do nothing.
+[10:55:15] AutomatedTester: medwards: is that persons python version up to date?
+[10:56:50] medwards: AutomatedTester: 2.7.2+ is good enough? (just checking for a baseline, investigating now)
+[10:59:01] AutomatedTester: medwards: sorry, meant his Selenium python egg
+[10:59:06] medwards: 2.7.1
+[10:59:15] medwards: ah its up-to-date
+[10:59:22] medwards: we checked that yesterday
+[10:59:33] medwards: although maybe she just checked wrong
+[IRC logfile - Started Tue Feb  5 11:00:00 2013]
+[11:00:00] medwards: I'll doublecheck this but for now lets assume 2.29.0 (latest from PyPI)
+[11:00:39] medwards: yup did it myself
+[11:01:35] barancev: I don't see call to findElement in the browser log. can it be lost on the python side?
+[11:01:59] simonstewart: andreastt: AutomatedTester and I are hacking on the spec today
+[11:03:58] medwards: maybe but the traceback seems to point to it at least having been sent over the network
+[11:04:04] medwards: I'll pastebin it
+[11:08:42] medwards: here's the traceback after I am forced to KeyboardInterrupt https://gist.github.com/anonymous/4713784
+[11:09:21] medwards: I see some: "[WEBDRIVER] [INFO] command_processor.js:10196 Ignoring pending about:document-onload-blocker request" messages further up the page, but with no time stamps its hard to tell if they occur before a page load or after
+[11:17:32] andreastt: simonstewart: Good, good.  I do intend to do that at some point too.
+[11:24:16] AutomatedTester: medwards: those are INFO messages
+[11:24:35] kaawee_ has joined #selenium
+[11:31:28] andreastt: simonstewart: Shadow DOM?
+[11:31:31] andreastt: simonstewart: You are brave.
+[11:31:37] simonstewart: http://www.w3.org/TR/shadow-dom/
+[11:31:54] simonstewart: It'd be a lot easier if a single shadow host couldn't have multiple shadow doms
+[11:31:58] simonstewart: all neatly stacked
+[11:32:51] jeichar has joined #selenium
+[11:32:56] andreastt: I'm not sure I totally see the use case of this spec, but yes.
+[11:33:20] medwards: AutomatedTester: welp, like barancev notes, the call must be getting lost somewhere. I thought info messages from the command_processor might help narrow it down.
+[11:33:26] simonstewart: I can see it being really useful as someone attempts to componentise their html
+[11:33:30] andreastt: The idea that something should be hidden away from the rest of the DOM is just perceived.
+[11:33:53] simonstewart: Well, there's no way to get hold of the rendered DOM in the spec that I can see
+[11:33:58] AutomatedTester: medwards: have you got a python traceback?
+[11:35:11] medwards: yeah its bured in seljenkinsbot output
+[11:35:22] medwards: https://gist.github.com/anonymous/4713784
+[11:35:42] andreastt: Wonderful, compiling Opera in VS2012 crashes VS.
+[11:35:53] AutomatedTester: andreastt: \o
+[11:36:03] AutomatedTester: medwards: have you got it where it times out the connection?
+[11:36:07] simonstewart: andreastt: \o/ surely?
+[11:36:10] andreastt: Yes!
+[11:36:41] andreastt: AutomatedTester: I shall have you know I've done much Python as of late.  I still can't figure out how to do relative imports in a non-painful way.
+[11:37:05] andreastt: Also known as, not having to modify the sys.path.
+[11:37:18] AutomatedTester: andreastt: create __init__.py files in relative directories?
+[11:37:34] AutomatedTester: then magic happens
+[11:37:40] AutomatedTester: the file can be empty
+[11:37:45] andreastt: Yeah, I tried that and the .. trick to the import statement.
+[11:38:14] medwards: AutomatedTester: you mean eventually the socket will timeout and produce a stacktrace? How long do you think it will take?
+[11:38:33] AutomatedTester: medwards: 60s at most
+[11:39:22] medwards: interesting. The find_element_by_id bug in FF17 didn't, or did it?
+[11:39:41] simonstewart: Right. So, here's my TODO list for the Shadow DOM and WebDriver: 
+[11:39:56] simonstewart: 1) How to access a shadow dom from the shadow host
+[11:40:08] simonstewart: 2) Amending "activeElement" to remain sane
+[11:40:30] andreastt: (Good thing we don't support traversals.)
+[11:40:37] simonstewart: 3) Accessing multiple shadow doms all hosted on the same host
+[11:41:00] simonstewart: 4) What does the xpath expression "../" mean when on a shadow host?
+[11:41:37] admc1 has joined #selenium
+[11:41:55] simonstewart: My preference would be to say "when an element is a shadow host, all findElement calls are made on the oldest shadow dom subtree, if the element is a shadow host"
+[11:42:14] simonstewart: 5) Changes required to getText
+[11:45:19] andreastt: AutomatedTester: Which packages are on the PYTHONPATH from before is seriously confusing.
+[11:45:43] andreastt: This is the second time I run into the problem of global packages taking presedence during import over local similarly-named packages.
+[11:45:43] AutomatedTester: andreastt: I never care what is in my pythonpath really
+[11:45:55] AutomatedTester: andreastt: use virtualenv's
+[11:46:04] AutomatedTester: they make life much easier
+[11:46:11] AutomatedTester: and avoid global pollution
+[11:46:11] andreastt: I don't want people to have to set up virtualenvs to run a simple script.
+[11:46:22] andreastt: I say simple.
+[11:46:40] andreastt: Even Perl is easier than this.  At least I can understand what it does.
+[11:46:59] rp2 has left #selenium
+[11:48:15] AutomatedTester: andreastt: tbh, sounds like you are making a meal of it...
+[11:48:38] alkemist has joined #selenium
+[11:49:23] andreastt: Is it such a strange request to want to have files split into multiple folders, but not to have them in the same namespace?
+[11:50:34] AutomatedTester: no
+[11:50:59] AutomatedTester: andreastt: but then put put a __init__.py file in each folder and hey presto you can access those other .py files
+[11:54:30] medwards: AutomatedTester: herm, its not timing out. Could it be because of WebDriverWait.until wrapping the call? I have ignore_exceptions=AssertionError only, not anything else
+[11:55:06] andreastt: AutomatedTester: Not unless you have the root on your PYTHONPATH.
+[11:55:10] barancev: medwards: no idea what can cause this
+[11:55:27] barancev: I've seen another issue related to hanging findElement #4757
+[11:55:28] selbot2: 03 open/new findElement hangs on a page with error log full of "Ignoring pending about:document-onload-blocker request" - https://code.google.com/p/selenium/issues/detail?id=4757 [Type-Defect Priority-Medium Browser-Firefox]
+[11:55:39] barancev: but this one looks different
+[11:55:49] AutomatedTester: andreastt: or that...
+[11:56:01] AutomatedTester: andreastt: but I dont like using PYTHONPATH
+[11:56:42] AutomatedTester: andreastt: and since you wanted simplicity I thought you would want to void people wanting pythonpath
+[11:56:51] AutomatedTester: but its totally up to you
+[11:58:10] medwards: barancev: yeah me too. If it went away on a browser wipe I wouldn't bother you guys with it. Was kind of hoping we could start to identify this, since comment number 8 on that issue sounds like someone experiencing the same thing.
+[11:58:20] medwards: It would be nice if SauceLabs had FF18 for OS X :/
+[11:59:03] medwards: The next thing I'm going to do is install Selenium Server on this computer and then try to reproduce from my desktop. That should narrow it down to the browser command_executor...
+[11:59:37] barancev: at least I can reproduce 4745 locally
+[IRC logfile - Started Tue Feb  5 12:00:00 2013]
+[12:00:00] barancev: s/4745/4757/
+[12:00:27] samphippen has joined #selenium
+[12:01:48] medwards: Is 4757 just another dupe of #4814?
+[12:01:52] selbot2: 03 closed/fixed WebDriver element.click() randomly hangs on Firefox 17 but not 15 or 4 - https://code.google.com/p/selenium/issues/detail?id=4814 [Type-Defect Priority-Medium Browser-Firefox]
+[12:02:08] rmartin has joined #selenium
+[12:02:58] medwards: I guess not since you can repro it
+[12:03:02] medwards: :/
+[12:15:58] andreastt: simonstewart: Heh.  We are now customers of your previous employer.
+[12:16:07] simonstewart: Ha!
+[12:16:19] andreastt: Apparently we're outsourcing mail.
+[12:16:23] andreastt: (wtf)
+[12:17:12] andreastt: They made it a point to stress that Google's services comply with the law.
+[12:17:28] Ardesco: that just makes it sounds dodgy
+[12:17:36] andreastt: Indeed (-:
+[12:17:39] Ardesco: did your's not?
+[12:17:40] Ardesco: :)
+[12:17:49] plightbo has joined #selenium
+[12:17:58] AutomatedTester: andreastt: wow... I am surprised
+[12:18:04] andreastt: I don't know.  I'm glad Google can find out what we're working on themselves, rather than having to probe us directly though.
+[12:18:07] andreastt: (-;
+[12:18:17] xiaoli__ has joined #selenium
+[12:18:20] AutomatedTester: andreastt: I thought the security and privacy people would have thrown their toys out of the cot about that
+[12:18:30] andreastt: AutomatedTester: Who?  They all got fired.
+[12:18:42] Phil37: google is good at looking for things
+[12:18:50] simonstewart: Apps is bloody great. I miss gmail terribly
+[12:19:49] andreastt: I don't think anyone said Google didn't make a good service.
+[12:20:10] andreastt: It's more the privacy aspect of it all that's worrying.  At that Google is a comeptitor.
+[12:20:13] Ardesco: andreastt: I should think so too, apparently illegal activity was going on with your mail service and they didn't nstop it
+[12:20:14] Ardesco: ;)
+[12:20:42] andreastt: Ardesco: I feel so more confident now that Google will determine what that illegal activity is for us.
+[12:22:05] Ardesco: It's fine, they have got your back
+[12:22:17] Ardesco: as long as you tell them everything (which you now are)
+[12:22:19] Ardesco: :P
+[12:22:46] ha6aha6a: hello. i have a java question.... can i have a function in the constructor? or should i just give the variables their values and put the function somewhere else?
+[12:43:21] andreastt: AutomatedTester: The fundamental problem is still that the top-level directory is not part of the python path.
+[12:46:45] eutheria has joined #selenium
+[12:47:07] eutheria: i have setup a number of vm's each running a different version of chrome
+[12:47:36] eutheria: chrome 17 for some reason gives a strange connection reset error at the end of this test, is 17 just a bit of a bad release?
+[12:48:15] AutomatedTester: eutheria: how many people still use that version of Chrome?
+[12:48:22] AutomatedTester: stable is on 24 or 25 atm
+[12:49:03] Ardesco: http://www.statowl.com/web_browser_usage_by_version.php?timeframe=last_6&interval=month&chart_id=4&limit%5B%5D=chrome&fltr_os=&fltr_se=&fltr_cn=
+[12:49:09] Ardesco: I would say ignore 17
+[12:49:11] Ardesco: :)
+[12:49:34] eutheria: AutomatedTester, i am aware of that, however someone wrote "must have automated tested on chrome 17"
+[12:49:43] eutheria: i might forget about it
+[12:49:48] AutomatedTester: I would...
+[12:49:59] AutomatedTester: seriously not worth the effort
+[12:50:53] Ardesco: if somebody wrote that I would find out why
+[12:50:57] eutheria: the person who asked for it will say very bad things to me
+[12:50:59] Ardesco: and then bin it
+[12:51:00] Ardesco: :)
+[12:51:05] eutheria: maybe i will try a different version
+[12:51:14] AutomatedTester: for browsers on quick release e.g. Chrome and Firefox, support for N and N-1 is fine
+[12:51:28] AutomatedTester: eutheria: selenium doesnt officially support those browsers anymore
+[12:51:45] AutomatedTester: so if it is broken then you will be on your own to fix it 
+[12:52:05] barancev: :apidocs
+[12:52:05] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[12:52:13] AutomatedTester: barancev: did you see the email?
+[12:53:17] barancev: about FF 3.x ?
+[12:53:21] AutomatedTester: yea
+[12:53:44] barancev: why do you hate it so much? :)
+[12:53:49] eutheria: AutomatedTester, after this i won't be doing testing for them
+[12:53:54] Ardesc0_H has joined #selenium
+[12:54:15] AutomatedTester: barancev: its old and it smells
+[12:54:24] eutheria: but thanks for your advice
+[IRC logfile - Started Tue Feb  5 13:00:58 2013]
+[13:00:58] simonstewart: andreastt: https://dvcs.w3.org/hg/webdriver/rev/becf961c6367
+[13:01:03] simonstewart: Turns out to be a tiny change in the spec
+[13:01:23] simonstewart: switchTo().shadowDom(element, index) is the biggest change
+[13:03:30] samphippen has joined #selenium
+[13:06:11] zeljkof_ has joined #selenium
+[13:07:24] simonstewart has joined #selenium
+[13:07:33] simonstewart has joined #selenium
+[13:12:13] Hronom has joined #selenium
+[13:20:45] RossPatterson has joined #selenium
+[13:20:45] ChanServ has altered RossPatterson's mode: +o
+[13:29:59] christoe has joined #selenium
+[13:34:27] farlan has joined #selenium
+[13:47:03] cmcgraw has joined #selenium
+[13:53:06] llaskin has joined #selenium
+[13:58:23] rmartin has joined #selenium
+[IRC logfile - Started Tue Feb  5 14:06:11 2013]
+[14:06:11] Michael_Wowro has joined #selenium
+[14:09:26] rmartin has joined #selenium
+[14:09:30] jimevans has joined #selenium
+[14:10:03] jimevans: g'day everybody!
+[14:11:12] jamesoram has joined #selenium
+[14:17:15] cgoldberg has joined #selenium
+[14:17:47] Ardesc0_H has joined #selenium
+[14:19:46] bluescreen10 has joined #selenium
+[14:20:58] *RossPatterson waves
+[14:22:34] mreedell-work has joined #selenium
+[14:24:58] nirvdrum has joined #selenium
+[14:26:35] Phil37: i think there are rare occurences where thread.sleep is warranted
+[14:29:28] Ardesco: like when they are very small and in a polling loop ?
+[14:29:29] Ardesco: :)
+[14:29:46] Phil37: there too
+[14:29:55] Phil37: ive got 2 buttons, save and close
+[14:30:22] Phil37: if you hit close too soon after save, the save doesn't get registered and you're prompted with a popup wether you wantto leave
+[14:30:36] Phil37: a little sleep(1000) gives it ample time
+[14:30:42] Phil37: should i feel bad for doing this
+[14:30:54] Ardesco: then you should be waiting for the save process to finish before hitting close IMHO
+[14:31:06] jimevans: dammit. Ardesco beat me to it.
+[14:31:09] medwards: yeah you could just use webdriver.wait
+[14:31:23] Ardesco: not often I get in there before jimevans 
+[14:31:24] Ardesco: :)
+[14:31:31] Phil37: don't know ifthere's any indication given on the page for that
+[14:31:38] Phil37: but i havent looked hard yet
+[14:31:50] jimevans: Phil37: if the save persistence isn't displayed on the page, you should be looking for it in the data store.
+[14:32:09] Ardesco: if the site uses jQuery it tracks ajax requests
+[14:32:18] RossPatterson: Phil37: The question to ask is always "How would a human know that <X> was complete?"
+[14:32:21] Ardesco: wait for jQuery.active ===0
+[14:32:49] Ardesco: +1 RossPatterson 
+[14:33:06] Phil37: you all rock
+[14:33:09] Phil37: I'll work on this
+[14:34:38] RossPatterson: We have a similar setup.  Clicking on "Save" disables the save button until the operation completes.  So our tests do "click(saveLocator); waitForEnabled(saveLocator); click(finishedLocator);"
+[14:35:15] RossPatterson: Because the human-focised indicator is the grayed-out Save button becoming not-grayed-out.
+[14:35:25] RossPatterson: s/focised/focused/
+[14:37:13] simonstewart has joined #selenium
+[14:42:44] barancev: jimevans: I've yesterday performed some experiments with cookies and found that IEGetProtectedModeCookie returns something, whereas InternetGetCookieEx  always returns ERROR_NO_MORE_ITEMS
+[14:42:59] jimevans: barancev: okay.\
+[14:43:08] jimevans: even on XP where there is no protected mode?
+[14:43:29] barancev: but my C++ string-conversion kung-fu is not good enough to get real information from the returned result
+[14:44:01] barancev: atm I'm on Win7 with protected mode off, and it seems to work
+[14:44:13] barancev: still need to check on XP
+[14:46:00] qaguy has joined #selenium
+[14:46:24] melter has joined #selenium
+[14:47:20] kaawee_ has joined #selenium
+[14:49:25] gdennis has joined #selenium
+[14:49:29] detronizator has joined #selenium
+[14:50:04] detronizator: AutomatedTester: hey, so? what was this morning tweet about?
+[14:50:10] detronizator: I'm still waiting...
+[14:50:33] Ardesco: afternoon detronizator 
+[14:51:01] detronizator: Ardesco: afternooooon
+[14:51:47] freynaud has joined #selenium
+[14:51:49] simonstewart has left #selenium
+[14:51:54] simonstewart has joined #selenium
+[14:51:56] simonstewart has left #selenium
+[14:53:20] barancev: AutomatedTester: why can't I run alert.text after alert.accept() in python?
+[14:53:43] barancev: got NoAlertPresentException
+[14:55:14] garndt: because the alert has been dismissed already
+[14:56:41] girija_ has joined #selenium
+[14:58:05] simonstewart has joined #selenium
+[14:58:18] simonstewart: back again
+[14:58:34] barancev: garndt: so what? :)
+[14:58:41] garndt: if I remember correctly, the alert object does not hold any state (such as the text of the alert)
+[14:59:13] garndt: so once you called alert.text, it issues a command to webdriver, which has no alert currently visible to act upon
+[14:59:35] barancev: in Java it *does* hold
+[14:59:45] barancev: that's why I asked about python
+[14:59:51] garndt: I am speaking about python
+[IRC logfile - Started Tue Feb  5 15:00:25 2013]
+[15:00:25] barancev: yes, and the question is: why python implementation varies from The Canonical Java Implemenation
+[15:01:05] barancev: Ruby does holds, all right
+[15:03:09] barancev: simonstewart: should alert.getText() after alert.accept() return the text or throw ?
+[15:03:20] simonstewart: NoSuchAlert
+[15:03:29] barancev: (I can't find such a test)
+[15:03:35] simonstewart: Accepting the request dismisses it, meaning that the text is no longer present
+[15:03:46] rbalent has joined #selenium
+[15:03:46] rbalent has joined #selenium
+[15:03:50] simonstewart: Just as if you called "close" on a window and then tried to execute another command on it: NoSuchWindow
+[15:03:54] barancev: the object (Alert) is present
+[15:04:05] simonstewart: Accept should have dismissed it
+[15:04:08] simonstewart: That's the contract
+[15:04:17] simonstewart: We might still have a reference to the object in our code
+[15:04:24] rpereira_ has joined #selenium
+[15:04:27] barancev: is it specified?
+[15:04:44] simonstewart: I thought it was
+[15:05:09] barancev: what to do with "unhandled" alerts, then?
+[15:05:16] simonstewart: UnexpectedAlert
+[15:05:23] simonstewart: There's definitely a test for that
+[15:05:28] barancev: exception contains a link to the alert, but we can't get its text
+[15:06:00] barancev: I mean-- can we get the alert text in the UnexpectedAlertException handler, if it is already autodismissed?
+[15:06:01] simonstewart: eh?
+[15:07:53] eutheria: hello, i have a laptop i would like to convert to a vm, would would be the best way to do that?
+[15:08:45] Ardesco: eutheria I could do you a trade in, send me the laptop and I'll send you a VM 
+[15:08:47] Ardesco: ;)
+[15:09:39] eutheria: you want this door stop?
+[15:09:59] eutheria: 32mb ram, 20 mins battery
+[15:10:09] eutheria: i guess the disposal cost is worth it
+[15:10:21] eutheria: it is a pentium mmx too
+[15:10:41] barancev: simonstewart: https://code.google.com/p/selenium/source/browse/java/client/test/org/openqa/selenium/AlertsTest.java#417
+[15:11:14] simonstewart: Well that test actually makes sense
+[15:11:27] simonstewart: The opening of the alert causes the window close to fail
+[15:11:53] eutheria: oops sorry wrong channel
+[15:12:01] simonstewart: eutheria: ok
+[15:12:03] simonstewart: :)
+[15:12:06] eutheria: man i am having a bad day
+[15:12:18] simonstewart: barancev: that's a perfectly valid test
+[15:13:07] barancev: simonstewart: and this one? https://code.google.com/p/selenium/source/browse/java/client/test/org/openqa/selenium/AlertsTest.java#200
+[15:13:19] barancev: how can they both pass? hmm...
+[15:13:40] simonstewart: That's the behaiour I described earlier: if there's no alert, throw a NoAlertPresent
+[15:13:54] barancev: ha! testAlertShouldNotAllowAdditionalCommandsIfDismissed tests nothing!
+[15:14:14] jimevans: so how can i convert the CSS borderBottomWidth value to a number of pixels? it returns the value as a string ("5px") but it could be specified as a different unit than pixels.
+[15:14:15] barancev: actually it does not throw, it returns the cached text of the alert
+[15:14:39] simonstewart: barancev: there's a missing "fail" after line 207
+[15:14:48] barancev: exactly
+[15:15:00] simonstewart: Well, that's an oversight. 
+[15:15:01] simonstewart: :)
+[15:15:15] barancev: but I think that getText() should not throw
+[15:15:27] simonstewart: getText absolutely should
+[15:15:35] simonstewart: it's executing on something that doesn't exist
+[15:15:42] simonstewart: (in this case)
+[15:15:51] simonstewart: alert.dismiss closes the alert
+[15:16:15] barancev: https://code.google.com/p/selenium/source/browse/java/client/test/org/openqa/selenium/AlertsTest.java#417 -- in this test the alert is dismissed in the catch block
+[15:16:52] barancev: so either *this* test or testAlertShouldNotAllowAdditionalCommandsIfDismissed is not valid
+[15:17:16] simonstewart: I don't see where the alert is dimissed in testIncludesAlertInUnhandledAlertException
+[15:17:33] barancev: because we have "autodismiss" feature
+[15:17:48] simonstewart: The next test should fail, then
+[15:18:18] plightbo has joined #selenium
+[15:18:28] fatguylaughing has joined #selenium
+[15:18:29] simonstewart: the autodismiss feature should only be invoked if there's an alert present and someone continues attmpeting to do stuff without switching to it
+[15:18:44] simonstewart: We throw the UnexpectedAlertPresent and then dismiss the alert
+[15:18:50] barancev: yes, driver.getTitle() in this test
+[15:18:53] simonstewart: becase normally people aren't expecting it to be present
+[15:19:00] simonstewart: Ah.
+[15:19:18] simonstewart: Interesting
+[15:19:27] simonstewart: Fucked up
+[15:19:30] barancev: and this call causes UnhandledAlertException with autodismission
+[15:19:45] simonstewart: then testIncludesAlertInUnhandledAlertException isn't doing what we expect
+[15:20:03] simonstewart: I think.
+[15:20:20] simonstewart: There might be some subtlety around the fact that we've been waiting for the alert
+[15:20:27] simonstewart: So we've obviously switched to it
+[15:20:36] simonstewart: But I dont think I'd be that cleer
+[15:20:38] simonstewart: clever
+[15:20:40] barancev: so we can't deal with unhandled alerts, no way to analyse and trace them, it's a bad thing
+[15:20:46] simonstewart: (damn fat fingers)
+[15:20:48] barancev: current implementation is better imho
+[15:21:04] simonstewart: barancev: the exception thrown by UnhandledAlert should contain the alert text
+[15:21:21] simonstewart: That's as much data as you'd get out of the alert anyway
+[15:21:24] simonstewart: biab
+[15:21:59] barancev: with respect to the fact that swithTo().alert() mapped to /session/:sessionId/alert_text -- why don't cache it?
+[15:22:34] barancev: nobody can change alert text, caching is safe
+[15:23:36] millenium_: If someone ask you to test Kendo UI grid RUN!!! :(
+[15:23:49] rpereira_ has joined #selenium
+[15:23:52] barancev: atm, Java and Ruby allow getting alert text after dismissal, Python and .Net does not allow
+[15:23:55] Ardesco: bet i've seen worse
+[15:23:56] barancev: 50:50
+[15:23:57] Ardesco: :)
+[15:25:24] noahsussman has joined #selenium
+[15:27:03] Ardesco: jimevans: could write something to calculate px
+[15:27:13] Ardesco: if px return px
+[15:27:38] Ardesco: if % calculate px based on % could be a pain in the butt though
+[15:27:59] Ardesco: pt -> px shouldn't be too bad
+[15:28:12] jimevans: Ardesco: yep, that'd be a true pain.
+[15:28:16] Ardesco: and em should correlate to document font size so again should be ok..
+[15:28:49] Turzai has joined #selenium
+[15:28:55] simonstewart: barancev: we don't do caching anywhere in the protocol
+[15:29:00] Turzai: Hi
+[15:29:07] dude-x has joined #selenium
+[15:30:30] barancev: simonstewart: so after switchTo().alert() that is /session/:sessionId/alert_text   next call to getText() should again perform this protocol operation?
+[15:30:56] simonstewart: Right
+[15:31:08] simonstewart: Because that's how our protocol works: we always go back to the server
+[15:31:43] barancev: ok, so we need to change Java and Ruby implementation
+[15:31:50] barancev: and formatters in IDE
+[15:31:56] simonstewart: yes
+[15:32:19] simonstewart: And add a test that the UnexpectedAlertPresent exception contains the alert's text
+[15:32:50] barancev: ok, will do
+[15:33:26] simonstewart: Thank you
+[15:34:22] jarib: barancev: i din't read the full discussion, but if IIRC we had a good reason for doing that (bb928d8b)
+[15:34:23] selbot2: 03illicitonion about 1 year ago - DanielWagnerHall: Responding to review comments for alert handling stuff - use a call to getText rather than a new RPC, because it behaves the same.  Firefox-only fix, IE to come in an additional commit | https://code.google.com/p/selenium/source/detail?r=bb928d8 | http://dashboard.ci.seleniumhq.org/#/revision/bb928d8
+[15:34:38] jarib: i was just following up in e475433b
+[15:34:39] selbot2: 03jarib about 1 year ago - JariBakken: Follow up r13175 in the Ruby bindings. | https://code.google.com/p/selenium/source/detail?r=e475433 | http://dashboard.ci.seleniumhq.org/#/revision/e475433
+[15:36:23] simonstewart: jarib: short version: "gettext on a closed alert should throw an exception"
+[15:36:50] jarib: ah
+[15:36:57] jarib: that makes sense
+[15:37:19] simonstewart: "The alert thrown when an unexpected alert is seen should contain the text of the alert"
+[15:37:24] barancev: moreover, "getText should always send /session/:sessionId/alert_text" even if we do already know the text
+[15:37:34] jarib: ok
+[15:37:43] simonstewart: Yay! Less special case code
+[15:38:07] jarib: the exception is thrown browser side, though?
+[15:38:29] simonstewart: It's thrown browser side. All you need to do is replay the value of the response
+[15:38:34] barancev: jarib: yes
+[15:38:35] jarib: yeah
+[15:38:42] jarib: all good then
+[15:39:23] simonstewart: :)
+[15:39:41] barancev: btw, if we switched to an alert, and some JS code on the page closes it, we should get NoSuchAlert exception on an attempt to get its text too
+[15:40:15] simonstewart: JS is single threaded and blocked by the opened alert
+[15:40:25] simonstewart: So that would never happen
+[15:40:48] barancev: ok, good
+[15:40:57] simonstewart: Sometimes the web is good :)
+[15:41:37] intchanter-work has joined #selenium
+[15:41:45] jarib: at least in chrome, you can still evaluate JS code in the console after an alert()
+[15:42:38] simonstewart: Not if you're using chromedriver 2 :)
+[15:42:39] jarib: although the the event loop is definitely blocked by the alert
+[15:42:56] simonstewart: You can't access the console cos the chromedriver is using the remote debugging port
+[15:46:01] barancev|2 has joined #selenium
+[15:46:29] stan has joined #selenium
+[15:50:48] jarib: simonstewart: oh? that'll be frustrating in development
+[15:51:11] simonstewart: Yes. Ditto Marionette. Both Mozilla and Google are aware of just how irksome it is
+[15:52:30] simonstewart: I'm told that Moz are already working on fixing it
+[15:56:46] jimevans: so there was a discussion awhile back about getting location of hidden and zero-sized elements. where did we land on that?
+[15:59:54] cheezy has joined #selenium
+[IRC logfile - Started Tue Feb  5 16:00:14 2013]
+[16:00:14] ha6aha6a has joined #selenium
+[16:00:32] simonstewart: I think the conversation was more nuanced. There are some elements which aren't displayed but which do have an impact on layour
+[16:00:35] simonstewart: layout
+[16:01:16] jimevans: i seem to recall that too, but i don't remember the details
+[16:01:28] simonstewart: I think that was basically about it
+[16:01:40] jimevans: or to be more precise, i didn't pay attention to the conversation at all, and now IE is non-compliant.
+[16:02:43] simonstewart: Here's the question: is it?
+[16:02:55] simonstewart: There might be genuine differences in layout
+[16:03:36] jimevans: well, let's put it this way, barancev added a bunch of new tests for coordinates that are ignored in IE because IE doesn't behave the way the tests expect them to.
+[16:04:05] barancev|2: simonstewart: https://code.google.com/p/selenium/source/browse/java/client/test/org/openqa/selenium/CoordinatesTest.java
+[16:04:16] simonstewart: (love context :)
+[16:04:27] kaawee_ has joined #selenium
+[16:04:36] simonstewart: viewport is highly browser dependent
+[16:04:56] simonstewart: Since it refers to the HWND and perhaps not the frame viewport
+[16:05:01] barancev: simonstewart: ie just throws an exception "element is not visible"
+[16:05:11] simonstewart: Ah. 
+[16:05:25] simonstewart: Well, the tests are browser-specific for viewport and screen
+[16:06:03] simonstewart: They might be browser/version specific too
+[16:06:09] simonstewart: Just to make joyful
+[16:06:30] simonstewart: (for example, I seem to recall that firefox changed how it used native windows on linux at some point)
+[16:06:43] simonstewart: (eranm might well be able to moan about that better than me)
+[16:07:12] barancev: (we still have several failing tests on linux with native events that kill the browser)
+[16:08:44] simonstewart: Ho ho ho
+[16:08:52] simonstewart: Bloody native events on linu
+[16:08:53] simonstewart: c
+[16:08:57] simonstewart: s/c/x/
+[16:09:08] barancev: for more context the link to the dev group: https://groups.google.com/forum/?fromgroups=#!topic/selenium-developers/NCcm_eH35TA
+[16:11:02] barancev: and, yes, I should change tests to use getCoordinates().onPage(), it's more browser-neutral
+[16:11:28] nhirata has joined #selenium
+[16:12:12] smccarthy has joined #selenium
+[16:18:27] stan has joined #selenium
+[16:18:35] Turzai: Hey guys i have an issue with jenkins-grid-webdriver setup. I would appreciate if someone could give me some tips how to resolve the issue.
+[16:22:56] Phil37: :ask
+[16:22:57] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[16:23:41] Turzai: ok
+[16:23:46] Turzai: thx
+[16:23:59] Turzai: so i have jenkins with grid plugin
+[16:24:04] Turzai: with 2 slave nodes
+[16:24:08] Turzai: they are registered to the hub
+[16:24:24] Turzai: i have junit test with paramteres
+[16:25:11] Turzai: and when i try to run them through jenkins, blank browser windows appears
+[16:25:23] Turzai: one for the firefox and another one for the iexplorer
+[16:26:37] Turzai: in the testResult i have NullPointerException in the line where i try to create the RemoteWebdriver
+[16:27:14] rmartin has joined #selenium
+[16:33:58] adamgoucher has joined #selenium
+[16:34:33] dude-x: sounds like you made a programming error, paste a gist
+[16:34:55] plightbo_work has joined #selenium
+[16:36:19] stephend has joined #selenium
+[16:42:06] Turzai: thx dude-x , you have helped me a lot
+[16:42:53] dude-x: is that sarcasm, or are you recalling the past?
+[16:44:17] Turzai: no, no, no
+[16:44:23] Turzai: you pointed me to the right direction
+[16:45:14] dude-x: ah okay thanks
+[16:45:16] girija_ has joined #selenium
+[16:45:36] dude-x: in my experience, null pointer errors are usually my fault 
+[16:45:36] Turzai: i am working 12+ hours now, and didn"t saw an obvious error, and thanks to you i can sleep a little now
+[16:45:52] dude-x: :)
+[16:45:55] dude-x: rest up
+[16:50:03] KaibutsuX: anyone know if there is a way to register a function to get called everytime webdriver loads a url?
+[16:50:50] KaibutsuX: I could obviously insert my code after every click() and get() but I'm wondering how I could detect if someone mouseovers and fires an event that submits a form
+[16:57:47] Spanktar has joined #selenium
+[16:58:35] lukeis has joined #selenium
+[16:58:36] selbot2: lukeis: note from santiycr about 12 hours ago: hey, I think we solved the bug in iwebdrvier with hearts and pants being typed instead of special keys: https://github.com/jlipps/appium/commit/da124e45128b6ba9a271692f3dd22ec77656fe16 
+[16:59:51] dude-x: KaibutsuX: your request soudns a bit too vague
+[IRC logfile - Started Tue Feb  5 17:01:40 2013]
+[17:01:40] girija_ has left #selenium
+[17:05:04] Turzai has left #selenium
+[17:06:42] lukeis: :note santiycr wtf is "keys"? looks like i have to look into what is different in the wd.js bindings :-/
+[17:06:43] selbot2: ok!
+[17:08:49] lukeis: :note sanitycr ok, maybe i'm missing something, but I don't see what ya mean on how that solves it :)
+[17:08:50] selbot2: ok!
+[17:16:34] stephend_ has joined #selenium
+[17:17:15] simonstewart: :yt blue eiffel 65
+[17:17:16] selbot2: I'm Blue - Eiffel 65 - http://www.youtube.com/watch?v=SLBZLjLBMKs&feature=youtube_gdata
+[17:17:27] simonstewart: Sorry
+[17:17:40] adamgoucher: wow, thats an unexpected choice
+[17:18:03] simonstewart: adamgoucher: I like to be a little leftfield from time to time
+[17:18:13] jimevans: simonstewart: would you mind weighing in on the email that just came through on the dev list? it's regarding issue #18
+[17:18:14] selbot2: 03simon.m.stewart open/new Allow webdriver to attach to a running browser - https://code.google.com/p/selenium/issues/detail?id=18 [Type-Enhancement Priority-Medium Component-WebDriver Restrict-AddIssueComment-Commit]
+[17:18:58] jimevans: implementing that feature would be easy for IE. for every other browser i'm aware of, not so much.
+[17:19:07] lukeis: I'm blue (I was beat as a child, I was beat as child)...
+[17:19:15] simonstewart: Looking now
+[17:19:23] simonstewart: :yt PiL Rise
+[17:19:24] selbot2: PUBLIC IMAGE LIMITED - "Rise" (Encore) @ The Regency Ballroom, San Francisco, 4/17/10 - http://www.youtube.com/watch?v=kVLy2sHXFk0&feature=youtube_gdata
+[17:19:51] dude-x: lukeis: i grew up in a household where my parents resorted to corporeal punishment
+[17:19:52] adamgoucher: :yt velvet underground sister ray full
+[17:19:53] selbot2: Velvet Underground - Sister Ray (Boston 15/3/69) - http://www.youtube.com/watch?v=VEM1wayCOjI&feature=youtube_gdata
+[17:20:43] lukeis: sorry to hear that dude-x
+[17:21:22] mreedell-work has joined #selenium
+[17:21:24] dude-x: keep in mind among many latin americans, that's the norm rather than resorting to timeouts and grounding
+[17:21:59] adamgoucher: i went to k/1 in the caribbean; big red paddle on the back of all the classroom doors
+[17:22:21] lukeis: explains a lot adamgoucher ;)
+[17:22:29] dude-x: heh
+[17:22:53] adamgoucher: i honed my skillz to deflect blame early :D
+[17:23:07] *jimevans is old enough that corporal punishment was still acceptable by most when he was a kid
+[17:23:30] dude-x: there is a movement against it in many latin american countries
+[17:23:36] dude-x: but it's still the norm
+[17:24:36] llaskin: dude-x and look, u turned out just fine eh?
+[17:25:01] *lukeis didn't escape unscathed from childhood either.. and I turned out… umm, hrm, i'm not a good example ;)
+[17:25:07] simonstewart: :code
+[17:25:07] selbot2: https://code.google.com/p/selenium/source/checkout
+[17:25:11] simonstewart: :cla
+[17:25:12] selbot2: http://goo.gl/qC50R
+[17:25:20] lukeis: code, that's new one
+[17:25:29] dude-x: i turned out ok, but for my sister it has lead to abusive relationships in the past
+[17:25:42] rpereira_ has joined #selenium
+[17:27:30] dude-x: my opinion of corporal punishment is that it's only appropriate for a minority of things kids do. hitting someone because they annoy you or don't do chores is just a bit silly
+[17:27:45] dude-x: i mean, extremely silly
+[17:28:08] sfbrian has joined #selenium
+[17:28:24] simonstewart: jimevans: weighed in
+[17:28:29] simonstewart: Feel free to counter-weigh
+[17:29:43] lukeis: dude-x: my wife would seriously leave me if I ever did anything of the sort for any reason to the kids
+[17:29:57] adamgoucher: 'I have the time and skills to implement it,' is my favorite part of that thread
+[17:30:10] Michael_Wowro: Hi lukeis: If one look at http://seleniumhq.org/about/events.jsp - one might think, that Sel is a dead project ... Wouldn't it be smarter, if all past events from the calendar-rss are shown (or at least 4)?
+[17:31:08] lukeis: sure :)  i didn't make that page… i intended to improve it by including meetups automatically, but didn't finish that
+[17:31:37] lukeis: it's literally a link to a google calendar maintained by ashley at saucelabs
+[17:31:43] Michael_Wowro: hmmm, just changing one date should solve that
+[17:31:55] dude-x: lukeis: one thing i learned from all those nanny shows is that you have to talk to your kids… how are your kids disciplined?
+[17:32:04] dude-x: lukeis: are they old enough?
+[17:32:56] lukeis: the oldest gets it… we talk to her, she gets timeouts, we try to explain why we're doing it (usually in tantrum mode she is literally incapable of listening) we wait for her to calm down and then talk to her again about it, then 'make' her apologize :)
+[17:33:51] dude-x: what's the 'recidivism' rate?
+[17:34:19] lukeis: for a 3 year old… all the freaking time
+[17:34:26] dude-x: ah 
+[17:34:30] dude-x: yeah they're 3
+[17:34:44] lukeis: the 1 yr old is worse ;)
+[17:34:49] dude-x: :)
+[17:37:24] jimevans: mine are 9 and 11, and the "i'm really disappointed in the choice you made" is usually enough to bring on real contrition.
+[17:37:55] adamgoucher: jimevans: pitchers and catchers report in a week
+[17:38:08] jimevans: adamgoucher: indeed!
+[17:38:50] Michael_Wowro: lukeis: src\main\webapp\js\event.js - row 102 - changing the "3" in "12" should show the 4 past events. That would be a quick fix ... but I haven't tested it.
+[17:38:58] jimevans: if only the two closest teams training camps weren't the yankees and phillies. 
+[17:39:28] lukeis: Michael_Wowro: feel free to send a pull request :)
+[17:39:33] simonstewart: lukeis: http://www.seleniumhq.org/
+[17:39:39] lukeis: yes i saw :)
+[17:39:39] adamgoucher: jimevans theyre closer to you than me
+[17:39:47] lukeis: simonstewart: thank you :)
+[17:39:56] simonstewart: .com redirects to the wrong place, but needs plightbo_work to fix it
+[17:40:10] simonstewart: (or I would if I knew which server to access and had root)
+[17:40:11] lukeis: yep and naked to "docs."
+[17:40:17] simonstewart: ditto
+[17:40:17] jleyba has joined #selenium
+[17:40:38] jimevans: adamgoucher: blue jays would be the next closest after those two. :)
+[17:41:10] adamgoucher: jimevans: ya, you need to convince salesforce to bring me down to tampa at some point over the next six weeks
+[17:41:31] Michael_Wowro: lukeis: I'll try - you like it via email?
+[17:41:38] jimevans: adamgoucher: sorry, man, we're a java shop here.
+[17:41:56] lukeis: Michael_Wowro: nope :)   either a :newissue or a github pull request
+[17:41:57] selbot2: https://code.google.com/p/selenium/issues/entry
+[17:42:06] adamgoucher: jimevans: so? just means you have to pay twice my normal rate :D
+[17:42:20] Michael_Wowro: lukeis: ok
+[17:42:23] lukeis: Michael_Wowro: here's the github url https://github.com/seleniumhq/www.seleniumhq.org
+[17:42:26] jimevans: adamgoucher: hah! the java tax! :)
+[17:42:54] adamgoucher: jimevans: its a dangerous tax -- someone will pay it at some point and i'll have to write java
+[17:43:03] art_man1 has joined #selenium
+[17:43:38] lukeis: we have some teams doing python / ruby / javascript … so you *could* get away without java ;)
+[17:43:46] lukeis: of course obj-c ;)
+[17:44:15] adamgoucher: lukeis: youre office isnt nearly as interesting during spring training :P
+[17:44:28] jimevans: (none of those, i'm compelled to point out, are based in tampa)
+[17:44:51] lukeis: ;)
+[17:45:17] lukeis: if i knew where spring training camps were i could figure out which SFDC office was there and what was worked on...
+[17:45:50] adamgoucher: http://en.wikipedia.org/wiki/Spring_training#Spring_training_locations_by_team
+[17:46:57] lukeis: florida and arizona? that's it? really? … goes back to not really caring about baseball ;)
+[17:48:38] jost has joined #selenium
+[17:49:07] regex: jimevans: hey office gangster
+[17:49:37] jimevans: s'up
+[17:56:56] jimevans: i may have just inadvertently solved some spurious UnhandledAlertException occurrences in IE.
+[17:58:47] stackedsax has joined #selenium
+[17:59:07] KaibutsuX: jimevans: everything about IE is inadvertant :)
+[IRC logfile - Started Tue Feb  5 18:00:01 2013]
+[18:00:01] stephend has joined #selenium
+[18:01:51] lukeis: apparently pandora decided to hate linux users… they shoulda used selenium to test ;)
+[18:01:54] jimevans: turns out, the task manager has a window class of a dialog.
+[18:02:13] jleyba: lukeis: pandora loves flash.  selenium does not love flash
+[18:02:21] lukeis: i know ;)
+[18:02:41] jimevans: and if you've closed a showModalDialog window, and you have the task manager open, when you close the showModalDialog window, boom!
+[18:02:59] lukeis: the simple act of testing that the flash loaded, verses 'you need at least version 10 of flash' when version 11+ is installed...
+[18:05:47] jimevans: barancev: yt?
+[18:05:54] barancev: yes
+[18:06:21] jimevans: so i'm in the process of making two changes to coordinate calculations in the IE driver.
+[18:06:38] jimevans: first, is that we will take the border size into account for frames
+[18:07:12] jimevans: the second is that we won't blindly throw "element is not displayed" when calling to get the locations
+[18:08:26] barancev: do you need my help?
+[18:08:37] jimevans: the only test that should need to be ignored for IE in CoordinatesTest after this commit is testShouldGetCoordinatesOfAnEmptyElement
+[18:08:41] jimevans:  i think.
+[18:09:03] jimevans: i'm building now.
+[18:09:16] jimevans: building prebuilts, that is.
+[18:09:25] qaguy has joined #selenium
+[18:10:13] jimevans: once i commit, feel free to put it through its paces.
+[18:10:32] jimevans: i'm confident about the frame border piece. less so about the visibility check.
+[18:12:00] barancev: AutomatedTester: lukeis: what IDE do you use to develop in python?
+[18:12:07] lukeis: vim ;)
+[18:12:19] lukeis: i speak for both of us
+[18:12:25] jimevans: AutomatedTester uses vim too, if memory servers.
+[18:12:29] jimevans: serves
+[18:12:41] jimevans: as lukeis just said. :)
+[18:12:45] barancev: hmm... I'd prefer emacs then :)
+[18:12:56] lukeis: it's your choice :)
+[18:13:10] barancev: is there something more GUI-rich popular?
+[18:13:18] lukeis: thus why I despise * imports… not easy way to search for where the keyword is defined
+[18:13:28] lukeis: there's plenty
+[18:13:34] lukeis: intellij works well even
+[18:13:39] dude-x: sublime text2 is pretty popular
+[18:13:47] lukeis: yeah, that I hear too
+[18:13:53] dude-x: pycharm from the intellij folks
+[18:14:31] lukeis: if you depend on autocomplete in python you're doing it wrong ;)_
+[18:14:35] barancev: ok, I'll try intellij, for Ruby I use RubyMine from them and I like it
+[18:14:53] dude-x: autocomplete is still useful, even in python
+[18:15:12] lukeis: in vim it's ctl-x ctl-p :)
+[18:15:13] dude-x: i write long function names for my page object methods
+[18:15:26] lukeis: i do too
+[18:16:46] lukeis: auto-completion gui's always failed me with python, thus loading files in vim with word completion has always been good to me
+[18:17:08] dude-x: how does that work
+[18:17:11] stepheneb has joined #selenium
+[18:17:19] dude-x: can vim load your other source files and provide those words?
+[18:17:32] lukeis: there's lots of ways to do it :)
+[18:17:36] KaibutsuX: I use slickedit and my python tags never really work
+[18:17:47] lukeis: slickedit is still around? :)
+[18:18:03] lukeis: i used that like 10 years ago :)
+[18:18:04] dude-x: sublime text2 treats every word in a file as a possible autocomplete word
+[18:18:35] dude-x: and with Rope it can look at other files and include access to those 'symbols' in your current document
+[18:18:56] KaibutsuX: I love slickedit, def better than eclipse and I'm not a huge fan of VS
+[18:20:54] dude-x: i'm okay with eclipse
+[18:21:46] lukeis: I was finally getting used to being able to use intellij only… now i'm doing android work and I'm back in eclipse ;)
+[18:22:49] dude-x: there goes your muscle memory :p
+[18:23:04] lukeis: no shit...
+[18:23:10] simonstewart: lukeis: I use IJ for android too
+[18:23:37] lukeis: any nice tutorial to hook it all up? (like with auto launching devices etc?)
+[18:23:55] lukeis: s/devices/emulators/
+[18:24:15] Espenfjo has joined #selenium
+[18:24:39] lukeis: i can easily code in intellij… just having the ability to 'run' the code and deploy to the emulator of choice is what keeps me in eclipse right now
+[18:25:44] simonstewart: I can do that too
+[18:25:50] simonstewart: I'm obviously missing something....
+[18:26:08] barancev: jleyba: regarding testShouldNotHandleAlertInAnotherWindow -- is an alert in a window really blocks other windows too?
+[18:26:15] jleyba: yes
+[18:26:23] lukeis: ok, maybe i need to take another look at it :) for some reason things didn't 'just work' as I expected them to in intellij
+[18:26:26] barancev: in all browsers?
+[18:26:41] Sedaro has joined #selenium
+[18:26:48] Espenfjo: hi. I am creating a function to recursively click on all links on a page (click on link 1 on the front page, then click on link 1 on that page etc.). When all links are clicked, i navigate.back() and click on the next link (I create an array of WebElements on each page).
+[18:27:09] jimevans: Espenfjo: that's not going to work
+[18:27:15] llaskin1 has joined #selenium
+[18:27:15] Selenium-Git has joined #selenium
+[18:27:15] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 3 new commits to 06master: 02http://git.io/RttOIQ
+[18:27:15] Selenium-Git: 13selenium/06master 14eef8ac8 15Jim Evans: Removed checking for element visibility and non-zero size from IE driver...
+[18:27:15] Selenium-Git: 13selenium/06master 143314213 15Jim Evans: Fixed unexpected occurrences of UnhandledAlertException after closing...
+[18:27:15] Selenium-Git: 13selenium/06master 14c8a5816 15Jim Evans: Fixing .NET alerts tests and adding onbeforeunload page to trigger leave/stay dialog
+[18:27:15] Selenium-Git has left #selenium
+[18:27:24] Espenfjo: However I do get the "StaleElementReferenceException: Element not found in the cache - perhaps the page has changed since it was looked up" thing when I am trying to click the next link after navigate.back
+[18:27:28] Espenfjo: jimevans: Yeah.. :)
+[18:27:44] barancev: jleyba: I use tabs in FF and Chrome, and an alert on a tab does not prevent serfing in other tabs
+[18:27:48] Espenfjo: jimevans: I guess I need to navigate.back and then find all WebElements again?
+[18:27:59] jimevans: Espenfjo: yep. you'll need to refind the elements
+[18:28:11] Espenfjo: ok, thats what I started to believe. Thank you
+[18:28:56] lukeis: Espenfjo: it's much more efficient to not use selenium to 'crawl' sites
+[18:29:18] Espenfjo: lukeis: Yeah, I know, but I need something to evaluate and run java scripts
+[18:29:28] Espenfjo: if not Id rather use LWP-rget, or www::mech
+[18:29:32] aweiteka has joined #selenium
+[18:29:48] jimevans: think of the browser canvas as a blackboard displaying the content of the page. every time you navigate to a page (even back to a previous one), the blackboard is erased and completely redrawn. the elements in the DOM are the actual chalk on the blackboard that display the content.
+[18:29:52] lukeis: ok, then use ghostdriver / phantomjs  (with selenium) ~ will be pretty fast
+[18:29:57] jleyba: barancev: It appears newer releases of Firefox restrict the modal dialog to the opening window
+[18:30:11] jleyba: Chrome and (Mobile) Safari definitely block every window when a modal dialog is opened
+[18:30:23] Espenfjo: lukeis: ok, thanks for the tips
+[18:31:24] jleyba: Opera restricts the alert to the opening tab
+[18:32:14] barancev: so, it's browser dependent. should we standartize this or leave underspecified?
+[18:32:15] jleyba: The behavior is certainly not universal enough for "WebDriver should only intercept alerts from the focused window" to be enshrined in our test suite
+[18:32:24] KaibutsuX: is there anything in FirefoxProfile to automatically dismiss the "Script not responding error"
+[18:32:41] jleyba: KaibutsuX: You can increase the timeout, but I don't remember the config key
+[18:33:01] KaibutsuX: i'll do some digging
+[18:33:52] barancev: we can standartize it to be strict -- a single alert in any window block all methods in all windows (read: causes UnexpectedAlertException on any call)
+[18:34:02] KaibutsuX: dom.max_script_run_time ?
+[18:34:15] jleyba: KaibutsuX: that's it
+[18:34:30] jleyba: barancev: SGTM.  Already implemented that way for Safari :)
+[18:35:10] jimevans: jleyba, barancev: ugh, please no.
+[18:36:21] jimevans: the IE code for figuring out whether an alert is active, and then whether the requested command can be processed based on that is convoluted enough as it is.
+[18:37:06] jleyba: jimevans: IE7-9 will block every window if you open an alert
+[18:37:18] jleyba: Is the IEDriver able to by pass that?
+[18:38:04] jimevans: shouldn't, if all we're talking about is multiple windows on the same session.
+[18:38:28] jleyba: yeah, single browser session
+[18:38:50] jimevans: but if the alert appears on a window that isn't the focused window (via a setTimeout or the like) we'd probably fail miserably.
+[18:39:02] jleyba: we should etiher standardize on raise UnexpectedAlertException for alert opened by any window in the session, or leave it explicitly undefined
+[18:39:07] simonstewart: Toodle pip, chaps!
+[18:39:10] simonstewart has left #selenium
+[18:39:14] jleyba: but we cannot standardize on only the focused window b/c that's not possible in many browsres
+[18:40:06] barancev: at least we should be able to switch to the window that owns the alert to dismiss it
+[18:40:49] jleyba: alert shouldn't be attached to a specific window
+[18:40:59] barancev: aha, good point
+[18:45:09] Archdude_ has joined #selenium
+[18:46:34] jimevans: jleyba: i'm not sure i agree with that.
+[18:47:07] Selenium-Git has joined #selenium
+[18:47:07] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/ufYkHQ
+[18:47:07] Selenium-Git: 13selenium/06master 144d3f89c 15Alexei Barantsev: getText() on a closed alert should throw an exception (Ruby binding should be changed too)
+[18:47:07] Selenium-Git has left #selenium
+[18:47:34] jimevans: a specific window displays the alert. it may block all others in the session, but it was put up by a specific window.
+[18:48:06] jimevans: it's legitimate to say that an alert is "owned" or "attached" to a specific window, imo
+[18:48:23] jleyba: Yes, but if you get an UnsupportedAlertException, how do you dismiss it if you don't know which window it came from?
+[18:48:24] jleyba: Maybe we should just standardize on getAlert() printing a warning to stdout? "Be kind to your users, stop using alerts"
+[18:50:52] barancev: jimevans: why do we need to know which window "owns" an alert? how can we use this information?
+[18:52:12] jleyba: barancev: I see jimevans point.  If WebDriver can tell you that window A doesn't have an alert, but window B does, it should
+[18:52:27] diminoten: is there a way to use selenium without a driver or anything?
+[18:52:31] diminoten: just for its html parsing powers
+[18:52:36] admc has joined #selenium
+[18:52:48] jimevans: diminoten: selenium doesn't parse html. :)
+[18:52:48] jleyba: diminoten: Selenium doesn't have html parsing powers
+[18:52:56] lukeis: htmlunit does :)
+[18:52:58] diminoten: ookay what's the right term then
+[18:53:10] jimevans: what are you trying to do?
+[18:53:13] diminoten: I'd rather do "find_element_by_foo" than "tree.blah.blah"
+[18:53:33] diminoten: I've got the HTML already no need for help there
+[18:53:41] barancev: jleyba: the same question -- how can we use this knowledge?
+[18:53:46] diminoten: just seems easier to traverse the DOM with selenium than lxml
+[18:53:55] diminoten: (might be mincing terms there)
+[18:54:30] lukeis: selenium only treats the browser as a puppet, it's the browser that does the parsing / DOM creation etc.
+[18:54:31] jleyba: diminoten using WebDriver for DOM traversal is a touchy subject around here :)  You might to take a look at phantomjs though
+[18:54:34] barancev: diminoten: use any DOM XML parser + XPath engine
+[18:55:03] jimevans: diminoten: depending on the language you're using you may have other options.
+[18:55:08] diminoten: python
+[18:55:28] diminoten: I can't be the only one to think lxml tree-style traversal is a pain
+[18:55:36] lukeis: it is ;)
+[18:55:46] jimevans: how about beautiful soup?
+[18:56:03] diminoten: reading now
+[18:56:11] lukeis: diminoten: the lightest weight thing selenium has to offer right now is ghostdriver / phantomjs
+[18:56:42] lukeis: works well with python even ;)
+[18:57:17] diminoten: beautiful soup looks reasonable
+[18:57:28] diminoten: for what I want, just as long as it's not lxml straight
+[18:57:31] jimevans: god the IE driver is such a piece of crap.
+[18:58:44] *lukeis does not care to step in it… even though i've been doing a little bit of cpp on the side ;)
+[18:58:49] barancev: jimevans: jleyba: again, let's suppose we know a window that "owns" an alert, what to do with this information?
+[18:59:03] barancev: do we want to expose it to a user?
+[IRC logfile - Started Tue Feb  5 19:00:10 2013]
+[19:00:10] jleyba: barancev: I think the idea would be if you say driver.switchTo().alert(), it would throw NoSuchAlertException if the focused window doesn't have an alert open
+[19:00:27] Archdude_ has joined #selenium
+[19:00:33] jleyba: Don't think I agree with doing that though
+[19:00:36] jimevans: that's what the IE driver does today
+[19:01:09] barancev: what if I perform any operation in a window when another window has an open alert?
+[19:01:37] barancev: if the curent windows is blocked, I should get some exception
+[19:02:08] jleyba: Ok, how about this
+[19:02:09] barancev: it can't be UnexpectedAlertException
+[19:02:28] jleyba: For every command, if there is an open alert that would block the execution of that command, WebDriver returns an UnexpectedAlertException
+[19:02:31] barancev: because  driver.switchTo().alert() says NoSuchAlert just before
+[19:02:32] jleyba: That leaves it browser specific
+[19:03:32] jleyba: Similarly, for switchTo().alert():  Returns the alert blocking the current window. Raises NoSuchAlert if none is present.
+[19:04:56] awilson820 has joined #selenium
+[19:07:59] barancev: jarib: yt?
+[19:10:22] jimevans: barancev: btw, the unexpected alert exception response includes the text of the alert.
+[19:11:02] barancev: jimevans: yes, I know, what's the issue with this text?
+[19:11:09] *jimevans was paying very little attention to the language bindings discussion earlier today between barancev and simonstewart.
+[19:11:44] barancev: in short: getText() on a closed alert should throw an exception
+[19:11:54] barancev: in all bindings
+[19:12:12] albinadatsukova has joined #selenium
+[19:12:14] barancev: .Net and Python already conform to this rule
+[19:12:19] jcarr has joined #selenium
+[19:12:19] jimevans: exactly so. and in the auto-close case, the exception gives you the text of the alert that was closed.
+[19:13:03] barancev: I've fixed Java and want somebody to fix Ruby
+[19:15:04] Selenium-Git has joined #selenium
+[19:15:04] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/fiUx5Q
+[19:15:04] Selenium-Git: 13selenium/06master 14970deff 15Alexei Barantsev: Deprecating getAlert() in UnhandledAlertException in favour of getAlertTest(). A user can only get text of an auto-dismissed alert, no other actions are allowed.
+[19:15:04] Selenium-Git has left #selenium
+[19:15:37] barancev: jimevans: ^^^^
+[19:16:23] barancev: UnhandledAlertException.UnhandledAlert that does ThrowAlreadyDismissed is a bad thing 
+[19:16:32] jimevans: right, so if you attempt to perform an operation in a window in the IE driver where another window in the same session is blocked by an alert, the command is not blocked on the "unalerted" window.
+[19:17:29] barancev: a user can set IGNORE unexpected alert behaviour, in this case an alert is present, whereas we tell from UnhandledAlertException.UnhandledAlert that it is dismissed
+[19:17:53] jimevans: so it might succeed, might fail depending on the command
+[19:18:52] barancev: jimevans: would you please change UnhandledAlertException in dotnet to synchronize it with Java?
+[19:19:21] barancev: deprecate GetAlert and introduce GetAlertText
+[19:20:16] Osleg has joined #selenium
+[19:20:25] Osleg: salut all!
+[19:20:56] barancev: jimevans: which commands are not blocked on the unalerted window?
+[19:21:27] barancev: or which commands should not be blocked
+[19:21:29] jimevans: barancev: did you change testIncludesAlertInUnhandledAlertException in your deprecation?
+[19:22:06] jimevans: (or change the test to be appropriately named, and perform the appropriate function?)
+[19:22:26] jimevans: barancev: no commands are blocked on the unalerted window.
+[19:22:27] barancev: jimevans: yes, I forgot the test, will fix it
+[19:24:14] sayd has joined #selenium
+[19:24:19] barancev: well, many tests, actually
+[19:24:23] lukeis: AutomatedTester: python bindings don't implement this wire call anywhere… http://code.google.com/p/selenium/wiki/JsonWireProtocol#POST_/session/:sessionId/keys   I would have assumed that Actions.send_keys did it, but it actually doesn't, it finds the active element first and then calls send_keys on that… I think it needs to be changed to be more like key_down / key_up  (how java does it)
+[19:24:53] lukeis: i mean it does implement it, just with keydown/up … should with send_keys too
+[19:24:56] sayd: i am using se-builder to save python, anyone else? I see in the latest from github there is a success flag, but it only throws generic "Test Failed." exceptions
+[19:25:53] ha6aha6a has joined #selenium
+[19:28:29] nirvdrum has joined #selenium
+[19:30:55] jimevans: barancev: .NET changes done.
+[19:31:10] Selenium-Git has joined #selenium
+[19:31:11] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 2 new commits to 06master: 02http://git.io/S3betQ
+[19:31:11] Selenium-Git: 13selenium/06master 140333c0c 15Jim Evans: Deprecating Alert property of UnhandledAlertException in favor of AlertText property.
+[19:31:11] Selenium-Git: 13selenium/06master 142824d0a 15Jim Evans: StyleCop changes. No functional differences
+[19:31:11] Selenium-Git has left #selenium
+[19:31:15] barancev: thanks!
+[19:31:33] plightbo_work has joined #selenium
+[19:31:55] fatguylaughing has joined #selenium
+[19:33:53] Selenium-Git has joined #selenium
+[19:33:53] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/v50ZTw
+[19:33:53] Selenium-Git: 13selenium/06master 1487eb46e 15Alexei Barantsev: Fixing tests to not use deprecated UnhandledAlertException.getAlert() method
+[19:33:53] Selenium-Git has left #selenium
+[19:35:30] pa has joined #selenium
+[19:35:48] jimevans: oh, hang on. jleyba, i think you're mistaken.
+[19:37:03] jimevans: i can click on a link that opens a new window; in that new window, perform an operation that throws up an alert; manually switch focus back to the first window, and click to my heart's content.
+[19:37:41] jimevans: (in IE that is)
+[19:37:44] barancev: so window switching operation should be allowed even on "alerted" windows?
+[19:37:55] jleyba: jimevans: which version of IE?
+[19:38:03] jimevans: jleyba: IE9
+[19:38:18] jleyba: try 7/8?
+[19:38:26] jimevans: can't. soz.
+[19:38:40] jimevans: not at the moment anyway.
+[19:39:23] qaguy has joined #selenium
+[19:39:29] *jimevans wants a new work laptop with a decent sized hard drive.
+[19:41:33] detronizator has left #selenium
+[19:43:04] detronizator has joined #selenium
+[19:43:09] detronizator has left #selenium
+[19:44:25] plightbo_work has joined #selenium
+[19:45:04] AutomatedTester: lukeis: huh?
+[19:45:45] AutomatedTester: just randomly sendKeys?
+[19:49:03] lukeis: it doesn't randomly… it sends it to the 'active element'
+[19:49:19] RossPatterson has joined #selenium
+[19:49:19] ChanServ has altered RossPatterson's mode: +o
+[19:49:31] AutomatedTester: lukeis: link to the java implementation?
+[19:49:39] lukeis: just a moment...
+[19:49:53] barancev: jimevans: do you know why testShouldBeAbleToIterateOverAllOpenWindows fails in IE?
+[19:49:54] *AutomatedTester is a little surprised that WebDriver object has sendKeys in Java
+[19:50:04] lukeis: it doesn't
+[19:50:05] barancev: it can't open the third window
+[19:50:07] lukeis: it's in the actions
+[19:50:35] lukeis: AutomatedTester: http://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteKeyboard.java#34
+[19:50:40] AutomatedTester: lukeis: like https://code.google.com/p/selenium/source/browse/py/selenium/webdriver/common/action_chains.py#233 ?
+[19:51:01] jimevans: barancev: first blog post i ever wrote. http://jimevansmusic.blogspot.com/2012/06/whats-wrong-with-internet-explorer.html
+[19:51:11] lukeis: AutomatedTester: no, like https://github.com/lukeis/selenium/commit/706494da69b932ed10c6823f750cf2e82eee8fe8
+[19:51:13] selbot2: 03lukeis 18 minutes ago - changing Actions.send_keys to use <sessionId>/keys endpoint | https://code.google.com/p/selenium/source/detail?r=706494d | http://dashboard.ci.seleniumhq.org/#/revision/706494d
+[19:51:27] lukeis: although i have a bug on line 217 ;)
+[19:51:49] AutomatedTester: lukeis: ok but I dont see the value in that change?
+[19:51:56] AutomatedTester: lukeis: does it not do the same thing?
+[19:52:08] lukeis: different end point calls
+[19:52:12] AutomatedTester: right
+[19:52:17] AutomatedTester: but same result?
+[19:52:26] barancev: jimevans: so, if I set requireWindowFocus capability it should pass, right?
+[19:52:28] lukeis: as is, does <sessionId>/element/<elementId>/value   
+[19:52:37] jimevans: barancev: should do.
+[19:52:39] lukeis: new is <sessionId>/keys
+[19:52:55] lukeis: AutomatedTester: *should* be the same result ;) but isn't for iphone
+[19:53:09] AutomatedTester: thats a bug in the iphone driver then
+[19:53:20] lukeis: :-P
+[19:53:30] AutomatedTester: driver.switch_to_active_element.send_keys('foo') should do the same
+[19:53:37] lukeis: *should* but doesn't
+[19:53:56] AutomatedTester: lukeis: iphone driver bug...
+[19:54:05] jcarr has left #selenium
+[19:54:13] lukeis: and python isn't implementing the full wire
+[19:54:14] jcarr has joined #selenium
+[19:54:23] AutomatedTester: by choice
+[19:54:41] lukeis: that's an odd choice to not expose it
+[19:54:57] AutomatedTester: why?
+[19:55:26] lukeis: it's one 'wire' call vs. two
+[19:55:31] AutomatedTester: there is that
+[19:55:39] AutomatedTester: is that all?
+[19:55:43] lukeis: and my bug ;)
+[19:55:55] lukeis: which i don't know how to fix
+[19:56:37] AutomatedTester: how are you getting the activeElement?
+[19:56:52] lukeis: the current approach uses the atoms
+[19:57:00] lukeis: activeElement.send_keys that is
+[19:57:11] lukeis: driver.keys, can let me call the native keyboard
+[19:57:34] AutomatedTester: is this current iphone driver or Francios' stuff?
+[19:57:36] sayd: Is there a way to open my normal firefox when having a webdriver instance open?
+[19:57:42] lukeis: not yet ;)
+[19:57:58] lukeis: oh, mostly ios-driver and appium
+[19:57:59] lukeis: both
+[19:58:02] lukeis: those
+[19:58:12] AutomatedTester: ahhh appium...
+[19:58:14] AutomatedTester: hmmm
+[19:58:15] lukeis: iwebdriver is crap ;)
+[19:59:14] sayd: anyone?
+[19:59:39] AutomatedTester: sayd: you can have normal firefox open and webdriver firefox open at the same time
+[19:59:45] barancev: are we going to consider (at some point) ios-driver as an "externalized" replacement for iwebdriver?
+[19:59:58] AutomatedTester: barancev: hopefully
+[IRC logfile - Started Tue Feb  5 20:00:19 2013]
+[20:00:19] sayd: AutomatedTester: how? maybe I need to start my own profile before starting wedbriver/
+[20:00:28] dude-x: sayd: i always have my normal firefox open. webdriver creates a new profile so you can have multtiple webdriver firefoxes open
+[20:00:46] AutomatedTester: barancev: what I think would be a really great idea is to have the Chrome team to hire Francios and get the chrome driver using the same code
+[20:01:39] AutomatedTester: sayd: webdriver creates a new profile
+[20:04:12] alkemist has joined #selenium
+[20:06:39] smccarthy has joined #selenium
+[20:07:28] stackedsax has joined #selenium
+[20:12:56] barancev: appium on sauce: http://sauceio.com/index.php/2013/02/announcing-appium-on-sauce-native-hybrid-ios-testing-in-the-cloud/
+[20:14:28] adamgoucher has joined #selenium
+[20:16:44] dude-x: i just watched the godaddy commercial where a big nerd kisses a model/actress. the actress clearly shows her disgust 
+[20:18:44] plightbo has joined #selenium
+[20:19:30] dude-x: godaddy should just stop making commercials all-together
+[20:22:26] plightbo_work: hmmm... LimeChat claims someone mentioned me, but can't find it
+[20:22:44] lukeis: simon did earlier today
+[20:23:04] Selenium-Git has joined #selenium
+[20:23:04] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/we17aw
+[20:23:04] Selenium-Git: 13selenium/06master 14595447d 15Alexei Barantsev: Fixing Selenium IDE formatters to call alert.getText() and storing the alert text before dismissing the alert
+[20:23:04] Selenium-Git has left #selenium
+[20:23:21] lukeis: plightbo_work: :log  at 17:39:56
+[20:23:22] selbot2: http://illicitonion.com/selogs/selenium/2013/02/05.txt | http://illicitonion.com/selogs/search
+[20:23:43] lukeis: :) pointing it out, cause I want ya to do something too
+[20:26:55] barancev: jimevans: just tell: should testShouldNotHandleAlertInAnotherWindow pass in IE or not?
+[20:27:05] plightbo_work: lukeis: not in my buffer - resend? I'm guessing it's about DNS? :)
+[20:27:23] lukeis: yep
+[20:27:39] jimevans: barancev: it should, and does.
+[20:27:54] barancev: on sauce it fails in IE6 and 7
+[20:28:12] lukeis: plightbo_work: simon was asking about 'www.seleniumhq.com' (there's something he may need from you to help point it the right way) and we still need "seleniumhq.org" to redirect to "docs.seleniumhq.org"
+[20:29:00] barancev: ok, at least "it should"
+[20:29:23] barancev: now to Firefox and Chrome -- should they pass or not? hm...
+[20:29:52] jimevans: barancev: is that test disabled for IE in CI?
+[20:30:33] barancev: jimevans: it is disabled for IE beause it fails in CI, yes
+[20:31:38] Osleg: hey guys, can anyone point me to where should be located source for selenium IDE python formatters?
+[20:34:51] regex has joined #selenium
+[20:39:58] lukeis: Osleg: this i believe - https://code.google.com/p/selenium/source/browse/ide/plugins/python-format/src/content/formats/python2-wd.js
+[20:40:06] jimevans: barancev: can you locally try all alerts tests in IE? i believe there should be no ignores, save the one that fails in IE6 and 7 in CI.
+[20:40:51] barancev: jimevans: I have IE9 only locally atm
+[20:41:06] jimevans: that's what i have too.
+[20:41:26] jimevans: i suppose i could just unignore the tests in java and see what kind of hell breaks loose on CI.
+[20:41:49] barancev: let me find the previous test result... a moment please
+[20:42:09] Selenium-Git has joined #selenium
+[20:42:10] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/msHP1Q
+[20:42:10] Selenium-Git: 13selenium/06master 1485b8dea 15Jim Evans: Allowing the IE driver to get the text of a prompt() dialog window....
+[20:42:10] Selenium-Git has left #selenium
+[20:42:49] barancev: jimevans: http://ci.seleniumhq.org:8080/view/IE%20Tests/job/IE%207%20Java%20Tests/2329/testReport/org.openqa.selenium/AlertsTest/testShouldNotHandleAlertInAnotherWindow/
+[20:43:14] Osleg: lukeis: thanks :)
+[20:43:21] barancev: oh! line numbers are shifted
+[20:43:42] barancev: it's easier to uignore the test, you're right
+[20:43:57] jimevans: barancev: yeah, it's not that one i'm talking about. there are two or three other ignored alerts tests in IE. i believe they should work.
+[20:44:11] barancev: lets' try
+[20:45:19] adamgoucher has joined #selenium
+[20:47:15] qaguy has joined #selenium
+[20:51:13] lukeis: :note santicyr feel free to ignore all those notes from me
+[20:51:14] selbot2: ok!
+[20:58:32] qaguy has joined #selenium
+[20:59:23] detronizator_hom has joined #selenium
+[20:59:33] jimevans: barancev: can we adjust capabilities to a CI job on a per job basis?
+[IRC logfile - Started Tue Feb  5 21:00:21 2013]
+[21:00:21] jimevans: i'm curious to see if setting requireWindowFocus = true would improve results on IE10 
+[21:00:52] AutomatedTester: http://devopsreactions.tumblr.com/post/42345786031/senior-developer-explaining-how-to-use-his-library
+[21:02:07] barancev: jimevans: it is possible, but for each capablity we need to add a bit of code to SauceDriver
+[21:02:26] sfbrian_ has joined #selenium
+[21:03:03] barancev: there is no universal mechanis atm
+[21:03:13] jimevans: ok. that's fair.
+[21:05:03] AutomatedTester: http://devopsreactions.tumblr.com/post/42266990821/still-trying-to-find-the-issue-after-10-hours
+[21:06:37] AutomatedTester: http://soyeahdjango.com/post/42291919670/how-i-feel-when-a-test-catches-a-bug-before-deploy
+[21:11:41] KaibutsuX: AutomatedTester: question about browsermob, do I need to call proxy.new_har() prior to each get() call?
+[21:12:10] KaibutsuX: or can I call new_har once and then just call har(), whenever I want to see the last one
+[21:13:28] AutomatedTester: call new har and then get traffic up to the point 
+[21:13:52] KaibutsuX: ohhhhh
+[21:14:13] *AutomatedTester checks
+[21:14:14] KaibutsuX: so if I get() 30 times, then call new_har and har(), I'll have all traffic passed since the first get?
+[21:14:18] AutomatedTester: I havent used it in a while
+[21:14:23] AutomatedTester: new_har()
+[21:14:26] AutomatedTester: then 30 gets
+[21:14:28] AutomatedTester: then har
+[21:14:33] AutomatedTester: that should get you what you want
+[21:14:37] KaibutsuX: sweet, thank you
+[21:14:54] KaibutsuX: btw, do you know that using your Server class in windows, doesn't kill the java process?
+[21:15:03] KaibutsuX: on .stop() i should say
+[21:15:17] AutomatedTester: KaibutsuX: no i didnt know that
+[21:15:23] AutomatedTester: can you raise a bug please?
+[21:15:26] KaibutsuX: I dont think it's you, it's windows
+[21:15:39] AutomatedTester: https://github.com/automatedtester/browsermob-proxy-py/issues
+[21:15:43] KaibutsuX: starting the proxy.bat is it's own pid
+[21:15:45] KaibutsuX: I will
+[21:16:02] AutomatedTester: I will have a look and see what we can do
+[21:16:10] KaibutsuX: cool
+[21:21:01] Selenium-Git has joined #selenium
+[21:21:01] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 2 new commits to 06master: 02http://git.io/lUd-Rw
+[21:21:01] Selenium-Git: 13selenium/06master 1496e26d3 15Alexei Barantsev: Removing outdated binding for /session/:sessionId/alert and duplicated binding for /session/:sessionId/alert_text
+[21:21:01] Selenium-Git: 13selenium/06master 1441e0f97 15Alexei Barantsev: Another attempt to catch AssertionError properly
+[21:21:01] Selenium-Git has left #selenium
+[21:25:28] stackedsax has joined #selenium
+[21:36:32] meritum has joined #selenium
+[21:39:32] intchanter-work: Do the Python bindings have support for Python 3.x?
+[21:40:08] intchanter-work: When I try to start a webdriver.Firefox(), I get:
+[21:40:12] intchanter-work: TypeError: POST data should be bytes or an iterable of bytes. It cannot be str.
+[21:40:14] *jimevans ducks
+[21:40:26] lukeis: short answer, no
+[21:40:39] bradleymeck has joined #selenium
+[21:40:49] *lukeis ducks away from the long answer
+[21:40:55] sfbrian has joined #selenium
+[21:40:59] intchanter-work: Does the longer answer include how I can help?
+[21:41:18] lukeis: you'd have to have a chat with AutomatedTester
+[21:41:54] intchanter-work: Cool, thanks.
+[21:42:09] intchanter-work: Is that one that should be taken out-of-channel?
+[21:42:16] lukeis: i also know that dude-x did some work on this… https://github.com/Dude-X/Selenium2
+[21:42:26] lukeis: no, inchannel is appropriate
+[21:42:28] bradleymeck: does anyone ever fire JSONWire stuff concurrently (not waiting for the current request to return)
+[21:42:31] dude-x: intchanter-work: it will be a while before python3 bindings are done; my stuff is a bit out of date, but it works
+[21:42:48] dude-x: though not thoroughly tested
+[21:43:10] dude-x: nevertheless, if you look at the changes i've done, they are the changes required to make webdriver work with python3
+[21:43:20] lukeis: bradleymeck: that would put you in an inconsistent state and not recommended
+[21:43:39] intchanter-work: I got the go-ahead to convert our stuff from the non-maintained perl bindings, so I'll be pleased with anything that can work.
+[21:43:52] intchanter-work: And I want to start from Python3 so I don't have to fix it later.
+[21:43:57] bradleymeck: lukeis: i understand, i would not do it personally, but seems like something driver writers should support instead of complain about
+[21:44:08] intchanter-work: dude-x: I'll take a look at that.  Thanks.
+[21:44:53] jimevans: bradleymeck: people complain?
+[21:44:54] lukeis: who are you referring to as a 'driver writer'?
+[21:44:57] lukeis: :)
+[21:45:05] lukeis: jimevans never complains ;)
+[21:45:24] jimevans: s/never complains/complains constantly/
+[21:45:30] jimevans: there, i fixed it for you. :)
+[21:45:32] lukeis: thx
+[21:45:46] dude-x: intchanter-work: it's quite possilbe the changes for google chromedriver may no longer be relevant… but it's worth checking out
+[21:46:16] bradleymeck: lukeis: i am writing a JSONWire driver in node (i know there is one already)
+[21:46:37] lukeis: there's two 0.o ;)
+[21:46:55] lukeis: :wiki webdriverjs
+[21:46:57] selbot2: 1: 03WebDriverJs: WebDriver's JavaScript language bindings. - https://code.google.com/p/selenium/wiki/WebDriverJs
+[21:47:06] lukeis: and github.com/admc/wd
+[21:47:31] lukeis: i'd respectfully encourage you to contribute to one of those
+[21:47:55] lukeis: if php has taught us anything, fragmentation here is not always great...
+[21:48:07] bradleymeck: lukeis i dont like either's api
+[21:48:18] Selenium-Git has joined #selenium
+[21:48:18] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/X_M58w
+[21:48:18] Selenium-Git: 13selenium/06master 14d0d0fb1 15Jim Evans: Un-ignoring Alerts tests for IE in Java language bindings
+[21:48:18] Selenium-Git has left #selenium
+[21:48:52] lukeis: bradleymeck: have you talked to either maintainer to enhance it or change it to your liking?
+[21:49:34] *lukeis can make them run away ;)
+[21:49:51] bradleymeck: lukeis: nope, after seeing commit counts and age i doubt it will change
+[21:50:05] jimevans: bradleymeck: you must not try to pump commands to the IE driver for the same session without waiting for a request to return and you run into problems
+[21:50:38] jimevans: s/and you/or you will/
+[21:50:47] lukeis: they are very susceptible to change actually (well, webdriverjs more so i think)
+[21:51:37] jimevans: barancev: i may have broken alerts tests in IE. keep an eye on things for me, won't you?
+[21:51:52] barancev: jimevans: yes, I'm watching it
+[21:52:51] jimevans: but for now, i need to head out for awhile.
+[21:53:00] jimevans: back later maybe, but don't count on it.
+[21:53:01] jimevans has left #selenium
+[21:54:20] awilson820 has joined #selenium
+[21:54:34] freynaud has joined #selenium
+[21:54:35] lukeis: bradleymeck: maybe my last word on this (likely not): playing well with others and not re-inventing wheels helps an open source community
+[21:55:30] bradleymeck: im not really against playing with others, but complete overhauls are unlikely and writing the driver took me like an hour /shrug
+[21:55:58] amitev has joined #selenium
+[21:56:23] lukeis: :-/ 
+[21:56:57] barancev: we've lost him
+[IRC logfile - Started Tue Feb  5 22:00:02 2013]
+[22:00:02] barancev: do you know why PHP and JS programmers like to reinvent the wheel?
+[22:00:09] intchanter-work: It looks like we're only supporting as old as Python 2.6.  Is that correct?
+[22:01:57] intchanter-work: If so, that should simplify the porting.
+[22:05:18] lukeis: yeah… basically because mac's ship with 2.6/2.7 out of the box, we like to have support for it :)
+[22:06:11] lukeis: barancev: i have no clue...
+[22:07:51] admc has joined #selenium
+[22:09:53] gdennis has left #selenium
+[22:22:58] jcarr has joined #selenium
+[22:26:54] santiycr has joined #selenium
+[22:26:55] selbot2: santiycr: note from lukeis about 5 hours ago: wtf is "keys"? looks like i have to look into what is different in the wd.js bindings :-/ 
+[22:28:03] lukeis: ha, i must have misspelled your name for the other notes ;)
+[22:28:11] lukeis: santiycr: disregard
+[22:28:15] santiycr: lol
+[22:28:29] santiycr: was about to paste a link to the wd readme
+[22:28:42] santiycr: they show there the link between api and JSONWP
+[22:28:52] lukeis: yep, figured it out
+[22:29:04] lukeis: python doesn't implement it though :-/
+[22:29:11] santiycr: oh
+[22:29:15] santiycr: we can fix that :)
+[22:29:41] lukeis: yep… https://github.com/lukeis/selenium/commit/9d0e1fb9887021533556b2d5b22dc7e312ffd760
+[22:29:42] selbot2: 03lukeis about 3 hours ago - changing Actions.send_keys to use <sessionId>/keys endpoint | https://code.google.com/p/selenium/source/detail?r=9d0e1fb | http://dashboard.ci.seleniumhq.org/#/revision/9d0e1fb
+[22:30:00] lukeis: not in the selenium repo yet though
+[22:31:14] Osleg: i want to be like you... to make changes and stuff -_-
+[22:32:15] dude-x: submit enough patches and if people like your work you can become a committer!
+[22:32:27] lukeis: what he said ^^ :-D
+[22:32:34] Osleg: submit enough patches
+[22:32:37] Osleg: patches
+[22:32:42] Osleg: ^ >_<
+[22:32:49] Osleg: that's what i mean
+[22:32:51] dude-x: you can still contribue regardless
+[22:32:55] dude-x: oh
+[22:32:56] Osleg: not the permission to commit
+[22:32:57] dude-x: :p
+[22:33:01] Osleg: but to actual writing :D
+[22:33:13] Osleg: it just takes me so slow to write 
+[22:33:19] Osleg: and my code is so awkward
+[22:33:20] lukeis: you can commit to your own repo ;)
+[22:33:31] Osleg: and i have to rewrite so many times to get thing right
+[22:33:34] Osleg: :(
+[22:34:02] barancev: santiycr: hi!
+[22:34:50] dude-x: Osleg: you can fork on github the mirror the repo and write your own patches on your own account. I have a few stuff i did for the python bindings
+[22:34:52] barancev: santiycr: no more errors with "establishing TCP connection", but I suspect they just mimic to something different: https://saucelabs.com/tests/3cd1ab7762e74525b02311c34235ec09
+[22:35:14] Osleg: dude-x: i did it already :)
+[22:35:24] dude-x: that's a start!
+[22:35:31] santiycr: barancev:  yup, that's about it. I just made that message more understandable
+[22:35:38] Osleg: i mean i forked and looked into it and... then went back to my work :(
+[22:36:09] barancev: santiycr: so what's the reason? what to fix? is it on selenium side? any exceptions on the server start?
+[22:36:10] lukeis: open source contributing can be small ;) you don't need to do 'big' things, start small
+[22:36:19] Osleg: dude-x: and what the stuff u did for python bindings?
+[22:36:24] Osleg: may i have a look? :)
+[22:36:34] santiycr: barancev: could be on the Sauce side, if the file downloaded is corrupted 
+[22:36:51] santiycr: barancev:  I'll add some more logging to test this
+[22:36:51] barancev: hmm... reasonable
+[22:37:35] barancev: may be we need a checksum?
+[22:37:53] barancev: to reattempt downloading if it is broken
+[22:40:28] santiycr: yeah, I'll add some checksums in
+[22:40:30] Osleg: where is WDAPI docs/dources ?
+[22:40:38] lukeis: :apidocs
+[22:40:39] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[22:40:40] lukeis: :code
+[22:40:41] selbot2: https://code.google.com/p/selenium/source/checkout
+[22:40:43] santiycr: though, I'm shocked this didn't happen when jars were pull right through the internet
+[22:40:58] santiycr: this is a local network transfer, which should be even more reliable
+[22:41:40] barancev: santiycr: btw I've found a UI bug -- see the scrollbar here: http://screencast.com/t/zJcat1s6jn
+[22:41:57] santiycr: oh, tks
+[22:42:03] santiycr: browser, version, os?
+[22:42:22] barancev: Win7x64, Chrome (latest stable)
+[22:42:27] Osleg: i meant this https://github.com/SeleniumHQ/selenium/blob/master/ide/main/src/content/formats/webdriver.js
+[22:42:29] Osleg: but thanks :)
+[22:42:53] lukeis: that's the github url
+[22:43:09] lukeis: (which is just a mirror)
+[22:43:10] Osleg: btw why is :code gives you url of googlecode rather github? :)
+[22:43:11] selbot2: https://code.google.com/p/selenium/source/checkout
+[22:43:25] lukeis: because that's where the 'canonical' source is
+[22:43:29] Osleg: oh, i thought slenium is moved to github
+[22:43:33] lukeis: no
+[22:43:36] lukeis: we moved to git
+[22:43:45] santiycr has left #selenium
+[22:43:49] lukeis: which allows easy mirroring to other git services
+[22:43:50] santiycr has joined #selenium
+[22:44:10] lukeis: github is just another clone ;)
+[22:44:48] Osleg: clones empire...
+[22:45:00] barancev: santiycr: the scrollbar is not always here. sometimes it just *appears* when I move between pages
+[22:45:01] Osleg: i heard something about that from my frand Lucas... :D
+[22:52:47] santiycr: barancev:  tks
+[22:53:04] santiycr: barancev:  just added logging of the checksum of the jar on each job, we'll deploy it today
+[22:53:19] santiycr: didn't put much effort into validating and stuff
+[22:53:21] intchanter-work: Just to make sure I have the workflow... I'll make my changes locally, format a patch, and attach it to an issue?
+[22:53:44] santiycr: tomorrow we can go see which ones fail due to this and look whether the sums were valid
+[22:53:48] lukeis: intchanter-work: that's one way :)
+[22:53:57] lukeis: we also accept github pull requests
+[22:53:58] intchanter-work: Is it preferred?
+[22:54:04] intchanter-work: Ooh, better!
+[22:54:34] lukeis: intchanter-work: please just note that you've signed the :cla
+[22:54:35] selbot2: http://goo.gl/qC50R
+[22:56:29] intchanter-work: Signed.
+[IRC logfile - Started Tue Feb  5 23:08:25 2013]
+[23:08:25] cgoldberg has joined #selenium
+[23:09:55] detronizator_hom has joined #selenium
+[23:11:19] sfbrian_ has joined #selenium
+[23:13:50] sfbrian__ has joined #selenium
+[23:20:02] admc has joined #selenium
+[23:22:46] adamgoucher has joined #selenium
+[23:23:28] kaawee_ has joined #selenium
+[23:26:09] santiycr has joined #selenium
+[23:29:36] fatguylaughing has joined #selenium
+[23:34:56] intchanter-work: So the Github repo (https://github.com/Selenium2/Selenium2) says patches should be submitted through Google Code.  Sounds like that could use an update?
+[23:37:56] lukeis: github.com/seleniumhq/selenium
+[23:37:59] lukeis: that's the repo
+[23:38:21] lukeis: krosenvold_: you should probably delete selenium2 on github ;)
+[23:38:31] intchanter-work: Okay, sounds like Google may need to be updated then.  :-)
+[23:41:53] testingb0t has joined #selenium
+[23:43:39] sayd: can I verify that a new tab opened?
+[23:43:59] lukeis: sure
+[23:44:32] lukeis: in IDE i have no clue ;)  in webdriver it's just checking the number of window handles increases
+[23:44:33] sayd: i wish you linked to 
+[23:44:35] sayd: :apidocs
+[23:44:36] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[23:44:40] sayd: from the docs site 
+[23:44:50] lukeis: :sehq webdriver
+[23:44:51] selbot2: 1: 03Selenium WebDriver: http://seleniumhq.org/projects/webdriver/
+[23:44:51] selbot2: 2: 03Selenium WebDriver � Selenium Documentation: http://seleniumhq.org/docs/03_webdriver.jsp
+[23:44:51] selbot2: 3: 03WebDriver - Google Code: http://code.google.com/p/selenium/w/list?q=label:WebDriver
+[23:45:02] lukeis: esh
+[23:45:06] lukeis: bad links
+[23:45:23] lukeis: sayd: it's on the :downloads page
+[23:45:23] selbot2: http://seleniumhq.org/download/ and https://code.google.com/p/selenium/downloads/list
+[23:45:28] sayd: annoying trigger too
+[23:50:48] testingb0t1 has joined #selenium
+[23:52:40] DarkRift has joined #selenium
+[23:52:40] DarkRift has joined #selenium

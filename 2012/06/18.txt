@@ -1,0 +1,658 @@
+[IRC logfile - Started Mon Jun 18 17:11:09 2012]
+[17:11:20] selloggingbot has joined #selenium
+[17:11:33] Dude-X: what's in 2.23.1 java?
+[17:11:43] lukeis: your mom
+[17:11:45] lukeis: oh..
+[17:11:47] lukeis: i mean
+[17:11:50] Dude-X: ohhhhh
+[17:11:59] llaskin: burn
+[17:11:59] lukeis: FF13 support for windows RC
+[17:12:04] foolx: RossPatterson: i didn't in the first solution. I just defined the div that contains my searchstring (Deutschland 1) and afterwards took the next button to that
+[17:12:18] lukeis: Dude-X: :changes
+[17:12:18] selbot2: .NET: http://goo.gl/SL88L | Java: http://goo.gl/50JPE | Ruby: http://goo.gl/K9ayk | Python: http://goo.gl/Ikm8u | IDE: http://goo.gl/tm4FM
+[17:12:33] Dude-X: it's not in the changelog 
+[17:12:45] lukeis: in the java one it is
+[17:13:01] Dude-X: hmm it is in THAT changelog but not in the zip
+[17:13:03] Dude-X: zipfile
+[17:13:20] lukeis: which zip?
+[17:13:27] lukeis: oh the release?
+[17:13:35] Dude-X: selenium-java-2.23.1.zip
+[17:13:35] Dude-X: yes
+[17:13:39] lukeis: that'd be my fault for forgetting to update it before releasing
+[17:13:40] davehunt_ has joined #selenium
+[17:14:21] RossPatterson: foolx: You can do it with one of several XPath locators, though.  For example, this will click on the Latin American server button: id('serverlist')/div[div/span[contains(@class, 'servername') AND .='Lateinakerika 1']]/div[contains(@class, 'play')]/input[@type='button']
+[17:14:53] Swadq has joined #selenium
+[17:15:38] lukeis: wow, that's some ugly xpath :)
+[17:16:05] llaskin: yea wow
+[17:16:08] Dude-X: i find functions in xpath to be unreliable
+[17:16:14] Dude-X: for tests
+[17:16:19] Dude-X: except for contains()
+[17:16:29] _gates has joined #selenium
+[17:16:43] _gates: hi
+[17:16:57] _gates: Does the browser alway open whe you run selenium
+[17:17:17] lukeis: if you use anything other than HtmlUnitDriver, yes
+[17:17:17] foolx: just trying that ugly xpath ;)
+[17:17:42] _gates: I am trying to use selenium with scrapy
+[17:17:54] _gates: but I keep getting a socket error, I think I am not using selenium correctly
+[17:19:04] foolx: RossPatterson: My intelliJ and FirePath both say nono to that xpath ;( ;)
+[17:19:11] _gates: here is src http://stackoverflow.com/questions/11038082/using-scrapy-with-selenium-to-scape-a-rendered-page-updated
+[17:19:27] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Re-add logging removed in revision 17176.  It should be cleaned up at some point. | https://code.google.com/p/selenium/source/detail?r=17189 | http://seleniumhq.org/ci.jsp?r=17189
+[17:21:37] Dude-X: thanks dawagner
+[17:21:41] _gates: lukeis:  hi
+[17:21:47] RossPatterson: Dude-X: llaskin: Perhaps the biggest problem with XPath is that HTML created the multi-valued "style" and "class" attributes, and XPath copes poorly with those.  In fact, the *best* way to code a "has class X" check is this ugly thing: contains(concat(' ', @class, ' '), ' X ')
+[17:22:19] _gates: should, the selenium("localhost", 4444, "*firefox", "http://linkedin.com/"), command open the port?
+[17:22:36] llaskin: ross: i avoid xpath as much as poslb
+[17:22:44] llaskin: (also spelling)
+[17:23:03] _gates: *taps mic* test test
+[17:23:03] Dude-X: i use xpath only to do things like '../..'
+[17:23:06] RossPatterson: foolx: I typed that by hand, I didn't test it.  If you're going to program real-world tests in Selenium, you're going to have to spend some time learning complex identification strategies, including non-trivial CSS selectors and XPath locators.
+[17:23:38] Dude-X: originaly this project was 99% xpaths
+[17:23:58] Dude-X: but i am slowly switching to css selectors and class name/id
+[17:24:13] foolx: RossPatterson: absolutly! i try another way. First get the correct element as far as cssSelector will help me. Afterwards i will select the Button with xpath. Think i will get that to work ;)
+[17:24:41] RossPatterson: _gates: Yes, the browser *always* opens when you call selenium.start().
+[17:24:57] Dude-X: i have done findByCss('#').findElement('../..')
+[17:25:09] _gates: RossPatterson:  when i run  self.selenium.start() i get an error
+[17:25:25] _gates: Connection Refused
+[17:25:32] RossPatterson: _gates: There can be failures, of course.  You might not *have* a Firefox installed, or it might be too new to be supported by the Selenium version you're using.
+[17:26:19] _gates: hmm I did /just/ install firefox
+[17:26:24] _gates: all i use is chrome
+[17:26:43] RossPatterson: _gates: I suspect you're good enough at this stuff to know that "i get an error" isn't very helpful :-)
+[17:26:47] _gates: socket.error: [Errno 61] Connection refuse
+[17:26:52] _gates: d
+[17:26:54] _gates: RossPatterson:  HA!
+[17:26:58] RossPatterson: :-)
+[17:27:09] _gates: just couldnt find it
+[17:27:18] RossPatterson: So the start() throws an exception?
+[17:28:04] _gates: yes
+[17:28:08] _gates: i do believe
+[17:28:22] _gates: yes
+[17:28:41] _gates: RossPatterson:  its not becausei ts being run in self.
+[17:29:27] _gates: no its not, cuz its called at the bottom sorry lol
+[17:29:39] RossPatterson: What versions of Firefox and Selenium are you using?  And you *have* started the Selenium server, right?
+[17:29:56] _gates: no i do not know how tno
+[17:30:04] _gates: wow lag!! (no i do not)
+[17:30:07] RossPatterson: Well, then, that's your problem.
+[17:30:27] _gates: *smiles stupidly*
+[17:30:57] _gates: RossPatterson: so umm how do i start it *looking around*
+[17:30:58] dawagner: bsilverberg: Could you check the difference in size of build/javascript/firefox-driver/webdriver.xpi before and after your attribute/property change?
+[17:31:07] RossPatterson: _gates: 'selenium("localhost", 4444, "*firefox", "http://www.linkedin.com")' means "I have a Selenium RC server running at port 4444 on this machine, and I want the browser to be connected to linkedin.com when it starts.
+[17:31:15] _gates: :o
+[17:31:20] _gates: i installed some firefox plugin
+[17:31:28] _gates: and pip selenium too
+[17:31:52] lukeis: _gates: are you new to selenium? if so, might I suggest you looking into / using the webdriver api
+[17:31:56] _gates: Yes
+[17:32:06] lukeis: http://seleniumhq.org/docs/03_webdriver.html
+[17:32:10] lukeis: from selenium import webdriver
+[17:32:18] lukeis: driver = webdriver.Firefox()
+[17:32:21] lukeis: :)
+[17:32:29] lukeis: meeting bbl
+[17:32:30] RossPatterson: _gates: You should read http://seleniumhq.org/docs/05_selenium_rc.html, and the answer to your specific question is under "Running Selenium Server".
+[17:32:39] _gates: thank you both
+[17:33:46] RossPatterson: _gates: lukeis and I disagree on whether Selenium RC is a "good thing" or not, but he's right that the future of the Selenium Project is the WebDriver API.
+[17:34:01] _gates: ahh
+[17:34:06] llaskin: i thought we all agreed it wa s abad thing?
+[17:34:08] _gates: i was going to say, there are different things here
+[17:34:13] llaskin: or that is "an old thing"
+[17:34:28] _gates: I mean here is my code
+[17:34:28] _gates: http://stackoverflow.com/questions/11038082/using-scrapy-with-selenium-to-scape-a-rendered-page-updated
+[17:34:31] _gates: am I just crazy?
+[17:35:31] RossPatterson: llaskin: A little difference of opinion in an OSS project is a good thing :-)  I don't think adamgoucher is ready to throw Selenium RC away either, and I suspect Sauce Labs is making some nice money off it too :-)
+[17:36:28] RossPatterson: _gates: You're not crazy.  You're using the Selenium RC API, which is fully supported, although it is not being enhanced.  But you still need to start the Selenium RC server before you run that code.
+[17:36:40] _gates: LOL
+[17:36:41] _gates: :}
+[17:36:47] simonstewart: The RC APIs are in maintainance mode
+[17:37:01] simonstewart: In selenium 3, they'll be pushed into a "legacy" package
+[17:37:14] simonstewart: But that's some way off :)
+[17:37:38] RossPatterson: _gates: simonstewart is as close to The Big Boss as we have in the Selenium Project :-)
+[17:38:00] _gates: ahh i understand
+[17:38:03] simonstewart: If I was starting a new project, I'd be using the WebDriver APIs
+[17:38:05] _gates: it seems like an awesome project
+[17:38:11] _gates: I assume it wasnt developed for scraping?
+[17:38:12] simonstewart: (and I've almost finished deleting the usages of RC at work)
+[17:39:20] _gates: woah
+[17:39:23] _gates: RossPatterson:  a lot just happen >.<
+[17:40:01] Dude-X: what is your vision for a Selenium 3?
+[17:40:12] Dude-X: stable mobile browser support?
+[17:40:30] simonstewart: Selenium 3? Delegate an awful lot of stuff to the browser vendors
+[17:40:40] simonstewart: Leaving the main project focusing on the next Big Problems
+[17:41:10] simonstewart: The W3C standard is going to be interesting
+[17:41:13] _gates: so many windows!
+[17:41:16] simonstewart: and provide us the room to do that
+[17:41:53] jcrza has joined #selenium
+[17:42:53] _gates: RossPatterson: so how do I "log in" with selenium :\
+[17:43:12] _gates: like authicate
+[17:43:28] _gates: authenticate** ..spelling helps
+[17:44:22] klrmn has joined #selenium
+[17:52:11] _gates: Can I feed selenium the code to render?
+[17:52:27] selbot2: 03james.h.evans.jr@gmail.com 2 minutes ago - JimEvans: Crash prevention for when there is no "current" browser window, like when the current window is closed without the user switching to another window. Fixes issue #4071. | https://code.google.com/p/selenium/source/detail?r=17190 | http://seleniumhq.org/ci.jsp?r=17190
+[17:53:44] noahsussman has joined #selenium
+[17:56:15] RossPatterson: _gates: It sounds like you got past "start()" :-)
+[17:56:38] _gates: I did!
+[17:56:46] _gates: i guess i wrote it right expect for something I didnt take into consideration
+[17:56:58] _gates: RossPatterson: thanks again, maybe you can help with this next part
+[17:57:38] _gates: I have two scripts ones a scraper (scapy) and the other sel, both of them are visiting the page but the problem is you have be logged in to see the content, theres so overlap but loggin into scrapy doesnt help me with sel
+[17:57:55] _gates: so eitherway (a) login with sel or (b) give sel the src from scrapy?
+[17:59:03] _gates: RossPatterson: is there like a FormRequest for Sel to login?
+[17:59:08] Fry33 has joined #selenium
+[IRC logfile - Started Mon Jun 18 18:01:20 2012]
+[18:01:20] RossPatterson: _gates: Some of what happens next, I can't answer, because it seems to be part of the "scrapy" system you're using.  The obvious question is, when start() finishes, is the browser displaying your login screen?
+[18:01:22] _gates: ...do i just login on firefox?
+[18:01:34] _gates: RossPatterson:  yes
+[18:03:20] RossPatterson: _gates: In a pure-Selenium environment, your next step would be to fill in the form fields and click the "login" button (or whatever it says).  Which looks to be what your login() method does.    So if that isn't happening, then I'd guess it's a Scrapy issue.
+[18:04:26] RossPatterson: _gates: One fine point: I would hope Scrapy does a Selenium wait_for_page_to_load() after posting the form data, otherwise it's gonna get out of sync with the browser.
+[18:04:44] RossPatterson: _gates: But I've never even *heard* of Scrapy, let alone looked at it.
+[18:06:58] _gates: its not scrapy
+[18:07:15] _gates: its taking the src and parsing it
+[18:09:15] _gates: RossPatterson: i think scrapy is messing with you
+[18:09:25] RossPatterson: Ah, so you've gotten past the login()/check_login_response() sequence?
+[18:09:28] _gates: I shouldnt have brought it up
+[18:09:39] _gates: How do I login with Selenium, using a form to login
+[18:10:11] SamuraiJack has joined #selenium
+[18:10:15] RossPatterson: No, it's not messing with my head, but the overall struction of your program (e.g., FormRequest.from_response(...)) is non-Selenium.
+[18:10:23] _gates: yes
+[18:10:30] _gates: whats Selenium main purpose
+[18:12:03] RossPatterson: In pure-Selenium, after start(), you'd do an open(login_url), followed by wait_for_page_to_load(), then type(userid_locator, userid_value), and type(password_locator, password_value), then click(login_button_locator), and another wait_for_page_to_load().  And then you'd be logged in.
+[18:12:09] _gates: If you were using Selenium and you wanted it to login for you, how would u?
+[18:12:11] RossPatterson: Basically, exactly like a person would do.
+[18:12:12] _gates: oh
+[18:12:23] _gates: i guess i dont understand Selenium's purpose
+[18:12:50] RossPatterson: "Selenium automates browsers. That's it. What you do with that power is entirely up to you. Primarily it is for automating web applications for testing purposes, but is certainly not limited to just that. Boring web-based administration tasks can (and should!) also be automated as well." (http://seleniumhq.org/, "What is Selenium?")
+[18:12:57] _gates: RossPatterson:  is the locator xpath?
+[18:13:09] simonstewart has left #selenium
+[18:13:21] RossPatterson: It can be, or there are other options as well (e.g., CSS selectors).
+[18:14:57] phdjsep has joined #selenium
+[18:15:14] RossPatterson: _gates: If this is a brand-new automation project, and you're capable of writing the code you've already posted, you might want to take lukeis's advice: use the WebDriver API instead of the Selenium RC API.  In Python, I think that's "from selenium import webdriver", but I'm not really a Python guy.
+[18:16:12] phdjsep: I believe you are correct
+[18:16:22] phdjsep: from selenium import webdriver
+[18:16:43] alexglow has joined #selenium
+[18:17:08] skiphuffman_: that is correct.
+[18:17:29] sassda has joined #selenium
+[18:17:39] skiphuffman_: I think there is a macro here on irc that will also give a link to the python webdriver api.
+[18:18:06] RossPatterson: skiphuffman: :api
+[18:18:13] skiphuffman_: :api
+[18:18:16] phdjsep: I have a quick question just to verify that I'm thinking about this correctly. I have a set of tests that run without a problem if run individually, but once I run as a suite, a random few fail. I'm thinking that it's a timing thing. Does anyone have experience with this?
+[18:18:29] RossPatterson: Oops, :apidocs
+[18:18:34] skiphuffman_: :apidocs
+[18:18:48] skiphuffman_: RossPatterson, You are just making me look dumb, now.
+[18:19:01] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[18:19:02] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[18:19:21] stockton has joined #selenium
+[18:19:27] skiphuffman_: phdjsep, Check your teardown process.  You might be leaving your SUT in a condition not ready for the next test.
+[18:19:56] phdjsep: What's SUT, if you don't mind?
+[18:20:07] skiphuffman_: System Under Test.
+[18:20:28] skiphuffman_: The thingy you are poking with a selenium stick.
+[18:20:35] phdjsep: hmm, thanks. I will check that out.
+[18:20:49] phdjsep: haha  at selenium stick
+[18:21:33] RossPatterson: :yt rhythm stick
+[18:21:34] selbot2: Ian Dury - Hit Me With Your Rhythm Stick 1978 - http://www.youtube.com/watch?v=A61i0Xscj-k&feature=youtube_gdata
+[18:22:18] phdjsep: hah, a remix with Selenium would be appropriate
+[18:23:13] skiphuffman_: Enough about other people.  I am seeing this issue Desired Capabilites: {'platform': u'VISTA', 'browserName': 'internet explorer', 'version': u'9', 'javascriptEnabled': True}
+[18:23:13] skiphuffman_: 13:07:30.090	FAIL	WebDriverException: Message: u'Connection refused: connect' ; Stacktrace: Method socketConnect threw an error in None 
+[18:23:18] brokenthumbs has joined #selenium
+[18:23:37] skiphuffman_: I know that I have a node available for that configuration.
+[18:24:33] Parabola has joined #selenium
+[18:24:50] stackedsax has joined #selenium
+[18:24:56] Parabola: afternoon folks
+[18:28:11] llaskin: howdy Parabola
+[18:28:53] Parabola: I'm still getting session is no longer valid messages :-\
+[18:29:13] Parabola: I've combed over google and cannot seem to find related information.  am I googling this wrong?
+[18:30:18] rbalent has joined #selenium
+[18:33:00] testingb0t has joined #selenium
+[18:37:14] Spanktar has joined #selenium
+[18:39:42] stackedsax has joined #selenium
+[18:41:39] klrmn has left #selenium
+[18:43:10] stephend has joined #selenium
+[18:45:57] selbot2: 03dawagner half a minute ago - DanielWagnerHall for BobSilverberg: Handle display: run-in properly for getText.  Fixes issue 1584. | https://code.google.com/p/selenium/source/detail?r=17191 | http://seleniumhq.org/ci.jsp?r=17191
+[18:48:05] bsilverberg: thanks dawagner 
+[18:48:06] lukeis: dawagner: how many commits is that for bsilverberg now? (you want to nominate him for commit status? :) )
+[18:51:11] llaskin: https://gist.github.com/2044b74b7979b1ea35d2  so i am getting this on occasion
+[18:51:12] llaskin: thoughts?
+[18:51:15] jibay has joined #selenium
+[18:51:22] Bebe_home has joined #selenium
+[18:52:19] jarib: llaskin: ruby 1.8.6? seem to remember that as a bug in 1.8.X
+[18:52:19] selbot2: jarib: note from lukeis about 2 hours ago: and native events on linux... i only asked you cause another ruby user asked for it in the channel 
+[18:52:29] llaskin: 1.8.7
+[18:52:34] llaskin: can't switch to 1.9.3
+[18:52:41] llaskin: causes a bunch of bugs and i haven't had to time to track em
+[18:53:23] jarib: it's masking the real error
+[18:53:33] llaskin: any way to trace it?
+[18:53:55] jarib: edit /usr/lib/ruby/1.8/net/http.rb:1060
+[18:55:22] jarib: what does that line look like?
+[18:55:52] llaskin:  @socket.close unless @socket.closed?
+[18:56:30] jarib: what does `ruby -v` give you?
+[18:57:07] llaskin: ruby 1.8.7 (2010-01-10 patchlevel 249) [i486-linux]
+[18:57:26] jarib: i have patchlevel 352, and it's fixed there
+[18:57:53] llaskin: is there a way to update ruby patchlevel without updating ruby?
+[18:58:14] jarib: depends on how you installed ruby
+[18:58:29] llaskin: sudo apt-get ruby 1.8.7 or something similar was what i did i think...
+[18:58:34] llaskin: i don't have RVM installed
+[18:58:48] dgempesaw has joined #selenium
+[18:58:58] llaskin: sudo apt-get install ruby1.8
+[IRC logfile - Started Mon Jun 18 19:01:27 2012]
+[19:01:27] jarib: on ubuntu precise, p352 is available from apt. 
+[19:02:15] llaskin: it is?
+[19:02:52] llaskin: how do i swtich to that?
+[19:03:01] eanxgeek: Looking for some help trying to get my remote (WD) tests to run against internetexplorer.
+[19:03:51] eanxgeek: Running IEDriverServer.exe on my windows machine, when I try to launch the tests from my Linux system I get a Connection timeout, this occurs ~60 - 90 seconds after hitting [enter] on the cli
+[19:04:29] jimevans: eanxgeek: yep. running the IEDriverServer.exe by itself doesn't allow for direct connections from remote machines.
+[19:04:44] eanxgeek: jimevans: do I have any options?
+[19:04:52] jimevans: use the java remote server on your windows machine.
+[19:05:26] eanxgeek: jimevans: I have / am trying that, I'm obviously missing something.
+[19:06:38] eanxgeek: cmdline reads java -jar selenium-server-standalone-2.23.1.jar -trustAllSSLCertificates -forcedBrowserModeRestOfLine *internetexplorer
+[19:07:11] eanxgeek: it appears I'm getting no activity, i.e. I'm in for a timeout
+[19:07:48] eanxgeek: jimevans: yup end result timeout
+[19:08:04] jimevans: eanxgeek: and how are you connecting with RemoteWebDriver? e.g. WebDriver driver = new RemoteWebDriver(…)
+[19:08:49] eanxgeek: jimevans: I'm using py.tests with a seleinum plugin, typically I would pass --browsername=.... --platform=.... --host=.... --port=4444
+[19:09:36] jimevans: okay, so i'm confused. is that using selenium rc or selenium webdriver under the covers?
+[19:09:41] *jimevans isn't a python guy
+[19:10:36] jimevans: if it's RC, then the IEDriverServer.exe won't know what to do with that anyway. it's webdriver only.
+[19:11:28] eanxgeek: jimevans: selenium WebDriver
+[19:11:47] eanxgeek: jimevans: with firefox on Linux and Chrome on Linux I have had no issue running this
+[19:12:13] jimevans: great. glad to hear chrome and firefox are working well for you.
+[19:12:17] jimevans: on linux
+[19:12:53] jimevans: does firefox or chrome work on your windows machine?
+[19:13:10] eanxgeek: haven't tried yet, but that verywell should be my next test
+[19:14:03] jimevans: indeed. if the problem is that the java remote server isn't able to open the port (due to firewall restrictions or some such), then it's not an IE-specific problem.
+[19:14:30] sfbrian has joined #selenium
+[19:14:39] jimevans: eanxgeek: one more thing. is IEDriverServer.exe on your path on the windows box?
+[19:15:13] llaskin: jarib: switching to 358, we'll see what happens
+[19:16:05] eanxgeek: jimevans: I have turned off the firewall completely
+[19:16:30] eanxgeek: jimevans: and I have IEDriverSErver.exe is in my path but I also dropped a copy of it in Windows\System32
+[19:17:16] eanxgeek: jimevans: and now I have tried both the standalone-server and the IEDriverServer.exe
+[19:17:20] jimevans: eanxgeek: that should be sufficient. the java server should be launching it if it's on the path.
+[19:17:42] jimevans: have you observed what happens on the windows machine?
+[19:17:58] jimevans: in other words, is there anything listed in the console log of the java server?
+[19:18:50] stackedsax has joined #selenium
+[19:21:35] eanxgeek: jimevans: well this is certainly a good sign, I guess, FF is timing out also
+[19:30:47] dawagner: Ok, I'm confused
+[19:30:58] dawagner: The test which is reliably failing in IE and Chrome on CI
+[19:31:08] eanxgeek: jimevans: ok I'm at a loss, I can telnet to the server on 4444, just like the remote wd connection, after a period of time the connection times out
+[19:31:15] dawagner: Passed when I grabbed a CI node and ran the test with exactly the same command line, against Sauce
+[19:31:23] farlan has left #selenium
+[19:31:31] eanxgeek: its like the standalone server is listening but not accepting requests
+[19:31:33] dawagner: (Ran the whole test suite, exact same command line)
+[19:32:18] farlan has joined #selenium
+[19:33:11] jarib: eanxgeek: :gist the output from the server?
+[19:33:11] selbot2: Please paste >3 lines of text to https://gist.github.com
+[19:33:51] jarib: i've seen the server take a really long time to launch if entropy is low, not sure if that applies to windows
+[19:34:07] jarib: (long time == several minutes)
+[19:35:02] eanxgeek: ~90s
+[19:35:12] eanxgeek: interesting, from my linux system nmap shows the port as filtered
+[19:35:25] eanxgeek: but I have the fw completely turned off, in services
+[19:38:21] hourback has left #selenium
+[19:38:33] skiphuffman_: Hey folks, who is the Grid expert today?
+[19:39:05] *skiphuffman_ looks for someone scurrying for the exit
+[19:40:16] skiphuffman_: Grid is not properly treating tests that are requesting the same resource.
+[19:41:19] skiphuffman_: I have one test node running Windows 7 and Internet Explorer 9.  If I have a test running against that, and someone else trys to start a test requesting that same set of capabilities, we are getting an error.
+[19:41:36] skiphuffman_: When I would expect the second request to be held by grid until the resource became available.
+[19:42:41] nirvdrum: skiphuffman_: Try changing the throwOnCapabilityNotPresent setting on the hub to false.
+[19:42:51] nirvdrum: It shouldn't affect anything, but it's something to try.
+[19:43:22] skiphuffman_: Will do
+[19:45:08] eanxgeek: jimevans: I got it
+[19:45:12] skiphuffman_: I assume just add this:     throwOnCapabilityNotPresent: True   to my configuration yml?
+[19:45:16] skiphuffman_: correct nirvdrum
+[19:45:19] skiphuffman_: ?
+[19:45:24] llaskin has joined #selenium
+[19:46:17] jimevans: eanxgeek: oh?
+[19:46:35] nirvdrum: skiphuffman_: That setting doesn't exist in configuration.yml.  configuration.yml only has grid 1 settings.
+[19:46:42] eanxgeek: had to re enable my firewall 
+[19:46:48] nirvdrum: You'd need to pass "-throwOnCapabilityNotPresent false" when you start up.
+[19:46:49] eanxgeek: and then grant full access to port 4444
+[19:46:55] nirvdrum: And it'll merge with the configuration.yml file.
+[19:46:58] skiphuffman_: Ah
+[19:47:00] skiphuffman_: ok
+[19:47:12] stephend has joined #selenium
+[19:47:20] eanxgeek: jimevans: that was for FF
+[19:47:39] nirvdrum: Kinda shitty, I know.  configuration.yml is maintained to help people transition to the new hub json config.
+[19:47:58] eanxgeek: now I'm trying to understand why I'm getting errors, test fails ~2 out of 3 times.
+[19:50:47] AutomatedTester: jimevans: have you seen #4101
+[19:50:49] selbot2: 03 open/new IEDriverServer crash on switchTo().alert() - https://code.google.com/p/selenium/issues/detail?id=4101 [Type-Defect Priority-Medium Status-Untriaged]
+[19:51:01] AutomatedTester: that is a great bug report!
+[19:51:03] jimevans: AutomatedTester: yes. i asked the reporter to submit it as a bug.
+[19:51:18] *AutomatedTester saw it on his email
+[19:52:03] AutomatedTester: lukeis: hotel I am in is across the road again
+[19:52:05] jimevans: yep. i think i know how to fix it, but i wanted to get it in the tracker, especially since he had the repro case already set up.
+[19:52:08] AutomatedTester: not the same one though
+[19:52:32] jimevans: AutomatedTester: oh, yeah, i just missed you. how was your trip?
+[19:52:37] lukeis: cool :) looking forward to seeing ya AutomatedTester 
+[19:52:48] *jimevans is starting his expense reports.
+[19:52:52] AutomatedTester: jimevans: my trip starts on Saturday
+[19:53:14] *lukeis likes that everyone comes to town to visit me ;)
+[19:53:20] jimevans: oh. right. i don't know why i thought you were on the west coast this week. :)
+[19:53:21] *AutomatedTester is organising beer events
+[19:53:46] AutomatedTester: jimevans: I must have said something to confuse people because a number of people thought I was in town this week
+[19:58:21] skiphuffman_: nirvdrum, sorry, that took a minute.  We start hub as a service and it took me some time to figure out where to stick the change.
+[19:58:35] skiphuffman_: And I did it wrong.
+[19:58:38] skiphuffman_: brb
+[IRC logfile - Started Mon Jun 18 20:11:21 2012]
+[20:11:21] skiphuffman_: uh oh.  nirdrum left.
+[20:12:49] *AutomatedTester knows he shouldnt get nervous when doing it but still get scared when committing to Firefox
+[20:18:18] umgeher has joined #selenium
+[20:18:18] umgeher has joined #selenium
+[20:20:35] farlan1 has joined #selenium
+[20:21:41] farlan1 has joined #selenium
+[20:22:59] santiycr has joined #selenium
+[20:28:29] llaskin has joined #selenium
+[20:29:10] llaskin has joined #selenium
+[20:35:29] Dome has joined #selenium
+[20:35:54] llaskin: y
+[20:37:34] AutomatedTester: because I just got to
+[20:37:52] skiphuffman_: Alrighty then.  I think 2.23.0 may have some major issues with windows test nodes.
+[20:38:09] AutomatedTester: skiphuffman_: try 2.23.1
+[20:38:22] AutomatedTester: if you are having issues with Firefox 13
+[20:38:31] skiphuffman_: Got a good reason?  or just "use latest"?
+[20:39:17] AutomatedTester: if its not working in version x try version x+1 if it exists
+[20:39:32] AutomatedTester: then people wont tell you to try version x+1
+[20:39:50] skiphuffman_: Understood, just asking whether that is what you were saying.
+[20:40:28] AutomatedTester: well since  "Alrighty then.  I think 2.23.0 may have some major issues with windows test nodes." has no information to help its the natural thing to say
+[20:40:38] hourback has joined #selenium
+[20:40:41] hourback has left #selenium
+[20:40:44] stackedsax has joined #selenium
+[20:42:23] skiphuffman_: Yeah, I was about to provide details.  Unless someone popped up with "Yeah, we know, you need to turn your keyboard over and shake to fix it"
+[20:43:03] skiphuffman_: I have a grid that includes Linux 12.04 nodes and Windows 7 and Windows Vista.
+[20:44:02] skiphuffman_: When I try to launch a test to windows, I often get one of a few errors, such as this WebDriverException: Message: u"Unable to bind to locking port 7054 within 45000 ms\nBuild info: version: '2.23.0', revision: '17137', time: '2012-06-07 15:43:04'\nSystem info: os.name: 'Windows Vista', os.arch: 'x86', os.version: '6.0', java.version: '1.6.0_25'\nDriver info: driver.version: FirefoxDriver" ; Stacktrace: Method lock threw an error in 
+[20:44:02] skiphuffman_: SocketLock.java"
+[20:44:47] skiphuffman_: We do have a perfectly reproducable case where Grid is NOT pausing jobs to wait for resources, but is instantly erroring them out.
+[20:45:08] skiphuffman_: Basically we can run tests from two location to one resource, say Vista with IE8
+[20:45:24] skiphuffman_: If one is already running, the other gets an instant error.
+[20:47:51] skiphuffman_: Also often when the resource is idle we will get the error mentioned earlier.
+[20:47:56] AutomatedTester: skiphuffman_: if the resource is being used then it should error
+[20:48:02] AutomatedTester: well thats how I would make it
+[20:48:59] skiphuffman_: No, AutomatedTester, it should let the test wait for the resource, until some timeout.  That is the way it used to work.
+[20:50:02] skiphuffman_: But even if it did error out, it should be more useful than this:  WebDriverException: Message: u'Connection refused: connect' ; Stacktrace: Method socketConnect threw an error in None
+[20:50:22] AutomatedTester: i agree the message should be better
+[20:51:45] skiphuffman_: We used to see something on the grid like "waiting for node"
+[20:59:46] skiphuffman_: It would also be FANTASTIC if we could tell which node had a failure
+[IRC logfile - Started Mon Jun 18 21:01:14 2012]
+[21:01:14] mdgreenfield has joined #selenium
+[21:08:23] mreedell has joined #selenium
+[21:08:28] Parabola: Write that yourself.
+[21:08:48] Parabola: mine logs which takes a shit
+[21:11:40] eanxgeek: anyone have any pointers on how to get around the untrusted certs with IE on Windows 7?
+[21:12:17] eanxgeek: I have "turned off" all zones, running the sel-standalone-server with -trustAllSSLCertificates and I'm running my tests with a --untrusted option
+[21:12:56] eanxgeek: w/ FF this works, I never get prompted to "continue" or "cancel" loading of a page due to a cert that can't be verified, with IE however, I am stopped.
+[21:13:07] mdgreenfield has left #selenium
+[21:14:11] adamgoucher has joined #selenium
+[21:16:39] bmulholland has joined #selenium
+[21:16:52] bmulholland: Hey, is anyone familiar with py.saunter?
+[21:18:29] *lukeis knows that some people here likely do :ask
+[21:18:30] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[21:18:51] bmulholland: Fair :)
+[21:20:42] bmulholland: In that case… why does SaunterTestCase assign self.driver in setup_method instead of setup_class?
+[21:21:51] bmulholland: Specifically, I need to set a cookie in my test setup. That requires (I think) the browser to be on the domain the cookie is for, which means loading a page in the setup. However, I'm trying to avoid any page loads in the method setup, since that means +1 page load per test
+[21:23:57] bmulholland: It makes more sense to me to set the driver in setup_class, then load one page in setup_class, which sets the context for my cookie. I can just override the SaunterTestCase method with the split I'm thinking, but that might break on future py.saunter upgrades
+[21:24:09] lukeis: sounds like you'll likely need / want to extend the base class and override the methods to suit your needs. I think the typical test pattern is that each test gets it's own state so that any previous tests will not mess with another
+[21:25:44] nirvdrum has joined #selenium
+[21:30:32] bmulholland: I guess that's part of my question… isn't WebDriver a singleton? If so, the setup_method will set self.driver to the same thing with every class… no point really
+[21:31:18] lukeis: py saunter appears to create the driver in the setup_method... so every test will get it's own new driver
+[21:31:41] bmulholland: Ah, the driver is actually different between them?
+[21:31:48] bmulholland: That would make sense then
+[21:31:50] lukeis: yes, i would guess so
+[21:32:02] bmulholland: cool, thanks
+[21:32:13] Dude-X: my test suite actually treats the driver as a singleton
+[21:32:18] Dude-X: but i didn't write it like that
+[21:32:58] lukeis: mine has a pool of drivers that can be used... and only one test can use one at a time ;)
+[21:33:33] Dude-X: i don't know how to change the code to spawn new instances
+[21:33:56] Dude-X: it's too bad i inherited a java project
+[21:33:57] AutomatedTester: adamgoucher: ^ re py.saunter
+[21:34:06] jsanchez011 has joined #selenium
+[21:34:15] lukeis: (wasn't going to call him out on it)
+[21:34:34] jsanchez011: Hi guys, I was here a week ago asking about the MoveTargetOutOfBoundsException and was asked to create a reproducible test case.. So I did here - http://code.google.com/p/selenium/issues/detail?id=4102&thanks=4102&ts=1340051615
+[21:34:53] adamgoucher: hello … bouncing icon
+[21:34:54] jsanchez011: If anyone can please take a look and run that I would appreciate it.. this issue has been failing many of our tests 
+[21:35:07] Dude-X: jsanchez011: and the element in question is in the viewport, and scrollable?
+[21:35:29] jsanchez011: you will just need to include the selenium-server-standalone-2.23.1.jar at the root of the directory for the classpath
+[21:35:41] adamgoucher: bmulholland: webdriver userd to be a singleton .. but now it is not
+[21:36:02] jsanchez011: Dude-X: I believe so yes, the exception is org.openqa.selenium.interactions.MoveTargetOutOfBoundsException: Element cannot be scrolled into view
+[21:36:14] bmulholland: adamgoucher: Gotcha. Are there any advantages to having a new self.driver for every test method?
+[21:36:17] jsanchez011: I included detailed instructions how to reproduce
+[21:36:22] jsanchez011: if anything is missing let me know
+[21:36:36] Dude-X: i'm not a maintainer but they can look at it
+[21:36:49] Dude-X: hopefully it's new case that doesn't involve visibility
+[21:36:55] adamgoucher: bmulholland: cleanliness, easier to parallelize, suites are built at run-time via marks
+[21:37:07] jsanchez011: what do you mean by doesn't involve visibility? 
+[21:37:20] Dude-X: you literally cant' see it in the browser
+[21:37:28] jsanchez011: oh no 
+[21:37:29] jsanchez011: its there
+[21:37:32] Dude-X: or it's obscured more than halfway
+[21:37:34] joar has joined #selenium
+[21:37:35] adamgoucher: bmulholland: also [kinda] forces independece of test methods rather than relying on some magic state
+[21:38:14] jsanchez011: but it fails if you make the browser small enough to cover the element, but passes if you maximize the browser fully
+[21:38:35] Dude-X: if it's covered, then it's expected to fail
+[21:38:52] Dude-X: if it's not obscured and you get that exception, then that's a bug
+[21:38:56] bmulholland: adamgoucher: Oh damn. Do you have any suggestions on how to do a method setup that does a magic login, then? I'm using requests to grab a logged in session cookie for each test. That works, but then I can't set the cookie without an extra page load
+[21:39:35] jsanchez011: but I don't understand, because there are elements on the page that are obviously not in the view of the browser, such as if a logout button is at the bottom of the page.. and it will scroll to it and click on it even tho it is not visible
+[21:39:42] jsanchez011: but in this case, it wont even scroll, just fails ut
+[21:39:44] jsanchez011: out*
+[21:39:51] jsanchez011: how can that be expected?
+[21:39:56] lukeis: jsanchez011: thx for the repro case, i've cc'd daniel who often is working on these related issues
+[21:40:09] Dude-X: the user should be able to scroll
+[21:40:27] Dude-X: if you can't scroll it, then webdriver can't scroll it
+[21:40:35] jsanchez011: yeah in this case the user is able to scroll too.. only difference is it is on a modal drop down
+[21:40:37] Dude-X: for example horizontal elements
+[21:41:01] lukeis: you can horizontal scroll in mac ;)
+[21:41:18] jsanchez011: yep
+[21:41:45] rpereira_ has joined #selenium
+[21:41:48] jsanchez011: i can scroll to it every time no matter how small the browser is.. but like i said the only difference in my case is this element is on a modal drop down
+[21:42:02] adamgoucher: bmulholland: somewhere i have an example of that. now to find it...
+[21:42:09] Dude-X: what's the mode in the dropdown?
+[21:42:28] noahsussman has joined #selenium
+[21:42:29] jsanchez011: how can I check that?
+[21:42:33] jsanchez011: not sure what the mode is
+[21:42:41] farlan has joined #selenium
+[21:43:17] jsanchez011: thanks lukeis for forwarding
+[21:43:44] bmulholland: adamgoucher: I'd really appreciate it :). I borrowed the idea from here, btw: http://element34.ca/blog/how-i-shaved-50-off-a-single-suite-run-a-write-up
+[21:43:45] Dude-X: i mean what makes the dropdown modal, does it prevent you from accessing other elements on the page
+[21:44:43] jsanchez011: no does not prevent from accessing other elements
+[21:44:52] jsanchez011: while it is up i can click on things outside of its scope
+[21:45:17] adamgoucher: bmulholland: right. so just load a[ny] page in your app, get the cookie with requests, inject it into the session, then self.driver.open('where you actually want to be) and you're golden
+[21:45:41] *lukeis likes to use a 404 page for that ^
+[21:45:56] noahsussman has joined #selenium
+[21:46:36] bmulholland: adamgoucher: so my method setup will have to go something like: load home page then magic login? No nice way to avoid the page load?
+[21:46:56] bmulholland: I guess one extra page load per test case isn't so bad
+[21:47:09] adamgoucher: nope. its a webdriver ism. users cant inject cookies into their session before it goes anywhere either
+[21:47:30] bmulholland: Yeah, that's fair
+[21:47:33] lukeis: that's a browser thing... not especially a webdriver thing
+[21:47:34] bmulholland: Cool, thanks a lot adamgoucher :)
+[21:47:41] bmulholland: lukeis: Yep
+[21:47:50] adamgoucher: bmulholland: have the devs put in a page that is just blank and load that one rather than having all the css and crap download
+[21:47:56] stackedsax has joined #selenium
+[21:48:04] bmulholland: adamgoucher: ooooh, great idea
+[21:48:06] lukeis: adamgoucher: another often requested feature that we can't/won't do? (cookie setting before page load) ;)
+[21:48:34] adamgoucher: lukeis: well, technically you could prime a custom profile...
+[21:48:45] lukeis: only with firefox...
+[21:49:22] bmulholland: One more question… what's the difference between setUp and setup_method?
+[21:50:06] bmulholland: Scratch that :)
+[21:51:21] adamgoucher: bmulholland: heh, ignoring the scratch, thats where the mess between unittest and py.test comes into play. medium-term, the unittest isms go away (but the asserts it provides are nice)
+[21:51:55] bmulholland: adamgoucher: Ah, so pretty much just avoid setUp?
+[21:52:07] bmulholland: that was my plan
+[21:53:18] adamgoucher: if you create a setUp, you need to make sure to call super(YourClass, self).setUp(). i think. will document that tonight (once i remember how :D)
+[21:55:13] bmulholland: Other way around, I think. webdriver.py, at least, sets setup_method
+[21:56:16] adamgoucher: i've been in php land for the last 2 weeks :D
+[21:57:54] bmulholland: it happens :)
+[21:58:04] bmulholland: Thanks again for the help!
+[IRC logfile - Started Mon Jun 18 22:02:37 2012]
+[22:02:37] stackedsax has joined #selenium
+[22:05:01] noahsussman has joined #selenium
+[22:05:24] mdgreenfield has joined #selenium
+[22:08:51] mdgreenfield has left #selenium
+[22:20:37] stackedsax: interesting thing my team is relating with the grid
+[22:21:38] stackedsax: if anyone cares: it seems that if we don't specify browser version tests will run at first and then start failing
+[22:21:52] stackedsax: as soon as we specify version, things are fine
+[22:22:29] nhirata has joined #selenium
+[22:23:45] AutomatedTester: stackedsax: first available one?
+[22:24:14] stackedsax: there are lots available
+[22:24:52] stackedsax: but it looks like if version isn't specified, grid eventually starts believing that no more browsers are avialable
+[22:25:44] stackedsax: grid knows to choose any old version if no version is specified, but eventually it runs its way through the entire list of available browsers
+[22:26:18] stackedsax: does anyone know how it chooses the version?  lowest version by default?
+[22:30:22] joar has joined #selenium
+[22:31:17] lukeis: stackedsax: i think this is the code: http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/selenium/server/browserlaunchers/BrowserLauncherFactory.java#80
+[22:32:34] stackedsax: thanks, I'll peruse
+[22:33:21] bsilverberg_ has joined #selenium
+[22:35:29] bsilverberg has joined #selenium
+[22:38:09] bsilverberg has joined #selenium
+[22:44:42] jibay_ has joined #selenium
+[22:47:32] jimevans: dammit, IE!
+[22:47:57] jimevans: screw you, IE. screw. you.
+[22:48:26] lukeis: heh :) as a UI developer for many years... i can't even count how many times i've said that
+[22:48:55] dmachi1 has joined #selenium
+[22:50:40] *AutomatedTester is so silly...
+[22:50:56] bsilverberg has joined #selenium
+[22:50:59] *AutomatedTester didnt have software on his mac and realised he can download it from the IT Dept
+[22:51:28] jimevans: okay, well that felt good to get off my chest. now for the real question at hand. should the alert interface be able to handle the message box on the beforeunload event that says "you're about to navigate away from the page"?
+[22:51:49] Dude-X: if that was automated that would be sweet
+[22:52:01] jimevans: (i have an opinion, but i'll keep it to myself for the moment)
+[22:52:04] Dude-X: but yes it should, it works in firefox
+[22:52:10] lukeis: i think we should support that...
+[22:52:21] lukeis: but i really hate it ;)
+[22:52:26] jimevans: it works in firefox? o_O
+[22:52:29] AutomatedTester: +1 for having to support it
+[22:52:42] Dude-X: i've been updating my tests to disable such navigation guards though
+[22:52:51] AutomatedTester: oh wait beforeUnload...
+[22:52:54] Dude-X: through injecting javacsript;
+[22:52:57] AutomatedTester: I guess we really should
+[22:53:06] AutomatedTester: Firefox definitely handles unload alerts
+[22:53:54] *lukeis has coded that on (small) two projects before... it's god awful user experience
+[22:54:25] jimevans: the "leave page/stay on page" dialog is the one i'm talking about.
+[22:54:31] lukeis: yep
+[22:54:31] jimevans: (just to be clear)
+[22:54:37] bmulholland: Argh! The documentation for python's add_cookie is wrong… that wasted a good hour :(. http://hustoknow.blogspot.ca/2011/08/using-addcookie-in-selenium-2.html
+[22:54:45] jimevans: and webdriver handles it fine for firefox?
+[22:54:52] jimevans: via the alert interface?
+[22:54:53] lukeis: bmulholland: which documentation?
+[22:55:05] *lukeis can fix it
+[22:55:07] Dude-X: yes, browser.switchTo.alert().accept() seems to work
+[22:55:27] bmulholland: lukeis: http://selenium-python.readthedocs.org/en/latest/api.html … not sure if that's official, though?
+[22:55:35] Dude-X: however the only problem is if we don't  have atomic functions for page object methods, then Firefox will hang
+[22:55:36] lukeis: that is not official
+[22:55:38] bmulholland: lukeis: Is there a better place to get documentation for it?
+[22:55:44] noahsussman has joined #selenium
+[22:55:48] Dude-X: :apidocs
+[22:55:48] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[22:55:51] lukeis: bmulholland: http://seleniumhq.org/docs/03_webdriver.html
+[22:56:01] lukeis: better is subjective
+[22:56:12] bmulholland: Yeah… I've found that one to be super hard to navigate/read
+[22:56:25] lukeis: it's not python specific... but has python samples
+[22:56:32] bmulholland: I just loaded it and have no idea where to find add_cookie, for example
+[22:56:45] lukeis: find in your browser :)
+[22:56:57] lukeis: http://seleniumhq.org/docs/03_webdriver.html#cookies
+[22:57:40] bmulholland: lukeis: Oh, I was looking at the apidocs
+[22:58:10] bmulholland: lukeis: I think the example is wrong there… secure seems to be required, for chrome at least
+[22:58:13] bmulholland: let me confirm...
+[22:59:01] lukeis: shouldn't be
+[22:59:25] stackedsax: lukeis: looking at that code to launch browsers, I think I'm looking for something slightly different
+[22:59:35] bmulholland: For non-secure cookies on Chrome, it's required
+[22:59:46] lukeis: well... yeah
+[22:59:48] bmulholland: from what I just tested, anyway
+[IRC logfile - Started Mon Jun 18 23:00:10 2012]
+[23:00:10] lukeis: oh, non-secure?
+[23:00:18] *lukeis goes to check :)
+[23:00:23] stackedsax: I'm looking through the hub's code now, for where it decides to choose one version over another if no version is specified…. if it does at all
+[23:00:42] bmulholland: lukeis: Yeah. Maybe it's that it assumes secure=true, then blows up when using http?
+[23:03:19] lukeis: bmulholland: just worked for me...
+[23:03:25] jimevans: g'night all~
+[23:03:27] jimevans has left #selenium
+[23:04:43] Dude-X: o/
+[23:06:27] lukeis: bmulholland: it's 'secure':True in python btw... I don't know if you're doing 'secure':'true' or something else
+[23:06:53] *lukeis goes to update the doc :)
+[23:07:21] bmulholland: lukeis: I'm doing 'secure': False…. if I omit that option from the cookie_dict, it errors out
+[23:07:45] lukeis: huh... i omit it and it works, what version of chromedriver?
+[23:07:51] bmulholland: ^_- odd
+[23:08:24] Dude-X: hmm jim left
+[23:08:49] Dude-X: the bitness of the IE server, does that mean run 32 bit IE on 64 bit IE or if the OS is 32 bit?
+[23:09:00] bmulholland: lukeis: version=19.0.1068.0
+[23:09:22] bmulholland: self.driver.add_cookie({"name": "session", "value": sessionid, "path": "/"}) # Error
+[23:09:27] stackedsax: lukeis: I wonder whether something here is tripping me up
+[23:09:28] stackedsax: http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/grid/selenium/proxy/DefaultRemoteProxy.java#246
+[23:09:57] lukeis: bmulholland: update to 1133? (what i'm using) :chromedriver
+[23:09:57] selbot2: https://code.google.com/p/selenium/wiki/ChromeDriver | https://code.google.com/p/chromedriver/downloads/list 
+[23:11:09] lukeis: stackedsax: are you specifying path to firefox binaries and versions in your grid config?
+[23:11:38] lukeis: then... yeah, maybe it is :)
+[23:12:49] Dude-X: seems like the browser bitness
+[23:13:41] stackedsax: lukeis: yes
+[23:17:54] bmulholland: lukeis: Still happening with 1133… that's weird.
+[23:18:25] stackedsax has joined #selenium
+[23:20:25] bmulholland: lukeis: https://gist.github.com/2951103
+[23:23:02] stackedsax: lukeis: someting like: https://gist.github.com/1307982
+[23:23:44] kennethkoontz has joined #selenium
+[23:24:17] lukeis: bmulholland: what OS are you on?
+[23:24:26] lukeis: stackedsax: ugh... windoze ;)
+[23:24:32] bmulholland: OS X 10.7
+[23:25:31] lukeis: hmm... i'm on 10.6.8... but your exception is not very helpful of chromedriver to be sending... message: null :-/
+[23:25:39] lukeis: err None
+[23:26:06] bmulholland: Tell me about it
+[23:26:17] bmulholland: That was the first thing I checked
+[23:26:33] lukeis: what version of Chrome (this shouldn't make a difference... but who knows :) )
+[23:31:49] joar_ has joined #selenium
+[23:32:41] stackedsax: lukeis: yes, the reason I hate life...
+[23:33:04] bmulholland: lukeis: 19.0.1084.56
+[23:33:10] bmulholland: sorry for the delay… multitasking at work :)
+[23:33:37] lukeis: ok... well, hmm, what version of selenium?
+[23:33:44] stackedsax: it feels to us like the grid is handing out firefox 3.6 browsers to start when no version is specified. 
+[23:33:59] lukeis: is it the first one registered?
+[23:34:06] stackedsax: yep
+[23:34:08] stackedsax: this is fine, until it runs out of those
+[23:34:16] stackedsax: and tries to hand out a different version
+[23:34:28] stackedsax: two problems, one ours, one hub's: 
+[23:34:40] stackedsax: ours: the other firefox versions should work
+[23:35:00] stackedsax: hub's: the 3.6 brosers should become available again after the tests are done
+[23:35:26] bmulholland: lukeis: 2.21. I'll upgrade now and test
+[23:35:34] lukeis: shouldn't matter...
+[23:36:00] lukeis: bmulholland: how are you creating your driver instance?  webdriver.Chrome or webdriver.Remote?
+[23:36:11] kennethkoontz: Anybody notice a difference in webdriver execution speed in 2.23? 
+[23:36:19] bmulholland: lukeis: I'm using py.saunter… let me check what it does
+[23:37:13] joar has joined #selenium
+[23:37:15] lukeis: bmulholland: it's doing Remote
+[23:37:36] stackedsax: lukeis: was "shouldn't matter" to me?
+[23:37:36] lukeis: so... where is your standalone server running? locally or on another box? ;)
+[23:37:42] lukeis: nope...
+[23:37:59] bmulholland: lukeis: locally
+[23:38:08] stackedsax: 'k, I'll let you finish this convo
+[23:38:16] lukeis: stackedsax: i'm not a grid expert (you know that i think...) so, this is a bit beyond me :)
+[23:38:27] stackedsax: 'k
+[23:38:42] lukeis: bmulholland: lemme try with a local server running too
+[23:40:01] joar has joined #selenium
+[23:40:35] lukeis: bmulholland: ok... i've reproduced your error
+[23:40:41] bmulholland: lukeis: wooo
+[23:40:41] lukeis: looks like a bug :-D
+[23:41:03] AutomatedTester: https://tbpl.mozilla.org/ <- red is bad right?
+[23:41:23] bmulholland: lukeis: Is there somewhere I can file that?
+[23:41:30] lukeis: :newissue
+[23:41:31] selbot2: https://code.google.com/p/selenium/issues/entry
+[23:41:54] lukeis: AutomatedTester: who let you touch the code ;)
+[23:43:05] lukeis: bmulholland: let me know the issue # when you log it
+[23:43:27] bmulholland: lukeis: Will do
+[23:44:08] AutomatedTester: lukeis: we are having really bad issues with our infra atm
+[23:44:47] lukeis: riiiiite... blame the tests not the code, didn't take long for you to become a 'dev' did it? :-{
+[23:44:50] lukeis: :-P
+[23:45:24] *lukeis likes harassing you
+[23:45:36] lukeis: s/harassing/trolling/
+[23:45:43] AutomatedTester: https://tbpl.mozilla.org/?tree=Mozilla-Inbound
+[23:45:49] AutomatedTester: look at that bad boy
+[23:46:18] AutomatedTester: The tree, the tree, the tree is on fire, we dont need no water let the mutha fucker burn!
+[23:48:51] Bebe_home has joined #selenium
+[23:50:07] joar has joined #selenium
+[23:50:41] bmulholland: lukeis: 4103 https://code.google.com/p/selenium/issues/detail?id=4103&thanks=4103&ts=1340059853
+[23:50:51] joar has joined #selenium
+[23:51:04] bmulholland: lukeis: I'm not entirely familiar with the details, so it would be nice if you could skim it and fill in anything I might have left out
+[23:51:43] andreastt has joined #selenium
+[23:51:44] eghm has joined #selenium
+[23:53:32] stackedsax: ok, I've discovered that my configuration for ff 8.0 must be broken, which is nice to find...
+[23:53:47] stackedsax: but this sorta confirms that the grid is doing something I wasn't expecting
+[23:55:03] bmulholland: lukeis: Just noticed… this is a dupe of a bug Adam filed back in January
+[23:55:17] lukeis: which #?
+[23:55:20] bmulholland: http://code.google.com/p/selenium/issues/detail?id=3268
+[23:55:41] AutomatedTester: #3268
+[23:55:42] selbot2: 03 open/new setting a cookie without one of the optional values (secure) null pointers through remote webdriver - https://code.google.com/p/selenium/issues/detail?id=3268 [Type-Defect Priority-Medium Component-WebDriver GettingInvolved]
+[23:56:13] bmulholland: That said… his bug is stuck as New, whereas mine just got accepted
+[23:57:07] lukeis: heh... that doesn't matter much :)
+[23:57:18] lukeis: adam has the ability to change it if need be
+[23:57:23] bmulholland: ah, fair
+[23:57:29] bmulholland: marked as a dupe now
+[23:57:33] lukeis: yup
+[23:57:33] bmulholland: but yeah, good to know
+[23:57:47] toxboi has joined #selenium
+[23:58:02] bmulholland: Thanks for the help lukeis :)
+[23:58:04] lukeis: we usually mark accepted the bugs we reproduce if the person isn't a committer
+[23:58:13] bmulholland: ah, that's fair
+[23:58:46] lukeis: we assume other committers aren't logging invalid issues ;)

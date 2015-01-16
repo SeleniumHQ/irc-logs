@@ -1,0 +1,519 @@
+[IRC logfile - Started Thu Jan 31 00:02:05 2013]
+[00:02:05] icio_ has joined #selenium
+[00:03:12] jcarr has left #selenium
+[00:06:23] KaibutsuX: AutomatedTester: yt?
+[00:13:49] kentor has joined #selenium
+[00:15:17] kentor: I'm trying to import browsermobproxy but am not able to do so with selenium, the issue is this import "from browsermobproxy import Server" -> ImportError: No module named browsermobproxy
+[00:15:29] kentor: I'm not sure how to install browsermobproxy so that python finds it
+[00:17:55] KaibutsuX: kentor: Im actually doign the same right now
+[00:18:14] KaibutsuX: you need to copy the bmp package to wherever your python path is
+[00:18:27] KaibutsuX: or use sys.path.append() to add the bmp path to it
+[00:24:03] kentor: where would I put the package exactly
+[00:24:26] kentor: would it be at this level /usr/lib64/python2.6/ ?
+[00:24:51] mreedell has joined #selenium
+[00:25:12] KaibutsuX: yes, if you put it in there, then it should be locatable
+[00:25:43] KaibutsuX: or you can do, sys.path.append('/tmp/browsermobproxy'); from browsermobproxy import Server
+[00:26:59] kentor: do I need to import system first
+[00:27:01] kentor: [sgalkov@zpub-web-203 ~]$ python display.py Traceback (most recent call last):   File "display.py", line 4, in <module>     sys.path.append("/home/sgalkov/browsermob/browsermob-proxy-2.0-beta-7") NameError: name 'sys' is not defined
+[00:27:34] KaibutsuX: import sys
+[00:27:51] kentor: ok got it
+[00:27:54] kentor: still doesn't work
+[00:28:16] kentor: I now have
+[00:28:16] kentor: import sys sys.path.append("/home/sgalkov/browsermob/browsermob-proxy-2.0-beta-7/") from browsermobproxy import Server
+[00:28:28] kentor: but i get
+[00:28:29] kentor: [sgalkov@zpub-web-203 ~]$ python display.py Traceback (most recent call last):   File "display.py", line 6, in <module>     from browsermobproxy import Server
+[00:28:57] KaibutsuX: is display.py your script
+[00:29:02] kentor: yes
+[00:29:37] KaibutsuX: there is no traceback
+[00:29:55] KaibutsuX: try it interactively to see what happens
+[00:30:00] kentor: sorry like this
+[00:30:01] kentor: [sgalkov@zpub-web-203 ~]$ python display.py Traceback (most recent call last):   File "display.py", line 6, in <module>     from browsermobproxy import Server ImportError: No module named browsermobproxy
+[00:30:19] KaibutsuX: did you unzip it?
+[00:30:25] kentor: same problem
+[00:31:14] KaibutsuX: oh you'll need to rename the directory to actually "browsermobproxy" instead of ...2.0-beta-7
+[00:32:33] kentor: :(
+[00:33:41] kentor: http://pastebin.com/QXq5NTLG
+[00:35:18] kentor: interactively I get the same error
+[00:35:22] kentor: how did you get yours to work
+[00:35:44] KaibutsuX: what's in bin?
+[00:36:11] kentor: [sgalkov@zpub-web-203 bin]$ ls browsermob-proxy  browsermob-proxy.bat  browsermob_test.py  test.py
+[00:36:33] KaibutsuX: you should have client.py and server.py somewhere
+[00:36:41] KaibutsuX: those are the actual python libs
+[00:36:52] kentor: really
+[00:37:04] kentor: i dont have those
+[00:37:14] kentor: can you show me what yours looks like
+[00:37:31] KaibutsuX: https://github.com/AutomatedTester/browsermob-proxy-py/tree/master/browsermobproxy
+[00:37:41] kentor: isn't it http://opensource.webmetrics.com/browsermob-proxy/
+[00:38:07] KaibutsuX: ohh, thats only the java libs
+[00:38:13] kentor: what are those for
+[00:38:19] KaibutsuX: AutomatedTester made the python bindings for it
+[00:38:34] KaibutsuX: I think you still need the browsermob-proxy.bat to actually start the binary
+[00:38:40] KaibutsuX: but I can't get it to work
+[00:38:42] sayd: so i realize i cant do a click() on an element that loads a page and immediately do a wait. but i dont get how to wait for that element on the loading page to be ready
+[00:39:08] KaibutsuX: WebDriverWait
+[00:39:20] KaibutsuX: for ele
+[00:39:26] fatguylaughing has joined #selenium
+[00:39:35] KaibutsuX: sayd: but if the ele is an <a> with an href, it will wait
+[00:40:07] sayd: just .until(lambda d: wd.find_element_by_id("my_submit_button_id"))
+[00:40:08] sayd: ?
+[00:40:34] sayd: and then another .until(element_is_clickable) ?
+[00:40:58] KaibutsuX: i would assume locating it is the same as is_clickable, I dont know what that means
+[00:41:12] KaibutsuX: but your first one should work, although I'm not familiar with the .until
+[00:41:15] kentor: ok i cloned that repo
+[00:41:26] kentor: however still same issue
+[00:42:15] KaibutsuX: kentor: you'll still need to put that repo where python can find it or sys.path it 
+[00:42:32] kentor: yes one sec, that's what i did
+[00:42:36] kentor: one sec ill show you
+[00:42:39] kentor: maybe im missing something else
+[00:43:46] sayd: yeah i dont know why its not finding it in the script. it works through interpreter
+[00:43:56] kentor: http://pastebin.com/b5QC5guq
+[00:43:58] KaibutsuX: probably relative path issue
+[00:44:59] KaibutsuX: oh yeah, you can't be inside the browsermobproxy if you do from []
+[00:45:09] KaibutsuX: the from [] means, looks for this directory or file
+[00:45:19] KaibutsuX: so be one dir up from browsermobproxy
+[00:45:26] KaibutsuX: OR do from server import Server
+[00:45:38] KaibutsuX: which means from [file] import [class]
+[00:46:54] kentor: hrmm, i am running it 2 dirs up from browserproxy
+[00:46:57] kentor: no?
+[00:47:27] KaibutsuX: then your sys.path should append one dir up from browsermobproxy
+[00:47:50] KaibutsuX: when you say from [browsermobproxy] it means look in the PATH for either a file or folder name "browsermobproxy"
+[00:48:14] KaibutsuX: and goddamnit, the .bat file relies on java being installed
+[00:48:18] KaibutsuX: thats why mine won't start
+[00:48:33] kentor: ahhh I got a new error!
+[00:48:40] kentor: I understand what you mean
+[00:48:49] kentor: thats some progress
+[00:48:53] KaibutsuX: good
+[00:48:58] kentor: but now
+[00:49:31] kentor: http://pastebin.com/BE8GqjCX
+[00:50:38] KaibutsuX: I think it relies on the requests module
+[00:50:41] KaibutsuX: which isn't standard
+[00:50:52] KaibutsuX: http://docs.python-requests.org/en/latest/
+[00:52:09] icio has joined #selenium
+[00:52:50] kentor: getting selenium + headless browser + browsermobproxy is the most difficult package installation i've ever done :)
+[00:52:59] kentor: ok let me try to figure out how to get the requests module in there
+[00:53:15] KaibutsuX: you know, you don't necessarily need headless, you can use the HTMLUNIT browser
+[00:53:32] KaibutsuX: and why do you need browsermob anyway?
+[00:54:56] kentor: i haven't come across htmlunit
+[00:55:02] kentor: i want to produce a .har file
+[00:55:25] kentor: i want to run selenium with browsermob on a remote linux box without GUI 
+[00:55:32] kentor: to get the .har file
+[00:56:13] kentor: ok it worked
+[00:56:20] kentor: lets see if the script works now
+[00:57:54] sayd: so click() and until() should be all i need when click opens a page right
+[00:57:59] KaibutsuX: you know if you just want a har file with no interaction: https://github.com/snoe/harToCurl/blob/master/harToCurl
+[00:58:20] KaibutsuX: sayd: I believe so
+[00:58:28] KaibutsuX: what is the click actually doing?
+[00:58:50] sayd: maybe something is wrong with my wait: wait.until(lambda d: wd.find_element_by_id("edit-delete"))
+[00:59:00] sayd: KaibutsuX: click is submitting a form
+[00:59:07] sayd: its an input type=submit
+[00:59:16] KaibutsuX: the you don't even need the wait
+[00:59:18] KaibutsuX: *then
+[00:59:28] KaibutsuX: webdriver will wait until the page loads before it proceeds
+[00:59:36] kentor: oh interesting, but I would like to build a framework that will also test for some things and I think selenium works well for that
+[00:59:50] KaibutsuX: it only gets really complicated if your onclick does a lot of JS and then manually manipulates the url like window.location
+[00:59:54] KaibutsuX: then you would need a wait
+[IRC logfile - Started Thu Jan 31 01:00:17 2013]
+[01:00:17] KaibutsuX: and I think the problem with your lambda is you did lambda d: [wd] - should be d.find_element...
+[01:01:33] sayd: KaibutsuX: cool! I got rid of the wait and it worked :)
+[01:01:49] KaibutsuX: cool
+[01:01:50] sayd: and I think that d/wd confusion was prob why it was never firing
+[01:02:00] sayd: i'll store it in the brainum for next time
+[01:02:28] KaibutsuX: kentor: I think you might check out webdriver.Remote() if you want to run a headless without any need for virtualdisplay
+[01:02:42] KaibutsuX: im out
+[01:02:44] KaibutsuX: night
+[01:02:55] kentor: ok thank you so much for your help
+[01:02:57] KaibutsuX: np
+[01:03:03] kentor: really, thank you very very much :)
+[01:05:14] nirvdrum has joined #selenium
+[01:05:32] kentor: only thing left is to figure out why proxy.har is not returning any output
+[01:05:47] kentor: it should return a JSON object
+[01:08:28] plightbo_work has joined #selenium
+[01:09:32] nirvdrum: kentor: Did you grab the latest BrowserMob Proxy?  There were some fixes around HAR collection, IIRC.
+[01:12:03] kentor: I have http://dl.dropbox.com/u/1995643/browsermob-proxy/browsermob-proxy-2.0-beta-7-bin.zip
+[01:12:34] kentor: when I run the python script, do I need to start selenium server or run bmp prior to that
+[01:12:40] kentor: or just run the python script
+[01:13:18] kentor: from my script -> http://pastebin.com/x0yzde7x
+[01:13:34] kentor: i see
+[01:13:34] kentor: [sgalkov@zpub-web-203 ~]$ python display.py Google [sgalkov@zpub-web-203 ~]$
+[01:13:40] kentor: "Google" so selenium works
+[01:13:52] kentor: "Google" so webdriver works*
+[01:14:01] kentor: and the proxy isn't throwing errors
+[01:25:30] gia has joined #selenium
+[01:28:56] stepheneb has joined #selenium
+[01:50:46] stackedsax1 has joined #selenium
+[01:52:19] mbersoult has joined #selenium
+[IRC logfile - Started Thu Jan 31 02:10:52 2013]
+[02:10:52] stackedsax has joined #selenium
+[02:32:10] aweiteka has joined #selenium
+[02:38:04] admc has joined #selenium
+[02:49:40] riotz has joined #selenium
+[02:54:35] stepheneb has joined #selenium
+[02:58:04] knorrium_ has joined #selenium
+[IRC logfile - Started Thu Jan 31 03:07:52 2013]
+[03:07:52] stackedsax has joined #selenium
+[03:14:32] towski has joined #selenium
+[03:15:42] stepheneb_ has joined #selenium
+[03:35:36] DarkRift has joined #selenium
+[03:35:36] DarkRift has joined #selenium
+[03:45:18] rananda has joined #selenium
+[IRC logfile - Started Thu Jan 31 04:13:37 2013]
+[04:13:37] millenium_ has joined #selenium
+[04:14:16] elopio has joined #selenium
+[04:16:54] millenium_ has joined #selenium
+[04:20:44] millenium_ has left #selenium
+[04:23:50] stephend has joined #selenium
+[04:26:44] plightbo_work has joined #selenium
+[04:46:03] stepheneb has joined #selenium
+[04:57:30] Brendon has joined #selenium
+[IRC logfile - Started Thu Jan 31 05:05:52 2013]
+[05:05:52] jeichar has joined #selenium
+[05:07:17] millenium_ has joined #selenium
+[05:07:31] millenium_ has left #selenium
+[05:07:32] millenium_ has joined #selenium
+[05:07:38] millenium_ has left #selenium
+[05:07:40] millenium_ has joined #selenium
+[05:09:37] stephend has joined #selenium
+[05:12:01] millenium_ has left #selenium
+[05:12:04] millenium_ has joined #selenium
+[05:12:13] millenium_ has left #selenium
+[05:19:31] meritum has joined #selenium
+[05:28:42] girija_ has joined #selenium
+[05:31:00] millenium_ has joined #selenium
+[05:31:02] sayd has joined #selenium
+[05:31:42] kaawee has joined #selenium
+[05:43:15] barancev has joined #selenium
+[05:43:15] selbot2: barancev: note from santiycr about 7 hours ago: the job you pasted is a legit selenium failure to start the browser. Look at the log: https://saucelabs.com/jobs/5ac421750f314f3c9907ae391ef2cf63/selenium-server.log 
+[05:43:16] selbot2: barancev: note from santiycr about 7 hours ago: Sauce has a way to retry launching browsers when this happens, but it's disabled for selenium-ci as thei are issues that make selenium unreliable and need to be addressed from the selenium end 
+[05:54:26] millenium_ has left #selenium
+[05:54:28] millenium_ has joined #selenium
+[05:58:37] admc has joined #selenium
+[IRC logfile - Started Thu Jan 31 06:27:24 2013]
+[06:27:24] stephend has joined #selenium
+[06:36:18] jeichar has joined #selenium
+[06:36:49] rananda has joined #selenium
+[IRC logfile - Started Thu Jan 31 07:06:28 2013]
+[07:06:28] kaawee_ has joined #selenium
+[07:29:06] rananda has joined #selenium
+[07:31:28] millenium__ has joined #selenium
+[07:31:28] papegaaij has joined #selenium
+[07:48:18] zeljkof has joined #selenium
+[IRC logfile - Started Thu Jan 31 08:10:29 2013]
+[08:10:29] rbalent has joined #selenium
+[08:10:30] rbalent has joined #selenium
+[08:12:26] rbalent has joined #selenium
+[08:12:26] rbalent has joined #selenium
+[08:17:15] testingb0t has joined #selenium
+[08:26:59] Ardesco has joined #selenium
+[08:36:41] Hronom has joined #selenium
+[08:38:58] millenium__ has left #selenium
+[08:38:58] millenium__ has joined #selenium
+[08:56:37] jamesoram has joined #selenium
+[08:59:38] millenium_ has joined #selenium
+[IRC logfile - Started Thu Jan 31 09:05:59 2013]
+[09:05:59] freynaud has joined #selenium
+[09:08:25] floppyears has joined #selenium
+[09:23:23] stan has joined #selenium
+[09:27:13] zac_sel has joined #selenium
+[09:28:46] anix has joined #selenium
+[09:29:37] anix: Hi , need some help on PhantomJS. I am unable to open a secured intranet site using PhantomJS driver...any suggestions?
+[09:30:25] anix: Invoking driver with following cmd: phantomjs --ignore-ssl-errors=true --local-to-remote-url-access=true --webdriver=4444
+[09:32:20] annette_ has joined #selenium
+[09:39:15] alkemist has joined #selenium
+[09:47:06] annette_ has left #selenium
+[09:53:01] freynaud has joined #selenium
+[IRC logfile - Started Thu Jan 31 10:02:42 2013]
+[10:02:42] Ardesco: hmm i see more and more questions on the se users list that I start typing a reply to and then halfway through think, "I  just can't say anything sane in response to this" then delete it nowadays :(
+[10:02:44] sburjan has joined #selenium
+[10:13:43] jamesoram has joined #selenium
+[10:17:07] stackedsax has joined #selenium
+[10:22:01] Quadlex: Ardesco: Because the questions show an understanding gap?
+[10:23:19] Ardesco: Well it's things like: IE causes JavaScript errors which breaks IEDriver.  How do I fix IE driver
+[10:23:31] Ardesco: The answer is fix your decking JavaScript
+[10:23:51] Ardesco: but people don't want to do that they want to work around problems in their codebase to just make tests pass
+[10:23:59] Ardesco: It kind of defeats the point of testing
+[10:24:04] *Ardesco is a sad panda
+[10:26:24] Ardesco: I just noticed that my irc client autocorrected fecking to decking.  Nice...
+[10:26:29] megha has joined #selenium
+[10:26:39] Ardesco: :yt south park sad panda
+[10:26:40] selbot2: ...that makes me a sad panda (South Park) - http://www.youtube.com/watch?v=oGn-FGTxRdA&feature=youtube_gdata
+[10:31:09] anix: I am unable to open a secured intranet site using PhantomJS driver...any suggestions?
+[10:32:49] smoke_ has left #selenium
+[10:32:53] smoke_ has joined #selenium
+[10:44:36] icio has joined #selenium
+[10:52:22] milligan has left #selenium
+[IRC logfile - Started Thu Jan 31 11:07:22 2013]
+[11:07:22] davehunt has joined #selenium
+[11:18:33] zac_sel has joined #selenium
+[11:22:48] megha has joined #selenium
+[11:38:27] carljokl has joined #selenium
+[11:39:29] carljokl: Is anyone active in this chat right now?
+[11:42:51] alkemist has joined #selenium
+[11:44:07] carljokl: *tumbleweed*
+[11:45:22] vimto: carljokl: Just ask your question, someone may be able to help
+[11:45:54] carljokl: I posted a question on the Google group but thought I could ask on here as well
+[11:46:13] carljokl: Does anyone "Own" the Android Web Driver part of the project right now?
+[11:48:11] carljokl: I know that for quite a while it was kind of a Google driven effort.
+[11:48:23] carljokl: But I thought there has been some moving around since then.
+[11:48:42] carljokl: I don't know if anyone is in charge of maintaining it or the technical direction anymore.
+[11:51:10] knorrium has joined #selenium
+[11:54:46] Nari1110 has joined #selenium
+[11:56:15] caddoo has joined #selenium
+[11:59:39] girija_ has joined #selenium
+[IRC logfile - Started Thu Jan 31 12:03:14 2013]
+[12:03:14] davehunt_ has joined #selenium
+[12:07:27] RossPatterson has joined #selenium
+[12:07:27] ChanServ has altered RossPatterson's mode: +o
+[12:20:30] jimevans has joined #selenium
+[12:20:58] jimevans: G'day everybody. 
+[12:21:44] RossPatterson: carljokl: There is no Android "owner", but it gets some activity.  What's your real question?
+[12:21:47] samphippen has joined #selenium
+[12:24:55] carljokl: There are quite a number of things about the Android Web Driver that could be improved
+[12:25:10] carljokl: I am pushing Shazam to let me join the project as a contributor.
+[12:25:52] freynaud has joined #selenium
+[12:25:53] carljokl: I had achieved quite a few things as a proof of concept at Electronic Arts to instrument a test application there.
+[12:26:28] carljokl: While the knowledge is still fresh in my mind I hoped to get involved in the project to see if I could improve the Android driver in general
+[12:26:56] carljokl: However there are a number of things I think could be done differently but that would likely need some negotiation.
+[12:27:17] RossPatterson: You should wave at simonstewart and dawagner when they check in to the channel.
+[12:28:01] RossPatterson: Also lukeis.
+[12:28:16] h8R has joined #selenium
+[12:28:28] RossPatterson: All of whom are conveniently absent at the moment :-)
+[12:30:02] jimevans: Well to be fair, it is like 0430 in lukeis' part of the world. :)
+[12:30:17] h8R has joined #selenium
+[12:31:08] carljokl: Sleep is for lesser mortals.
+[12:31:25] RossPatterson: I was thinking more of the limeys :-)
+[12:31:29] RossPatterson: But yes.
+[12:31:30] jimevans: Tell me about it. 
+[12:31:55] carljokl: Google did a lot of the Web Driver development. I was under the impression that some key people or a key person involved moved on to doing other things.
+[12:32:09] RossPatterson: Yes, yes, and no.
+[12:32:11] carljokl: Shazam has a partnership relationship with Google anyway
+[12:32:30] carljokl: It there is work going on then it could be good to collaborate.
+[12:32:40] RossPatterson: simonstewart is still heavily involved.  He's as close to a Top Banana as we have, but he's not at Google any more.
+[12:32:54] carljokl: Shazam in Hammersmith and Google in Victoria
+[12:33:04] RossPatterson: Google is everywhere :-)
+[12:33:07] carljokl: We are just a district line train journey apart.
+[12:33:27] RossPatterson: How do you spell "color"?
+[12:33:28] carljokl: The current Google main development office in London
+[12:33:37] *RossPatterson detects another guy east of the Atlantic :-)
+[12:33:39] carljokl: Does it matter?
+[12:33:43] RossPatterson: No :-)
+[12:34:00] RossPatterson: Just that we have several very active folks in London on this project.
+[12:34:04] carljokl: I think we can put our differences behind us……for Selenium
+[12:34:10] carljokl: (you monster)
+[12:34:26] RossPatterson: LOL
+[12:34:59] jimevans: Much of the project has a distinct British flavour anyway. 
+[12:35:36] *jimevans checks to see if his favourite South African is online
+[12:36:03] RossPatterson: It's quiet in here.  Too quiet.
+[12:36:30] jimevans: How the hell do you have a surgery center without wifi in the waiting room?!?!
+[12:36:41] carljokl: British flavour? Does that mean it suffers from excessive bureaucracy?
+[12:37:28] jimevans: Unfailingly polite. Even when it probably shouldn't be. :)
+[12:38:21] RossPatterson: jimevans: Yeah.  Medical attitudes towards RFI have changed a lot in the last decade.  Took my son to the hospital a few months back, and instead of a "please  turn off your cell phones" sign, they asked for a cell number for the nurses to call inside the hospital.
+[12:39:01] carljokl: Just as long as it doesn't turn into a "Heathrow Terminal 5"
+[12:39:24] jimevans: The Wife is already back in pre-op. 
+[12:39:36] girija_ has joined #selenium
+[12:40:22] RossPatterson: carljokl: simonstewart is the current Benevolent Leader for Life Or Whatever, and has joined Facebook.  He's one of the Londoners, as is dawagner (who's at Google).  And AutomatedTester seems to visit there frequently enough to know the local pubs.
+[12:43:02] jimevans: detronizator (GhostDriver/PhantomJS guy) is local to London too. 
+[12:44:07] carljokl: I guess Facebook are another partner
+[12:44:44] stepheneb has joined #selenium
+[12:45:38] carljokl: The person who has been heading up the Android test automation in Shazam is leaving
+[12:46:06] carljokl: (something about being in love and getting married, like whatever…priorities)
+[12:46:25] carljokl: I am being looked to to take over his work on Android automation
+[12:46:48] carljokl: I did a lot of work trying to beat Android Web Driver into submission
+[12:47:24] jimevans: carljokl: As a general rule, we love contributions. 
+[12:48:18] carljokl: I am pushing for a decision from legal as to whether I can join as an official contributor
+[12:48:36] carljokl: In the mean time I thought I could ask questons
+[12:49:32] carljokl: I disagree with some of the code architecture
+[12:49:38] jimevans: Be careful though. You start by joining as a contributor, and end up owning part of the project in perpetuity. And that way lay madness. Insanity. Crankiness. 
+[12:49:44] ShishKabab has joined #selenium
+[12:49:52] carljokl: More so than usual?
+[12:50:21] jimevans: I used to be a reasonably friendly chap. 
+[12:50:33] jimevans: Then IE happened. 
+[12:50:48] carljokl: I achieved things at Electronic Arts with the Android Web Driver that I am not sure others have done
+[12:50:59] carljokl: However that was just a proof of concept
+[12:51:31] ShishKabab: How do I debug failing Selenium tests in Python? I have a test that only fails when using Selenium, not when testing it by hand. Is there any way to use FireBug or make console.log() print to my terminal?
+[12:51:36] carljokl: I think that there are a number of classes that would do better to have separate lighter weight and Android specific implementations
+[12:51:36] jimevans: When you say you disagree with some of the architecture, can you elaborate on that? 
+[12:52:11] carljokl: I think the Android code should be kept separate to the desktop Java code
+[12:52:59] carljokl: I think the Android Library ends up more bloated than it needs to be with bits of code that is only applicable to desktop
+[12:53:13] carljokl: For example I eliminated the dependency on external storage
+[12:53:36] carljokl: I think this exists due to the common implementation of the TemporaryStorage class
+[12:54:42] carljokl: I created an Android version that can use whatever the default cache location was for the Android app and then it could just happily use internal storage or external or whatever Android prefers.
+[12:54:46] carljokl: It seemed to work fine
+[12:54:53] carljokl: It was a proof of concept though
+[12:55:04] carljokl: I just completed it before leaving EA
+[12:55:21] carljokl: If I wanted to contribute back I would wish to do a lot more testing
+[12:55:45] jimevans: I've honestly never looked at the android code at all. Too much else to worry about. 
+[12:55:53] carljokl: I was also working on getting the Android Web Driver compatible with Android 2.2
+[12:56:09] carljokl: That was the base support for the EA project. At Shazam it is Android 2.1
+[12:56:33] carljokl: Supporting only 4.0+ seems really poor as it eliminates testing for a lot of devices out there.
+[12:56:54] carljokl: I don't think supporting 2.1/2.2 even if it is with a subset of functionality is unrealistic
+[12:57:30] carljokl: Some of the functionality worked with Android 2.2 when I eliminated the API dependencies.
+[12:57:45] carljokl: Some bits did not but I did not have time to find out why
+[12:58:28] carljokl: Also the Android Web Driver suffers from random ClassCastExceptions. I have a theory as to why this is happening and a potential fix.
+[12:58:48] carljokl: Concurrency issues though are notoriously tricky to diagnose and reproduce.
+[12:58:59] carljokl: Anyway I may just be talking at you at this point.
+[12:59:22] carljokl: Better stop for breath (metaphorical breath I know I am touch typing)
+[IRC logfile - Started Thu Jan 31 13:00:09 2013]
+[13:00:09] RossPatterson has joined #selenium
+[13:00:09] ChanServ has altered RossPatterson's mode: +o
+[13:00:11] Ardesco: carljokl: why don't you just offer up your improvements as pull requests
+[13:00:20] jimevans: Well it's good you're passionate about it.
+[13:00:57] carljokl: The reason I am pushing for being a contributor is I would like to work on the problems while they are fresh in my mind
+[13:01:25] carljokl: If I wait until I get back to a specific web test I may have forgotten where I had got to on my EA prototype
+[13:01:33] Ardesco: you don't need the tag of contributor to contribute though
+[13:02:01] carljokl: I also proved with some modification, the Android Web Driver code can be used to instrument a WebView in another app.
+[13:02:58] carljokl: Don't I?
+[13:03:10] carljokl: I have never contributed so far to know either way.
+[13:03:30] Ardesco: well I would suggest that the path to being a contributor is to contribute code 
+[13:03:53] ShishKabab: Is there any way of executing a script on a page before the page will load? This would enable me to patch console.log()
+[13:03:58] carljokl: However to contribute code, don't I need to get some approval about what I plan to change?
+[13:04:03] Ardesco: and then as you contribute more and more good code people with the commit bit will say "shit this guy knows his stuff, lets give him a commit nit"
+[13:04:26] Ardesco: anybody can check out the code, make changes and do a pull request
+[13:04:29] *Ardesco has
+[13:04:33] carljokl: I am all Sun Certified don't you know (for those who even care)
+[13:05:02] jimevans: carljokl: Now that the project has migrated to Git, you can fork the project mirror on GitHub and code away. 
+[13:05:04] Ardesco: it will either be accepted, you will be asked why you did things and suggestions to make it acceptable will be made
+[13:05:09] Ardesco: or it will be rejected
+[13:05:15] simonstewart has joined #selenium
+[13:05:51] Ardesco: I guess what I'm saying is you don't need a commit bit to get involved
+[13:05:53] Ardesco: :)
+[13:05:54] carljokl: Would this be the Simon Steward you mentioned?
+[13:06:12] carljokl: Stewart
+[13:06:17] carljokl: *sigh*
+[13:07:09] carljokl: Albeit I am kind of hungry and should think about lunch
+[13:07:10] Ardesco: and that is simonstewart yes 
+[13:07:31] carljokl: …..but Simon Stewart is here…..and….I haven't talked to him yet.
+[13:07:49] simonstewart: Here now. 'sup?
+[13:08:03] carljokl: Greetings….
+[13:08:08] simonstewart: Hi!
+[13:08:12] Ardesco: with looking at the :log probably :)
+[13:08:12] selbot2: http://illicitonion.com/selogs/selenium/2013/01/31.txt | http://illicitonion.com/selogs/search
+[13:08:20] carljokl: I am Carl Jokl of Shazam, formerly of Electronic Arts
+[13:08:56] carljokl: I was involved in mobile and web test automation at EA and now am part of the Android test automation team at Shazam
+[13:08:57] simonstewart: Hi Carl. Love shazam. You've settled more than a few disputes in the pub for me :)
+[13:09:07] simonstewart: Ah! Where are you based?
+[13:09:09] simonstewart: London?
+[13:09:12] carljokl: Yes
+[13:09:34] simonstewart: Just reading the logs.
+[13:09:38] carljokl: Trying to leave behind my Yorkshire heritage but that is another story
+[13:09:50] simonstewart: No-one owns the Android Driver right now, but it does need some TLC
+[13:10:01] simonstewart: carljokl: coming to acculondon tonight? I'll be there
+[13:10:03] carljokl: Indeed it does
+[13:10:09] simonstewart: :)
+[13:10:11] simonstewart: Or :(
+[13:10:15] simonstewart: Depending on how you look at it
+[13:10:54] carljokl: Gah! that would have been a good opportunity to meet but alas I have some paperwork to do for a volunteer responsibility I have
+[13:11:03] carljokl: I need to be elsewhere this evening
+[13:11:11] simonstewart: Google did do a lot of the initial work. Dounia, who was basically _the_ person moved on to a different project
+[13:11:15] jeichar has joined #selenium
+[13:11:27] simonstewart: OK. Well, I live here. Plenty of time to meet up :)
+[13:11:33] carljokl: However if you are in London, I have a tube pass an everything and could stalk you….I mean find another time when we could meet
+[13:11:46] simonstewart: I work at Facebook now
+[13:11:51] simonstewart: (42 Earlham Street, London)
+[13:12:09] carljokl: I like Facebook
+[13:12:33] carljokl: It helps me maintain a sense of friendship with the people who I ditched in exchange for London living.
+[13:12:38] carljokl: Or something like that...
+[13:12:50] simonstewart: Ha!
+[13:13:03] carljokl: Doesn't Facebook use a lot of PHP?
+[13:13:20] simonstewart: We do. I seem to be neck deep in Java right now, though
+[13:13:50] carljokl: Java is everywhere (maybe that is more true than even the Sun marketing implies)
+[13:13:58] carljokl: I miss Sun
+[13:14:01] jimevans: The Wife says hi and thanks for the well wishes. 
+[13:14:02] carljokl: But I digress
+[13:14:24] simonstewart: So, reading the logs. Points to mention
+[13:14:44] simonstewart: We rearranged the CLA to make it easy for companies to allow an individual to join the project
+[13:14:45] simonstewart: :cla
+[13:14:45] selbot2: http://goo.gl/qC50R
+[13:15:01] simonstewart: We have wording for a full corp CLA if necessary too
+[13:15:24] simonstewart: Changing the architecture of the android driver is cool so long as it continues to work :)
+[13:15:30] p_l: CLA?
+[13:15:40] simonstewart: Contributor License Agreement
+[13:15:42] p_l: ah
+[13:15:45] carljokl: I joined as an individual already (but to be honest that was just because EA denied my request to join officially on behalf of the). If I can join officially on behalf of Shazam I would prefer to be all official.
+[13:15:49] simonstewart: Basically it says that it's cool for you to donate your code
+[13:16:01] carljokl: When you say continues to work
+[13:16:04] *p_l has a different meaning for CLA which is a bunch of apparently badly documented code on top of Hibernate
+[13:16:14] simonstewart: carljokl: "doesn't fail any more than it already does"
+[13:16:22] carljokl: Just checking
+[13:16:24] simonstewart: p_l: ah
+[13:16:25] simonstewart: not that
+[13:16:57] carljokl: I was just walking along on my way to South Kensington station as people are want to do an a cause of the ClassCastExceptions occurred to me.
+[13:16:58] simonstewart: Approval for changes? Start small, let us know what your code is like, and then build up
+[13:17:17] simonstewart: Other than the obvious :)
+[13:17:33] carljokl: The thing about Android is that it is kind of self contained, insulated by communication links
+[13:17:34] simonstewart: It's a deserialization problem probably caused by the JsonToBeanConverter
+[13:17:35] p_l: carljokl: lol
+[13:18:06] simonstewart: Probably
+[13:18:13] simonstewart: :seen dawagner
+[13:18:13] selbot2: dawagner was last seen about 19 hours ago, quitting.
+[13:18:14] carljokl: That I think is a symptom
+[13:18:22] carljokl: I think what may be happening
+[13:18:28] simonstewart: There's also a bunch of code being executed on the wrong thread.
+[13:18:32] simonstewart: But we don't talk about that
+[13:18:37] carljokl: Is due to the JavaScript response being handled in a static context
+[13:19:13] carljokl: Meaning the response to one request could accidentally overwrite the response to a different request
+[13:19:33] aweiteka has joined #selenium
+[13:19:52] simonstewart: The internals are messy and not terribly thread safe
+[13:19:57] simonstewart: 'tis true
+[13:20:04] carljokl: I would suggest using request id's that get passed through the JavaScript execution and the response handling method to make sure a response can only go back to the request that made it.
+[13:20:20] simonstewart: It'd be nicer to avoid a static context, no?
+[13:20:42] carljokl: I was working this morning on some proof of concept code to see what functionality works through the JavaScript bridge.
+[13:20:53] carljokl: Indeed
+[13:21:13] carljokl: Albeit sometimes something global and static may be unavoidable
+[13:21:13] simonstewart: sounds interesting
+[13:21:29] simonstewart: Agreed. But java devs tend to reach for them a little too quickly
+[13:22:00] carljokl: When I did instrumentation with the Android code, it helped me initialise the instrumentation and deal with the application passing the WebView to the code than instrumented it.
+[13:22:24] carljokl: that instrumented it
+[13:22:37] simonstewart: ok
+[13:22:39] carljokl: I also wondered about the embedded web server.
+[13:22:51] carljokl: Is it just me or is it a bit heavy for what it has to do?
+[13:23:06] carljokl: I mean the REST API handles its own sessions
+[13:23:18] simonstewart: It might be. Have we switched it out for webbit yet?
+[13:23:20] simonstewart: That's a lot smaller
+[13:23:30] carljokl: Webbit is used
+[13:23:41] carljokl: I wondered if it might be possible to go smaller still
+[13:23:46] simonstewart: Quite possibly
+[13:23:57] simonstewart: The abstraction around http is in place
+[13:24:02] simonstewart: So we can swap things out as necessary
+[13:24:15] carljokl: Albeit my pondering coming up with a more compact binary protocol might cause flaming
+[13:24:38] carljokl: Not as a replacement but a companion maybe
+[13:24:39] simonstewart: The :spec is written to be transport and encording neutral
+[13:24:40] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[13:24:53] carljokl: It might allow for targeting even smaller devices like Java ME
+[13:25:01] simonstewart: NMP
+[13:25:17] carljokl: NMP?
+[13:25:23] simonstewart: "Not My Problem" :)
+[13:25:38] simonstewart: Android is enough for me
+[13:26:17] carljokl: Shazam supports a lot of mobile platforms including Java ME albeit not strictly my problem either.
+[13:26:37] carljokl: Do you want my email address?
+[13:26:47] simonstewart: Ah. SEP == YP
+[13:27:16] simonstewart: carljokl: you can ping me on email if you'd like. If it's public, then the selenium-developers group is also a fine place to be
+[13:27:37] simonstewart: Does the embedded webview work on JME?
+[13:27:44] simonstewart: I'm both impressed and slightly scared
+[13:28:13] carljokl: I don't know about WebViews on JavaME, from past experience the APIs tended to be very limited
+[13:28:16] carljokl: It was just a thought
+[13:28:46] simonstewart: Oh. OK. 
+[13:28:55] carljokl: It might just be that using a binary protocol would make performance faster and if tests take a long time to run, any time saved may be beneficial
+[13:29:02] simonstewart: For reference, Nokia brought up J2ME in the first W3C testing meeting
+[13:29:14] carljokl: Plus I am hardcore and like bit twiddling to prove I have still got it.
+[13:29:19] simonstewart: carljokl: in the common case, network latency is the limiting factor
+[13:29:27] cmcgraw has joined #selenium
+[13:29:42] simonstewart: carljokl: I try and avoid it, and use protocols and encodings that are widely supported
+[13:29:50] carljokl: I don't think it should be all that complicated
+[13:30:24] carljokl: Oh well it was a thought. I thought it would probably be frowned upon
+[13:30:25] simonstewart: Take a look at protobufs and thrift before heading your own route
+[13:30:46] simonstewart: Not frowned upon, but there's generally a push to make it easy for client languages to write their bindings
+[13:30:54] simonstewart: The Json/HTTP thing keeps life very simple
+[13:30:58] simonstewart: Which is why we like it
+[13:31:25] carljokl: It is certainly easy. I guess mobile has different constraints on it.
+[13:31:52] simonstewart: I'm not that convinced. A modern phone has more computing power than my laptop when I started this project
+[13:32:03] carljokl: Anyway my email is carl.jokl@shazamteam.com
+[13:32:07] carljokl: I guess so
+[13:32:10] simonstewart: :)
+[13:32:24] carljokl: Anyway I am really hungry and would like to go get some lunch quickly
+[13:32:24] cgoldberg has joined #selenium
+[13:32:36] carljokl: If that is ok with everyone
+[13:32:38] simonstewart: Go! I'll be lurking here for the rest of the day
+[13:33:46] farlan has joined #selenium
+[13:38:57] bluescreen10 has joined #selenium
+[13:45:58] jimevans: Now I can go find some breakfast. 
+[13:46:00] jmathes_ has joined #selenium

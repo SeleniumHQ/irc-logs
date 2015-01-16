@@ -1,0 +1,507 @@
+2011-06-04T00:47:27  *** Mayank has joined #selenium
+2011-06-04T00:55:36  *** Mayank has left #selenium
+2011-06-04T00:56:14  *** Mayank has joined #selenium
+2011-06-04T00:56:37  *** freynaud has joined #selenium
+2011-06-04T00:59:12  *** freynaud has left #selenium
+2011-06-04T01:18:32  *** freynaud has joined #selenium
+2011-06-04T01:19:11  *** lisak has joined #selenium
+2011-06-04T01:19:54  <lisak> where can i find firefox profile preferences that can be set via firefoxProfile.setPreference(key, value);
+2011-06-04T01:21:39  <lisak> there are those FROZEN_PREFERENCES that are not to be overriden
+2011-06-04T01:26:25  *** reddeviL is now known as red^
+2011-06-04T01:28:34  <freynaud> lisak: have you tried about:config ?
+2011-06-04T01:36:16  <lisak> damn, there isn't anything about starting FF with a profile
+2011-06-04T01:36:51  <lisak> according to the documentation one can use this jvm option -Dwebdriver.firefox.profile to do that
+2011-06-04T01:36:57  <lisak> but for me it doesn't work
+2011-06-04T01:37:18  <lisak> and it doesn't seem there is a way to do that via firefox built-in preferences
+2011-06-04T01:37:42  <lisak> java bindings
+2011-06-04T01:38:29  <freynaud> selenium1 API or webdriver ?
+2011-06-04T01:38:34  <lisak> webdriver
+2011-06-04T01:38:49  <barancev> FirefoxProfile profile = new FirefoxProfile();
+2011-06-04T01:38:58  <barancev> WebDriver driver = new FirefoxDriver(profile);
+2011-06-04T01:39:02  <freynaud> DesiredCapabiliy cap = DesiredCapability.firefox();
+2011-06-04T01:39:54  <freynaud> cap.setCapability(FirefoxDriver.PROFILE, profile);
+2011-06-04T01:40:14  <lisak> yes, but it's a NEW profile, not the one I started FF in before and set it up
+2011-06-04T01:40:23  <freynaud> that's better than before, the profile becomes a part of you test
+2011-06-04T01:40:33  <freynaud> lisak: no it's not
+2011-06-04T01:40:40  <freynaud> you can take an existing one as a base
+2011-06-04T01:40:57  <freynaud> if you have one with firebug abd some certificate exception, it will use that
+2011-06-04T01:41:12  <barancev> FirefoxProfile profile = new FirefoxProfile(new File("your/profile/dir"));
+2011-06-04T01:42:36  <lisak> I see, I overlooked this constructor, now I can rule :-) thanks
+2011-06-04T01:43:00  <Binken[A]> freynaud, Should we install all browsers on the machine which is runing remotewebdriver
+2011-06-04T01:43:00  *** Binken[A] is now known as Binken
+2011-06-04T01:43:00  * Binken is no longer away : Gone for 2 hours 47 minutes 14 seconds
+2011-06-04T01:43:06  <Binken> freynaud, Should we install all browsers on the machine which is runing remotewebdriver
+2011-06-04T01:43:45  <freynaud> Binken: RemoteWebDriver is what you use in your tests, it's only sending the orders
+2011-06-04T01:44:07  <freynaud> you don't need any browser at all where you write your tests
+2011-06-04T01:44:24  <freynaud> you need them where the webdriver server is running
+2011-06-04T01:44:38  <Binken> understand
+2011-06-04T01:44:47  <freynaud> if you don't use grid and have RemoteWebDriver(new URL(ABC, cap)
+2011-06-04T01:44:54  <freynaud> you need them installed on ABC
+2011-06-04T01:48:37  <Binken> So the remotewebdriver is the core module to communicate with the browsers
+2011-06-04T01:48:51  <Binken> use the JSONWireProtocol
+2011-06-04T01:50:30  <freynaud> it's what will generate the command, that will be JSON object sent via http
+2011-06-04T01:52:30  <Binken> Very clear :)
+2011-06-04T01:55:17  <Binken> freynaud, Do you run your test parallelly
+2011-06-04T01:55:40  <freynaud> the tests support parallel run if you start them that way
+2011-06-04T01:55:59  <freynaud> a webdriver server can start as many chrome or firefox as you want for instance
+2011-06-04T01:56:38  <freynaud> so it's a matter of generating several tests in parallel, so that all request are recieved in parallel by the server
+2011-06-04T01:56:50  <freynaud> and if you want to scale more, then grid comes into the picture
+2011-06-04T01:57:05  <Mayank> Hi, all I have this SCORM code - http://pastebin.com/pN1NYu7M, which opens in a frame inside a php page, I am trying to test it. The problem is that this code has an alert on line number 182 that is not getting "suppressed" by selenium, the tests fail as I do not have any method for detecting the alert as selenium cannot detect this alert thus, i cannot use assertAlert of waitForAlert, stuck on this from the past 5 days! :/
+2011-06-04T01:58:25  <Binken> For now, I am running all the automated tests on local machine not webdriver server. And I run three type of browsers per case
+2011-06-04T01:58:57  <Binken> I run these testcase one by one, Since each testcase has it's own input data
+2011-06-04T01:59:08  <freynaud> are you running RemoteWebDriver
+2011-06-04T01:59:20  <Binken> For now, no
+2011-06-04T01:59:21  <freynaud> or FirefoxDriver etc
+2011-06-04T01:59:38  <Binken> I am running use the FirefoxDriver etc
+2011-06-04T01:59:45  <freynaud> you can try with Remote, that will avoid you some refactoring later
+2011-06-04T02:02:07  <Binken> If I use the Remote, I have to use the java command run the selenium server?
+2011-06-04T02:02:41  <freynaud> either that
+2011-06-04T02:02:48  <freynaud> or you can have it started by your test
+2011-06-04T02:03:15  <freynaud> if you use JUnit , have setup starting it
+2011-06-04T02:03:29  <Binken> For now, I have not find the best solution for my current test enviroment
+2011-06-04T02:03:40  <freynaud> an later, the only refactoring you'll need it to change localhost to the remote server where it run or where grid runs
+2011-06-04T02:03:42  *** towski has joined #selenium
+2011-06-04T02:03:54  <Binken> I know you mean :)
+2011-06-04T02:05:13  <Binken> Sound reasonable
+2011-06-04T02:08:46  <Binken> Freynaud, If you have one testcase with inputdata wanted to be run in mutiple browsers, what will you plan to do this?
+2011-06-04T02:09:18  <freynaud> it depends on the test framework you use and how complex you tests are
+2011-06-04T02:09:45  <Binken> I am current using NUnit
+2011-06-04T02:09:59  <freynaud> if the test has no other param and you're using java, I would use testNG and a dataprovider returning the list of browser capabilities you're interested in
+2011-06-04T02:10:01  <Binken> Tests are not so complex right now
+2011-06-04T02:10:19  <freynaud> i'm not familiar with the .net world :)
+2011-06-04T02:10:35  <Binken> I think the idea is same :)
+2011-06-04T02:11:53  <freynaud> yes, it's the same in the sense it will not be solved by selenium
+2011-06-04T02:12:08  <freynaud> tests corretly built with selenium will allow it
+2011-06-04T02:12:27  <freynaud> but the test framework you use will input the param and config you want
+2011-06-04T02:12:36  *** Mayank has quit IRC
+2011-06-04T02:17:44  *** towski has quit IRC
+2011-06-04T02:20:22  <Binken> you mean the desired browsers will be input in the test framework?
+2011-06-04T02:20:26  <lisak> freynaud, there were some metacharacters when copy/paste the arguments, that's why it didn't work
+2011-06-04T02:20:37  <lisak> google/chrome/chromedriver ????????-Dwebdriver.development=true ????????-Dwebdriver.firefox.useExisting=true ????????-Dwebdriver.firefox.profile=webdriver ????????-Dwebdriver.reap_profile=true ????????-Dsurefire.useFile=false ????????-X
+2011-06-04T02:21:09  <freynaud> k
+2011-06-04T02:24:34  *** towski has joined #selenium
+2011-06-04T02:49:11  <lisak> freynaud, anyway I didn't manage to -Dwebdriver.firefox.useExisting=true
+2011-06-04T02:49:27  <lisak> use the same firefox process
+2011-06-04T02:49:32  <lisak> it always starts a new instance
+2011-06-04T02:49:52  <lisak> I didn't find an option that would set this up
+2011-06-04T02:50:24  *** Binken is now known as Binken[A]
+2011-06-04T02:50:24  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-04T02:51:20  <freynaud> lisak: i'm not sure i understnad. Do you want to use your profile as a base or attach to an existing running firefox ?
+2011-06-04T02:51:33  *** Mayank has joined #selenium
+2011-06-04T02:52:09  <lisak> I can run the profile  new File(System.getProperty("user.home") + "/.mozilla/firefox/2fhjtuk5.webdriver
+2011-06-04T02:52:28  <lisak> but I need to attach to an existing running ff
+2011-06-04T02:52:43  <lisak> which I can't figure
+2011-06-04T02:53:09  <lisak> I run it locally and tons of firefox windows everywhere, on desktop :)
+2011-06-04T02:53:50  <freynaud> i don't think you can attach o an already running ff
+2011-06-04T02:53:58  *** |izzie has quit IRC
+2011-06-04T02:54:02  <freynaud> it breaks completly the independance of the test
+2011-06-04T02:54:19  <lisak> the java bindings documentation says you can via -Dwebdriver.firefox.useExisting=true
+2011-06-04T02:54:46  <lisak> http://code.google.com/p/selenium/wiki/FirefoxDriver
+2011-06-04T02:55:51  <freynaud> Never use in production Use a running instance of firefox if one is present  :)
+2011-06-04T02:56:05  <freynaud> and I see this variable in the code only once
+2011-06-04T02:56:09  <freynaud> commented out in a test
+2011-06-04T02:56:18  <freynaud> so I don't think it's doing anything ^^
+2011-06-04T02:56:38  <freynaud> why are you trying to attach to an existing ff in the fiist place ?
+2011-06-04T03:01:40  <lisak> because I'm using these test when developing to see how the code behave
+2011-06-04T03:01:54  <lisak> so I run it quite often
+2011-06-04T03:02:10  <lisak> and I have full desktop of FF windows
+2011-06-04T03:02:27  <freynaud> at the end of you test, the FF should be closed
+2011-06-04T03:02:34  <freynaud> there should be no left over
+2011-06-04T03:02:37  <lisak> I could have FF window full of tabs instead
+2011-06-04T03:07:12  <lisak> freynaud, pls excuse my basic knowledge absence ... i'm using webdriver 10 days without being aware of driver.close();
+2011-06-04T03:07:22  <lisak> thanks :)
+2011-06-04T03:07:31  <freynaud> driver.close isn't closing the driver :)
+2011-06-04T03:07:44  <lisak> it makes the FF close :)
+2011-06-04T03:07:50  <freynaud> it's closing the browser window, and the driver if that was the last window
+2011-06-04T03:08:04  <freynaud> if you want to close everything for sure, it's driver.quit
+2011-06-04T03:08:37  <lisak> the driver can "fork" into many windows ?
+2011-06-04T03:09:04  <lisak> ok, I'll take a look at that
+2011-06-04T03:09:05  <freynaud> you can have a new firefox window opening if you have popups etc
+2011-06-04T03:09:17  <lisak> k
+2011-06-04T04:02:54  *** Binken[A] has quit IRC
+2011-06-04T04:08:01  *** Mayank has quit IRC
+2011-06-04T04:08:36  *** Mayank has joined #selenium
+2011-06-04T04:24:42  *** Mayank1 has joined #selenium
+2011-06-04T04:26:50  *** Mayank has quit IRC
+2011-06-04T04:42:20  *** miker2 has joined #selenium
+2011-06-04T04:59:58  *** miker2 has quit IRC
+2011-06-04T05:14:51  *** Binken has joined #selenium
+2011-06-04T05:37:48  *** Mayank1 has quit IRC
+2011-06-04T05:38:15  *** Mayank has joined #selenium
+2011-06-04T05:39:33  *** miker2 has joined #selenium
+2011-06-04T05:44:48  *** Binken is now known as Binken[A]
+2011-06-04T05:44:48  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-04T06:13:19  *** stepheneb has joined #selenium
+2011-06-04T06:31:07  *** miker2 has joined #selenium
+2011-06-04T06:42:07  *** Binken[A] has quit IRC
+2011-06-04T06:51:25  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: adding throwCapabilityNotPresent parameter for the hub, allowing to have the tests queued until a proxy with the correct capability  is added - http://code.google.com/p/selenium/source/detail?r=12360
+2011-06-04T06:53:25  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: adding test for the new grid hub param and fixing some timing issues that made some test flaky - http://code.google.com/p/selenium/source/detail?r=12361
+2011-06-04T07:07:44  <freynaud> any JUnit expert here ?
+2011-06-04T07:10:17  <__mike> what you trying to do ? i've fiddled with junit
+2011-06-04T07:12:41  <freynaud> i'd like to do what i can do in testNG
+2011-06-04T07:12:57  <freynaud> I have a method that is suppose to block due to a timeout
+2011-06-04T07:13:20  <freynaud> so I want @Test(timeout=2000 ,expected=timeoutException)
+2011-06-04T07:13:24  <freynaud> smething like that
+2011-06-04T07:13:42  <freynaud> but with junit, timeout throws java.lang.Exception
+2011-06-04T07:14:00  <freynaud> and if I say expect=Exception.class, and it throws that, it fails anyway
+2011-06-04T07:14:22  <freynaud> timeout probably always fails a method, independently of the expected tag
+2011-06-04T07:16:29  <__mike> lemme fiddle around
+2011-06-04T07:16:37  <__mike> so basically you want a test to pass even if it throws an exception right ?
+2011-06-04T07:17:14  <freynaud> no, I want to the test to pass ONLY if it throw
+2011-06-04T07:17:49  <freynaud> it's supposed to block until something happens.I test that it never returns if that something doesn't happen
+2011-06-04T07:18:29  <__mike> okay let me try
+2011-06-04T07:18:42  <freynaud> thx
+2011-06-04T07:19:02  *** Mayank1 has joined #selenium
+2011-06-04T07:19:51  *** Mayank1 has quit IRC
+2011-06-04T07:20:22  *** Mayank1 has joined #selenium
+2011-06-04T07:20:22  *** Mayank has quit IRC
+2011-06-04T07:21:46  <__mike> i'm a bit unsure what you mean by if it throws exception and you're expecting it then it fails
+2011-06-04T07:21:50  <__mike> http://pastebin.com/Ds9qBGiD
+2011-06-04T07:21:59  <__mike> if i do that and i let it throw then it will pass. if i comment it then it fails
+2011-06-04T07:22:15  *** Mayank1 has quit IRC
+2011-06-04T07:22:33  *** Mayank has joined #selenium
+2011-06-04T07:22:53  <freynaud> ok, try that now :)
+2011-06-04T07:23:12  *** miker2 has quit IRC
+2011-06-04T07:25:14  <freynaud> https://gist.github.com/1007941
+2011-06-04T07:25:28  <freynaud> the method never returning will never return
+2011-06-04T07:25:51  <freynaud> so if I put that in a test, with timeout=2000, I should have the timeout
+2011-06-04T07:26:04  <freynaud> that throw a java.lang.Exception from Junit
+2011-06-04T07:26:06  <__mike> ahhh
+2011-06-04T07:26:13  <__mike> and the expected doesn't catch that right
+2011-06-04T07:26:15  <freynaud> that's what I expect, so expected=Exception
+2011-06-04T07:26:26  <freynaud> and that should be a pass :)
+2011-06-04T07:26:37  <freynaud> no, the timeout takes precedence
+2011-06-04T07:27:55  <__mike> ah i get your problem now. i know you could get past this by overriding the runner but it seems like overkill
+2011-06-04T07:28:22  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: fixing tests, commenting out some JUnit ones. - http://code.google.com/p/selenium/source/detail?r=12362
+2011-06-04T07:28:38  <freynaud> yeah, my guess is that junit should throw a timeoutException, and that should be handle by the expected, if any
+2011-06-04T07:29:47  <__mike> yes. i think if you wanted to override.. you could do it from BlockJUnit4ClassRunner by overriding how withPotentialTimeout works :/
+2011-06-04T07:29:58  <__mike> it's not a very nice method though
+2011-06-04T07:31:08  <__mike> you could also kick off another thread within your unit test that does the timeout. and throws an exception. that way it would get caught by the 'expected'
+2011-06-04T07:31:38  <freynaud> if i start another thread
+2011-06-04T07:31:46  <freynaud> and anythign happens in it, junit will pass :p
+2011-06-04T07:32:11  <freynaud> if I start doing all that, 50% chance i'll spend more time debugging the tests than the real code :)
+2011-06-04T07:32:24  <__mike> haha. let me fiddle
+2011-06-04T07:36:01  <selbot2> francois.reynaud less than a minute ago - FrancoisReynaud: removing system.out - http://code.google.com/p/selenium/source/detail?r=12363
+2011-06-04T07:51:15  <__mike> if i got it working by threading would you want that as a solution ?
+2011-06-04T07:51:29  <__mike> same question for overriding the runner too
+2011-06-04T07:57:18  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: addign a helper method to get the browser icons for the grid consoles. - http://code.google.com/p/selenium/source/detail?r=12364
+2011-06-04T08:25:09  <barancev> freynaud: does grid2 check what browsers are available (installed) in a system?
+2011-06-04T08:26:58  <freynaud> barancev: NO, NOT YET.
+2011-06-04T08:27:06  <barancev> ok
+2011-06-04T08:27:07  <freynaud> sry caps
+2011-06-04T08:27:22  <barancev> np
+2011-06-04T08:29:29  <freynaud> i plan to do some kind of helper for that
+2011-06-04T08:29:56  <freynaud> but it's not really grid. If you have a llarge system, you should have some programatic way of knowing what's where
+2011-06-04T08:30:04  <freynaud> and generate the registration requetss from that
+2011-06-04T08:30:21  <barancev> config files would help
+2011-06-04T08:30:57  <freynaud> the thing is, if you have a lot of nodes
+2011-06-04T08:31:14  <freynaud> you probably want them to be managed from a central point, like from the hub machine
+2011-06-04T08:31:40  <freynaud> what I do is generate the registration request from the hub itself.
+2011-06-04T08:32:04  <freynaud> for instance if it's a linux, I know I have chrome and firefox 3 and 4 on it
+2011-06-04T08:32:09  <barancev> yes, and I'd like to see from a centrac console what browsers are installed on each node
+2011-06-04T08:32:19  <freynaud> I have a script that ssh from the hub to the linux, start webdriver server
+2011-06-04T08:32:37  <freynaud> and from the hub, generate a reg request, inserting the IP
+2011-06-04T08:33:10  <barancev> and I don't want a test to be sheduled to a node that has no appropriate browser installed
+2011-06-04T08:33:24  <freynaud> i don't think I can build that generic enoughI It's very much linked to your system.
+2011-06-04T08:33:41  <barancev> that's why I mentioned config files
+2011-06-04T08:33:42  <freynaud> for instance when I register a node, the machine doesn't have to even exist
+2011-06-04T08:33:52  <freynaud> if it doesn't, it starts a VM automatically etc
+2011-06-04T08:34:03  <freynaud> so it's very much coupled to my system
+2011-06-04T08:34:14  <barancev> a kind of node descriptiors
+2011-06-04T08:34:32  <freynaud> I don't want a test to be schedule"
+2011-06-04T08:34:41  <freynaud> that should already work
+2011-06-04T08:34:55  <barancev> ok, I mean dispatched
+2011-06-04T08:35:03  <freynaud> if you request a firefox, and you grid doesn't know firefox, it will throw an exception right away
+2011-06-04T08:35:41  <barancev> if I request ff, I'd like a test to be dispatched to a node that has it installed
+2011-06-04T08:36:25  <freynaud> that's already what grid does. I will iterate all the node, until one becomes available for what you asked
+2011-06-04T08:36:58  <freynaud> the config file kind of exist already, the request is a JSON object. You don't need to have the selfRegisteringNode producing it
+2011-06-04T08:37:07  <freynaud> you can create it yourself and send it
+2011-06-04T08:37:14  <barancev> so, if a node can't start a test in FF, the grid will try another node?
+2011-06-04T08:37:49  <freynaud> yes. It will look at all the node, and take the first one that matches at least what you ask
+2011-06-04T08:38:19  <barancev> does not that affect preformance?
+2011-06-04T08:38:20  <freynaud> if you ask for firefox, without specifying the OS, it will take the first available, on linux on win. If you specify the os, it will take that into account etc
+2011-06-04T08:38:49  <freynaud> it's not really noticeable I think. Starting a firefox takes 4-5 seconds
+2011-06-04T08:39:22  <barancev> suppose I have a network of 20 nodes, 10 WIn+IE and 10 Lin+FF
+2011-06-04T08:39:33  <freynaud> if you start having so many nodes that iterating through them becomes visible compared to 5-6 sec, you'll have other issues: )
+2011-06-04T08:39:49  <freynaud> you won't see it
+2011-06-04T08:40:04  <freynaud> the unit tests run with 500 nodes
+2011-06-04T08:40:37  <barancev> when I ask for FF, the grid may make up to 10 requests to Win nodes until it could find Lin with FF
+2011-06-04T08:40:49  <freynaud> oh, no
+2011-06-04T08:40:57  <freynaud> grid is the central point
+2011-06-04T08:41:06  <freynaud> it keeps track of all running tests, where etc
+2011-06-04T08:41:37  <freynaud> when a node register to the hub, it gives all the possible capabilities
+2011-06-04T08:42:10  <freynaud> the hub remmebers that, all the test running etc, and it will only send a FF request to a node if the resources are free
+2011-06-04T08:42:34  <freynaud> the filtering is done on the hub. For instance webdriver server will accept as many new FF request as you send
+2011-06-04T08:42:48  <barancev> that's what I asked about - how a node understand its capabilities to report it to hub? the node should know, what browsers are available in the system
+2011-06-04T08:43:09  <freynaud> if you send 1000 request to a server, it will accept them all and crash. The hub will make sure only MAX_INSTANCES are fowrwaded
+2011-06-04T08:43:34  <freynaud> it doesn't at the moment it trust the person registering it
+2011-06-04T08:43:43  <freynaud> it assumes firefox and chrome are always there
+2011-06-04T08:43:51  <freynaud> and that IE is always there on windows
+2011-06-04T08:44:11  <freynaud> that's if you register using -role webdriver
+2011-06-04T08:44:17  <freynaud> without specifying anything else
+2011-06-04T08:44:22  <barancev> can I configure node capabilities when I start it?
+2011-06-04T08:44:25  <freynaud> yes
+2011-06-04T08:45:01  <freynaud> -role webdriver -browser browserName=firefox,version=3,6 -browser browserName=chrome,version=13
+2011-06-04T08:45:30  <freynaud> http://code.google.com/p/selenium/wiki/Grid2
+2011-06-04T08:45:38  <freynaud> you have more example there
+2011-06-04T08:46:27  <barancev> that's the way to specify version. but how to say "there is no chrome here"
+2011-06-04T08:46:50  <barancev> maxInstances=0 ?
+2011-06-04T08:47:10  <freynaud> as soon as you start specifying the browsers yourself
+2011-06-04T08:47:16  <freynaud> the default are ignored
+2011-06-04T08:47:31  <freynaud> -browser browserName=firefox
+2011-06-04T08:47:38  <freynaud> will register a single firefoxx
+2011-06-04T08:48:40  <barancev> wow! that's important, and missing from docs, thanks!
+2011-06-04T08:48:49  <freynaud> is it ?
+2011-06-04T08:49:34  <barancev> is it important or is it missing? :)
+2011-06-04T08:50:55  <freynaud> it's important, and it's not missing anymore
+2011-06-04T08:50:56  <selbot2> francois.reynaud half a minute ago - Edited wiki page Grid2 through web user interface. - http://code.google.com/p/selenium/source/detail?r=12365
+2011-06-04T08:52:19  <barancev> excellent
+2011-06-04T08:55:07  *** drim has joined #selenium
+2011-06-04T08:55:39  <drim> will ChromeDriver get merged back into the standalone selenium server jar   with the next release?
+2011-06-04T08:56:48  <freynaud> i don't think so
+2011-06-04T08:57:12  <freynaud> chrome driver is done by the chrome time, they have a different release process
+2011-06-04T08:58:01  <drim> freynaud: I don't understand. ChromeDriver was into the 2.0b3 release. Now it's separate, not sure why..  What do you mean different release process ?
+2011-06-04T08:58:44  <freynaud> chrome driver use to be done by the selenium team. It was part of the selenium project.
+2011-06-04T08:58:54  <drim> and no longer is ?
+2011-06-04T08:59:12  <barancev> there is ChromeDriver java class in rc2, that uses chromedriver.exe as an external process
+2011-06-04T08:59:16  <freynaud> it's now done by the chrome team directly. They implement the selenium API directly into chrome. It means direct access to everything, much faster
+2011-06-04T08:59:41  <drim> so it's getting better. but chromedriver binary will remain separate
+2011-06-04T08:59:44  <freynaud> but it also means chrome driver is now part of chrome, not f selenium
+2011-06-04T08:59:49  <freynaud> correct
+2011-06-04T09:00:07  <drim> and from your side you only put some bindings ..
+2011-06-04T09:00:16  <freynaud> the same way we don't include chrome or firefox as part of selenium
+2011-06-04T09:00:29  <drim> ?
+2011-06-04T09:00:40  <drim> firefox driver is built into the standalone
+2011-06-04T09:00:47  <drim> and Opera just got in with the rc1
+2011-06-04T09:00:49  <freynaud> yes, selenium define the JSONWireProtocol as the standard API
+2011-06-04T09:00:54  <freynaud> and chrome team implements it
+2011-06-04T09:01:05  <barancev> opera is like chrome
+2011-06-04T09:01:14  <freynaud> which means you can still switch from chrome driver to any other driver without changing a single line of your test
+2011-06-04T09:01:51  <barancev> you need a separate operadriver.exe to run OperaDriver binding
+2011-06-04T09:01:55  <drim> yep I get that. I'm was just curious technically will they get into one single server jar. But understand not.  While the rest will be in the standalone right ?
+2011-06-04T09:02:11  <drim> barancev I haven't downloaded any standalone opera driver
+2011-06-04T09:02:18  <drim> maybe it got installed with opera itself
+2011-06-04T09:02:26  <drim> I run the server on linux btw
+2011-06-04T09:02:40  <freynaud> drim: all the driver developped by selenium are in the standalone
+2011-06-04T09:03:21  <freynaud> the plan is to slowly move away from "selenium team does all driver" to  browser team like mozilla or MS do their drivers
+2011-06-04T09:03:50  <freynaud> chrome team just happen to be the first team doing that
+2011-06-04T09:04:00  <barancev> operadriver is developer by Opera Software -- http://www.opera.com/developer/tools/operadriver/
+2011-06-04T09:04:22  <barancev> may be it is bundled with Opera browser, I'm not sure
+2011-06-04T09:04:44  <drim> barancev: I see I'll check it out
+2011-06-04T09:05:18  <drim> so in future all browsers will provide separate binary drivers and selenium itself will have only the core functionality ?
+2011-06-04T09:05:57  <barancev> that's the goal
+2011-06-04T09:06:37  *** Archdude_ has joined #selenium
+2011-06-04T09:07:03  <barancev> but there are IE and Safari, and who knows what MS and Apple think about that goal :)
+2011-06-04T09:07:15  <drim> I still think that it would be more convinient for people if it was all bundled in one standalone. Browsers can still do drivers them selves but just merge them in the selenium server...
+2011-06-04T09:07:24  <freynaud> apple is pretty open I think
+2011-06-04T09:07:44  <drim> safari 5 got plugins which makes it possible in theory now
+2011-06-04T09:07:49  <barancev> but Safari support is the worst
+2011-06-04T09:07:51  <freynaud> drim: the chrome driver is linked to a version of chrome
+2011-06-04T09:08:12  <freynaud> so we would have to have them all, for all platform
+2011-06-04T09:08:38  <freynaud> have you tried to checkout the source lately :) It's already slightly too big ^^
+2011-06-04T09:08:49  <drim> freynaud: gotcha. So browsers would eventually install drivers with the browser tiself ?
+2011-06-04T09:09:07  <freynaud> as an addon probably
+2011-06-04T09:09:13  <freynaud> not everybody test
+2011-06-04T09:09:14  <freynaud> :)
+2011-06-04T09:09:23  *** Archdude_ has quit IRC
+2011-06-04T09:09:26  *** Archdude has quit IRC
+2011-06-04T09:09:28  <drim> true, but if it's 500kb binary who cares
+2011-06-04T09:10:01  <barancev> i's 500k for each major version of each supported browser
+2011-06-04T09:10:07  *** Archdude has joined #selenium
+2011-06-04T09:10:54  <drim> hey one more question
+2011-06-04T09:10:59  <barancev> and if a vendor fixed a bug in a driver - should a new selenium release be issued?
+2011-06-04T09:11:04  <drim> any hints how to make the firefox browser start in fullscreen
+2011-06-04T09:11:22  <drim> barancev: right this makes sense I agree
+2011-06-04T09:11:47  <freynaud> you can use JS for that
+2011-06-04T09:11:57  <drim> how ?
+2011-06-04T09:12:10  <drim> as far as I read clean JS cant go fullscreen
+2011-06-04T09:12:22  <drim> I can change browser window position and resize it
+2011-06-04T09:12:33  <drim> but go to true fullscreen.. don't know how
+2011-06-04T09:12:34  <barancev> window.moveTo(0,0);window.resizeTo(screen.width,screen.height);
+2011-06-04T09:12:40  <drim> that's not fullscreen
+2011-06-04T09:12:56  <freynaud> no idea
+2011-06-04T09:13:07  <freynaud> why do you want it full screen ?`
+2011-06-04T09:13:17  <drim> well I want to have constant active space
+2011-06-04T09:13:24  <drim> if I test with 4 different browsers
+2011-06-04T09:13:29  <drim> I want to test same resolution
+2011-06-04T09:13:37  <drim> so I want to get toolbars and stuff out of the way
+2011-06-04T09:13:50  <drim> basically all display size would be equal to active testing space
+2011-06-04T09:13:54  <barancev> or you may emulate F11 key
+2011-06-04T09:14:05  <drim> right , how to emulate it with JS
+2011-06-04T09:14:20  <barancev> no, not JS
+2011-06-04T09:14:25  <drim> why is there no such api in selenium
+2011-06-04T09:14:28  <barancev> on OS level
+2011-06-04T09:14:33  <drim> something like browser.window.maximize
+2011-06-04T09:14:37  <drim> browser.window.minize
+2011-06-04T09:14:41  <freynaud> what will that test do ? Users don't browser in full screen mode
+2011-06-04T09:14:42  <drim> browser.window.fullscreen
+2011-06-04T09:15:02  <barancev> #1750 - you may vote for it :)
+2011-06-04T09:15:03  <selbot2>  open/new There is no native way to move, resize or manipulate with browser window. - http://code.google.com/p/selenium/issues/detail?id=1750
+2011-06-04T09:15:19  <drim> barancev: I will ! :)
+2011-06-04T09:15:55  <drim> freynaud: You don't need to emulate the full user experience for web testing . you don't test the inteface of chrome and the os. you care about the website itself
+2011-06-04T09:16:14  <drim> freynaud: so you want so how it works when rendered in given resolutions
+2011-06-04T09:17:37  <freynaud> i still don't get it. If you are in 1280*1024 full screen and it looks ok, what does it tell you ?
+2011-06-04T09:18:02  <freynaud> it doesn't validate that a user with a screen that size will be ok, as he will have the menu bar and stuff
+2011-06-04T09:18:54  <__mike> drim. what do you want to do ? get the same client size or window size of the browsers ?
+2011-06-04T09:19:26  <drim> same active view size
+2011-06-04T09:19:28  <__mike> freynaud : one usecase could be if the site is designed for mobile then you want to limit the size to say 480x320
+2011-06-04T09:19:36  <drim> in other words without toolbars and things
+2011-06-04T09:19:49  <__mike> okay. afaik this can not be done with javascript
+2011-06-04T09:19:51  <__mike> firefox you can do it
+2011-06-04T09:20:01  <drim> I've done it already for Chrome and Opera
+2011-06-04T09:20:11  <__mike> for IE i believe you can't
+2011-06-04T09:20:19  <__mike> how are you doing it with chrome and opera right now
+2011-06-04T09:20:24  <drim> I've modified the startup scripts that that start them (Linux)
+2011-06-04T09:20:42  <drim> is a bash script that starts chrome binary
+2011-06-04T09:20:52  <drim> oh the last message didn't show up
+2011-06-04T09:20:53  <__mike> and you can specify client size with that ?
+2011-06-04T09:20:54  <drim> so...
+2011-06-04T09:20:59  <drim> no
+2011-06-04T09:21:03  <freynaud> __mike: mobile is less flexible, there won't be extra bars and stuff. If you know the screen is 420, you know the fix size of the toolbar and can find the size you need for your canvas
+2011-06-04T09:21:03  <drim> it's a virtual machine
+2011-06-04T09:21:11  <drim> I change resolution with X api.
+2011-06-04T09:21:16  <drim> xrandr -s XxY
+2011-06-04T09:21:21  <drim> then start browser at Fullscreen
+2011-06-04T09:21:35  <__mike> oh
+2011-06-04T09:21:57  <drim> I've modified Chrome and Opera at the test system to run in Fullscreen by default
+2011-06-04T09:22:15  <__mike> i see what you're trying to do now
+2011-06-04T09:22:36  <__mike> but given that firefox javascript engine allows you to accurately size the viewport, i don't see why you can't do that for ff at least
+2011-06-04T09:23:34  <drim> __mike: what do you mean? I could resize it but I want fullscreen so that it's consistent with other browsers. sort a uniform solution
+2011-06-04T09:24:05  <drim> it would have been best if firefox had some parameter to start in fullscreen (like Chrome and Opera)
+2011-06-04T09:24:08  <drim> but it doesnt
+2011-06-04T09:24:32  <freynaud> if you're in a VM, it's easier I guess
+2011-06-04T09:25:01  <freynaud> you can start a VM with screen resolution = the resulution you need + 200px / 200px
+2011-06-04T09:25:14  <freynaud> then resize the canvas to the exact size you want
+2011-06-04T09:25:23  <drim> how are you sure that the bars would be 200px exactly ?
+2011-06-04T09:25:34  <drim> they would vary based on the browser
+2011-06-04T09:25:36  <freynaud> make it 1000px if you want
+2011-06-04T09:25:52  <freynaud> you just need enough free space so that when you resize the canvas it fits
+2011-06-04T09:25:56  <drim> right but can JavaScript set the active area size ?
+2011-06-04T09:26:01  <freynaud> yes
+2011-06-04T09:26:01  <drim> I think it has api to resize window
+2011-06-04T09:26:06  <drim> but not active aria
+2011-06-04T09:26:08  <drim> area*
+2011-06-04T09:26:39  <drim> can you give example how to set canvas to 800x600 with JS (if of cource the display is big enough)
+2011-06-04T09:27:31  <drim> also this JS resize.. will it work on all browsers? __mike said something about FF java engine particularly
+2011-06-04T09:27:40  <freynaud> window.resizeTo(800,600};
+2011-06-04T09:27:41  <freynaud> ?
+2011-06-04T09:29:33  <drim> I don't know much JS. let me try it.. I believe this resizes t he window
+2011-06-04T09:29:56  <drim> so the actual canvas would be 800x600  -  length_of_bars X height_of_bars
+2011-06-04T09:31:33  <barancev> window.resizeTo changes the sise of the window (with toolbars, statusbast etc), not canvas
+2011-06-04T09:48:01  *** Jakes has joined #selenium
+2011-06-04T09:49:36  <Jakes> I would like to know if Selenium identify HTC elements ?
+2011-06-04T09:51:47  *** red^ is now known as reddeviL
+2011-06-04T09:51:52  *** reddeviL is now known as red^
+2011-06-04T09:58:19  <barancev> Jakes: Selenium works with DOM and can identify only elements that are in DOM
+2011-06-04T10:08:17  <Jakes> Barancev: Oh! Is there a work around? I see a asp.net tag like <xyz:cuztomlistbox> which gets a event function from a HTC file.
+2011-06-04T10:09:21  <barancev> if you can see this element in DOM tree (in IE click F12 to start dev tools) -- selenium will be able to fing this element, probably
+2011-06-04T10:09:39  <barancev> s/fing/find/
+2011-06-04T10:10:20  <Jakes> unfortunately  selenium doesn
+2011-06-04T10:10:35  <Jakes> oops...unfortunately IE doesn
+2011-06-04T10:11:35  <Jakes> the entire HTC content identified as on single component
+2011-06-04T10:13:07  <Jakes> Is there a workaround?
+2011-06-04T10:13:21  <barancev> as a workaround you can use custom javascript code to access this component
+2011-06-04T10:15:02  <Jakes> So, I should try getting the element object using my JavaScript code?
+2011-06-04T10:17:17  <Jakes> Ok I will give it a try Thank
+2011-06-04T10:32:00  *** drim has quit IRC
+2011-06-04T10:44:03  *** AutomatedTester has joined #selenium
+2011-06-04T11:07:52  *** AutomatedTester has quit IRC
+2011-06-04T11:08:15  <Jakes> Hey any one know a simple code to call javascript function in webdriver in c#
+2011-06-04T11:16:00  *** dereke has quit IRC
+2011-06-04T11:22:31  *** dereke has joined #selenium
+2011-06-04T11:39:01  *** Jakes has quit IRC
+2011-06-04T12:00:35  *** Spanktar has joined #selenium
+2011-06-04T12:15:45  *** miker2 has joined #selenium
+2011-06-04T12:20:35  *** red^ is now known as reddeviL
+2011-06-04T12:26:32  *** cakehero has joined #selenium
+2011-06-04T12:49:01  *** Mayank has quit IRC
+2011-06-04T12:49:30  *** Mayank has joined #selenium
+2011-06-04T13:10:10  *** sjmikem has joined #selenium
+2011-06-04T13:14:16  *** lisak has quit IRC
+2011-06-04T13:18:38  *** miker2 has quit IRC
+2011-06-04T13:22:03  *** reddeviL is now known as red^
+2011-06-04T14:03:41  *** Spanktar has quit IRC
+2011-06-04T14:06:07  *** Mayank has quit IRC
+2011-06-04T14:06:49  *** Mayank has joined #selenium
+2011-06-04T14:08:02  *** Mayank has joined #selenium
+2011-06-04T14:28:58  *** Mayank has quit IRC
+2011-06-04T14:29:33  *** Mayank has joined #selenium
+2011-06-04T14:41:31  *** adamgouchertoo has joined #selenium
+2011-06-04T14:44:21  *** adamgoucher has quit IRC
+2011-06-04T14:44:21  *** adamgouchertoo is now known as adamgoucher
+2011-06-04T14:47:06  *** Mayank has quit IRC
+2011-06-04T14:47:32  *** Mayank has joined #selenium
+2011-06-04T14:55:18  *** red^ is now known as reddeviL
+2011-06-04T14:59:18  *** miker2 has joined #selenium
+2011-06-04T14:59:43  *** Spanktar has joined #selenium
+2011-06-04T15:04:59  *** brettporter has joined #selenium
+2011-06-04T15:10:07  *** miker2 has quit IRC
+2011-06-04T15:11:43  *** cakehero has quit IRC
+2011-06-04T15:16:17  *** cakehero has joined #selenium
+2011-06-04T15:17:35  <Mayank> Mayank: Hi, all I have this SCORM code - http://pastebin.com/pN1NYu7M, which opens in a frame inside a php page, I am trying to test it. The problem is that this code has an alert on line number 182 that is not getting "suppressed" by selenium, the tests fail as I do not have any method for detecting the alert as selenium cannot detect this alert thus, i cannot use assertAlert or waitForAlert, stuck on this from the past 5 days! :/
+2011-06-04T15:19:53  <barancev> Mayank: do you know why the alert is not suppressed?
+2011-06-04T15:20:16  <Mayank> barancev: that is what i do not know
+2011-06-04T15:20:46  <Mayank> barancev: even if i use window.alert = null; the alert is not being suppressed
+2011-06-04T15:21:01  <Mayank> as in , sometimes it does, sometimes it does not
+2011-06-04T15:21:41  <Mayank> I am not sure where to add - window.alert = null; in the Selenes HTML script
+2011-06-04T15:22:59  <barancev> Mayank: aha, I see, it is called from body onLoad
+2011-06-04T15:23:23  <Mayank> barancev: yes, but it should be supressed, should it be?
+2011-06-04T15:23:48  <Mayank> by selenium itself.
+2011-06-04T15:24:05  <Mayank> I am using IE 8
+2011-06-04T15:25:11  *** adamgouchertoo has joined #selenium
+2011-06-04T15:27:52  *** adamgoucher has quit IRC
+2011-06-04T15:27:52  *** adamgouchertoo is now known as adamgoucher
+2011-06-04T15:28:11  <barancev> Selenium does NOT support JavaScript alerts that are generated in a page's onload()
+2011-06-04T15:29:21  <barancev> that can help: http://thoughtstoblog.blogspot.com/2009/09/selenium-alert-and-confirm-in-pages.html
+2011-06-04T15:33:43  <Mayank> barancev: but Selenium does suppresses onLoad alerts right? Am I wrong?
+2011-06-04T15:34:31  <Mayank> any idea how I can "inject" JavaScript through Selenese HTML script?
+2011-06-04T15:34:36  <Mayank> and thanks for the link.
+2011-06-04T15:34:40  <barancev> today's score is 3:1 -- 3 new issues registered and 1 issue has been fixed and a patch created. not a win..
+2011-06-04T15:38:21  *** |izzie has joined #selenium
+2011-06-04T15:38:32  *** barancev has quit IRC
+2011-06-04T15:43:10  *** sjmikem has quit IRC
+2011-06-04T15:50:48  <selbot2> francois.reynaud less than 20 seconds ago - FrancoisReynaud: adding a node configuration via config files + keep the current command line solution - http://code.google.com/p/selenium/source/detail?r=12366
+2011-06-04T15:50:51  *** brettporter has quit IRC
+2011-06-04T15:52:54  *** freynaud has quit IRC
+2011-06-04T16:07:02  *** miker2 has joined #selenium
+2011-06-04T16:11:21  *** barancev has joined #selenium
+2011-06-04T16:25:41  *** miker2 has quit IRC
+2011-06-04T16:40:24  *** ivog has joined #selenium
+2011-06-04T16:55:05  *** denizt_ has joined #selenium
+2011-06-04T16:55:05  *** denizt has quit IRC
+2011-06-04T16:55:05  *** denizt_ is now known as denizt
+2011-06-04T17:08:57  *** __mike has quit IRC
+2011-06-04T17:13:35  *** ivog has quit IRC
+2011-06-04T17:30:28  *** miker2 has joined #selenium
+2011-06-04T17:35:03  *** miker2 has quit IRC
+2011-06-04T17:52:07  *** sjmikem has joined #selenium
+2011-06-04T17:58:05  *** esteele_ has joined #selenium
+2011-06-04T18:00:42  *** esteele_ is now known as esteele
+2011-06-04T18:00:50  *** esteele has left #selenium
+2011-06-04T18:32:28  *** brettporter has joined #selenium
+2011-06-04T18:35:02  *** miker2 has joined #selenium
+2011-06-04T18:43:28  *** brettporter has quit IRC
+2011-06-04T18:47:00  *** Binken has joined #selenium
+2011-06-04T19:02:51  *** overlords has quit IRC
+2011-06-04T19:02:59  *** overlords has joined #selenium
+2011-06-04T19:12:32  *** Binken has quit IRC
+2011-06-04T19:19:24  *** Binken has joined #selenium
+2011-06-04T19:46:28  *** miker2 has quit IRC
+2011-06-04T19:49:22  *** Binken is now known as Binken[A]
+2011-06-04T19:49:22  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-04T20:08:27  *** cakehero has quit IRC
+2011-06-04T20:17:56  *** Binken[A] has quit IRC
+2011-06-04T20:19:18  *** Spanktar has quit IRC
+2011-06-04T20:51:48  *** |izzie has quit IRC
+2011-06-04T21:51:25  *** retornam has joined #selenium
+2011-06-04T22:36:58  *** cvhhmm has joined #selenium
+2011-06-04T22:42:59  *** cvhhmm has quit IRC
+2011-06-04T22:49:59  *** reddeviL is now known as red^
+2011-06-04T23:09:49  *** ivog has joined #selenium
+2011-06-04T23:14:18  *** ivog has quit IRC
+2011-06-04T23:24:40  *** freynaud has joined #selenium
+2011-06-04T23:24:40  *** stepheneb has quit IRC
+2011-06-04T23:25:10  *** freynaud has quit IRC
+2011-06-04T23:48:46  *** Nirdosh has left #selenium
+2011-06-04T23:50:09  *** Nirdosh has joined #selenium
+2011-06-04T23:54:06  *** Nirdosh has left #selenium

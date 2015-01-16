@@ -1,0 +1,337 @@
+[IRC logfile - Started Sat Mar 16 00:00:25 2013]
+[00:00:25] BW^-: dude-x_: let's see, from about:config i found two filenames with logs, so the webdriver is confirming it's installed and outputing something. but nothing about any listening portl
+[00:01:08] Dude-X_: web driver is the key in about...
+[00:01:18] Dude-X_: but it does set the listening port to 7055
+[00:01:38] Dude-X_: or maybe the extension itself is set to that
+[00:01:38] BW^-: dude-x_: does it really start listening presuming only that the plugin is installed?
+[00:01:47] Dude-X_: yes it needs the plugin
+[00:02:23] Dude-X_: the plugin pretty much has the interpreter and "web server"
+[00:02:56] Dude-X_: also it needs the profile set with certain things disabled so that web driver can do things cleanly
+[00:03:06] BW^-: dude-x_: so i've installed the plugin. tried to look in the Py souces but didn't see any additional clue except for that "webdriver_firefox_port" setting declared there, that i don't know how i could introduce to firefox yet
+[00:03:17] BW^-: dude-x_: should it just work? any suggestion for how i make it work?
+[00:03:37] Dude-X_: there's the anonymous profile that sets a whole bunch of user.prefs settings
+[00:03:44] Dude-X_: it's under FIrefoxprofile
+[00:04:59] BW^-: https://code.google.com/p/selenium/source/browse/py/selenium/webdriver/firefox/firefox_profile.py
+[00:06:46] Dude-X_: after reading the source code, i am lead to believe the XPS file hardcodes the default port
+[00:07:06] Dude-X_: the Java code makes it seem you can change the port too but i am not convinced that works
+[00:07:10] Dude-X_: last time l looked
+[00:07:42] BW^-: hm
+[00:10:14] BW^-: dude-x_: still trying to figure out. where in the .xps would the port number be harcdoded?
+[00:10:25] Dude-X_: i never saw the source code for that
+[00:10:26] BW^-: netstat indeed shows my computer is listening on some ports, but i can't see any seeming relevant
+[00:10:28] BW^-: k
+[00:10:44] Dude-X_: the main # is 7055 on firefox
+[00:11:26] Dude-X_: the driver will use any available port to listen back from the extension
+[00:12:01] BW^-: dude-x_: now checked with "netstat -b" on windows, and the firefox is not listening on any port
+[00:12:58] Dude-X_: does firefox say "Webdriver" at the bottom?
+[00:13:58] BW^-: dude-x_: no
+[00:14:10] BW^-: dude-x_: i mean, i have no statusbar or anything at the bottom of the firefox, and don't know how to enable
+[00:14:11] Dude-X_: then the extension is not loaded
+[00:14:12] Dude-X_: or primed
+[00:14:19] BW^-: ah wait wait
+[00:14:31] BW^-: dude-x_: i clicked "AddOn Bar" andn ow it shows "Webdriver"  at the bottom right indeed! =)
+[00:14:51] Dude-X_: why are you trying to do raw web driver?
+[00:14:56] BW^-: dude-x_: and when i move the mouse over webdriver, it says "this firefox can be remote controlled with webdriver".
+[00:15:09] BW^-: dude-x_: well i think it should work first of all
+[00:15:18] BW^-: and second, because i want to do manual json requests to the firefox
+[00:15:20] Dude-X_: it doesn't work on freeBSD?
+[00:15:27] BW^-: didn't try, i don't have that installed
+[00:15:30] BW^-: now am trying on MS Windows
+[00:15:35] BW^-: just to get an idea
+[00:15:37] Dude-X_: oh
+[00:15:40] BW^-: should be really straightforward, i mean it's just a plugin
+[00:15:46] Dude-X_: not just a plugin
+[00:15:54] BW^-: well, almost just a plugin :)
+[00:15:59] Dude-X_: you need to have the right settings in the profile
+[00:16:03] Dude-X_: then it loads the plugin
+[00:16:04] BW^-: supposedly i don't need the native stuff, so for my usecase it should reduce to that
+[00:16:24] BW^-: apparently my firefox loads the plugin already
+[00:16:58] BW^-: hmm. soo. i do have a default dir for firefox.
+[00:17:33] Dude-X_: the PHP bindings do raw JSON wire for communicating with browsers. not fun
+[00:18:24] BW^-: dude-x_: maybe i should check how it starts firefox
+[00:18:31] BW^-: i got now how the Py file modifies the profile file anyhow
+[00:18:47] BW^-: it's really basic, it just adds user_pref(key,value); copmmands to prefs.js
+[00:19:11] Dude-X_: yeah
+[00:20:20] BW^-: tried manually adding webdriver_firefox_port, 7055 in my global firefox conf, did not have effect. now. hmm.
+[00:20:28] BW^-: ah wait, i added it as string *changing to integer*
+[00:20:46] Dude-X_: in java or python when you call driver = FirefoxDriver() it will first create an anonymous profile (prefs.js) and then load the extension in firefox. visibility you'll see firefox open then close again; then it will open again, ready to listen to json commands
+[00:22:38] BW^-: dude-x_: what's your point now,t hat it runs and closes and then runs again by some reason?
+[00:23:46] Dude-X_: yes
+[00:23:53] Dude-X_: i think it calls firefox with the profile command
+[00:24:01] BW^-: right
+[00:24:09] BW^-: dude-x_: but, if i add this to my global profile, it should work fine too
+[00:24:55] Dude-X_: to load that profile and load the extension. it shuts down firefox so that it can load the extension (since most extensions need to restart firefox anyway) 
+[00:28:46] Dude-X_: getting dinnner
+[00:28:49] phishy has joined #selenium
+[00:29:05] BW^-: dude-x_: .. ah this is difficult, i can't see how to get this going
+[00:29:17] BW^-: should be simple though
+[00:29:41] Dude-X_: try debugging the python
+[00:29:46] Dude-X_: bindings
+[00:29:57] Dude-X_: you will see step by step what happens
+[00:31:19] BW^-: ok
+[00:45:09] farlan has joined #selenium
+[00:47:17] FullTiltProspect has joined #selenium
+[00:53:52] BW^-: aha, progress!
+[00:53:53] BW^-: Timestamp: 2013-03-16 02:54:09
+[00:53:53] BW^-: Error: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED)
+[00:53:53] BW^-: [nsIPrefBranch.getIntPref]
+[00:53:53] BW^-: Source File: ...rmmu634t.default/extensions/fxdriver@googlecode.com/components/httpd.js
+[00:53:53] BW^-: Line: 527
+[00:53:54] BW^-: hmm
+[00:54:36] FullTiltProspect has joined #selenium
+[00:55:35] FullTiltProspect has joined #selenium
+[00:56:21] BW^-: haha yey, the plugin loaded
+[00:56:22] BW^-: how unexpected
+[00:56:28] BW^-: it failed with an exception that there was nonetwork.http.max-connections-per-server setting
+[00:56:49] BW^-: that one is not even among the profile settings provided by the client code
+[IRC logfile - Started Sat Mar 16 01:00:29 2013]
+[01:00:29] stephend|mtg has joined #selenium
+[01:05:31] BW^-: does the webdriver instance listen to localhost only by default?
+[01:16:59] llaskin has joined #selenium
+[01:20:03] BW^-: umm, should not just http://localhost:7055/sessions   work fine to visit?
+[01:20:09] BW^-: I get 404 Not Found for this now
+[01:33:19] BW^-: http://localhost:7055/wd/hub/status :D
+[01:33:21] admc has joined #selenium
+[01:40:21] smccarthy has joined #selenium
+[01:45:58] jibay has joined #selenium
+[01:49:27] BW^-: umm
+[01:49:34] BW^-: what is the base URL for "session" and "sessions" ?
+[01:54:00] admc has joined #selenium
+[01:56:00] stephend has joined #selenium
+[01:56:54] jleyba_ has joined #selenium
+[01:59:48] BW^-: aha, hub, soo http://localhost:7055/hub/session
+[IRC logfile - Started Sat Mar 16 02:01:29 2013]
+[02:01:29] stephend: BW^-: having problems with Grid/launching Firefox?
+[02:04:37] BW^-: yey :)
+[02:04:46] BW^-: stephend: it took about 4hrs to get it going though now i did it
+[02:04:57] BW^-: manual json access over telnet finally going, yey :)
+[02:05:01] stephend|out: oh cool
+[02:05:18] BW^-: now
+[02:05:18] stephend|out: BW^-: you're Python, is that right?
+[02:05:18] BW^-: stephend|out: i'm telnet!
+[02:05:22] stephend|out: heh, well
+[02:05:31] BW^-: i was surprised to see that i ran into an error when starting the XPI
+[02:05:37] stephend|out: I say a "Py file" reference
+[02:05:38] stephend|out: ah
+[02:05:47] BW^-: it required a profile property that firefox had not set
+[02:05:49] BW^-: so it threw exception
+[02:05:50] BW^-: !!!
+[02:06:05] BW^-: namely this one network.http.max-connections-per-server
+[02:06:14] BW^-: it was not set in my firefox, whichi s the ordinary one from getfirefox.com
+[02:06:15] stephend|out: what's your command-line arg?
+[02:06:24] BW^-: and, the py or java files don't set that one too
+[02:06:27] BW^-: stephend|out: none.
+[02:06:31] BW^-: to firefox, if that's what you mean.
+[02:06:32] stephend|out: hrm
+[02:06:43] BW^-: the absence of network.http.max-connections-per-server made httpd.js throw exception
+[02:06:51] BW^-: anyhow, luckily i found out so it's fine
+[02:06:56] stephend|out: ah, yeah
+[02:07:06] stephend|out: we push prefs via JSON too, in our plugin
+[02:07:11] BW^-: btw, it appears to me that the server address used by the XPI is localhost:[port number]
+[02:07:17] BW^-: but i didn't see where it actually says localhost in the code
+[02:07:19] BW^-: how is it?
+[02:07:19] stephend|out: BW^-: we're Python -- py.test and a custom Grid/Saucelabs config
+[02:07:30] BW^-: for security, it would make sense to only listen to localhost, not accept from other hosts
+[02:07:34] BW^-: at least as default setting
+[02:07:42] BW^-: stephend|out: ok
+[02:07:45] stephend|out: sorry, heh
+[02:07:54] stephend|out: even though I work for Mozilla, I don't actually know
+[02:07:58] stephend|out: don't know much about client stuff
+[02:08:02] BW^-: hehe
+[02:08:19] BW^-: stephend|out: in httpd.conf, the web server constructor has as second argument "loopback" which if true means it listens to localhost only
+[02:08:30] BW^-: though duno where the httpd is instantiated :)
+[02:08:41] BW^-: also i should be able to read this from netstat but .. em :)
+[02:09:15] BW^-: hmm. yes, looking at the netstat output, i cannot understand it as that it'd be listening on anything else than localhost
+[02:09:28] BW^-: also, trying to connect from another machine appears to fail.
+[02:10:09] stephend|out: ah, you're all integrated
+[02:10:11] BW^-: yeah so it must be localhost only - great
+[02:10:24] BW^-: very well
+[02:10:25] BW^-: well
+[02:10:31] BW^-: got it going now, very neat. :)
+[02:11:09] BW^-: stephend|out: how come  you queried about python and the grid, were you thinking about any particular code issue relating to those or?
+[02:11:25] stephend|out: BW^-: always interested in Grid-stability issues
+[02:11:39] stephend|out: https://github.com/mozilla/moz-grid-config
+[02:12:18] stephend|out: there's our config -- we've reported quite a few issues, but there are still problems w/Firefox on our gird
+[02:12:19] stephend|out: grid
+[02:13:11] BW^-: aha
+[02:13:16] BW^-: what's the mechanism of this grid thing?
+[02:13:27] BW^-: i mean, it's not just separate instances running separately on separate machines?
+[02:13:37] BW^-: running a set of sessions each?
+[02:13:51] stephend|out: we have 7 nodes running on mac mini
+[02:13:56] stephend|out: and VMs within those nodes
+[02:14:03] stephend|out: let me show you our architecture
+[02:14:35] stephend|out: https://wiki.mozilla.org/QA/Execution/Web_Testing/Automation/Selenium_Grid
+[02:16:46] stephend|out: BW^-: browsers are specified (versions, paths)
+[02:17:04] stephend|out: in a config file, then we launch with pytestmozwebqa, via Jenkins, and send to Grid
+[02:17:23] stephend|out: we have hooks to call out to Sauce Labs
+[02:19:03] BW^-: aha
+[02:19:53] stephend|out: we can do either/both
+[02:20:03] stephend|out: https://github.com/davehunt/pytest-mozwebqa
+[02:25:01] phishy has joined #selenium
+[02:26:19] awilson820 has joined #selenium
+[02:29:33] phishy has joined #selenium
+[02:30:08] itsmikerudolph has joined #selenium
+[02:33:42] BW^-: aha
+[02:33:43] BW^-: so
+[02:34:03] BW^-: as to isntall teh XPI on OpenBSD, its install.rdf file needs  the following line       <em:targetPlatform>OpenBSD</em:targetPlatform>
+[02:34:12] BW^-: otherwise the browser says the Firefox version is bad :)
+[02:34:37] BW^-: so that would be a good thing to add
+[IRC logfile - Started Sat Mar 16 04:13:33 2013]
+[04:13:33] dgempesaw has joined #selenium
+[04:38:00] stackedsax has joined #selenium
+[04:46:15] ShawnM has joined #selenium
+[04:52:17] Selenium-Git has joined #selenium
+[04:52:17] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06jruby-update at 14ecb6aa3: 02http://git.io/tqbnfQ
+[04:52:17] Selenium-Git has left #selenium
+[IRC logfile - Started Sat Mar 16 05:07:48 2013]
+[05:07:48] jmathes__ has joined #selenium
+[05:09:41] Dude-X_ has joined #selenium
+[05:11:20] girija has joined #selenium
+[05:11:38] Getty has joined #selenium
+[05:23:36] tinygeo has joined #selenium
+[05:48:49] farlan1 has joined #selenium
+[IRC logfile - Started Sat Mar 16 06:23:51 2013]
+[06:23:51] amitev has joined #selenium
+[06:32:29] ShawnM has joined #selenium
+[IRC logfile - Started Sat Mar 16 07:40:37 2013]
+[07:40:37] SamuraiJack has joined #selenium
+[07:46:07] SamuraiJack_ has joined #selenium
+[07:47:56] admc has joined #selenium
+[IRC logfile - Started Sat Mar 16 08:07:52 2013]
+[08:07:52] manoj_ has joined #selenium
+[08:11:38] testingb0t has joined #selenium
+[08:16:24] ShawnM has joined #selenium
+[08:34:20] KaibutsuX has joined #selenium
+[IRC logfile - Started Sat Mar 16 09:02:08 2013]
+[09:02:08] ShawnM has joined #selenium
+[09:03:05] ShawnM has joined #selenium
+[09:08:32] ShawnM has joined #selenium
+[09:18:16] zeljkof has joined #selenium
+[09:25:46] samphippen has joined #selenium
+[09:33:21] barancev has joined #selenium
+[09:33:30] barancev: :log
+[09:33:30] selbot2: http://illicitonion.com/selogs/selenium/2013/03/16.txt | http://illicitonion.com/selogs/search
+[09:46:28] samphippen has joined #selenium
+[IRC logfile - Started Sat Mar 16 10:19:16 2013]
+[10:19:16] manoj_ has joined #selenium
+[10:26:28] stackedsax has joined #selenium
+[IRC logfile - Started Sat Mar 16 11:06:20 2013]
+[11:06:20] mika has joined #selenium
+[11:06:21] mika has joined #selenium
+[11:11:58] ShawnM has joined #selenium
+[11:30:56] samphippen has joined #selenium
+[11:42:15] samphippen has joined #selenium
+[IRC logfile - Started Sat Mar 16 12:05:55 2013]
+[12:05:55] jibay has joined #selenium
+[12:17:56] detroniz_ has joined #selenium
+[12:31:35] SamuraiJack_ has joined #selenium
+[12:55:14] admc has joined #selenium
+[12:58:21] zeljkof has joined #selenium
+[IRC logfile - Started Sat Mar 16 13:00:41 2013]
+[13:00:41] rbalent has joined #selenium
+[13:12:05] llaskin has joined #selenium
+[13:16:35] phishy has joined #selenium
+[IRC logfile - Started Sat Mar 16 14:01:08 2013]
+[14:01:08] girija has joined #selenium
+[14:13:06] rbalent has joined #selenium
+[14:14:11] Selenium-Git has joined #selenium
+[14:14:11] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/ks6WJQ
+[14:14:11] Selenium-Git: 13selenium/06master 146cfaf2b 15Alexei Barantsev: Unignoring tests that pass locally in Chrome
+[14:14:11] Selenium-Git has left #selenium
+[14:19:51] itsmikerudolph has joined #selenium
+[14:33:28] SamuraiJack__ has joined #selenium
+[14:38:51] SamuraiJack__ has joined #selenium
+[14:49:28] stephend has joined #selenium
+[IRC logfile - Started Sat Mar 16 15:02:20 2013]
+[15:02:20] ryanpetrello has joined #selenium
+[15:09:22] intchanter has joined #selenium
+[15:10:10] Selenium-Git has joined #selenium
+[15:10:10] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/0u3hlA
+[15:10:10] Selenium-Git: 13selenium/06master 14303fd64 15Alexei Barantsev: Ignoring back a test method that was unignored in the previous commit by...
+[15:10:10] Selenium-Git has left #selenium
+[15:11:11] barancev: jarib: не,
+[15:11:16] barancev: jarib: yt?
+[15:23:58] stephend has joined #selenium
+[15:32:47] DarkRift has joined #selenium
+[15:38:43] nirvdrum has joined #selenium
+[15:38:57] barancev|2 has joined #selenium
+[15:41:41] stephend has joined #selenium
+[15:45:21] llaskin has joined #selenium
+[15:48:14] AutomatedTester: adamgoucher: ping
+[IRC logfile - Started Sat Mar 16 16:10:35 2013]
+[16:10:35] adamgoucher: pong
+[16:12:51] AutomatedTester: adamgoucher: skype
+[16:19:27] manoj has joined #selenium
+[16:19:53] adamgoucher: hurray for live streams - http://cdn.livetvstatic.ru/webplayer.php?t=justintv&c=49rolex49&lang=de&eid=160508&lid=126624&ci=679&si=7 12 hours of sebring :)
+[16:22:33] *AutomatedTester is watching Rugby via the intertubes
+[16:22:36] samphippen has joined #selenium
+[16:37:05] tinygeo has joined #selenium
+[16:40:14] adamgoucher: of course, as soon as i settle in with the feed they swith to superbikes
+[16:41:12] *Dude-X_ is watching PyCon live streaming
+[16:51:34] SamuraiJack has joined #selenium
+[IRC logfile - Started Sat Mar 16 17:00:40 2013]
+[17:00:40] awilson820 has joined #selenium
+[17:01:58] manoj has joined #selenium
+[17:07:31] alkemist has joined #selenium
+[17:15:09] llaskin has joined #selenium
+[17:32:51] DarkRift has joined #selenium
+[17:32:51] DarkRift has joined #selenium
+[17:52:14] manoj: Dude-X_: how to watch the live streaming of pycon ?
+[17:52:38] manoj: also i think Sauce's Tutorial and talks are over… is there a way to see that as well ?
+[17:52:41] Dude-X_: htttp://www.timvideos.us
+[17:52:52] Dude-X_: www.timvideos.us/
+[17:53:37] Dude-X_: tutorials are recorded but you will have to wait for videos to be posted
+[17:53:59] manoj: okay..
+[IRC logfile - Started Sat Mar 16 18:10:06 2013]
+[18:10:06] manoj: i see selenium there :) 
+[18:10:21] manoj: intchanter: is there in the channel too.. :) #pycon
+[18:14:18] intchanter: I'm loving the testing track so far this morning.
+[18:18:18] llaskin has joined #selenium
+[18:18:41] DK3 has joined #selenium
+[18:18:56] intchanter: "Because its more fun to write tests on weekdays than fix bugs on weekends."
+[18:19:22] intchanter: - Carl Meyer in "Getting Started With Automated Testing" at PyCon
+[18:20:55] jarib: barancev|2: here now
+[18:44:13] rbalent has joined #selenium
+[18:48:48] ShawnM has joined #selenium
+[18:50:23] phishy has joined #selenium
+[18:56:08] Dude-X_: intchanter, j carr will do monile testing prez in 8 min
+[18:57:01] intchanter: I already have the streaming up and am in #pycon-ef as well.  :-)
+[18:58:11] Dude-X_: i didn't; fixed that
+[IRC logfile - Started Sat Mar 16 19:07:33 2013]
+[19:07:33] Selenium-Git has joined #selenium
+[19:07:33] Selenium-Git: [13selenium] 15twalpole opened pull request #31: fix javasricpt tests for contenteditable that were copied but not fully edited (06master...06contenteditable_tests)  02http://git.io/SOprVA
+[19:07:33] Selenium-Git has left #selenium
+[19:20:54] llaskin has joined #selenium
+[19:21:47] barancev|2: jarib: why did you close #5340? there is a comment there that it was reproduced in FF10esr
+[19:21:48] selbot2: 03 closed/wontfix Browser long script execution over webdriver - https://code.google.com/p/selenium/issues/detail?id=5340 [Type-Defect Priority-Medium]
+[19:32:40] Dude-X_: seems like Appium is pretty swank
+[19:34:06] stackedsax has joined #selenium
+[19:46:51] jarib: barancev|2: ah, missed that. will reopen
+[19:48:41] intchanter: Dude-X_: Yes, it looks pretty cool.  Being able to run your desktop browser tests on mobile (mostly) without modification?  Win.
+[19:50:41] phishy has joined #selenium
+[19:51:06] SamuraiJack_ has joined #selenium
+[IRC logfile - Started Sat Mar 16 20:06:49 2013]
+[20:06:49] ooo has joined #selenium
+[20:45:51] stephend has joined #selenium
+[20:48:33] stephend has joined #selenium
+[20:53:33] phishy has joined #selenium
+[20:54:54] intchanter: Someone here mentioned not using fpm for something.  What was that, and does anyone have references handy?
+[20:59:00] zeljkof has joined #selenium
+[IRC logfile - Started Sat Mar 16 21:08:13 2013]
+[21:08:13] Swadq has joined #selenium
+[21:14:15] stephend has joined #selenium
+[21:19:05] DarkRift has joined #selenium
+[21:23:27] testingb0t has joined #selenium
+[21:29:04] zeljkof has joined #selenium
+[21:30:08] ShawnM has joined #selenium
+[21:34:13] stephend has joined #selenium
+[21:52:31] elopio has joined #selenium
+[IRC logfile - Started Sat Mar 16 22:12:13 2013]
+[22:12:13] fatguylaughing has joined #selenium
+[22:17:34] DarkRift has joined #selenium
+[22:30:11] rbalent has joined #selenium
+[22:30:11] rbalent has joined #selenium
+[IRC logfile - Started Sat Mar 16 23:37:28 2013]
+[23:37:28] ShawnM has joined #selenium
+[23:54:01] ryanpetrello has joined #selenium
+[23:55:06] ryanpetrello has joined #selenium

@@ -1,0 +1,607 @@
+[IRC logfile - Started Tue May  1 16:13:23 2012]
+[16:13:33] selloggingbot has joined #selenium
+[IRC logfile - Started Tue May  1 16:14:30 2012]
+[16:14:40] selloggingbot has joined #selenium
+[IRC logfile - Started Tue May  1 16:14:57 2012]
+[16:15:07] selloggingbot has joined #selenium
+[16:15:12] dawagner: test...
+[16:15:23] dawagner: http://illicitonion.com/selogs/
+[16:16:05] lukeis: nice
+[16:16:08] jimevans: whee!
+[16:16:13] jimevans: nice one, dawagner
+[16:16:39] lukeis: dawagner: i saved off the logs from 2011-02-10 to 2011-10-07 if you want to host them too
+[16:17:01] dawagner: Sure, if you dump them somewhere I can happily dump them up
+[16:17:24] lukeis: it's 14M
+[16:17:28] dawagner: Awesome :)
+[16:18:04] jarib: bsilverberg: https://gist.github.com/2568723
+[16:18:27] dawagner: jarib: Where did you scrape that from?
+[16:18:38] jarib: dawagner: code is on the bottom :)
+[16:18:39] dawagner: aha, the script is below :)
+[16:18:47] jarib: it's from the spec
+[16:18:54] dawagner: Nice!
+[16:19:00] jarib: in particular the version of the spec that's currently in the watir-webdriver repo
+[16:19:01] lukeis: dawagner: check your gmail
+[16:19:47] bsilverberg: nice! thanks jarib 
+[16:20:40] jarib: the webidl syntax keeps changing, i need to fix my parser to make it work for the latest and greatest spec
+[16:20:49] jarib: bsilverberg: yw :)
+[16:21:05] barancev: IE is upsetting me...
+[16:21:09] jarib: actually i should probably not write my own parser..
+[16:21:13] barancev: <div id="zero-size"><img src="" width="0" height="0"/></div> -- isDisplayed = true
+[16:21:25] barancev: <div id="transparent" style="opacity:0">transparent</div> -- true again
+[16:21:48] zac_sel_: ie has not discovered the concept of 0 yet :D
+[16:21:58] dawagner: lukeis: Uploaded :)
+[16:22:00] barancev: does not it use isShown atom?
+[16:22:59] lukeis: if i'd known i would have dumped more... i only wrote a script to grab those logs cause I was looking for something that was mentioned and didn't know when (yay to be able to use grep)
+[16:23:18] jimevans: barancev: it does, in point of fact, use the isShown atom.
+[16:23:49] barancev: well, this zero-size div is (965, 1) in IE
+[16:24:01] bsilverberg: So, if we change bot.dom.getAttribute to *not* normalize the attributes and then enhance webdriver.atoms.element.getAttribute to do the normalization, will that be ok for other users of the atoms? Does everyone go through webdriver? And if the answer is "maybe" then do we just make the change and see what, if anything, breaks?
+[16:24:21] dawagner: I'd say make the change and see what happens
+[16:25:08] jimevans: or, more explicitly, it use the isDisplayed atom, which explicitly is bot.dom.isShown
+[16:25:25] jimevans: if that javascript function is misbehaving, you'll need to debug the javascript.
+[16:25:34] barancev: yes, isShow must be correct but it's no matter as IE thinks that size is > 0
+[16:26:13] jimevans: barancev: it *does* matter.
+[16:26:19] bsilverberg: but you're saying that in theory we should be able to change the behaviour of atoms as long as we make a corresponding change to js/webdriver?
+[16:26:35] dawagner: Yes
+[16:26:35] jimevans: the *only* thing isDisplayed() does in the IE driver is call isShown and return the result.
+[16:27:06] bsilverberg: cool :-)
+[16:27:07] barancev: jimevans: it sounds to be getSize problem, not isShown
+[16:27:34] jimevans: but you're saying the problem is in isDisplayed...
+[16:28:22] barancev: jimevans: I thought that isDisplayed should return false for <div id="zero-size"><img src="" width="0" height="0"/></div>
+[16:28:24] jimevans: sorry, let me rephrase. you're saying you're seeing incorrect behavior when you call WebElement.isDisplayed(), right? or am I misreading your comments.
+[16:28:34] bsilverberg: jarib: do you have a url for the source of that info which I can add to a comment? I assume pointing at the gist in a comment would not be a good idea
+[16:28:36] barancev: IE returns true
+[16:29:25] barancev: but at the same time it returns non-zero size  (965, 1) for this element
+[16:29:35] jimevans: i believe you, that IE returns true for that particular element. what I'm asking is what does bot.dom.isShown() return for the same element in IE?
+[16:29:40] barancev: that's wrong too and looks like the root cause
+[16:30:12] jimevans: if that's the root cause, then it's in the javascript called by bot.dom.isShown().
+[16:31:03] dawagner: I hate flaky tests.
+[16:31:11] jimevans: listen carefully to what i'm telling you. the *only* thing WebElement.isDisplayed() does in IE is call bot.dom.IsShown(). whether that atom does checking of the element size, i have no idea.
+[16:31:25] barancev: it does
+[16:31:31] barancev: // Any element without positive size dimensions is not shown
+[16:31:38] jimevans: but the C++ code of the driver does not do any further checking outside of whatever that javascript function returns.
+[16:31:53] barancev: it checks bot.dom.getElementSize(e) to be non-zero
+[16:32:07] jimevans: then the problem is in the atom.
+[16:32:19] barancev: that, in its term, uses goog.style.getSize(element)
+[16:32:32] barancev: s/term/turn/
+[16:33:01] dmachi has joined #selenium
+[16:34:07] dawagner: For the record, pizza with a hot dog in the curst is amazing.
+[16:34:23] jimevans: although it's entirely possible that IE renders an empty div as a 1-pixel element.
+[16:34:34] jimevans: which would be stupid, but not surprising.
+[16:34:39] barancev: :)
+[16:36:35] dmachi1 has joined #selenium
+[16:37:14] SamuraiJack has joined #selenium
+[16:37:30] selbot2: 03luke.semerau@gmail.com less than 20 seconds ago - LukeIS: updating link to IRC chat log on support page | https://code.google.com/p/selenium/source/detail?r=16755 | http://seleniumhq.org/ci.jsp?r=16755
+[16:39:51] barancev: element.clientHeight -> 0, element.offsetHeight -> 1 , element.scrollHeight -> 1
+[16:39:56] jarib: bsilverberg: the source is ultimately http://www.whatwg.org/specs/web-apps/current-work/
+[16:39:58] bsilverberg: sounds super healthy too, dawagner 
+[16:40:15] bsilverberg: thanks
+[16:40:23] barancev: yes, it is rendered as 1-pixel height element
+[16:40:40] jimevans: yeah, that's what i thought.
+[16:40:48] selbot2 has joined #selenium
+[16:41:14] jimevans: it's actually rendering the element, so *technically* the atom is reporting the correct result. :)
+[16:41:14] travis-ci has joined #selenium
+[16:41:15] travis-ci: [travis-ci] jarib/selbot2#17 (master - 82c10f9 : Jari Bakken): The build passed.
+[16:41:15] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/db1f571...82c10f9
+[16:41:15] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1219684
+[16:41:15] travis-ci has left #selenium
+[16:41:23] barancev: and this one is the best of IEs, not 6th, but 9th
+[16:41:33] jarib: :log
+[16:41:33] selbot2: http://illicitonion.com/selogs/selenium/2012/05/01.txt
+[16:41:39] jarib: thanks lukeis 
+[16:41:55] lukeis: np :)
+[16:42:36] kenck has joined #selenium
+[16:42:53] RossPatterson has joined #selenium
+[16:43:24] jimevans: right. back in an hour or so. remaining logged into the channel, but i'm not actually around. :)
+[16:43:35] bsilverberg_ has joined #selenium
+[IRC logfile - Started Tue May  1 17:03:30 2012]
+[17:03:30] marlena has joined #selenium
+[17:03:40] llaskin has joined #selenium
+[17:07:40] tunabum has left #selenium
+[17:10:47] _kip has joined #selenium
+[17:14:57] ssims has joined #selenium
+[17:15:55] benadderson: jimevans: Quick question about the new IEDriverServer.exe - when/how are we going to need to use it with Grid? Will it be the same as the ChromeDriver, i.e. make sure its available on the Path?
+[17:17:13] lukeis: benadderson: likely, yes
+[17:19:51] benadderson: lukeis: thanks. Any idea of timescales? Looks like there was some discussion on the mailing list (https://groups.google.com/forum/#!searchin/selenium-developers/ie$20driver/selenium-developers/vf98uN0NOAI/FYarpCGDhbwJ)  but nothing since Feb?
+[17:20:21] jleyba has joined #selenium
+[17:20:55] lukeis: um, i doubt you'll ever get anything concrete out of selenium for dates ;) .. but yeah, I would say in the next couple of releases it'll be around (depends on how much time jim can spend outside of work, etc to work on it!)
+[17:21:32] benadderson: Sure, I had assumed the answer would be in terms of versions, not dates ;)
+[17:21:59] lukeis: if i had to guess, 2.23+ will be using it
+[17:22:00] benadderson: I'm just trying to figure when I'm going to change our grid
+[17:22:18] lukeis: doubtful for 2.22
+[17:22:20] benadderson: OK, that's cool, thanks for the guess :)
+[17:24:14] kalle has joined #selenium
+[17:24:16] kalle: hi all
+[17:24:41] kalle: i have problems with selenium not respecting timeouts when tcp packages to http has been filtered out
+[17:24:53] kalle: filtered out as in eaten up by a firewall somewhere on the way
+[17:25:04] kalle: selenium will just sit there and wait forever
+[17:25:30] kalle: i can reproduce this really easy using my own firewall
+[17:25:42] kalle: is there some pleace where i should report this?
+[17:27:44] nirvdrum: kalle: The issue tracker: http://selenium.googlecode.com/
+[17:28:53] lukeis: :newissue
+[17:28:53] selbot2: https://code.google.com/p/selenium/issues/entry
+[17:30:47] Spanktar has joined #selenium
+[17:36:42] stephend has joined #selenium
+[17:37:50] dawagner: benadderson: Given that it should Just Work either now or very shortly, I would change the grid ASAP :)
+[17:38:06] retornam has joined #selenium
+[17:39:18] stockton has joined #selenium
+[17:39:29] lukeis: ha, watching simon's state of the union, he said i work adobe ... heh ;)
+[17:40:32] dawagner: I noticed that, yeah
+[17:41:37] xirkus has joined #selenium
+[17:44:35] benadderson: dawagner: The reason I haven't changed yet was to save myself the time of updating it, if the DriverServer revs between now and when the grid nodes will need it
+[17:45:20] jfunk has joined #selenium
+[17:52:49] stackedsax has joined #selenium
+[17:52:54] smev: hey
+[17:53:58] llaskin has joined #selenium
+[IRC logfile - Started Tue May  1 18:02:39 2012]
+[18:02:39] smev: if I navigate to a image url
+[18:02:52] smev: how can I download the binary of the image ?
+[18:04:55] Dude-X: do an http get?
+[18:05:29] smev: well the image needs to download under the same session as the browser...
+[18:06:16] dawagner: You can get all the cookies for the current session, and append that to your GET request
+[18:06:27] dawagner: I believe Ardesco has a useful utility class for doing so
+[18:08:49] jeichar_ has joined #selenium
+[18:10:24] smev: yeah the problem is I need it to run off the same IP as the selenium node
+[18:11:32] brokenthumbs has joined #selenium
+[18:12:17] sassda has joined #selenium
+[18:15:51] Jackneill has joined #selenium
+[18:17:06] barancev has joined #selenium
+[18:19:07] jimevans: benadderson: i'm back now. to answer your question more directly, the answer is whenever the language bindings the grid uses (in other words, java) are updated to support the standalone server.
+[18:19:30] jimevans: i wouldn't look for that any earlier than 2.23, as lukeis said.
+[18:21:05] baijum has joined #selenium
+[18:28:04] jimevans: i have now officially tweeted one of my fondest wishes… :)
+[18:33:51] mreedell has joined #selenium
+[18:41:48] santiycr has joined #selenium
+[18:41:48] selbot2: santiycr: note from dawagner about 4 hours ago: Can you talk to me and barancev about the IEDriverServer when you're around? :) 
+[18:42:53] santiycr: dawagner, barancev: hi
+[18:43:13] santiycr: let's talk about IEDriverServer ;)
+[18:47:05] barancev: I'm here
+[18:48:31] santiycr: what's up?
+[18:48:33] barancev: I have a CI-related question. I've created a patch for the java binding to use IEDriverServer.exe, but postpone to commit it because it should break the build on CI if the is no IEDriverServer.exe in PATH
+[18:49:58] barancev: we need to install IEDriverServer.exe on CI-server (upload and setup environment)
+[18:50:50] santiycr: I see
+[18:50:58] santiycr: got it
+[18:51:05] santiycr: let me fix that :)
+[18:51:09] barancev: ok
+[18:52:48] jeichar has joined #selenium
+[18:54:19] dawagner: santiycr: We'd like to be able to upload or unpack the server like with the selenium server jar, though
+[18:54:36] santiycr: oh boy
+[18:54:38] santiycr: :)
+[18:54:47] kenck has joined #selenium
+[18:55:04] santiycr: you guys haven't needed that for chromedriver :)
+[18:55:19] barancev: dawagner: is not it like chromedriver.exe?
+[18:55:21] dawagner: We don't own the chromedriver
+[18:55:32] dawagner: So we don't test changes to it, the chrome team do
+[18:55:37] santiycr: damn, I knew the answer to that one :)
+[18:55:56] dawagner: Sorry :p
+[18:56:06] santiycr: ok, let's start by placing IEDriverServer 
+[18:56:12] santiycr: then we'll figure out how to make it more flexible
+[18:56:31] dawagner: Thanks :)
+[18:56:34] dawagner: (Sorry :p)
+[18:56:37] santiycr: no need to be sorry!
+[18:56:45] santiycr: you guys are making shit happen
+[18:57:22] jarib: jimevans: do the .NET bindings support both the standalone executable and the DLL at the moment?
+[18:57:23] barancev: if it was unpacked somewhere from the distr, we would use a property to set path to the executable
+[18:57:46] barancev: jarib: yes, .net supports both
+[18:57:56] jarib: how does it decide what to use?
+[18:58:05] barancev: jarib: my patch will provide support for both too
+[18:58:27] barancev: it's useLegacyInternalServer capability
+[18:58:27] jimevans: jarib: yes.
+[18:58:44] jarib: ok, a capability
+[18:58:54] jimevans: jarib: there's a capability, but in reality, it mostly depends on which constructor you use.
+[18:59:44] clinton has joined #selenium
+[IRC logfile - Started Tue May  1 19:00:34 2012]
+[19:00:34] barancev: jimevans: what constructor to use to get dll-based server?
+[19:01:22] jimevans: any constructor that doesn't take a string, or pass in an explicit InternetExplorerOptions instance will use the library-based server.
+[19:01:41] sumxyz1 has joined #selenium
+[19:01:57] ssims_ has joined #selenium
+[19:02:18] jimevans: when the Java bindings include support for the standalone server, i'll reverse that, and make the standalone server the default constructor.
+[19:02:59] jimevans: incidentally, if you embed the .exe in the jar and extract at runtime, you'll run the risk of anti-virus scanners throwing false positives.
+[19:03:37] jimevans: it also hamstrings us from being able to rev the standalone server outside of a full-stack Selenium release.
+[19:05:24] jimevans: ok
+[19:07:13] barancev: btw, will it be possible to run multiple Ies on the same machine with this new executable server?
+[19:07:30] jimevans: should be.
+[19:07:32] lukeis: santiycr / dawagner : when we find some time we should also hook the iOS tests in to sauce (or whenever sauce enables that for "us" to consume ios...)
+[19:09:13] jimevans: though i confess no huge depth of testing there.
+[19:11:02] santiycr: barancev: any jar I can use to test the IEDriverServer?
+[19:13:22] santiycr: lukeis: indeed
+[19:13:46] santiycr: lukeis: we need to dynamically download the webdriver ios app, right?
+[19:13:51] barancev: santiycr: if you can run it from console using the same account that runs test - it's ok
+[19:14:22] barancev: I don't know how to build a small jar for testing purposes
+[19:14:49] barancev: but I can share my patched selenium-server-standalone.jar
+[19:14:52] santiycr: ./go release
+[19:15:03] santiycr: or that :)
+[19:15:08] santiycr: patching jars is fun
+[19:15:27] retornam has joined #selenium
+[19:15:43] barancev: I mean built with go release from the patched source, of course :)
+[19:15:51] barancev: a moment...
+[19:16:23] santiycr: oh, that's what I'm looking for
+[19:16:31] santiycr: a url to the jar would work
+[19:19:09] santiycr: Dude-X: man, the first 5 minutes suck
+[19:19:24] lukeis: santiycr: yep, we'll need to do that... well, once we get a OSX build server to actually build it :-/
+[19:19:36] santiycr: slept through my alarm and made it to the venue 3 minutes before my talk started. My stress levels were to the roof
+[19:19:45] Dude-X: wow
+[19:20:55] santiycr: Dude-X: the content should be useful. I'm pretty proud of the ideas that went in it
+[19:20:57] Dude-X: just got another email in LinkedIn from a recruiter looking for a selenium test writer
+[19:21:20] santiycr: lukeis: fun
+[19:21:29] santiycr: lukeis: let's talk about that in 1 or 2 months
+[19:21:37] lukeis: sounds good
+[19:21:38] santiycr: lukeis: we got lots of servers
+[19:28:59] eanxgeek: I have just recently started plaing with Select() ... in python with WD ... can someone tell me if Select() support multi-select?
+[19:30:02] eanxgeek: I'm thinking it does as long as I don't pass a deselect() in between multiple select() calls
+[19:30:14] lukeis: yes it does
+[19:30:22] eanxgeek: i.e. for item in list: select(item)
+[19:30:39] Dude-X: select works as long you don't have an ajaxy like select that renders on top of generic <Select> tags
+[19:31:27] eanxgeek: yeah I already have one select working however, in going over some scenarios it turns out there are two places in the webui where I could in theory test using multiple select.  
+[19:31:44] eanxgeek: manually this multiple select would occur by a [ctrl]+left mouse click
+[19:31:45] santiycr: barancev: got a commit that downloads and places IEDriverServer in our boxes
+[19:31:50] santiycr: just need to test it
+[19:32:07] eanxgeek: in selenium terms I assume I can just keep calling select() and it will continue to add to my selected items 
+[19:32:16] eanxgeek: deselect() would deselect() all
+[19:32:18] santiycr: barancev: whenever you have a jar, we'll run a test and put it live
+[19:32:19] barancev: santiycr: I'm doing go release
+[19:32:24] santiycr: cool
+[19:32:46] barancev: I'm on the laptop atm, that's not very fast
+[19:32:58] Dude-X: santiycr: i like the idea of guinea pigs
+[19:33:16] Dude-X: it lets the UI desiginers make changes and just run that set of tests
+[19:33:27] santiycr: barancev: no rush, I have plenty of things to do in the meantime :)
+[19:33:44] santiycr: Dude-X: yeah, guinea pigs and state generation and my favorite tips
+[19:33:55] santiycr: Dude-X: not too many people do them
+[19:34:02] ian_mac has joined #selenium
+[19:34:15] Dude-X: i don't have state generation, but i do have fixtures
+[19:34:32] santiycr: Dude-X: well, it's fixtures + mocking sessions
+[19:34:38] Dude-X: but the devs have to show us how the fixture framework works
+[19:34:58] santiycr: not just creating the data in the DB, but also being able to place your browser in the middle of a UI workflow without having to do the prior steps
+[19:35:00] Dude-X: sometimes the devs will add  internal webservice calls that let us reset app state and other neat thinsg
+[19:35:16] Dude-X: for our app, i think fixtures is generally enough
+[19:35:25] Dude-X: it would be faster to just jump to that state
+[19:35:46] Dude-X: but i don't think it would speed things up dramatically
+[19:36:04] santiycr: generally, just a simple login step before every test will add unnecessary minutes to your build
+[19:36:24] ssims has joined #selenium
+[19:36:35] barancev: anybody knows what's the current state of Selenium Builder?
+[19:36:43] Dude-X: we have a fixture login page, so that's superfast
+[19:36:56] santiycr: ah, cool
+[19:37:11] santiycr: barancev: getting more and more awesome every day :)
+[19:37:32] Dude-X: what is Selenium Builder in a nutshell
+[19:37:41] santiycr: barancev: I'm working on a spanish exporter :P
+[19:37:54] santiycr: Dude-X: Sel IDE with an html+js UI
+[19:37:59] barancev: is it available? what's plans to port to chrome?
+[19:38:11] Dude-X: oh nice. 
+[19:38:18] Dude-X: good to support your native language
+[19:38:21] santiycr: Dude-X: also, Se2 <-> Se1 support
+[19:38:38] santiycr: Dude-X: the goal is to be able to port it to other browsers in the future
+[19:38:47] Dude-X: ah instead of firefox only
+[19:38:53] Dude-X: a good goal
+[19:38:53] cMical has joined #selenium
+[19:39:00] santiycr: barancev: not much happening there right now, mostly focussing on wrapping it up for a release
+[19:39:17] santiycr: Dude-X: you gotta start somewhere, and the XUL UI was the first stopper
+[19:39:30] barancev: there is another prototype: https://github.com/jherault/Selenium-IDE-for-google-chrome
+[19:39:49] barancev: it has a working recorder
+[19:40:19] Transformer has joined #selenium
+[19:40:33] barancev: crossbrowser UI is one side, the rcorder is another one, it hardly can be portable
+[19:41:46] farlan has left #selenium
+[19:41:49] farlan has joined #selenium
+[19:46:48] AutomatedTester has joined #selenium
+[19:52:44] sfbrian has joined #selenium
+[19:58:20] retornam has joined #selenium
+[19:59:25] santiycr: barancev: awesome
+[19:59:28] santiycr: will pass that on
+[IRC logfile - Started Tue May  1 20:05:16 2012]
+[20:05:16] santiycr: barancev: that's pretty impressive
+[20:05:43] bburton has joined #selenium
+[20:06:03] barancev: santiycr: http://dl.dropbox.com/u/14835094/selenium-server-standalone-2.21.0.jar
+[20:08:05] santiycr: barancev: any special capability I need to setup?
+[20:08:20] santiycr: barancev: or will it just use the IEDriver server out of the box?
+[20:09:05] barancev: by default it should use IEDriverServer.exe
+[20:09:31] barancev: if you want old dll-based server, set useLegacyInternalServer capability
+[20:14:33] testingb0t has joined #selenium
+[20:20:21] nsussman has joined #selenium
+[20:20:46] jarib: :note bsilverberg updated the gist based on today's version of the spec https://gist.github.com/2568723
+[20:20:47] selbot2: ok!
+[20:21:09] ssims has joined #selenium
+[20:25:59] brokenthumbs has joined #selenium
+[20:30:14] lfryc has joined #selenium
+[20:30:22] MadMerlin|work: is there a se-ide exporter that can export php webdriver code?
+[20:30:49] lukeis: heh... the question would be to which php webdriver code ;)
+[20:30:54] santiycr: barancev: are you searching in path only?
+[20:31:02] MadMerlin|work: i found a php exporter plugin, but it seems to only export to the old style
+[20:31:12] lukeis: i don't think anyone has written one
+[20:31:41] MadMerlin|work: hmm, that's unfortunate
+[20:31:41] santiycr: cuz I'm setting the webdriver.ie.driver system property
+[20:32:04] santiycr: (that is, starting selenium with -Dwebdriver.ie.driver=\path\to\IEDriverServer.exe
+[20:32:33] santiycr: MadMerlin|work: you can write one for Builder
+[20:32:41] MadMerlin|work: builder?
+[20:32:48] santiycr: MadMerlin|work: https://github.com/admc/se-builder
+[20:33:55] santiycr: that's a java se2 exporter example:
+[20:33:56] santiycr: t
+[20:34:01] santiycr: https://github.com/admc/se-builder/blob/master/seleniumbuilder/chrome/content/html/js/builder/selenium2/io/formats/java.js
+[20:38:27] OperaDriver has joined #selenium
+[20:38:27] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/9c1c0f9...8272b66
+[20:38:27] OperaDriver: [operadriver/master] Bumping to latest guava release, removing deprecated method calls - Daniel Wagner-Hall
+[20:38:27] OperaDriver: [operadriver/master] Merge pull request #75 from illicitonion/master - Andreas Tolf Tolfsen
+[20:38:27] OperaDriver has left #selenium
+[20:41:01] barancev: santiycr: it's like chromedriver -- 1) PATH, 2) webdriver.ie.driver property
+[20:41:25] santiycr: let's see
+[20:41:39] lukeis: sigh. i can't respond to an email because they put "urgent" in it... personal rule, if that text appears I won't respond for at least 2 days ;)
+[20:42:14] eanxgeek: anyone seen this before, 15:40:50.678 WARN - Exception: Unable to connect to host 127.0.0.1 on port 7055 after 45000 ms. Firefox console output:
+[20:42:17] eanxgeek: *** LOG addons.xpi: startup
+[20:42:46] eanxgeek: I have no idea what WebDriver is trying to tell me here and this was working just fine yesterday and I haven't changed anything
+[20:42:56] eanxgeek: i.e. selenium-server.jar is still 2.19
+[20:42:57] lukeis: did firefox start? or not at all?
+[20:43:03] lukeis: FF12?
+[20:43:08] eanxgeek: lukeis: it started but never filled in the url
+[20:43:19] AutomatedTester: jimevans: were you shocked that by my tweet? :)
+[20:43:19] dawagner: Thanks andreast :)
+[20:43:23] lukeis: you need to upgrade to 2.21 (and even then i think there's a few bugs with FF12)
+[20:43:43] eanxgeek: sob my system did update to ff12
+[20:43:52] eanxgeek: I don't remember giving the green light on that 
+[20:43:54] eanxgeek: errrrrr
+[20:43:59] eanxgeek: I hate computers
+[20:44:27] AutomatedTester: eanxgeek: unfortunately we are like Chrome now
+[20:44:41] AutomatedTester: because people found the UI for "Do you want to update" scary
+[20:44:47] dawagner: AutomatedTester: Except that things break when you update ;)
+[20:45:06] AutomatedTester: dawagner: still waiting for that patch from Google
+[20:45:11] AutomatedTester: then less will break
+[20:45:33] eanxgeek: I agree, update screens are scary ;-) you know what's more scary - automatic updates letting technology make decisions for me
+[20:46:27] AutomatedTester: who wants to fix a regex for me quickly?
+[20:46:44] eanxgeek: lukeis: thanks, that has addressed the issue of getting my testing going again
+[20:46:49] Dude-X: i can take a crack if it's not too hairy
+[20:46:50] eanxgeek: haven't yet hit a bug
+[20:47:01] Dude-X: @ AutomatedTester
+[20:47:15] Dude-X: does native events work with FF12?
+[20:48:22] AutomatedTester: Dude-X: https://gist.github.com/15a43ddf6f2a3026aca8
+[20:48:33] AutomatedTester: my regex isnt working for the 2nd item
+[20:49:02] AutomatedTester: and when I get it getting it then it fubars the order
+[20:49:53] santiycr: yo jimevans, I'm having some issues with IEDriverServer
+[20:50:07] santiycr: https://img.skitch.com/20120501-ky8kxamdffhc9bpar1f26ayjq5.jpg
+[20:50:39] Dude-X: AutomatedTester: you want all elements? or all element/*
+[20:51:08] AutomatedTester: I want everything session/*
+[20:52:03] santiycr: jimevans: can I just download that dll? or do I need to install something I'm missing?
+[20:53:10] Dude-X: this says /session/(.*?)/((element/(.*?)/)?(.*)) -> grab all /session/ any here / element / maybe anything here, and whatever else
+[20:53:46] Dude-X: session/ any here / element / maybe anything here with a /, and whatever else
+[20:54:06] Dude-X: seems like it won't grab element/fin
+[20:54:14] santiycr: barancev: in case you know something about that error ^^^
+[20:54:23] Dude-X: brb
+[20:54:34] barancev: santiycr: never seen this
+[20:55:13] lukeis: AutomatedTester: do you want to replace it or something what groupings do you want... cause session.* matches ;)
+[20:55:37] santiycr: barancev: alrigth, going the brute force route and placing the dll in windows\system
+[20:56:24] AutomatedTester: Dude-X: thats my problem
+[20:57:56] jimevans: santiycr: aha. yeah. that's a thinkg.
+[20:58:01] jimevans: thing even
+[20:58:18] jimevans: you've got a pristine, clean environment there, don't you?
+[20:59:42] jimevans: well fuck
+[IRC logfile - Started Tue May  1 21:00:52 2012]
+[21:00:52] mdgreenfield has joined #selenium
+[21:00:56] santiycr: jimevans: yup
+[21:01:00] mdgreenfield has left #selenium
+[21:01:04] santiycr: jimevans: brand new vm every time
+[21:01:21] jimevans: what you actually want is: http://www.microsoft.com/en-us/download/details.aspx?id=8328
+[21:01:23] santiycr: jimevans: something tells me I'll have to update all our windows vm images :)
+[21:01:24] jimevans: and that sucks
+[21:02:07] jimevans: and this one: http://www.microsoft.com/en-us/download/details.aspx?id=13523 for x64.
+[21:02:30] jimevans: my bad. i didn't think about that as a potential issue.
+[21:02:35] santiycr: we currently don't have x64 boxes, so no worries about that one :)
+[21:02:53] santiycr: no worries
+[21:02:55] jimevans: wait a tick.
+[21:02:59] dawagner: santiycr: Please write down *everything* you need to do to get this up and running, we're going to need to have this written down somewhere *very* obvious
+[21:02:59] santiycr: probably worth adding to the docs
+[21:03:11] jimevans: i should be statically linked to the crt.
+[21:03:28] santiycr: dawagner: yup, taking notes
+[21:03:42] santiycr: jimevans: waiting 
+[21:04:32] santiycr: actually, will go get lunch
+[21:04:55] santiycr: will stay online in case you want to send me some instructions 
+[21:06:27] jimevans: bah. need to rebuild.
+[21:07:42] bsilverberg has joined #selenium
+[21:07:42] selbot2: bsilverberg: note from jarib about 1 hour ago: updated the gist based on today's version of the spec https://gist.github.com/2568723 
+[21:08:38] bsilverberg: thanks jarib 
+[21:11:29] AutomatedTester: Dude-X: I think I solved it
+[21:14:32] jibay__ has joined #selenium
+[21:14:50] jimevans: santiycr: building now. give me a few minutes.
+[21:19:41] nsussman has joined #selenium
+[21:23:37] Dude-X: AutomatedTester: great! i'm curious to see your solution
+[21:23:41] jimevans: santiycr: okay, pull the latest standalone server (2.21.1) from the downloads page and try again.
+[21:25:24] barancev: btw, what's roadmap to 2.22? (nice looking number, isn't it?)
+[21:25:45] Nogem has joined #selenium
+[21:25:58] Dude-X: 2.22 shoudn't ship until native events works on ubuntu 12.04 firefox
+[21:26:00] Dude-X: and ff12
+[21:26:03] sassda has left #selenium
+[21:26:09] jimevans: jleyba: ping
+[21:27:40] AutomatedTester: Dude-X: um, it passes my test data, let me try it working properly first
+[21:27:47] barancev: new ubuntas are not selenium-friendly. i've moved all my testlab to xubuntu
+[21:28:31] Dude-X: barancev: would it be too difficult to make it work?
+[21:29:18] barancev: unity is what I dislike in it
+[21:29:35] Dude-X: well you can install gnome panel (gnome classic)
+[21:29:44] Dude-X: unity does blow
+[21:31:44] barancev: I know I should learn how to configure it properly, but xubuntu works right and fast out-of-the box
+[21:33:15] Dude-X: actually what is xbuntun?
+[21:33:23] Dude-X: no fancy destkop environment?
+[21:33:39] barancev: it uses Xfce
+[21:33:48] barancev: http://en.wikipedia.org/wiki/Xfce
+[21:37:59] Dude-X: xfce is not too bad
+[21:39:09] santiycr: jimevans: win!
+[21:39:28] santiycr: remind me to buy you a beer when you're around! 
+[21:40:09] chainey has joined #selenium
+[21:40:15] chainey has left #selenium
+[21:40:19] jimevans: :-D
+[21:40:30] jimevans: static linking FTW!
+[21:40:55] santiycr: behold, the first IEDriverServer test run in the cloud:
+[21:40:55] Dude-X: ooh what new thing did you integrate
+[21:40:56] santiycr: https://sso.dev.saucelabs.com/jobs/69787cae7064484891d5a9d7e090905d
+[21:41:27] jimevans: do i hear an angel chorus?
+[21:45:27] dawagner: santiycr is magical
+[21:45:31] lukeis: santiycr: what was it doing for 46 seconds? ;)
+[21:46:56] Dude-X: that's why they call you tunabum
+[21:47:01] barancev: lukeis: https://sso.dev.saucelabs.com/jobs/69787cae7064484891d5a9d7e090905d/selenium-server.log
+[21:48:48] barancev: 20 seconds from the moment of the remote server start to the very end
+[21:48:51] jarib: :last 10
+[21:49:55] jimevans: barancev: does your patch implement auto-start and auto-shutdown of the standalone server (if using the "service" model)?
+[21:50:07] jimevans: (i would assume so)
+[21:50:17] barancev: jimevans: yes
+[21:50:47] jimevans: and the auto-shutdown is accomplished by calling the /shutdown url?
+[21:50:50] lukeis: yeah... so about 9 seconds to start it, not bad ;)
+[21:51:12] barancev: 10 sec to start selenium server + 8 sec to start browser + 2 sec to run a test
+[21:51:55] nirvdrum has joined #selenium
+[21:51:57] jimevans: barancev: you sure that's right? that's not how i read the log
+[21:53:01] AutomatedTester: Dude-X: I will sort the remote crazy fun tonight
+[21:53:09] AutomatedTester: I need it for work
+[21:53:19] Dude-X: ah nice
+[21:53:24] barancev: well, 10 sec to start selenium server + шувкшмукыукмук
+[21:53:36] Dude-X: cyrillic?
+[21:54:14] AutomatedTester: Dude-X: /session/(.*?)($|/((\w+/(.*?)/)?(.*)))'
+[21:54:19] AutomatedTester: thats the regex I have now
+[21:54:21] AutomatedTester: it works for me
+[21:54:27] AutomatedTester: well my test data
+[21:54:28] jimevans: i see approx. 8 seconds to load saucelabs.com.
+[21:54:39] barancev: s/шувкшмукыукмук/iedriverserver/, heh
+[21:55:24] jimevans: anyway, good to see it working. :)
+[21:55:32] Dude-X: AutomatedTester: yeah that will work for your purpose
+[21:55:56] jimevans: means i didn't screw things up too badly. :)
+[21:56:05] AutomatedTester: Dude-X: I hardly use regex so when I do I have to relearn things
+[21:56:35] Dude-X: i remember the basics and play with those regex tester websites
+[21:56:44] lukeis: AutomatedTester: and you call yourself a vim man... pffft
+[21:56:53] barancev: jimevans: yes, stop uses /shutdown url
+[21:57:21] jimevans: groovy.
+[21:57:25] AutomatedTester: lukeis: I dont replace code on a regular basis
+[21:57:35] AutomatedTester: and can find things with just /
+[21:57:47] barancev: I've unified chrome service and ie service, but...
+[21:58:12] barancev: there were two calls for chrome: /status and /healtz
+[21:58:40] jimevans: yes, based on which version of chromedriver.exe you might have.
+[21:58:40] barancev: .Net binding makes only /status when starts chromedriver
+[21:58:48] lukeis: :%s is basically muscle memory for me ;) and regex replacement <3
+[21:59:00] barancev: Java calls both /status and /healtz
+[21:59:02] jimevans: yes, because i made a judgement call to only support modern versions of chromedriver. :)
+[21:59:05] santiycr: lukeis: it was downloading a custom jar ;)
+[21:59:17] lukeis: figured that after seeing the log
+[21:59:45] barancev: what's more right: Java or .Net behavior?
+[IRC logfile - Started Tue May  1 22:00:31 2012]
+[22:00:31] jimevans: i think the "right" behavior is to support the latest version of chromedriver.exe, and that's it.
+[22:00:57] jimevans: the hue and cry over having to download an executable from a separate website is a red herring.
+[22:01:07] barancev: so /healtz is not needeв anymore?
+[22:01:13] barancev: needed
+[22:01:28] jimevans: if you can't configure your damned environment to call wget or curl to download the fucking file, you've got bigger problems.
+[22:01:45] jimevans: i believe /healthz is deprecated.
+[22:02:13] jimevans: and anyway, /status is part of the protocol documentation now anyway.
+[22:02:13] lukeis: can't remember which version switch to status... i think 1022
+[22:02:45] barancev: at least it passes all the tests without /healthz
+[22:03:15] jimevans: i can't remember, do the java bindings check /status or /healthz first?
+[22:03:51] barancev: new UrlChecker().waitUntilAvailable(20, SECONDS, status, healthz);
+[22:04:17] jimevans: oh, right. they do it *that* way.
+[22:04:40] kallisti: what on earth is healthz
+[22:05:10] jimevans: kallisti: it was the "check to see if i'm alive" url implemented by the chromedriver.exe.
+[22:05:21] jimevans: before /status was introduced/.
+[22:05:34] kallisti: ah
+[22:09:50] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Updating the IE driver standalone server project to statically link to the VC runtime. | https://code.google.com/p/selenium/source/detail?r=16756 | http://seleniumhq.org/ci.jsp?r=16756
+[22:09:53] jimevans: right. i'm going offline for a bit. back in an hour or so.
+[22:09:56] jimevans has left #selenium
+[22:13:07] barancev: santiycr: ping me when sauce will be ready to run iedriverserver on CI
+[22:13:46] lawcab has joined #selenium
+[22:17:08] jobicoppola has joined #selenium
+[22:17:18] versatiletech_ has joined #selenium
+[22:17:19] lawcab: anyone has experience with jquery pop up windows
+[22:17:28] lawcab: i have a jquery pop up window
+[22:17:38] lawcab: but i can't seem to identify any of the elements in it
+[22:17:47] lawcab: do I need to do a swhitchto
+[22:17:48] lawcab: ??
+[22:17:51] lawcab: how>
+[22:19:16] concertman has joined #selenium
+[22:19:59] versatiletech: lawcab: jquery ui dialog?
+[22:19:59] Dude-X: a jquery pop up window is still html/css
+[22:20:15] Dude-X: unless it's like pure images that is ran by javascript
+[22:20:24] Dude-X: then you'll need to delve into the javascript code
+[22:20:56] lawcab: not an image
+[22:21:02] sfbrian_ has joined #selenium
+[22:21:16] lawcab: as it deplay data
+[22:21:19] lawcab: display
+[22:23:11] santiycr: barancev: will do. Right now I'm cleaning up the code a bit and will soon be pushing
+[22:23:15] Dude-X: jquery stuff can be slippery but it's still findable by selenium
+[22:23:48] santiycr: will have time to deploy around 7pm PST, though (in 5hs)
+[22:23:52] santiycr: as I have some meetings 
+[22:24:46] barancev: ok, it's night here already, I'll commit tomorrow morning
+[22:27:01] santiycr: sounds good
+[22:27:04] santiycr: will be out for tomorrow
+[22:27:17] santiycr: I'll leave you a note in IRC to confirm
+[22:29:13] DustinFay has joined #selenium
+[22:30:20] cMical has joined #selenium
+[22:31:09] lawcab: so i just talked to a developer that its actually part of the main page
+[22:31:26] lawcab: it is just part of a div
+[22:34:10] lawcab: So on the main page when i click on a button
+[22:34:25] lawcab: the jqurey will scroll the dialog up
+[22:43:14] tessarakt2 has joined #selenium
+[22:43:40] tessarakt2: Hi, in Selenium WebDriver: Does the Firefox Driver run Firefox in headless mode?
+[22:46:13] jarib: :note jimevans would be good to have a --host option for the IEDriverServer, right now you can launch it multiple times on the same port (and it will bind to that port on multiple interfaces)
+[22:46:13] selbot2: ok!
+[22:48:05] jarib: :note alternatively force it to bind to AF_INET only (at least on my Win7 VM "localhost" resolves to either AF_INET (127.0.0.1) or AF_INET6 (::1)
+[22:48:06] selbot2: ok!
+[22:49:59] Dude-X: tessarakt2: you can if you use xvfb
+[22:50:14] tessarakt2: yeah, I found http://www.alittlemadness.com/2008/03/05/running-selenium-headless/
+[22:50:20] tessarakt2: does not seem too complicated
+[22:50:39] tessarakt2: so now I know I can write Selenium tests in Java
+[22:50:51] Dude-X: java, python, C#, ruby
+[22:50:53] tessarakt2: I guess setting up a proper Firefox profile should not be too hard
+[22:50:57] tessarakt2: yeah
+[22:51:10] tessarakt2: I'll now take a look at Jenkins integration
+[22:51:32] tessarakt2: we have a meeting tomorrow morning, and after that I guess I start setting that stuff up
+[22:51:40] hugs has joined #selenium
+[22:51:50] tessarakt2: and all that to run some QUnit tests ;-)
+[22:53:36] marlena has joined #selenium
+[22:55:30] jarib: :note jimevans hmm, i'm actually not 100% sure it's binding to both interfaces. netstat shows it only listening on 0.0.0.0.:5555, but it does start twice
+[22:55:30] selbot2: ok!
+[22:58:19] lawcab: jquery mobile changepage 
+[22:58:45] lawcab: can't get any elements anymore
+[22:58:47] lawcab: after that
+[IRC logfile - Started Tue May  1 23:00:57 2012]
+[23:00:57] Dude-X: if there are no more visible elements
+[23:01:11] Dude-X: then you will have to find out what javascript to execute to interact with that dialog :(
+[23:04:18] lawcab: what happens is that all others become disabled except for that div
+[23:04:28] lawcab: those are enabled
+[23:04:39] Dude-X: okay
+[23:04:55] Dude-X: that seems reasonable
+[23:06:05] lawcab: http://pastebin.com/3b6C68Ve
+[23:06:39] Dude-X: lawcab: actually are you using webdriver or IDe?
+[23:07:12] lawcab: WebDriver
+[23:07:22] lawcab: that thing i pasted was from firebug
+[23:07:38] lawcab: List<WebElement> resultMessageElements = getWebDriver().findElements(By.xpath(RESULT_TEXT_BREAKDOWN_XPATH));
+[23:08:00] lawcab: that is what my code is failing at
+[23:08:47] lawcab: [Exception... "An attempt was made to create or change an object in a way which is incorrect with regard to namespaces"  code: "14" nsresult: "0x8053000e (NS_ERROR_DOM_NAMESPACE_ERR)"  location: "file:///C:/Users/LAWREN~1.CAB/AppData/Local/Temp/anonymous2238077456350909218webdriver-profile/extensions/fxdriver@googlecode.com/components/driver_component.js Line: 2438"] Command duration or timeout: 12 milliseconds
+[23:09:02] Dude-X: sounds like your xpath is bad
+[23:09:05] Dude-X: paste that instead
+[23:09:13] Dude-X: that html is all jumboed up, i don't want to parse that
+[23:10:10] lawcab: paste the xpath that i was using
+[23:10:30] lawcab: id('resultsContent')/x:ul/x:li
+[23:10:56] Dude-X: that seems weird
+[23:11:33] Dude-X: i'd expect div[@id='resultsContent']//ul/li
+[23:13:46] lawcab: how about something like //div[contains(@id,'resultsContent')]/ul/li
+[23:13:54] lawcab: i will try toyr way
+[23:14:01] lawcab: i will try it your way
+[23:14:27] Dude-X: yeah that looks kosher
+[23:15:33] lawcab: ok
+[23:15:37] lawcab: i did try that
+[23:15:39] lawcab: and it did work
+[23:15:43] lawcab: thank you very much
+[23:16:00] lawcab: I used the first one with xpath checker in firefox and it worked
+[23:16:06] lawcab: so that was what i tried
+[23:16:14] lawcab: i guess i should not trust that
+[23:16:15] lawcab: :)
+[23:17:26] Dude-X: oh
+[23:17:37] Dude-X: firebug xpath with firepath is more reliable
+[23:18:03] Dude-X: firefox still supports only xpath 1.0 too
+[23:20:20] cgoldberg has joined #selenium
+[23:20:30] webtechy has joined #selenium
+[23:21:01] kalle: is it possible to configure selenium to kill browser that has been inactive for a given amount of time? (context: http://code.google.com/p/selenium/issues/detail?id=3837)
+[23:21:21] kalle: or sessions for that matter
+[23:21:34] webtechy: is there any doc for load testing (c#)?
+[23:22:39] jimevans has joined #selenium
+[23:22:39] selbot2: jimevans: note from jarib 36 minutes ago: would be good to have a --host option for the IEDriverServer, right now you can launch it multiple times on the same port (and it will bind to that port on multiple interfaces) 
+[23:22:39] selbot2: jimevans: note from jarib 27 minutes ago: hmm, i'm actually not 100% sure it's binding to both interfaces. netstat shows it only listening on 0.0.0.0.:5555, but it does start twice 
+[23:23:23] jimevans: jarib: ah. yes… needs idiot-proofing.
+[23:26:06] cgoldberg has joined #selenium
+[23:36:25] Bebe_home has joined #selenium
+[23:45:10] algard`` has joined #selenium
+[23:45:50] kyconquers has joined #selenium
+[23:48:09] maroym has joined #selenium
+[23:49:00] brokenthumbs_ has joined #selenium
+[23:49:36] xiaoli_p has joined #selenium
+[23:53:43] stephend|2 has joined #selenium
+[23:56:08] jens__ has joined #selenium
+[23:56:12] SpankyFromBRC has joined #selenium
+[23:56:43] dmachi has joined #selenium
+[23:57:58] jyrkip has joined #selenium

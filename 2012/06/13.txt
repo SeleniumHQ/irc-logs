@@ -1,0 +1,904 @@
+[IRC logfile - Started Wed Jun 13 00:11:10 2012]
+[00:11:10] sassda: I need to have a chrome with an installed plugin, I am looking at the documentation, it says to use "chrome.extentions" and provide a base64 encoded plugin, but I mean, if I base64 encode my plugin, it gives me like a huge line, isn't there any more practical way?
+[00:12:07] sassda: I see some example giving this code
+[00:12:09] sassda: capabilities.setCapability("chrome.switches", Arrays.asList("--load-extension=/path/to/extension/directory"));
+[00:12:28] sassda: but this would mean that the extension needs to be where my webdriver server is actually running
+[00:13:29] jarib: why is a "huge line" not practical? that's the way to go if you want the extension shipped over the network.
+[00:16:49] sassda: ok, if that's the way to go, then we'll go with this
+[00:18:10] amitev has joined #selenium
+[00:25:22] santiycr: :noe lukeis aparently, 2.23.1 didn't help with Firefox 12 and 13, both browsers are kind of flakey in our service for some reason even on WD
+[00:29:22] brettporter has joined #selenium
+[00:33:43] Dude-X: ^typo
+[00:34:59] ian_mac2 has joined #selenium
+[00:51:24] ttk23: just making sure my script-hanging issues isn't a syntax snafu. This is the way to change UserAgent in FF WebDriver via python right?  profile.set_preference("general.useragent.override",userAgent) where userAgent = "SomeUserAgentString"
+[00:52:19] ttk23: (thanks in advance)
+[00:59:48] santiycr has joined #selenium
+[IRC logfile - Started Wed Jun 13 01:22:41 2012]
+[01:22:41] santiycr: :note lukeis I take that back, the change worked great, except for when firefox 12 and 13 need to proxy through the Selenium proxy
+[01:22:42] selbot2: ok!
+[01:22:52] santiycr: God, I can't wait till we can get rid of that silly proxying 
+[01:23:26] santiycr: this is what happens when you make your application do things it shouldn't do
+[01:25:20] jarib: santiycr: you're proxying traffic from the browser to the interwebz? is that to work around SSL issues?
+[01:26:00] santiycr: yeah, mainly
+[01:26:17] santiycr: supporting any self signed certificate
+[01:26:55] santiycr: sadly, there aren't many forward proxies out there that both work well and do a certificate override 
+[01:27:18] santiycr: I'm considering browsermob proxy, but so far I've seen a lot of the same issues that selenium has
+[01:27:35] jarib: it's basically the same code, isn't it
+[01:27:39] santiycr: (as kevin pointed out, it's pretty much a fork of the same code)
+[01:27:42] santiycr: yeah
+[01:27:57] santiycr: the advantage is that it's running on a separate workflow
+[01:28:24] santiycr: I've even seen java InterruptedException inside the Selenium logs (running in both WD and RC)
+[01:28:45] santiycr: I believe this is introduced by the proxy and the worst part is it fucks up the automation thread 
+[01:28:57] santiycr: s/I believe/my theory is/
+[01:29:16] santiycr: so, browsermob proxy would be a win there
+[01:30:05] santiycr: but, knowing it's based on Jetty from 3 years ago is not encouraging 
+[01:30:31] jarib: yeah, surprised there's no existing lightweight proxy server that lets you do this
+[01:36:25] ttk23: im using python wrapper for browsermobproxy, it's been good to me so far
+[01:37:37] DarkRift has joined #selenium
+[01:37:37] DarkRift has joined #selenium
+[01:39:14] santiycr: yeah, in most cases, it's good, though users see issues in the most random cases
+[01:39:49] santiycr: like web servers replying invalid Content-length or dropping the response mid-way through
+[01:40:16] santiycr: browsers seem to be able to handle these, while jetty tends to fail 
+[01:40:27] santiycr: tough to solve all these, sadly
+[01:40:30] ttk23: the dropping is quite annoying.
+[01:40:58] santiycr: agreed
+[01:41:21] santiycr: sadly, it's hard to contradict people when they say "well, browsers here have no issues with this"
+[01:50:24] Binken_ has joined #selenium
+[01:51:10] Binken_: :log
+[01:51:11] selbot2: http://illicitonion.com/selogs/selenium/2012/06/13.txt
+[01:53:18] mreedell has joined #selenium
+[IRC logfile - Started Wed Jun 13 02:05:06 2012]
+[02:05:06] jimevans: right. til tomorrow!
+[02:05:09] jimevans has left #selenium
+[02:27:53] jcrza_ has joined #selenium
+[02:28:54] nhirata_ has joined #selenium
+[02:30:05] jcrza__ has joined #selenium
+[02:47:59] JackDandy has joined #selenium
+[02:57:34] ian_mac2 has joined #selenium
+[IRC logfile - Started Wed Jun 13 03:08:17 2012]
+[03:08:17] riotz has joined #selenium
+[03:20:45] Dude-X_ has joined #selenium
+[03:38:13] alexglow has joined #selenium
+[03:48:31] ian_mac2 has joined #selenium
+[IRC logfile - Started Wed Jun 13 04:02:02 2012]
+[04:02:02] Siph0n has joined #selenium
+[04:19:02] leev_ has joined #selenium
+[04:27:48] ian_mac has joined #selenium
+[04:29:35] mattp_ has joined #selenium
+[04:31:10] baijum has joined #selenium
+[04:34:54] mattp_ has joined #selenium
+[04:41:57] opapo has joined #selenium
+[04:44:56] stockton has joined #selenium
+[04:50:32] mattp_ has joined #selenium
+[IRC logfile - Started Wed Jun 13 05:32:05 2012]
+[05:32:05] stackedsax has joined #selenium
+[05:37:27] toabctl has joined #selenium
+[05:57:55] testingb0t has joined #selenium
+[IRC logfile - Started Wed Jun 13 06:10:48 2012]
+[06:10:48] testingb0t1 has joined #selenium
+[06:34:05] llaskin has joined #selenium
+[06:35:39] jmathes has joined #selenium
+[06:41:59] ian_mac has joined #selenium
+[06:50:55] papegaaij has joined #selenium
+[06:51:52] papegaaij has joined #selenium
+[IRC logfile - Started Wed Jun 13 07:13:23 2012]
+[07:13:23] SamuraiJack has joined #selenium
+[07:17:59] baijum has joined #selenium
+[07:29:57] lfryc has joined #selenium
+[07:29:58] lfryc has joined #selenium
+[07:43:18] SamuraiJack has joined #selenium
+[07:53:22] sjaak_trekhaak has joined #selenium
+[IRC logfile - Started Wed Jun 13 08:00:08 2012]
+[08:00:08] stackedsax has joined #selenium
+[08:32:15] benadderson has joined #selenium
+[08:37:03] tessarakt has joined #selenium
+[08:37:34] testingb0t has joined #selenium
+[08:44:17] Fry33_: Hi all, Can android driver close alert windows? getWebDriver().switchTo().alert().accept() - this has no affect for it. what I'm doing wrong?
+[08:45:34] foolx has joined #selenium
+[08:47:29] rbalent has joined #selenium
+[08:47:30] rbalent has joined #selenium
+[08:53:31] MadMerlin|work__ has joined #selenium
+[IRC logfile - Started Wed Jun 13 09:04:53 2012]
+[09:04:53] OperaDriver has joined #selenium
+[09:04:53] OperaDriver: [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/f1b7fb4723588e1c033e6adbc2ddce8b11858ccd
+[09:04:53] OperaDriver: [operadriver/master] OPDRV-185: Fatal error when evaluating in a non-existent runtime - Andreas Tolf Tolfsen
+[09:04:53] OperaDriver has left #selenium
+[09:05:19] robbim02 has joined #selenium
+[09:07:36] friskd has joined #selenium
+[09:13:36] sburjan has joined #selenium
+[09:17:22] OperaDriver has joined #selenium
+[09:17:22] OperaDriver: [operadriver] andreastt pushed 169 new commits to master: https://github.com/operasoftware/operadriver/compare/f1b7fb472358...ebcc5aa9215b
+[09:17:22] OperaDriver: [operadriver/master] DSK-358129 Make sure the opera-watir JARs aren't put in a subdirectory in case 'git describe' returns a string with a slash - Michal Zajaczkowski
+[09:17:22] OperaDriver: [operadriver/master] Changes for gitignore. - Michal Zajaczkowski
+[09:17:22] OperaDriver: [operadriver/master] DSK-354628 Fix profile handling for desktop Watir - Michal Zajaczkowski
+[09:17:22] OperaDriver has left #selenium
+[09:24:02] Fry33_: Could someone review this issue please: http://code.google.com/p/selenium/issues/detail?id=4080 ?
+[09:35:14] Bebe has joined #selenium
+[09:42:39] teodosia has joined #selenium
+[09:49:37] Ammar01 has joined #selenium
+[09:50:23] caddoo has joined #selenium
+[09:53:24] Bebe has joined #selenium
+[IRC logfile - Started Wed Jun 13 10:37:34 2012]
+[10:37:34] dawagner has joined #selenium
+[10:42:10] dawagner: This morning, I will mostly be listening to 5ive.
+[10:42:15] dawagner: :yt 5ive battlestar
+[10:42:16] selbot2: Five - Battlestar (Album - Invincible - with lyrics) - http://www.youtube.com/watch?v=UKiQ2h_p8uM&feature=youtube_gdata
+[10:44:09] *dawagner is temporarily taking down CI
+[IRC logfile - Started Wed Jun 13 11:03:53 2012]
+[11:03:53] andrewvos has left #selenium
+[11:14:19] baijum has joined #selenium
+[11:40:51] stackedsax has joined #selenium
+[11:50:09] AutomatedTester has joined #selenium
+[11:53:18] Maior: so attempting to disable JavaScript in Webdriver with the Python bindings - is this going to require Mad Hacks? I've read http://stackoverflow.com/q/8613440/928098 which hasn't been inspiring...
+[11:58:44] Ale has joined #selenium
+[11:58:54] dawagner: Why are you trying to disable javascript?
+[11:59:03] dawagner: It's almost certainly not going to work...
+[11:59:40] andreastt: I'm actually currently discussing this with Scope developers here too.
+[IRC logfile - Started Wed Jun 13 12:00:02 2012]
+[12:00:02] andreastt: Although our situation is that JS is disabled on certain pages out of security concerns.
+[12:00:15] andreastt: opera:historysearch, for instance.
+[12:01:13] andreastt: What!  http://entagen.github.com/jenkins-build-per-branch/
+[12:01:17] andreastt: I've been wanting that for ages.
+[12:02:22] Maior: dawagner: so I can test our site works without it...?
+[12:04:28] Maior: this seems a reasonable thing to want to test
+[12:05:31] AutomatedTester: Maior: since WebDriver relies on JavaScript you are probably going to have a really bad time
+[12:06:03] Maior: AutomatedTester: ah. bugger.
+[12:06:33] AutomatedTester: Maior: it *may* work as it runs the JS in a different context
+[12:06:55] AutomatedTester: but we have not tested it so cant guarantee the way that it will behave
+[12:07:15] AutomatedTester: dawagner: are you still using rdio or have you gone back to spotify?
+[12:11:03] dawagner: Maior: You can disable javascript in HtmlUnit
+[12:11:12] dawagner: And HtmlUnit should be sufficient to check that your site works
+[12:11:17] dawagner: (Using the HtmlUnitDriver)
+[12:11:29] dawagner: Because the big place HtmlUnit falls over is complex javascript, and by disabling that, you're good
+[12:11:32] dawagner: Just no screenshots
+[12:12:02] dawagner: AutomatedTester: I gave up on rdio, I had enough problems with their UI, and spotify has stopped crashing enough that I'm happy
+[12:12:15] AutomatedTester: fair enough
+[12:12:19] dawagner: I do miss the "just play me stuff I probably like"ness
+[12:13:12] dawagner: Achievement Unlocked: Was emailed picture of magical unicorn at work
+[12:13:26] AutomatedTester: dawagner: from the bearded one?
+[12:13:50] AutomatedTester: argg... /me just realised he hasnt do his annual review feed back
+[12:13:55] AutomatedTester: *snore* bbiab
+[12:14:15] dawagner: Alas not
+[12:14:49] dawagner: So it turns out:
+[12:14:50] dawagner: @ERROR: chroot failed
+[12:14:54] dawagner: rsync error: error starting client-server protocol (code 5) at main.c(1534) [Receiver=3.0.9]
+[12:14:55] *AutomatedTester realises he hasnt had a chat with him in what feels like an age :/
+[12:15:07] dawagner: Is the super-useful error message you get if the directory you're copying with rsync doesn't exist
+[12:15:21] *dawagner <3 user-friendly unix tools
+[12:15:23] AutomatedTester: dawagner: the error message looks fine
+[12:15:29] *AutomatedTester understands it
+[12:16:12] dawagner: I associated chrooting with much loftier things than copying files
+[12:16:43] AutomatedTester: dawagner: when you see those types of errors think old school MS error codes
+[12:16:49] AutomatedTester: and then it makes total sense
+[12:21:53] rbalent has joined #selenium
+[12:21:53] rbalent has joined #selenium
+[12:49:17] Jackneill has joined #selenium
+[12:49:22] rbalent has joined #selenium
+[12:49:22] rbalent has joined #selenium
+[12:56:03] OperaDriver has joined #selenium
+[12:56:03] OperaDriver: [operadriver] andreastt pushed 7 new commits to master: https://github.com/operasoftware/operadriver/compare/ebcc5aa9215b...af17cecc5dca
+[12:56:03] OperaDriver: [operadriver/master] Fixed tests for GNU/Linux - Andreas Tolf Tolfsen
+[12:56:03] OperaDriver: [operadriver/master] Adding run config for OperaDesktopDriverTest - Andreas Tolf Tolfsen
+[12:56:03] OperaDriver: [operadriver/master] Adding run configs for new desktop driver tests - Andreas Tolf Tolfsen
+[12:56:03] OperaDriver has left #selenium
+[IRC logfile - Started Wed Jun 13 13:00:02 2012]
+[13:00:02] mltolun has joined #selenium
+[13:03:34] RossPatterson has joined #selenium
+[13:04:11] mltolun has left #selenium
+[13:06:49] simonstewart has joined #selenium
+[13:06:49] selbot2: simonstewart: note from lukeis 1 day ago: I hereby relinquish the bacon, someone else's turn this week :) 
+[13:07:04] simonstewart: :note lukeis Fair enough
+[13:07:05] selbot2: ok!
+[13:07:11] AutomatedTester: hi hi simonstewart
+[13:07:41] simonstewart: Yo!
+[13:08:11] *AutomatedTester was an idiot and forgot to sort hotel for his conf in 2 weeks time
+[13:08:16] simonstewart: The builds all look surprisingly green
+[13:08:18] AutomatedTester: and now the nearby hotels are booked
+[13:08:21] AutomatedTester: ship!
+[13:08:22] simonstewart: Where's the conf?
+[13:08:26] AutomatedTester: Santa Clara
+[13:08:53] simonstewart: Could a friendly Mozillan put you up?
+[13:09:10] AutomatedTester: I will stay at the avante and get the shuttle to the conf
+[13:09:20] AutomatedTester: they have a free shuttle for >10 miles
+[13:09:22] simonstewart: sgtm
+[13:09:46] AutomatedTester: just a PITA to get back and forth since its like ~4 miles
+[13:09:59] dregin: Cycle
+[13:10:01] dregin: be grand
+[13:10:06] simonstewart: 4 miles? 
+[13:10:10] AutomatedTester: dregin: actually.... thats not a bad idea
+[13:10:10] simonstewart: Like an hour's walk?
+[13:10:18] simonstewart: Maybe a bit more if you're feeling slow
+[13:10:53] dregin: Dublin has a pretty sweet public bike system. You register with your credit card details, then use the card to unlock bikes from stands that are all over the city.
+[13:11:06] dregin: As long as you have the bike back in another stand within half an hour, it's completely free.
+[13:11:10] simonstewart: You can rest assured that the US isn't so forward thinking
+[13:11:21] AutomatedTester: Mozilla has bikes in the office that we can use
+[13:11:27] simonstewart: dregin: not too dissimilar from the Borris Bikes here in London
+[13:11:51] dregin: The government are bringing in something similar for cars...
+[13:12:00] dregin: To encourage car pooling.
+[13:12:28] dregin: you get a car to drive into the city, if there are 4 of your in it or something.
+[13:12:42] dregin: but yeah, probably of no use to you over there :)
+[13:13:04] simonstewart: I see that adam groucher is starting to blog again
+[13:14:00] ian_mac2 has joined #selenium
+[13:14:08] ian_mac2 has joined #selenium
+[13:16:26] *AutomatedTester wonders if it will be worth catching the train down to Santa Clara each day from San Francisco
+[13:16:37] bsilverberg has joined #selenium
+[13:16:47] AutomatedTester: than doing 3 hotels
+[13:16:54] AutomatedTester: since its only for 2 days in the middle
+[13:18:33] *AutomatedTester thinks he will do that
+[13:19:26] RossPatterson: Washington DC has a fantastic bike system, similar to Dublin's.  Over 1500 bikes at over 150 stations around the city.
+[13:20:36] RossPatterson: And they put their dashboard online: http://cabidashboard.ddot.dc.gov/CaBiDashboard/#Home - they're up over 175K trips per month.
+[13:21:20] RossPatterson: simonstewart: He's relatively ungrouchly lately :-)
+[13:21:29] simonstewart: Is he okay?
+[13:21:57] RossPatterson: Dunno - we may have to call 911 (or the Canajun equivalent) :-)
+[13:23:35] xtian_ has joined #selenium
+[13:24:46] seljenkinsbot has joined #selenium
+[13:27:41] *AutomatedTester needs a SF'er for advice
+[13:37:28] Maior: dawagner: ooh ok, thanks
+[13:39:40] hourback has joined #selenium
+[13:39:43] hourback has left #selenium
+[13:40:48] AutomatedTester: simonstewart: I am brewing my own beer, we should do a spec meetup again
+[13:41:12] *AutomatedTester thinks beer+spec==='complete'
+[13:41:13] simonstewart: The two facts are independent of each other?
+[13:41:17] simonstewart: Ahhh
+[13:41:21] simonstewart: Yes, we should
+[13:41:25] simonstewart: When are you next in London?
+[13:41:33] simonstewart: We should gather for a run through of edits
+[13:41:36] simonstewart: If nothing else
+[13:41:40] AutomatedTester: definitely
+[13:41:54] AutomatedTester: next week I am getting ready to go to USA and then in the US
+[13:41:55] simonstewart: biab
+[13:42:00] AutomatedTester: so will check after that
+[13:44:42] simonstewart: ok
+[13:45:06] AutomatedTester: the Wife will be home shortly so will grab her schedule
+[13:45:06] Alex0011 has joined #selenium
+[13:45:16] *AutomatedTester wants to come up to london soon-ish
+[13:46:38] selbot2: 03simon.m.stewart less than 20 seconds ago - SimonStewart on behalf of BobSilerberg: More colour conversions | https://code.google.com/p/selenium/source/detail?r=17169 | http://seleniumhq.org/ci.jsp?r=17169
+[13:48:11] mreedell has joined #selenium
+[13:49:01] brettporter has joined #selenium
+[13:49:09] brettporter has joined #selenium
+[13:54:41] hourback has joined #selenium
+[13:55:00] hourback has left #selenium
+[IRC logfile - Started Wed Jun 13 14:00:41 2012]
+[14:00:41] hourback has joined #selenium
+[14:01:12] hourback has left #selenium
+[14:04:44] robbim02 has joined #selenium
+[14:10:51] mdgreenfield has joined #selenium
+[14:11:33] baijum has joined #selenium
+[14:14:00] theabrar has joined #selenium
+[14:15:06] theabrar: Hello All..a quick Xpath question 
+[14:15:46] theabrar: I'm trying to find Xpath for an element with text which have ZeroWidthSpace in it
+[14:17:29] theabrar: anybody?
+[14:17:32] ebass: /*[contains(text(),'ZeroWidthSpace')]
+[14:17:45] ebass: i missed a forward slash
+[14:17:52] ebass: /*[contains(text(),'ZeroWidthSpace')]
+[14:18:04] theabrar: cool..
+[14:18:15] ebass: lol, it looks like my IRC client removes it
+[14:18:20] theabrar: so will this ignore the ZeroWidthSpace ?
+[14:18:29] ebass: no
+[14:18:32] theabrar: oh ok
+[14:18:39] ebass: it looks for that text inside of all nodes
+[14:19:04] theabrar: oh..sorry I'm not looking for certain text
+[14:19:51] theabrar: my Application uses GWT and sometimes for displaying names it add '&ZeroWidthSpace' in text (in the DOM)
+[14:20:49] theabrar: <span class="Name">test&ZeroWidthSpace</span>
+[14:20:56] theabrar: the above is from DOM
+[14:21:15] theabrar: the actual text is just 'test' but in the DOM it shows as above..
+[14:21:51] theabrar: and if i use the xpath as //span[@class='Name' and text()='test']
+[14:21:57] theabrar: doesn't work
+[14:24:32] theabrar: any solution?
+[14:28:53] RossPatterson: Use the XPath "normalize-space(...)" function.
+[14:29:31] theabrar: alright..lemme try it..thanks
+[14:32:50] theabrar: wow..that works like a charm..thanks you so much!!
+[14:33:13] Bebe has joined #selenium
+[14:33:39] Nosnam has joined #selenium
+[14:36:02] cgoldberg has joined #selenium
+[14:43:55] nacho has joined #selenium
+[14:50:11] mdgreenfield has left #selenium
+[14:51:30] Maior: python's selenium.common.exceptions.WebDriverException.screen - is there anything vaguely specified as to what this is, or do I need to read the source? can't find anything documented about it... :s
+[14:56:10] kinow has joined #selenium
+[14:58:17] QAGuy has joined #selenium
+[IRC logfile - Started Wed Jun 13 15:02:14 2012]
+[15:02:14] opapo has joined #selenium
+[15:02:43] AutomatedTester: Maior: did you read the docs?
+[15:03:07] AutomatedTester: :apidocs
+[15:03:08] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[15:03:33] Maior: http://selenium.googlecode.com/svn/trunk/docs/api/py/common/selenium.common.exceptions.html and http://selenium-python.readthedocs.org/en/latest/api.html seem to contain nothing
+[15:04:04] Maior: I'm happy to accept I've missed something
+[15:04:16] AutomatedTester: http://selenium.googlecode.com/svn/trunk/docs/api/py/_modules/selenium/common/exceptions.html#WebDriverException
+[15:04:54] AutomatedTester: it contains a screenshot
+[15:05:12] Maior: that would be a yes to "need to read the source" then? ;) cheers
+[15:06:00] Maior: Yeah I'd got that far from the name, just trying to see if I can work out what it is without just getting one and looking at it
+[15:06:37] AutomatedTester: Maior: the message you get in the exception would tell you if you need to look at it
+[15:06:55] AutomatedTester: Maior: exception messages tend to tell you the info you need...
+[15:07:19] Maior: AutomatedTester: I mean "what it is as an object"
+[15:07:51] Maior: is it base64, is it some kind of image object, is it a crude ascii-art rendering, etc.
+[15:08:17] AutomatedTester: morse code
+[15:08:27] AutomatedTester: its my favourite way to transmit data
+[15:08:27] Maior: cool
+[15:08:37] AutomatedTester: its Base64
+[15:08:44] Maior: my wpm's a bit low still, could do with increasing it
+[15:09:01] Maior: cheers
+[15:09:30] Maior: my fundamental question - have I missed something that says that, or is that information only available by reading the source / looking at the object / Knowing It
+[15:09:43] Maior: and if the latter's the case, can I rely on it in any way?
+[15:09:57] cmcgraw has joined #selenium
+[15:11:41] Maior: or is it undocumented because it's "private" / subject to change?
+[15:12:07] AutomatedTester: its not documented in the python code but it is documented in the transport stuff
+[15:12:11] Maior: ah ok
+[15:12:17] AutomatedTester: :wiki JSONWireProtocol
+[15:12:19] selbot2: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[15:12:24] Maior: ahh cool, thanks
+[15:12:39] AutomatedTester: I didnt want to duplicate in case it changed
+[15:12:51] AutomatedTester: also strings are easier to use cross lanuages
+[15:12:55] Maior: nod
+[15:14:05] AutomatedTester: simonstewart: have you heard from Wilhelm lately?
+[15:15:54] AutomatedTester: Maior: tbh sometimes I am too close to the code that things are obvious to me but not obvious to everyone else
+[15:17:02] Maior: always the way
+[15:17:08] Maior: cheers for the help though :)
+[15:17:13] AutomatedTester: anytime
+[15:18:14] simonstewart: Just spent a happy hour and a bit with dawagner and eranm working through the spec
+[15:18:21] simonstewart: AutomatedTester: not heard from Wilhelm
+[15:18:30] simonstewart: Last I heard he was in crunch mode
+[15:19:04] hxmws has joined #selenium
+[15:19:34] hxmws: Hi All, has anyone found a way to obtain 3rd party cookies from webdriver?
+[15:19:55] leev: i've written yet another php webdriver library.  just gotta go through all the internal stuff now to open source it.
+[15:20:42] hxmws: cool, guessing no one has written one in ruby
+[15:21:26] simonstewart: Can I just wonder aloud why the PHP webdriver library authors don't work together?
+[15:21:55] farlan has joined #selenium
+[15:24:29] AutomatedTester: leev: I think that makes it the 6th PHP library
+[15:24:43] leev: haha
+[15:24:52] leev: maybe its not worth doing then
+[15:24:56] AutomatedTester: simonstewart: I dont think PHP people like speaking to each other
+[15:25:15] *AutomatedTester knows of at least 5
+[15:25:18] leev: AutomatedTester: its not that.  the other 3 i saw, just used the magic methods etc to do commands
+[15:25:42] AutomatedTester: leev: and thats not worth fixing and speaking to them?
+[15:25:54] *AutomatedTester is playing devils advocate
+[15:25:55] leev: which can be quite annoying not having auto complete etc in the ide
+[15:26:09] leev: well, in the README for the facebook one, its done by design
+[15:26:13] brokenthumbs has joined #selenium
+[15:26:41] AutomatedTester: leev: yea the facebook one is crap
+[15:27:02] AutomatedTester: adamgoucher has forked it made it better
+[15:27:50] AutomatedTester: and then there are 3 others that have been mentioned on the mailing list
+[15:28:15] leev: yeah i'm sure they all end up doing the same thing.
+[15:28:20] leev: didn't take me too long to do anyway
+[15:28:42] AutomatedTester: leev: open source it too
+[15:28:50] AutomatedTester: I guess we cant have too much of the same thing
+[15:29:19] leev: yeah.  first time doing this though.  so need to go through the internal process.
+[15:29:44] dawagner has joined #selenium
+[15:30:03] AutomatedTester: release and then ask permission
+[15:30:10] AutomatedTester: whats the worst that could happen
+[15:30:34] leev: haha
+[15:30:53] Fry33 has joined #selenium
+[15:30:54] nhirata has joined #selenium
+[15:33:45] stockton has joined #selenium
+[15:37:06] ederig has joined #selenium
+[15:38:48] Maior: ...it's returning screenshots of my desktop, bugger
+[15:41:33] jfunk has joined #selenium
+[15:41:58] simonstewart: I'm chatting with the facebook guys
+[15:42:10] simonstewart: We'll see if we can get them to improve the bindings
+[15:42:31] AutomatedTester:  simonstewart I thought they wanted to expose the wire protocol
+[15:42:58] simonstewart: Yes, to start with. It's getting some adoption
+[15:43:07] simonstewart: Especially within FB, so I hear
+[15:43:12] simonstewart: So I expect that to change
+[15:44:33] AutomatedTester: the new FB office is near Seven Dials
+[15:44:38] AutomatedTester: simonstewart: know where that is?
+[15:44:46] AutomatedTester: is that up near Monmouth
+[15:45:36] simonstewart: New FB office?
+[15:45:53] simonstewart: Seven Dials is certainly close to Monmouths
+[15:45:56] dawagner has joined #selenium
+[15:46:24] eranm has joined #selenium
+[15:46:43] dawagner: Maior: Which browser?
+[15:47:02] dregin: I think I can see a facebook office from here, if I try hard enough...
+[15:47:52] Maior: dawagner: HtmlUnit via remote
+[15:48:34] dawagner: Yeah, you're not going to get screenshots out of HtmlUnit, it's a pure in-memory java browser which doesn't render
+[15:49:08] adamgoucher has joined #selenium
+[15:49:19] dawagner: I'm surprised you get a screenshot in those exceptions at all, tbh
+[15:49:27] simonstewart: dregin: where are you?
+[15:49:31] dregin: Dublin
+[15:49:31] simonstewart: Hacker Way
+[15:49:34] simonstewart: Ahhh...
+[15:49:49] dregin: So, yeah. Not *that* FB office :)
+[15:49:53] bluescreen10 has joined #selenium
+[15:51:04] nirvdrum has joined #selenium
+[15:55:06] Maior: dawagner: I'm just dumping exception.screen
+[15:55:09] Maior: right
+[15:56:13] Alex0011 has left #selenium
+[IRC logfile - Started Wed Jun 13 16:01:31 2012]
+[16:01:31] foolx: In java: When i got the element id="cboxClose" i can find it via: By.id("cboxClose") OR via By.cssSelector(input[id='cboxClose']) right?
+[16:01:44] foolx: just to be sure i create valid cssSelectors ;)
+[16:02:03] ebass: right...i would use #cboxClose for your cssSelector
+[16:02:10] foolx: why #?
+[16:02:15] ebass: or input#cboxClose
+[16:02:18] ebass: just short hand
+[16:02:21] ebass: for id=
+[16:02:45] foolx: ah, okay so instead of input[id='cboxLoadedContent'] i could use input[#cboxLoadedContent]
+[16:02:53] ebass: no brackets
+[16:03:03] ebass: input#cboxLoadedContent
+[16:03:21] ebass: says any input element with the id='cboxLoadedContent'
+[16:03:27] foolx: By.cssSelector(#cboxLoadedContent)
+[16:03:34] ebass: that works too
+[16:03:49] foolx: without any '' ?
+[16:03:54] ebass: since id's *should* be unique
+[16:04:05] ebass: well, you probably need to send a string to the By.cssSelector
+[16:04:16] ebass: By.cssSelector("#cboxLoadedContent")
+[16:04:41] foolx: thats not the problem since the value is already saved in a string field and i would just send the string
+[16:04:56] foolx: ;) thx a lot, *back to code*
+[16:05:15] ebass: np
+[16:05:18] ian_mac has joined #selenium
+[16:08:01] d0x has joined #selenium
+[16:08:03] nhirata_ has joined #selenium
+[16:08:34] d0x: Hi together. How to handle a print dialog? It makes my firefox webdriver stucked on this page: http://www.webbank-katalog.de/privatkunden0/konto___karten/konto/girokonto.virtualHost.html?print=1
+[16:11:28] jsanchez_ has joined #selenium
+[16:11:40] simonstewart: d0x: you don't
+[16:11:44] jimevans has joined #selenium
+[16:11:49] simonstewart: g'day jimevans
+[16:12:00] jimevans: g'day simonstewart
+[16:12:32] jsanchez_: is there any good workaround for the MoveTargetOutOfBoundsException? We are seeing this too often, and usually on drop downs
+[16:12:35] d0x: simonstewart: is there another we to validate the print option?
+[16:12:57] simonstewart: jsanchez_: a repeatable, reduced test case attached to an issue would Really Help
+[16:13:04] simonstewart: d0x: not using selenium
+[16:14:27] foolx: another short one: class="logoutbutton_profil_user" would be [class='logoutbutton_profil_user']
+[16:15:30] foolx: the total div looks like this: <div class="logoutbutton_profil_user" onclick="location.href='/logout'">Logout</div>
+[16:16:03] Dude-X: jsanchez_: maximize the browser?
+[16:16:26] jsanchez_: I have tried that but we are limited to small resolutions on Grid and Sauce
+[16:16:33] jsanchez_: locally on my Mac it is perfectly fine
+[16:16:39] Dude-X: foolx: if it's a css selector, .logoutbutton_profil_user
+[16:16:56] Dude-X: why are you limited to small resolutions on Grid (can't speak for sauce)
+[16:17:12] skiphuffman_: This might be a chrome driver question, but I will start here.  Why is .maximize_window throwing an exception for me on Chrome?
+[16:17:16] foolx: Dude-X: THX!
+[16:17:17] nacho has joined #selenium
+[16:17:51] Dude-X: skiphuffman_: it was recently introduced to the API a few months ago without the chrome team adding it
+[16:17:54] foolx: Dude-X: # = id and . = class?
+[16:18:00] Dude-X: foolx: yes
+[16:18:06] skiphuffman_: Dude-X, those slackers....
+[16:18:13] foolx: thx ;)
+[16:19:18] skiphuffman_: I guess I need to leave me "If chrome, don't do that" code in there for now.
+[16:19:31] Dude-X: use javascript to resize the window
+[16:21:23] jsanchez_: hey Dude-X, because the VM's we are using do not have large enough resolutions
+[16:21:38] Dude-X: are you using xvfb?
+[16:22:37] jsanchez_: simon, what would be the best way for me to get you that reproducable case?
+[16:22:51] jsanchez_: what is xvfb? sorry I did not setup the grid but I can ask?
+[16:22:53] lukeis has joined #selenium
+[16:22:54] selbot2: lukeis: note from santiycr about 15 hours ago: I take that back, the change worked great, except for when firefox 12 and 13 need to proxy through the Selenium proxy 
+[16:22:54] selbot2: lukeis: note from simonstewart about 3 hours ago: Fair enough 
+[16:23:11] simonstewart: jsanchez_: how do you produce a reduced test case?
+[16:23:28] simonstewart: Attempt to navigate to the point which fails in your test and save the page as a web archive
+[16:23:45] Dude-X: xvfb (on unix systems) is the X virtual frame buffer, it basically renders to a virtual screen (which in this case is not your display card but just computer memory)
+[16:23:45] simonstewart: Then write a test that loads that single page and then fails to click
+[16:24:01] simonstewart: If you're sensitive about revealing information, edit the HTML
+[16:24:33] jsanchez_: i see, okay then should I zip that up and email it to you?
+[16:24:45] simonstewart: Create a new issue on the tracker and attach the zip
+[16:24:55] simonstewart: And then come over here and nag one of us to fix it ;)
+[16:25:26] steve90000 has joined #selenium
+[16:26:05] steve90000: Hey guys, using webdriver python bindings - how can I click on a page element, have it open in a new window but keep the focus on the page from which I clicked?
+[16:26:17] simonstewart: should happen by default
+[16:26:21] jsanchez_: okay thank you! but does this sound like something to you that is even an issue that should be fixed if I can reproduce? or do you think it just the way it works? meaning is the MoveTargetOutOfBoundsException the expected outcome if you try to click on a drop down that is partially outside of the viewing area
+[16:28:11] lukeis: webdriver should scroll the element into view... if it truly can only be partially in the viewable screen, and the user can click on it, then yes webdriver should be able to also. this would be one of those corner cases though ;)
+[16:29:00] Dude-X: webdriver will scroll so long as user is able to scroll to it, if the user can't then webdriver can't either
+[16:29:51] Dude-X: steve90000: webdriver will not switch focus to the new window. you have to do so explicitly
+[16:30:17] lukeis: for me it sometimes scrolls things a user can't scroll ;)  hasn't 'broken' anything for me yet though
+[16:30:28] jibay has joined #selenium
+[16:30:41] Dude-X: probably because there's no CSS that's strict about placement
+[16:30:52] lukeis: likely
+[16:31:26] Dude-X: it's good at vertical scrolling, horizontal stuff works so long it's not fixed
+[16:32:22] d0x: simonstewart: is it possible to disable the print dialog
+[16:32:31] d0x: that my application doesnt freeze
+[16:32:36] lukeis: well also we have some pages that use jQuery iScroll ... yeah, it doesn't like being messed with the way selenium does "scrollling" ;)
+[16:32:49] d0x: like webdriver.enable.native.events
+[16:33:31] lukeis: d0x: not that I'm aware of... can you avoid it somehow? like not click something, or inject javascript to override window.print() ?
+[16:35:49] d0x: lukeis: i think inject javascript to override window.print is good
+[16:35:56] d0x: i can't avoid clicking it
+[16:36:41] steve90000: Dude-X: Would I have to tell the Chrome instance to open links in new windows first?
+[16:37:00] QAGuy has joined #selenium
+[16:37:01] steve90000: i.e., no method for it - you just have to turn it on and off in chrome by interfacing with the settings?
+[16:38:29] nacho has joined #selenium
+[16:38:50] d0x: lukeis: thx
+[16:39:20] lukeis: np
+[16:42:15] OperaDriver has joined #selenium
+[16:42:15] OperaDriver: [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/af17cecc5dca...6a048ef983e0
+[16:42:15] OperaDriver: [operadriver/master] Clarified xpathPointer - Andreas Tolf Tolfsen
+[16:42:15] OperaDriver: [operadriver/master] Clarified xpathPointer for EcmascriptService - Andreas Tolf Tolfsen
+[16:42:15] OperaDriver has left #selenium
+[16:44:03] OperaDriver has joined #selenium
+[16:44:04] OperaDriver: [operadriver] andreastt pushed 3 new commits to master: https://github.com/operasoftware/operadriver/compare/6a048ef983e0...ff76775dd553
+[16:44:04] OperaDriver: [operadriver/master] Updated classpath for eclipse - Daniel Bengtsson
+[16:44:04] OperaDriver: [operadriver/master] Need to handle + inside command line argument values - Daniel Bengtsson
+[16:44:04] OperaDriver: [operadriver/master] Merge branch 'r/danielb/geometry_argument_parsing' - Andreas Tolf Tolfsen
+[16:44:04] OperaDriver has left #selenium
+[16:45:34] klrmn has joined #selenium
+[16:45:51] JackDandy1 has joined #selenium
+[16:53:58] robbim02 has left #selenium
+[16:55:10] jleyba_ has joined #selenium
+[16:55:59] dmachi has joined #selenium
+[16:57:52] ner0x has joined #selenium
+[16:59:57] Bebe has joined #selenium
+[IRC logfile - Started Wed Jun 13 17:03:37 2012]
+[17:03:37] Maior: before I start debugging further, does anyone know offhand if, via the HtmlUnit driver, I can do .get("http://username:password@example.com/") ?
+[17:03:50] Maior: (well, *as* I start debugging further, yay parallelisation)
+[17:04:00] lukeis: i dont' think you can
+[17:04:22] Maior: current hunch agrees
+[17:05:03] lukeis: you have to set it on the WebClient object... which you can get access to by sub-classing the java htmlunitdriver... if you're in python... hmmm, you might be f*ed
+[17:05:32] Dude-X: does python even have a html unit driver?
+[17:05:41] Dude-X: or you can access it through remote?
+[17:05:41] lukeis: only via Remote
+[17:05:46] Dude-X: makes sense
+[17:06:19] Maior: nod
+[17:06:51] jimevans: so. opinions on #4078? i'm not sure i'm comfortable just opening up a potential security hole on a user's system.
+[17:06:52] selbot2: 03 open/new Standalone IEDriverServer doesn't work across a network - https://code.google.com/p/selenium/issues/detail?id=4078 [Type-Defect Priority-Medium Status-Untriaged]
+[17:07:56] jimevans: what does the chromedriver.exe do? does it allow connection from external machines?
+[17:08:47] foolx: and once more (and most likely the last time today :) ) -> cssSelector for this <input class="bgc_button bgc_signup_form_register" type="submit" value="Registrieren"> should be cssSelector("input[type='submit']") right? (the value="Registrieren") isn't fixed over the pages!
+[17:08:47] diminoten: just wanted to say that it's been a pleasure using selenium 2.23
+[17:08:49] diminoten: so much easier than I remember selenium 1 in java being
+[17:09:07] lukeis: jimevans: nope... just tried it
+[17:09:27] foolx: @diminoten: Absolut! I love Selenium 2.22 (no time/need to go to 2.23)
+[17:09:39] lukeis: jimevans: they need to use the standalone server. won't fix.
+[17:09:53] jimevans: lukeis: i didn't think so, but i wanted to make sure. i thought i remembered seeing the same acl in the chromedriver code.
+[17:10:32] alexglow has joined #selenium
+[17:11:07] jimevans: bbiab
+[17:13:13] lukeis: foolx: what about that class?  "input.bgc_signup_form_register" or is that not consistent for you?
+[17:13:17] RossPatterson: Is that issue trying to use StandaloneIEDriverServer outside WebDriver?  I mean, I can't imagine a proper WebDriver scenario where it gets run from a "remote machine".
+[17:14:09] lukeis: i think they want to start the server as a process instead of having java installed and running the standalone server
+[17:14:25] foolx: lukeis: we have 2 different pagedesigns running (still ... ;( ) and the other one doesn't have a class at that button, so i would like to use cssSelector for both ways
+[17:14:50] lukeis: ok... then what you have looks ok
+[17:15:21] lukeis: or try using a page object pattern if you can and have different (more specific) locators for each of them
+[17:15:49] foolx: i now want to use this: By.cssSelector("input[type='submit']")
+[17:16:08] Dude-X: that should work
+[17:16:58] foolx: it does ... but not for every page ;( I use a "selectOneIfVisible"... but even when using 2 working cssSelectors, some pages don't work ;(
+[17:18:49] Spanktar has joined #selenium
+[17:19:25] Dude-X: do "elements = findElements(By….) ; for (WebElement element: elements) { if element.isDisplayed() : element.click} 
+[17:19:29] Dude-X: or something like that
+[17:20:35] foolx: it seems that i have 3 different types of design .... damn
+[17:20:56] stackedsax has joined #selenium
+[17:21:38] foolx: Dude-X: How can i create that findElements(By.cssSelector) with 3 different values for cssSelector?
+[17:22:10] Dude-X: use the most common attribute
+[17:22:12] Dude-X: err
+[17:22:15] lukeis: well... with 2.23 you can use compound css selectors
+[17:22:18] Dude-X: use the attribute that is hared among all
+[17:22:19] teodosia has left #selenium
+[17:22:34] foolx: thats the problem ...
+[17:22:37] Dude-X: what ordering is given with compound css selectors?
+[17:22:46] lukeis: order as it appears in the dom
+[17:23:06] foolx: i want to test 4 pages. the same object (terms.checkbox) is defined by 3 different types
+[17:23:12] lukeis: <p><a> and select "a, p" return p, a
+[17:23:37] foolx: input[name='signup_termsAndCondition'] | .termsAndConditionsFakeCheck | #bgc_signup_form_termsAndConditions
+[17:24:07] lukeis: By.cssSelector("input[name='signup_termsAndCondition'], .termsAndConditionsFakeCheck, irc://chat.freenode.net/#bgc_signup_form_termsAndConditionss")
+[17:24:17] lukeis: darn you link
+[17:24:19] nhirata has joined #selenium
+[17:24:37] foolx: you can do that? simply , separation?
+[17:24:40] lukeis: yep
+[17:24:48] lukeis: it's called a compound css selector
+[17:24:58] lukeis: and only recently (2.23) enabled
+[17:25:08] foolx: Damn nice! DAMN! i am still on 2.22
+[17:25:36] lukeis: upgrade ;)
+[17:25:42] foolx: now i have a reason ;)
+[17:25:58] foolx: instead of WebElement termsElement = registerAB.waitOneOfElementsVisible(By.cssSelector(".termsAndConditionsFakeCheck"), By.cssSelector("#bgc_signup_form_termsAndConditions"), driver);
+[17:26:02] Dude-X: heh jim said the number of questions on the selenium users lists is mostly non selenium related; i was perusing it yesterday and i find it a bit mind numbing
+[17:26:36] baijum has joined #selenium
+[17:26:51] foolx: i then can use:             WebElement termsElement = driver.findElements(By.cssSelector(".termsAndConditionsFakeCheck", "#bgc_signup_form_termsAndConditions", "input[name='signup_termsAndCondition']"));
+[17:30:31] foolx: okay, i think i got it... just need to define a list/collection? of webelements right?
+[17:30:53] jimevans: well, to be fair, i didn't say "mostly", i just mentioned that the percentage is staggering. :)
+[17:31:51] Fry33 has joined #selenium
+[17:32:55] RossPatterson: Yup.  And the ones that are Selenium-related are rarely what Holmes would have called a "three pipe problem" :-)
+[17:33:05] Fry33 has joined #selenium
+[17:35:48] *jimevans is going to have to rewatch the BBC Sherlock thanks to RossPatterson now.
+[17:36:36] RossPatterson: You're welcome :-)
+[17:37:30] jimevans: yeah, didn't say that was a bad thing. :)
+[17:38:02] Maior: jimevans: read the books too if you haven't already
+[17:39:06] RossPatterson: Oh, indeed.  The BBC series with Jeremy Brett as Holmes took a few liberties (as has every screen adaptation).
+[17:39:19] jimevans: Maior: well, of course. but i've read them several time over.
+[17:39:43] foolx: Dude-X: now i get a new "MoveTargetOutOfBoundsException" ;(
+[17:40:27] klrmn: have there been any hover menu coding practices associated with ActionChains not being able to read the items in a menu / click on an item in the menu?
+[17:40:41] Dude-X: foolx: make your browser window bigger?
+[17:41:18] foolx: ? should not be any problem ... was never a problem before
+[17:41:19] jimevans: klrmn: in what sense?
+[17:41:50] klrmn: some of the mozilla sites have a situation where the ActionChains are succeeding in doing the right thing maybe one time in ten
+[17:41:57] foolx: also he says the object would be "HTMLInputElement ... i never assigned that
+[17:42:21] Dude-X: the interactions api is kind of new so it needs work
+[17:42:24] jimevans: klrmn: using firefox? or another browser?
+[17:42:45] klrmn: stand-alone server 2.22, firefox 12, on winxp
+[17:43:14] jimevans: klrmn: then i don't know what the issues are. for IE, i can point to exactly where the problems are, chapter and vers.
+[17:43:22] jimevans: verse*
+[17:43:53] klrmn: *nod*
+[17:44:14] klrmn: i'd try running it in IE but the tests use a lot of css locators not supported by IE
+[17:44:41] klrmn: (and mozilla isn't highly motivated to do testing on IE =)
+[17:46:03] jimevans: very few people outside of MSFT are highly motivated to do testing on IE. and they're not as eager to play ball with the selenium community as i'd like
+[17:46:16] Dude-X: why is that?
+[17:46:25] Dude-X: oh because they can't make money out of it?
+[17:46:42] jimevans: i'm not trying to be flippant or catty.
+[17:46:51] Dude-X: actually a microsoft sanctioned automation tool might attract the wrong people
+[17:47:14] jimevans: there was, at one time, a huge anti-open-source bias at the company.
+[17:47:48] jimevans: things have improved a little, but the corporate culture still has pockets of that bias where long-time employees are in charge.
+[17:47:58] jimevans: the IE group is one of those pockets.
+[17:50:22] jimevans: Dean Hachamovitch is one of the old-guard. i knew him a little when he worked on Office.
+[17:50:25] Dude-X: I think the IE group tries to do the right thing to to have standards
+[17:50:43] jimevans: which is one reason we're trying to push webdriver as a standard.
+[17:50:43] Dude-X: to have matching standards but they get pushed by back by upper management
+[17:54:49] stephend has joined #selenium
+[17:57:52] klrmn: jimevens: if you have anything written up on ActionChains and IE, maybe it'd give me a clue about what's going on in FF
+[17:59:44] jimevans: no, i don't have anything written up, and the problems are directly related to IE-only. specifically, if the physical mouse cursor is within the bounds of the IE window.
+[17:59:55] jimevans: :yt jim evans building a driver
+[17:59:56] selbot2: Building a Driver: Lessons Learned from Developing the Internet Explorer Driver - http://www.youtube.com/watch?v=myffo8o67OA&feature=youtube_gdata
+[IRC logfile - Started Wed Jun 13 18:00:06 2012]
+[18:00:06] jimevans: klrmn: ^^
+[18:00:42] klrmn: thank you =)
+[18:01:32] sfbrian has joined #selenium
+[18:02:57] simonstewart: G'night
+[18:03:00] simonstewart has left #selenium
+[18:04:47] mdgreenfield has joined #selenium
+[18:06:41] dawagner: jimevans: I prefer
+[18:06:47] dawagner: :yt jim evans better every day
+[18:06:48] selbot2: Jim Evans - Better Angels - 01 Better Every Day - http://www.youtube.com/watch?v=ptn9d61e3ZI&feature=youtube_gdata
+[18:06:50] dawagner: myself ;)
+[18:07:11] jimevans: dawagner: thanks, for that mate!
+[18:07:36] jimevans: was pretty proud of that album (need to put the rest of it online at some point)
+[18:07:57] foolx: Dude-X: i still don't get it to work ;( i now found 2 selectors that will work instead of three and moved back to my first version (select one of two versions when one is visible.) Still same error -> Element must be there, but somehow he can't find it
+[18:07:58] lukeis: jimevans, the rockstar programmer :-D
+[18:08:07] mdgreenfield has joined #selenium
+[18:08:08] foolx: he even don't find any on any of all 4 pages
+[18:08:10] jimevans: :D
+[18:08:23] stockton has joined #selenium
+[18:10:46] RossPatterson: jimevans: You a Lincoln fan?
+[18:11:27] jimevans: RossPatterson: in what context? the president? the town in nebraska? 
+[18:11:35] jimevans: as a vampire hunter?
+[18:11:47] RossPatterson: "Better angels" - from his 1st inaugural address.
+[18:11:58] RossPatterson: Oh, and vampire hunter - SO need to see that :-)
+[18:12:00] jimevans: yes. blatantly stolen.
+[18:12:15] Dude-X: foolx: then you will have to add "wait for something to be visible" checks before clicking on those elements
+[18:13:04] jimevans: "good artists copy, great artists steal" :)
+[18:13:16] RossPatterson: :-)
+[18:13:18] jimevans: (not that i consider myself a great artist, by any means)
+[18:14:40] foolx: okay... somehow the page doesn't work like before ...
+[18:14:50] hxmws has joined #selenium
+[18:15:00] hxmws has left #selenium
+[18:15:13] foolx: how can i tell the selenium server to start the new driver in fullscreen instead of window?
+[18:15:50] foolx: you were right ... it simply wasn't visible... i had never any problems with "not visible" because of the part that was visible of the page ...
+[18:18:08] klrmn: has anybody tried to mix ActionChains with WebDriverWait?
+[18:18:50] klrmn: or would that be a contradiction in terms?
+[18:19:48] bsilverberg has joined #selenium
+[18:20:16] foolx: anyone any idea how to tell DesiredCapabilities you want to start maximised?
+[18:20:34] jimevans: foolx: not every browser lets you do that via DesiredCapabilities.
+[18:21:14] foolx: so i have to do it in code?
+[18:21:15] jimevans: chrome does (via a command-line switch), but IE doesn't. you'd need to use the window api to maximize it.
+[18:22:17] alexglow has joined #selenium
+[18:22:52] foolx: maybe i should slap the webdesign guys until they implement the sidescrolling again ...
+[18:31:18] Maior: FINALLY
+[18:31:30] Maior: lukeis: so it does support it
+[18:31:36] Maior: lukeis: but seemingly not when password has a hash
+[18:31:47] Maior: or at least, it handles escaping differently to webdriver.Firefox
+[18:32:09] *Maior does a little dance
+[18:34:33] baijum has joined #selenium
+[18:36:05] QAGuy: jimevans: you are a good speaker. Just watched: http://www.youtube.com/watch?v=myffo8o67OA&feature=youtube_gdata
+[18:36:13] testingb0t has joined #selenium
+[18:36:25] jimevans: QAGuy: thanks, mate. my first conference presentation.
+[18:36:42] QAGuy: Would never have guessed that
+[18:36:42] jimevans: and I do speak too quickly. need to learn to slow down a bit.
+[18:36:48] jimevans: but thanks
+[18:37:03] QAGuy: That was sele conf in London this year?
+[18:37:07] QAGuy: sel*
+[18:37:08] jimevans: yes.
+[18:37:17] QAGuy: Nice. Salesforce paid?
+[18:37:47] QAGuy: If so, double bonus
+[18:37:50] QAGuy: :)
+[18:38:10] jimevans: i'd prepared myself to go on my own dime, but in exchange for putting their logo on my slides, yes.
+[18:38:12] Siph0n has joined #selenium
+[18:38:32] QAGuy: Good deal
+[18:38:37] QAGuy: Wish I could have gone
+[18:39:48] stockton has joined #selenium
+[18:40:21] foolx: okay, now i am pretty sure that my cssSelector is simply wrong ;(
+[18:40:59] foolx: can anyone take a look: http://www.farmerama.de/?aid=3703 -> <div class"termsAndConditionsFakeCheck">
+[18:41:29] foolx: the unchecked checkbox ... i can't get a valid cssSelector for that one
+[18:41:59] mdgreenfield has joined #selenium
+[18:42:45] wietze has joined #selenium
+[18:42:50] foolx: i already tried these: By.cssSelector("input[class='termsAndConditionsFakeCheck']") | By.cssSelector("#bgc_signup_form_termsAndConditions")
+[18:46:24] mdgreenfield has left #selenium
+[18:48:39] DarkRift has joined #selenium
+[18:48:40] DarkRift has joined #selenium
+[18:49:12] ebass|afk: foolx
+[18:50:09] ebass|afk: By.cssSelector("div.termsAndConditionsFakeCheck")
+[18:52:12] ebass: just worked when i tried selecting it using firebug
+[IRC logfile - Started Wed Jun 13 19:06:22 2012]
+[19:06:22] Spanktar has joined #selenium
+[19:07:54] bmulholland has joined #selenium
+[19:08:40] santiycr has joined #selenium
+[19:09:09] jleyba_ has joined #selenium
+[19:10:45] bmulholland: So my website has a standard header/footer with some basic actions, such as load X page. To model that, all my pages inherit from one BasePage. However, BasePage has actions that load some of my pages (which, remember, inherit from BasePage). How do I best avoid the circular dependencies this creates?
+[19:11:02] mydog2 has joined #selenium
+[19:12:33] foolx: ebass: seems to work! Thanks a lot!
+[19:13:13] klrmn: bmulholland: that doesn't have to create circular dependencies, but it does require that the methods that load new pages return page objects
+[19:14:27] rbalent has joined #selenium
+[19:14:27] rbalent has joined #selenium
+[19:15:08] bmulholland: klrmn: I guess my problem is that BasePage imports HomePage, but HomePage imports BasePage. Best practices in Python (which I'm using) are to put the imports at the top of the file. What happens then is HomePage is loaded, which brings in BasePage, which brings in HomePage… Error :)
+[19:15:28] bmulholland: I'm wondering what the best practices are to avoid that… seems like I'll have to use some inline imports
+[19:16:07] klrmn: why does BasePage import HomePage?
+[19:16:42] bmulholland: because all pages have an action click_logo, which takes you back to the home page
+[19:16:48] farlan has left #selenium
+[19:17:28] klrmn: you're right, you'll have to do that with inline imports
+[19:17:50] bmulholland: Cool, okay
+[19:18:10] bmulholland: I think I'll do top-of-file imports for everything except in base page, where I'll inline my page imports
+[19:18:21] klrmn: i would try to isolate them in BasePage tho, rather than scattering them
+[19:18:33] klrmn: we we apparently thinking alike
+[19:18:38] Siph0n has joined #selenium
+[19:18:48] bmulholland: klrmn: Excellent :)
+[19:19:11] bmulholland: Thanks!
+[19:20:04] Swadq has joined #selenium
+[19:25:54] bmulholland: Damn, I seem to also have pages that can possibly lead in a circular path (e.g. home.action1 -> page1, page1->action2->home)
+[19:26:58] farlan has joined #selenium
+[19:27:05] bmulholland: Does anyone know if using import … rather than from … import … in python fixes circular dependencies?
+[19:27:31] Dude-X: no
+[19:27:49] Dude-X: if you have circular imports, your'e doing it wrong;
+[19:28:26] Dude-X: in my test suite, most page objects are independent classes
+[19:29:08] Dude-X: if we need another class, we just import them and use them as regular member variables
+[19:29:31] Dude-X: buut this is in java and we tend to treat these page objects as singletons :/
+[19:29:43] Dude-X: i did not write the initial architectrue; but it works so far
+[19:30:57] bmulholland: Dude-X: So say you have two pages. Page1 links to Page2. Page2 has "Click To Go Back" link. Page1 now needs Page2, and Page2 needs Page1 so that they can each return the correct PageObject, right?
+[19:31:29] Dude-X: i don't ever return page objects; we use a different model for tests
+[19:32:03] bmulholland: Dude-X: Ah, okay. I'm using what I believe is the standard PageObject pattern
+[19:32:13] Dude-X: _loginPage.login('username', 'password'); _homePage.clickWidget(); _newPage.selectItem("Stuff");
+[19:32:14] bmulholland: but I'm new to this, so trying to figure out the quirks :)
+[19:32:28] bmulholland: oh yes, that's much different
+[19:32:43] Dude-X: bbl
+[19:33:07] farlan has left #selenium
+[19:34:07] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Some clean up in webdriver.promise.Application: | https://code.google.com/p/selenium/source/detail?r=17170 | http://seleniumhq.org/ci.jsp?r=17170
+[19:35:00] foolx: ebass: sorry, was to early to say that ... somehow he finds the element, but can't click onto it ... ;(
+[19:35:20] SamuraiJack has joined #selenium
+[19:36:24] jleyba_ has joined #selenium
+[19:36:44] sassda has joined #selenium
+[19:39:42] foolx: okay, i am off for today. Will try to fix that stupid problem tomorrow.
+[19:46:35] tessarakt has joined #selenium
+[19:49:05] jleyba_ has joined #selenium
+[19:56:14] alexhairyman has joined #selenium
+[19:58:52] chrisculver701 has joined #selenium
+[19:59:43] chrisculver701: I am having issues getting some jquery to fire off after i enter in data to a textbox.  it is randomly not firing off the total calculation
+[19:59:50] chrisculver701: any suggestions on that?
+[IRC logfile - Started Wed Jun 13 20:00:21 2012]
+[20:00:21] AutomatedTester: chrisculver701: browser/os/
+[20:00:56] chrisculver701: firefox win 7
+[20:01:24] chrisculver701: ff 12.0
+[20:02:01] chrisculver701: i've tried clicking before and after
+[20:07:15] Dude-X: which bindings?
+[20:10:39] lukeis: c# ;)
+[20:11:17] ttk23 has joined #selenium
+[20:12:26] chrisculver701: as lukeis said
+[20:12:45] chrisculver701: its not picking up the .change event everytime from jquery
+[20:12:48] Dude-X: have you tried enabling native events?
+[20:12:53] chrisculver701: i have not
+[20:13:04] chrisculver701: i'm 2 versions behind on selenium
+[20:13:15] Dude-X: that's okay, aah oh
+[20:13:18] Dude-X: :/
+[20:13:28] chrisculver701: .21 still
+[20:13:43] SamuraiJack has joined #selenium
+[20:13:45] Dude-X: yeah you might get issues with ff12
+[20:13:55] lukeis: an immediate workaround is to execute_script("$(arguments[0]).change();", webElement)
+[20:14:00] ttk23: Greetings!  Was wondering if anyone has a good resource for installing chrome & chromedriver via command line on ubuntu lucid32?
+[20:14:21] alexhairyman: Download chromedriver, symlink to /usr/localb/bin
+[20:14:33] alexhairyman: It's super easy!
+[20:14:36] chrisculver701: Dude-X, lukeis: thanks for the info
+[20:15:40] ttk23: alexhairyman: I don't need chrome proper?
+[20:16:45] Dude-X: you also need regular chrome installed of course
+[20:17:08] alexhairyman: ttk23, Yes, try it with chromium though if you have it
+[20:17:26] alexhairyman: chrome has a deb you can install with
+[20:18:54] ttk23: excellent, thanks y'all.  I figured I was overcomplicating things.  ;)
+[20:19:01] ttk23: I'll have a go at it.
+[20:20:22] alexhairyman: No problem!
+[20:20:22] Bebe_home has joined #selenium
+[20:22:25] diminoten: is this still a problem for macs? http://stackoverflow.com/questions/8833835/python-selenium-webdriver-drag-and-drop
+[20:23:02] AutomatedTester: diminoten: yes
+[20:23:23] diminoten: any alternative solutions for dragging and dropping?
+[20:23:48] diminoten: oh hey that's you
+[20:24:28] diminoten: anything I can do to help get this fixed?
+[20:29:28] AutomatedTester: diminoten: dont use Mac :) 
+[20:29:33] diminoten: rofl
+[20:29:36] alexhairyman: Yay for linux!
+[20:29:47] diminoten: is there documentation that explains the issue at all?
+[20:30:02] AutomatedTester: diminoten: hooking into the OS isnt straightforward
+[20:30:18] AutomatedTester: so we have it for Linux and WIndows
+[20:31:06] diminoten: there might be games I can play with js to get around this in my particular instance
+[20:31:18] ttk23: use a VM?
+[20:31:31] diminoten: my tests need to be able to run everywhere
+[20:33:21] ttk23: does everywhere = multiple OS environments?
+[20:34:18] diminoten: yes
+[20:34:36] diminoten: the requirement is all major OSes
+[20:34:44] diminoten: it's no big deal
+[20:34:50] diminoten: I'll figure it out
+[20:34:51] ttk23: k
+[20:34:54] ttk23: gl
+[20:35:04] diminoten: heh ty
+[20:35:49] AutomatedTester: diminoten: Chrome *might* work 
+[20:35:57] diminoten: hehe
+[20:36:01] AutomatedTester: but its doing magic in the background
+[20:36:10] AutomatedTester: its not really native...
+[20:36:31] santiycr has joined #selenium
+[20:36:40] diminoten: what about something like htmlunit
+[20:36:53] nhirata has joined #selenium
+[20:36:56] AutomatedTester: um... that might work
+[20:37:05] diminoten: more magic?
+[20:37:12] AutomatedTester: well its not a proper browser
+[20:37:18] diminoten: I feel like you might get around the need for OS hooks that way
+[20:37:30] diminoten: meh I'll tias
+[20:37:44] diminoten: can't really complain when a free tool doesn't have something I want
+[20:37:57] alexglow has joined #selenium
+[20:38:00] AutomatedTester: diminoten: it will be there in a few months
+[20:38:16] diminoten: oh word
+[20:38:31] AutomatedTester: actually I am pretty sure chrome will do it...
+[20:38:51] diminoten: I'll let you know what I end up experiencing
+[20:39:04] AutomatedTester: diminoten: its on my todo list for Firefox
+[20:39:25] AutomatedTester: but a way out unfortunately :/
+[20:40:39] diminoten: fortunately for this particular component it's got other ways to interact with it that don't require drag and drop - I'll just doc the hell out of it and put in a test so I'll know when it works :D
+[20:40:41] ttk23: (Checking one last time before I dive into different drivers) => has anyone had issues with changing the userAgent in WebDriver/ Firefox causing scripts to hang?
+[20:41:29] AutomatedTester: sorry I cant be of more help
+[20:46:26] pa has joined #selenium
+[20:55:24] DarkRift has joined #selenium
+[20:55:25] DarkRift has joined #selenium
+[IRC logfile - Started Wed Jun 13 21:01:22 2012]
+[21:01:22] jcrza has joined #selenium
+[21:01:40] alexglow has joined #selenium
+[21:14:26] nirvdrum has joined #selenium
+[21:14:58] ttk23: Anyone run into this issue when setting up chromedriver?  WebDriverException: Unable to either launch or connect to Chrome. Please check that ChromeDriver is up-to-date. Using Chrome binary at: /opt/google/chrome/google-chrome
+[21:15:08] ttk23: (n00b)
+[21:15:40] lukeis: if you were on a command line can you type "chromedriver"
+[21:16:41] ttk23: cmd not found
+[21:16:53] ttk23: do i need to add to path somewhere?
+[21:16:56] lukeis: yep
+[21:16:58] Bebe_home has joined #selenium
+[21:17:11] lukeis: anywhere that is in "echo %PATH%"
+[21:17:17] lukeis: or echo $PATH
+[21:21:07] kinow has joined #selenium
+[21:25:30] ebass: where did you install chromedriver?
+[21:27:11] lukeis:  /usr/bin
+[21:27:12] ttk23: in a temp location for test (on a VM) .... i'm assuming add that loc to my PATH, right?
+[21:27:26] ttk23: or is that required?
+[21:27:44] lukeis: you can do either... it's just easier if you put it in an already existing path location
+[21:28:19] ttk23: agreed, ok
+[21:28:31] ttk23: moving it...
+[21:29:27] nacho has joined #selenium
+[21:29:59] stephend has joined #selenium
+[21:32:20] ttk23: hmm, getting same error now it's just referring to /usr/bin/google-chrome 
+[21:32:24] nhirata has joined #selenium
+[21:34:13] ttk23:  /afk
+[21:34:39] klrmn has joined #selenium
+[21:35:52] kinow_ has joined #selenium
+[21:53:20] AutomatedTester: jimevans: wanna field http://stackoverflow.com/questions/11023002/selenium-webdriver-stop-working-when-click-on-different-window
+[IRC logfile - Started Wed Jun 13 22:08:01 2012]
+[22:08:01] cieufhrxmpfakoih has joined #selenium
+[22:11:48] testingb0t1 has joined #selenium
+[22:12:55] alexglow has joined #selenium
+[22:16:06] dawagner has joined #selenium
+[22:16:22] dawagner: AutomatedTester: Is there a way I can unit test firefox extension code?
+[22:16:45] dawagner: i.e. load this one file as if it were in an extension context, run some tests exercising it
+[22:16:58] AutomatedTester: dawagner: old style or new style?
+[22:17:38] dawagner: Old-style.  But I'm not actually testing a full extension, just a function which depends on running in the right context
+[22:18:28] AutomatedTester: um dunno old style
+[22:18:51] dawagner: What would the new-style way of doing it be?
+[22:20:31] _md has joined #selenium
+[22:21:02] AutomatedTester: you write some JS and then run cfx telling it to run tests
+[22:22:09] jimevans: AutomatedTester: yeah, i'll take a stab at it.
+[22:22:31] AutomatedTester: i cant find docs but I can show you examples
+[22:22:58] lukeis: heh... i want to answer "no"
+[22:23:16] AutomatedTester: dawagner:  https://github.com/mozilla/memchaser/tree/71bd8c9eeb7b8cf29b951639f71dd073297379fe/extension/test
+[22:23:57] dawagner: Awesome, thanks :)
+[22:33:22] nhirata has joined #selenium
+[22:37:11] jleyba has joined #selenium
+[22:38:18] kallisti has joined #selenium
+[22:38:18] kallisti has joined #selenium
+[22:48:55] kallisti has joined #selenium
+[22:49:05] kallisti has joined #selenium
+[22:49:09] dmachi has joined #selenium
+[22:50:34] Siph0n| has joined #selenium
+[IRC logfile - Started Wed Jun 13 23:02:19 2012]
+[23:02:19] kallisti has joined #selenium
+[23:02:19] kallisti has joined #selenium
+[23:10:58] alexglow has joined #selenium
+[23:11:07] Getty has joined #selenium
+[23:13:55] tessarakt has joined #selenium
+[23:15:40] kallisti has joined #selenium
+[23:15:41] kallisti has joined #selenium
+[23:27:05] nirvdrum has joined #selenium
+[23:30:38] lovedaddy has joined #selenium
+[23:34:10] kallisti has joined #selenium
+[23:34:11] kallisti has joined #selenium
+[23:36:28] lovedaddy: evening everyone - just wondering if there is an ETA on 2.23 for Ruby?  Using FF13 here and the native events dont seem to work (windows 7, ff13, selenium-webdriver 2.22.2 with watir webdriver 0.6.1)
+[23:39:40] dawagner has joined #selenium
+[23:40:20] lukeis: jarib: ^
+[23:43:16] lukeis: :note jarib releasing 2.23 for ruby may be a good idea (soonish) since it would enable native event support for FF13... you know, if you have time :-D
+[23:43:17] selbot2: ok!
+[23:44:11] lovedaddy: =)
+[23:45:55] kallisti has joined #selenium
+[23:45:55] kallisti has joined #selenium

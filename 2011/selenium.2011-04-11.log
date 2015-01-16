@@ -1,0 +1,1229 @@
+2011-04-11T00:05:17  *** sburjan has joined #selenium
+2011-04-11T00:24:56  *** csanchez has quit IRC
+2011-04-11T00:32:12  *** lfryc has joined #selenium
+2011-04-11T00:35:31  *** andialbrecht is now known as andialbrecht_
+2011-04-11T00:44:55  *** keturn has quit IRC
+2011-04-11T00:48:23  *** keturn has joined #selenium
+2011-04-11T01:10:00  *** rbalent has joined #selenium
+2011-04-11T01:17:34  *** anatoli has quit IRC
+2011-04-11T01:30:52  <ato> Is there any documentation anywhere on the new advanced input APIs that are coming to WebDriver?
+2011-04-11T01:31:07  *** madteckhead_1 has joined #selenium
+2011-04-11T01:31:14  <jarib> :wiki advanceduserinteractions
+2011-04-11T01:31:15  <selbot2> 1: AdvancedUserInteractions: How to use the Advanced User Interactions API - http://code.google.com/p/selenium/wiki/AdvancedUserInteractions
+2011-04-11T01:31:20  <jarib> ato: ^
+2011-04-11T01:31:32  <ato> Yay, cheers.
+2011-04-11T01:31:37  <jarib> back in norway?
+2011-04-11T01:32:43  <ato> Indeed, just got back in the office.
+2011-04-11T01:32:51  <ato> Thanks for an awesome time in SF:
+2011-04-11T01:32:57  <ato> s/:/.
+2011-04-11T01:33:09  <madteckhead_1> G'day folks, popping in with a question I can't find a solution too. Really happy with the new webdriver stuff, just can't work out how to wait for an element OR even just delay for a set period using the python bindings. Have others come up with a solution for this?
+2011-04-11T01:33:27  <jarib> ato: thanks to you too!
+2011-04-11T01:34:52  <jarib> madteckhead_1: not sure what it looks like in python, but you could either wait explicitly (recommended), or configure an implicit wait
+2011-04-11T01:35:28  <jarib> in java/ruby/.net we have helpers for doing explicit waiting (WebDriverWait in java, Selenium::WebDriver::Wait in Ruby)
+2011-04-11T01:35:42  <jarib> either way setting up explicit waiting is pretty simple
+2011-04-11T01:36:03  <madteckhead_1> yeah, i can't figure out how .... ahhh.... i just realised waiting has nothing to do with selenium does it
+2011-04-11T01:36:12  <madteckhead_1> just something like pause(10)
+2011-04-11T01:36:27  *** vrockai has joined #selenium
+2011-04-11T01:36:38  <madteckhead_1> i feel so stupid... think thats a sign i need a break
+2011-04-11T01:36:40  <jarib> you really should avoid sleep() or pause() calls
+2011-04-11T01:37:02  <madteckhead_1> o really, so how to wait explicitly?
+2011-04-11T01:37:22  <jarib> poll the DOM for the state you want (with a timeout)
+2011-04-11T01:37:39  <madteckhead_1> okay, thanks.
+2011-04-11T01:38:05  <jarib> i.e. something like   wait_until { driver.find_element(...) }
+2011-04-11T01:43:12  *** csanchez has joined #selenium
+2011-04-11T02:00:12  *** pnitin has joined #selenium
+2011-04-11T02:05:20  <madteckhead_1> thanks for you pointers jarib
+2011-04-11T02:12:19  *** lfryc is now known as lfryc_away
+2011-04-11T02:15:17  *** bebe has joined #selenium
+2011-04-11T02:15:53  *** dave_miles_cf has quit IRC
+2011-04-11T02:17:16  *** Guest5130 has quit IRC
+2011-04-11T02:17:39  *** webben has joined #selenium
+2011-04-11T02:19:36  *** dave_miles_cf has joined #selenium
+2011-04-11T02:27:12  <selbot2> simon.m.stewart half a minute ago - SimonStewart (on behalf of MalcolmRowe): Making the docs on the javascript executor clearer - http://code.google.com/p/selenium/source/detail?r=11966
+2011-04-11T02:27:45  <mashiara> some sort of "page loaded" callback would be nice (in thise case I'm writing an interaction class for a CMS toolbar and of course I need to re-init my toolbar class each time the page is changed for whatever reason)
+2011-04-11T02:28:24  <jarib> mashiara: the problem with that is that what is considered "loaded" depends on context
+2011-04-11T02:28:42  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Preparing to remove the 'isJavascriptEnabled' method. - http://code.google.com/p/selenium/source/detail?r=11967
+2011-04-11T02:29:16  <mashiara> driver.get() is kinda obvious, and easy to wrap
+2011-04-11T02:29:23  <jarib> webdriver tries to block as best as possible, but at some point it needs to throw up its hands and let you as the author/tester deal with it
+2011-04-11T02:29:38  <mashiara> but clicking on links and form controls gets complicated.
+2011-04-11T02:29:48  <jarib> get() can be complicated as well
+2011-04-11T02:30:07  <jarib> consider onload='setTimeout(...)' etc
+2011-04-11T02:30:19  <jarib> the whole UI could potentially be built there.
+2011-04-11T02:30:28  <jarib> i think webdriver strikes the right balance at the moment.
+2011-04-11T02:30:52  <mashiara> yes, let me rephrase: I would like to be able to define a callback to be called just before get or click returns
+2011-04-11T02:31:09  <mashiara> I'm happy so far with the magic that happens inside the methods
+2011-04-11T02:32:01  <mashiara> but the click callback (if defined for "page load") should only be called if a page was loaded as far as webdriver core is concerned
+2011-04-11T02:32:09  <mashiara> (now it got complicated...)
+2011-04-11T02:32:40  <mashiara> I can deal with this manually easily but it would make my test code cleaner if I didn't have to add so much boilerplate
+2011-04-11T02:34:24  *** keturn_ has joined #selenium
+2011-04-11T02:34:28  *** keturn has quit IRC
+2011-04-11T02:37:35  *** brettporter has quit IRC
+2011-04-11T02:38:58  *** bebe is now known as Bebe
+2011-04-11T02:39:06  *** Bebe is now known as Bebef
+2011-04-11T02:39:34  *** Bebef is now known as bebef_1987
+2011-04-11T02:40:21  <jarib> mashiara: not sure how a callback would make sense in webdriver, since it's a blocking api
+2011-04-11T02:40:30  *** mokki has joined #selenium
+2011-04-11T02:40:57  <jarib> and your test code can be as clean as you want, if you build the right abstractions :)
+2011-04-11T02:41:08  <jarib> e.g. page objects
+2011-04-11T02:41:23  *** foobarbaz has joined #selenium
+2011-04-11T02:41:55  <mashiara> "hook" then :) mainly making a wrapper for the click method to determine if this particular click caused a "page load" or not might be a bit complex.
+2011-04-11T02:42:28  <mokki> hi, is there any way to debug what happens in the browser side when selenium exequtes a request? I have enabled httpclient debug which shows that the FirefoxDriver sends a "GET /hub/session/379f6f79-4d1e-40ac-9460-234233b291f3/element/%7B112d0de0-39b9-4707-b085-1346fd3a9b89%7D/enabled HTTP/1.1" request but never receives any reponse from the browser - this is very repeatable
+2011-04-11T02:42:31  <mashiara> while at the pie-in-the-sky department: callback/signal/hook for when server explicitly deletes cookie would be nice
+2011-04-11T02:44:38  <mashiara> (I have a system for "persisting" select cookies across invidual tests, again I can manually check if they're still valid but...)
+2011-04-11T02:45:47  *** lfryc_away is now known as lfryc
+2011-04-11T02:46:35  <jarib> persisting cookies across tests sounds like asking for trouble
+2011-04-11T02:46:53  <jarib> each test should be self-contained
+2011-04-11T02:47:01  <mashiara> it's just the login session cookies
+2011-04-11T02:49:20  <mashiara> in this case the logins go through Shibboleth so it's a nontrivial amount of time to do it for each test separately.
+2011-04-11T02:49:37  <mashiara> anyways, now lunch. thanks for the insinghts
+2011-04-11T02:50:59  *** dmachi has joined #selenium
+2011-04-11T02:51:00  *** dmachi1 has quit IRC
+2011-04-11T02:51:49  <HolyGoat> I'm a bit confused. I've seen a number of messages on newsgroups stating that selenium does not support tests that go over multiple domains, yet when I create a test that goes over e.g. login.foo.com to www.foo.com , it succeeds (without running Selenium RC in proxy injection mode explicitly)
+2011-04-11T02:52:07  <HolyGoat> am I missing something, or does Selenium RC support this transparently now?
+2011-04-11T03:00:38  *** zmijunkie has joined #selenium
+2011-04-11T03:01:26  *** foobarbaz has quit IRC
+2011-04-11T03:11:28  *** csanchez has quit IRC
+2011-04-11T03:18:58  <jarib> HolyGoat: how about login.foo.com to google.com?
+2011-04-11T03:19:04  <jarib> perhaps subdomains are fine
+2011-04-11T03:22:01  *** nitin_ has joined #selenium
+2011-04-11T03:22:01  *** pnitin has quit IRC
+2011-04-11T03:32:30  <jarib> krosenvold: did you say you had issues with the chrome dev channel on 64-bit linux?
+2011-04-11T03:32:33  <jarib> or was that something i dreamt
+2011-04-11T03:34:51  *** foobarbaz has joined #selenium
+2011-04-11T03:42:42  <selbot2> james.h.evans.jr half a minute ago - JimEvans: Adding test files for testing session cookies in IE. - http://code.google.com/p/selenium/source/detail?r=11968
+2011-04-11T03:43:42  <selbot2> james.h.evans.jr half a minute ago - JimEvans: Fixing up page file name case in test. - http://code.google.com/p/selenium/source/detail?r=11969
+2011-04-11T03:46:12  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Pick a more logical name for the XPIDL environment variable - http://code.google.com/p/selenium/source/detail?r=11970
+2011-04-11T03:47:07  *** Nafai has left #selenium
+2011-04-11T03:47:13  *** zmijunkie has quit IRC
+2011-04-11T03:48:12  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Version number bump, ready for the next release - http://code.google.com/p/selenium/source/detail?r=11971
+2011-04-11T03:50:08  <HolyGoat> jarib: I can try that, thanks
+2011-04-11T03:55:22  *** zmijunkie has joined #selenium
+2011-04-11T03:57:50  *** kylls has joined #selenium
+2011-04-11T03:59:39  <HolyGoat> jarib: Works just fine
+2011-04-11T04:02:39  <HolyGoat> It's a good thing in my case, just not entirely sure if this is expected behaviour.
+2011-04-11T04:23:02  *** brettporter has joined #selenium
+2011-04-11T04:37:05  *** Stuk has joined #selenium
+2011-04-11T04:38:08  <ato> jarib: Stuk's now officially hanging!
+2011-04-11T04:38:11  *** nitin_ has quit IRC
+2011-04-11T04:38:17  <Stuk> 'sup
+2011-04-11T04:57:15  <jarib> Stuk: welcome!
+2011-04-11T04:57:43  <Stuk> jarib: thank you very much :)
+2011-04-11T04:57:47  <jarib> Stuk: did you see simon's pull request?
+2011-04-11T04:58:10  <jarib> i understood the github repo wasn't entirely in sync with your internal one
+2011-04-11T04:58:15  <Stuk> jarib: yep
+2011-04-11T04:58:18  <jarib> but we did the patch anyway
+2011-04-11T04:58:19  <Stuk> was just about to say tha
+2011-04-11T04:58:20  <Stuk> t
+2011-04-11T04:58:35  <jarib> right
+2011-04-11T04:58:35  <Stuk> so I'm thinking I'll sync it with our internal one, then apply it
+2011-04-11T04:58:45  <jarib> great
+2011-04-11T04:58:48  <Stuk> which will mean deleting it and pushing anew
+2011-04-11T04:59:04  <jarib> oh :/
+2011-04-11T04:59:14  <Stuk> yeah
+2011-04-11T04:59:52  <ato> Yes, essentially the repos are not the same.
+2011-04-11T05:00:01  <ato> (Whoever came up with that idea I don't know.)
+2011-04-11T05:00:10  <Stuk> just need to confirm internally that it's ok to push it out :)
+2011-04-11T05:00:23  <Stuk> and yeah, it wasn't a great idea
+2011-04-11T05:07:26  *** leftmoose has joined #selenium
+2011-04-11T05:10:32  *** ssims has joined #selenium
+2011-04-11T05:13:44  <jarib> Stuk: so you'll be in sync going forward?
+2011-04-11T05:14:06  <Stuk> jarib: yep
+2011-04-11T05:14:11  <jarib> cool
+2011-04-11T05:14:23  <leftmoose> hi. has anyone has problems with [win7/ie8]: "Couldn't open app window; is the pop-up blocker enabled?"
+2011-04-11T05:14:46  <jarib> r11915 added discovery of the opera driver to the remote server, so it only needs to be on the classpath to be available
+2011-04-11T05:14:50  <selbot2> simon.m.stewart 3 days ago - SimonStewart: Adding opera support to the list of supported browsers in the remote server - http://code.google.com/p/selenium/source/detail?r=11915
+2011-04-11T05:15:04  <jarib> which opens up some interesting possibilities
+2011-04-11T05:15:45  *** cburroughs has joined #selenium
+2011-04-11T05:18:03  *** RossPatterson has joined #selenium
+2011-04-11T05:19:12  <mashiara> btw, any hope of getting the Sizzle (jQuery) CSS selectors to webdriver too ?
+2011-04-11T05:19:42  <krosenvold> jarib: the 64 bit .deb was too old on dev channel
+2011-04-11T05:20:08  <jarib> krosenvold: ok. how long ago was this?
+2011-04-11T05:20:21  <ato> mashiara: We have that in OperaDriver, but I don't think it's made its way to WebDriver yet.
+2011-04-11T05:20:25  <krosenvold> 2
+2011-04-11T05:20:38  <jarib> krosenvold: years? :)
+2011-04-11T05:20:45  <ato> mashiara: Also, slightly unrelated, I've made a prototype for jQuery-like DOM selectors in OperaWatir.
+2011-04-11T05:21:06  <krosenvold> days
+2011-04-11T05:21:15  <ato> krosenvold: A question of curiosity, are you located in Oslo?
+2011-04-11T05:21:16  <jarib> mashiara: webdriver falls back to sizzle if the native querySelector API isn't available
+2011-04-11T05:21:32  <krosenvold> ato: yes
+2011-04-11T05:21:38  <Stuk> jarib: ahh fantastic, thanks
+2011-04-11T05:22:00  <jarib> mashiara: which means locating by css isn't entirely consistent
+2011-04-11T05:22:35  <jarib> if you don't rely on sizzle's CSS extensions, you should be good though
+2011-04-11T05:22:41  <ato> krosenvold, jarib: I've noticed that we have quite a few developers and users of Selenium/Watir in the Oslo-region now, would you be interested in maybe doing some sort of meetup sometime?
+2011-04-11T05:22:48  <krosenvold> jarib: It might have been a bad link on the download page too
+2011-04-11T05:23:03  <jarib> krosenvold: thanks. will give it a shot and report back
+2011-04-11T05:23:10  <mashiara> jarib: ok, does the native querySelector support the super-handy extended things Sizzle has ? because I seem to get all kinds of "invalid string in selector" -style errors when I try to use them...
+2011-04-11T05:23:11  <jarib> i'd be interesting in meeting up
+2011-04-11T05:23:22  <jarib> [14:29]      jarib : if you don't rely on sizzle's CSS extensions, you should be good though
+2011-04-11T05:23:23  <krosenvold> jarib: pointing at the wrong channel maybe?
+2011-04-11T05:24:15  <mashiara> jarib: I take that as a no, any way to force falling back to sizzle ?
+2011-04-11T05:24:24  <jarib> no
+2011-04-11T05:24:28  <jarib> krosenvold: i'll try this
+2011-04-11T05:24:28  <jarib> http://dl.google.com/linux/direct/google-chrome-unstable_current_amd64.deb
+2011-04-11T05:25:21  <krosenvold> i dont know why i didnt
+2011-04-11T05:26:15  *** rbalent has quit IRC
+2011-04-11T05:26:16  <krosenvold> since they had so many channels i was expecting unstable to be, well, unstable :)
+2011-04-11T05:26:38  <krosenvold> ato: It would be cool
+2011-04-11T05:26:40  *** rbalent has joined #selenium
+2011-04-11T05:26:49  <jarib> dev channel links here points to that http://www.chromium.org/getting-involved/dev-channel
+2011-04-11T05:27:23  <ato> krosenvold: Do you have an email?
+2011-04-11T05:27:31  <jarib> that's 12.0.725.0
+2011-04-11T05:27:40  <krosenvold> @gmail
+2011-04-11T05:27:45  <ato> Cheers
+2011-04-11T05:28:25  *** madteckhead_1 has quit IRC
+2011-04-11T05:28:41  <mashiara> ato: back to your point about operadriver vs webdriver, you mean that the native querySelector API will support Sizzle-extensions at some point (one can hope...)
+2011-04-11T05:30:10  <ato> We've implemented it as findElementByCss, so I guess this is different from exposing querySelector.
+2011-04-11T05:30:31  <mashiara> well thats what I meant
+2011-04-11T05:30:42  *** Archdude has quit IRC
+2011-04-11T05:30:43  <jarib> webdriver doesn't *expose* querySelector
+2011-04-11T05:31:03  <jarib> findElement(By.css(...)) will use querySelector if available, otherwise fall back to sizzle
+2011-04-11T05:31:04  *** Archdude has joined #selenium
+2011-04-11T05:31:47  <mashiara> Being able to use Sizzle extensions (for all browsers) in find_element_by_css_selector (when talking about python) is what I would love to have.
+2011-04-11T05:32:01  *** Archdude has quit IRC
+2011-04-11T05:32:15  <ato> jarib: So it will call driver.querySelector?
+2011-04-11T05:32:46  *** Archdude has joined #selenium
+2011-04-11T05:33:00  <ato> And that's essentially doing document.querySelector() in ECMAscript?
+2011-04-11T05:33:08  <jarib> ato: it will call document.querySelector in JS way down in the stack
+2011-04-11T05:33:14  *** jimevans has joined #selenium
+2011-04-11T05:33:44  <ato> So whenever you use a browser that hasn't implemented querySelector yet, how does Sizzle plug into this?
+2011-04-11T05:33:57  <jarib> it injects sizzle to provide css support.
+2011-04-11T05:35:01  <jarib> mashiara: the main argument against is speed (injecting sizzle when it's not needed)
+2011-04-11T05:36:02  <mashiara> optional enable_sizzle() method ?
+2011-04-11T05:36:13  <jarib> mashiara: if your app uses jquery (which is the case for most people asking about this), you can always do driver.execute_script("return $(selector).get(0)")
+2011-04-11T05:37:05  <jarib> mashiara: not going to happen. we'd like to keep the api as small as possible
+2011-04-11T05:37:28  <jarib> and an enable_sizzle method would be very specific to this point in time
+2011-04-11T05:37:53  <mashiara> jarib; ok, and the execute_script workaround is good enough
+2011-04-11T05:38:02  <jarib> aye :)
+2011-04-11T05:38:56  <mashiara> I just need to write a wrapper that falls back to that in case I get the funky exception I get when trying to use Sizzle selectors where they're not available
+2011-04-11T05:40:22  <HolyGoat> I really hope the company I work for lets me open source the stuff I wrote with SeleniumRC. It spits out useful stuff to Nagios (like benchmarking relevant calls, correctly dealing with asserts that fail etc)
+2011-04-11T05:42:46  <ato> Which browsers do still not support querySelector?
+2011-04-11T05:44:34  *** adamgoucher has quit IRC
+2011-04-11T05:45:29  <jimevans> ato: In the latest versions of the browser? None that I know of. But as long as we're supporting IE6 and IE7, we'll need to keep Sizzle around.
+2011-04-11T05:46:01  <ato> Of course, that makes sense.
+2011-04-11T05:46:15  <ato> My question was more in the category of general curiosity (-:
+2011-04-11T05:46:24  <jimevans> :)
+2011-04-11T05:47:12  <jimevans> general question: Outside of IE and Firefox, who supports showModalDialog()?
+2011-04-11T05:49:12  <selbot2> james.h.evans.jr less than 10 seconds ago - JimEvans: IE native code should no longer hang when presented with a window created by showModalDialog(). - http://code.google.com/p/selenium/source/detail?r=11972
+2011-04-11T05:50:32  <ato> jimevans: We don't yet, but it's in the pipeline.
+2011-04-11T05:50:45  <ato> jimevans: It's pretty far down on the priority list, though.
+2011-04-11T05:51:50  * ato comments on that bug in the BTS.
+2011-04-11T05:52:14  <ato> jimevans: In which part of WebDriver is that used?
+2011-04-11T05:52:57  <jimevans> ato: It's not, at least not yet (#284). showModalDialog presents a weird case for the WebDriver API.
+2011-04-11T05:53:05  <ato> jimevans: Interesting.  It's filed as the 118th bug in Opera (=
+2011-04-11T05:53:12  <ato> (That's very, very young.)
+2011-04-11T05:53:34  <jimevans> let's try this again: #284
+2011-04-11T05:53:34  <selbot2>  open/new Support for window.showModalDialog - http://code.google.com/p/selenium/issues/detail?id=284
+2011-04-11T05:53:40  <jimevans> there's selbot2!
+2011-04-11T05:53:51  <ato> (#284)
+2011-04-11T05:54:01  <ato> jarib: You clearly have a bug with it (-;
+2011-04-11T05:54:39  *** skiphuffman_ has joined #selenium
+2011-04-11T05:54:41  <jimevans> At any rate, someone pinged me offline about wanting to fix it for IE, and I started digging around with it at SeConf.
+2011-04-11T05:54:59  <jimevans> For IE, it's not a simple fix.
+2011-04-11T05:54:59  <ato> That's an awesome feature, actually.
+2011-04-11T05:55:33  <jimevans> But it brings up an interesting question about the WebDriver API. Do we handle it as a regular window, or do we handle it as an alert?
+2011-04-11T05:55:35  <ato> I think part of the problem is that showModalDialog is very underspecified, however.
+2011-04-11T05:55:47  *** SL-BWood has joined #selenium
+2011-04-11T05:56:11  <ato> Window would make sense.
+2011-04-11T05:56:13  <jimevans> ato: Well, sure. It started life as an IE-only thing.
+2011-04-11T05:56:47  <ato> But then there's the question of whether a window could have a return value…
+2011-04-11T05:56:47  <jimevans> Handling it as a window makes sense to me too, but I thought I'd bring it up anyway.
+2011-04-11T05:56:48  <ato> Heh.
+2011-04-11T05:57:02  <jarib> ato: well, don't want http://blah/#241 to trigger it
+2011-04-11T05:57:12  <jarib> perhaps i should special case (
+2011-04-11T05:57:16  <ato> We don't?
+2011-04-11T05:57:37  <jarib> it used to do that and someone complained
+2011-04-11T05:57:38  <ato> Well, maybe not.
+2011-04-11T05:57:41  <jarib> so i fixed it not to
+2011-04-11T05:57:47  <ato> RIght.
+2011-04-11T05:58:02  <jimevans> jarib: you can't please everybody. :)
+2011-04-11T06:00:15  *** mbeierl has joined #selenium
+2011-04-11T06:01:19  * ato makes a case for implementing modal dialogues in Opera.
+2011-04-11T06:05:30  <jimevans> I suspect it doesn't, but does anybody know if the Firefox driver supports showModalDialog() windows?
+2011-04-11T06:06:21  *** toseter has joined #selenium
+2011-04-11T06:19:52  *** matt1s has quit IRC
+2011-04-11T06:21:22  *** matt1s has joined #selenium
+2011-04-11T06:23:07  *** adamgoucher has joined #selenium
+2011-04-11T06:24:19  <jarib> jimevans: pretty sure it doesn't
+2011-04-11T06:24:34  <jarib> i'd be surprised if it did
+2011-04-11T06:24:38  <jarib> but i've never had to deal with one
+2011-04-11T06:24:44  *** dawagner has joined #selenium
+2011-04-11T06:24:50  <jarib> i could try it easily if someone has an example page
+2011-04-11T06:25:05  <jimevans> same here, on both counts.
+2011-04-11T06:25:09  <jarib> hehe
+2011-04-11T06:25:13  <jarib> dawagner: welcome!
+2011-04-11T06:25:17  <dawagner> Hello!
+2011-04-11T06:26:05  <jarib> so, moving to london?
+2011-04-11T06:28:52  <dawagner> Indeed! Should be lots of fun :)
+2011-04-11T06:31:42  <jarib> i don't doubt it will be :)
+2011-04-11T06:35:36  *** pnitin has joined #selenium
+2011-04-11T06:38:08  <Stuk> this looks like it may be wrong: http://code.google.com/p/selenium/source/browse/trunk/Rakefile#275
+2011-04-11T06:38:20  <Stuk> "firefox" => "*chrome"
+2011-04-11T06:38:28  <Stuk> is it, or am I missing something?
+2011-04-11T06:38:50  <jimevans> Stuk: no, that's correct. the string for launching firefox is "*chrome"
+2011-04-11T06:38:51  <jarib> Stuk: it's a Selenium 1 thing
+2011-04-11T06:39:08  <jarib> Stuk: nothing to do with the webdriver world
+2011-04-11T06:39:15  <Stuk> ahhh, okey then
+2011-04-11T06:39:16  <mashiara> can I refer to a webelement  via it's Selenium id (webelement.id property) in driver.execute_script() somehow ?
+2011-04-11T06:39:18  <adamgoucher> and chrome is a mozilla thing
+2011-04-11T06:39:30  <jimevans> historical note: the firefox string existed before the google chrome browser did.
+2011-04-11T06:39:46  <Stuk> I'm trying to work out how I can easily run the selenium tests against Opera Driver
+2011-04-11T06:39:55  <jarib> mashiara: you can pass in the element; driver.execute_script("return typeof arguments[0]", webelement)
+2011-04-11T06:41:04  <mashiara> jarib: ok thanks, btw is there a good documentation on all of this somewhere that I should read before asking stupid questions ?
+2011-04-11T06:41:23  <jarib> Stuk: i think dawagner here may be your best bet for that
+2011-04-11T06:41:55  <jarib> dawagner: Stuk works on webdriver at opera
+2011-04-11T06:42:05  <Stuk> dawagner: hi!
+2011-04-11T06:42:12  <jarib> and the remote server looks for the operadriver on the classpath
+2011-04-11T06:42:18  *** anatoli_ has joined #selenium
+2011-04-11T06:42:38  <jarib> so perhaps the easiest path would be to run the remote tests with DesiredCapabilities.opera()
+2011-04-11T06:42:44  <jarib> not sure where that's set up
+2011-04-11T06:42:58  <Stuk> okey, then
+2011-04-11T06:42:58  *** carlisia has joined #selenium
+2011-04-11T06:43:02  <Stuk> I'll have a little look
+2011-04-11T06:43:22  <jarib> mashiara: the wiki or java/ruby docs i guess
+2011-04-11T06:44:04  <ato> I believe jarib/simon added DesiredCapabilities.opera() just a few days ago.
+2011-04-11T06:46:59  *** anatoli_ has quit IRC
+2011-04-11T06:50:00  *** csanchez has joined #selenium
+2011-04-11T06:55:02  <HolyGoat> Hm.. according to Same Origin Policy documentation foo.bar.com and www.bar.com are two different hosts (makes sense). Yet I seem to be able to cross domains with Selenium RC without a problem (even completely different domains). I hope I'm not doing something wrong and that this is indeed the expected behaviour.
+2011-04-11T07:08:17  *** AutomatedTester has joined #selenium
+2011-04-11T07:11:49  <dawagner> Stuk/jarib: I don't know anything about the opera stuff, https://github.com/operasoftware/operawatir is the best I can point you at, but that's somewhat watir-specific
+2011-04-11T07:12:12  <mashiara> it lives! http://friendpaste.com/2syl0KjNXs3pPK4JTCZFAQ (a wrapper for handling Sizzle [jQuery] selectors in webdriver [if not supported by the underlying querySelect API])
+2011-04-11T07:12:15  <dawagner> Remote may be a good option, though I think you'd need to build from trunk
+2011-04-11T07:14:20  <Stuk> dawagner: I work at Opera with ato, so I know all about that side :) I need more help with the Rakefile, and how it actually runs the tests on a particular driver
+2011-04-11T07:15:48  <dawagner> Which language are you trying to get them going in?
+2011-04-11T07:16:34  <AutomatedTester> :wiki crazyfun
+2011-04-11T07:16:34  <selbot2> 1: BuildReadme: A list of Questions that need to be answered after someone checks out the source code. - http://code.google.com/p/selenium/wiki/BuildReadme
+2011-04-11T07:17:13  <AutomatedTester> Stuk: have you looked at http://code.google.com/p/selenium/wiki/CrazyFunBuild?
+2011-04-11T07:17:40  <Stuk> AutomatedTester: oo, nope, haven't seen that
+2011-04-11T07:17:41  <Stuk> thanks
+2011-04-11T07:17:51  <AutomatedTester> no worries
+2011-04-11T07:18:04  <AutomatedTester> is ato back yet?
+2011-04-11T07:19:41  <ato> I am, I am.
+2011-04-11T07:19:48  <ato> Got back yesterday.
+2011-04-11T07:20:45  *** davehunt|away has joined #selenium
+2011-04-11T07:21:07  <bebef_1987> Hy guys! Do you know how to check the favicon of a web page using selenium
+2011-04-11T07:21:13  <jarib> dawagner: it's more a question of how to run the remote driver tests with DesiredCapapabilites != firefox
+2011-04-11T07:21:36  <jarib> at least in my mind
+2011-04-11T07:21:57  <Stuk> yep, that sounds right jarib
+2011-04-11T07:22:10  <AutomatedTester> jarib: I was lazy and hard coded it
+2011-04-11T07:22:17  <ato> bebef_1987: Define check?
+2011-04-11T07:22:28  <AutomatedTester> but with the python stuff its easy to add a commandline arg
+2011-04-11T07:22:43  <AutomatedTester> well easy in using the python test runner
+2011-04-11T07:22:54  <AutomatedTester> dunno how to get it from CrazyFun to the runner
+2011-04-11T07:22:58  <bebef_1987> ato: if it is present  and if Firefox loads it
+2011-04-11T07:23:12  <dawagner> We hard-code it, basically
+2011-04-11T07:23:36  <Stuk> ah
+2011-04-11T07:23:42  <dawagner> We have two java TestSuites called something like RemoteWebDriverTestSuite and IeRemoteWebDriverTestSuite (possibly RemoteWebDriverIeTestSuite)
+2011-04-11T07:24:03  <dawagner> And the remote test task runs both of them
+2011-04-11T07:24:59  <dawagner> See $ROOT/java/server/test/org/openqa/selenium/remote/server
+2011-04-11T07:25:25  * dawagner -> meeting
+2011-04-11T07:26:00  *** eghm has quit IRC
+2011-04-11T07:26:08  <Stuk> dawagner: thanks, I'll have a look
+2011-04-11T07:31:21  *** eghm has joined #selenium
+2011-04-11T07:33:31  *** QAguy has joined #selenium
+2011-04-11T07:35:18  *** mashiara has quit IRC
+2011-04-11T07:40:01  *** simonstewart has joined #selenium
+2011-04-11T07:40:10  <simonstewart> G'day all
+2011-04-11T07:40:16  *** rbalent has quit IRC
+2011-04-11T07:40:37  <jimevans> hi, simonstewart!
+2011-04-11T07:40:49  <simonstewart> I see you've been wrestling with modal dialogs
+2011-04-11T07:40:50  *** simonstewart has left #selenium
+2011-04-11T07:40:57  *** simonstewart has joined #selenium
+2011-04-11T07:41:04  <simonstewart> Furrfu. Closed wrong window
+2011-04-11T07:41:18  <jimevans> yeah, they're a pita.
+2011-04-11T07:41:23  *** ebass has joined #selenium
+2011-04-11T07:41:24  <simonstewart> Agreed
+2011-04-11T07:41:38  <jimevans> Chrome doesn't support them does it?
+2011-04-11T07:41:58  <simonstewart> I think IE is the only browser that actually makes them modal
+2011-04-11T07:42:17  <jimevans> Probably so.
+2011-04-11T07:42:38  <jimevans> I asked earlier if the Firefox driver supported them
+2011-04-11T07:42:50  <jimevans> (I suspect not)
+2011-04-11T07:42:58  <jimevans> (or at least not explicitly)
+2011-04-11T07:43:18  <simonstewart> I've no ide
+2011-04-11T07:43:21  <simonstewart> idea
+2011-04-11T07:43:26  <simonstewart> A quick test will tell us
+2011-04-11T07:44:41  <jimevans> Making them work in IE is going to involve a fairly intrusive refactor.
+2011-04-11T07:44:51  <simonstewart> Furrfu
+2011-04-11T07:44:55  <simonstewart> What's the issue?
+2011-04-11T07:44:58  *** rbalent has joined #selenium
+2011-04-11T07:45:00  <simonstewart> That they block the calling thread?
+2011-04-11T07:45:31  <jimevans> The major issue is that the modal dialog window isn't an IWebBrowser2.
+2011-04-11T07:45:46  <simonstewart> Ah. Does it have no IHTMLDocument at all?
+2011-04-11T07:45:56  <jimevans> Consequently, it doesn't sink the events for IWebBrowser2.
+2011-04-11T07:46:04  <jimevans> Oh, it has a document.
+2011-04-11T07:46:36  <simonstewart> Well, that's a start
+2011-04-11T07:46:42  <simonstewart> How are people using these things?
+2011-04-11T07:46:46  <jimevans> And I can get to the document, but several of the ways we manage the browser won't work because we don't get an OnQuit event.
+2011-04-11T07:47:08  *** andytinkham has joined #selenium
+2011-04-11T07:47:12  <simonstewart> Grief
+2011-04-11T07:47:24  *** sburjan has quit IRC
+2011-04-11T07:47:32  <simonstewart> I have no idea how to tell which other interfaces it supports
+2011-04-11T07:48:08  <jimevans> The approach I'm going to have to take is to create a common base class for "real" browsers and modal dialogs
+2011-04-11T07:48:16  <simonstewart> sounds sane
+2011-04-11T07:48:28  <simonstewart> Polymorphism FTW
+2011-04-11T07:48:41  <jimevans> I started down the road of making the modal dialog windows a subclass of the browser window, but that way lay madness
+2011-04-11T07:48:55  <jimevans> (mostly because of the aforementioned events)
+2011-04-11T07:49:02  <simonstewart> ugh
+2011-04-11T07:50:01  <jimevans> I did patch the existing code this morning so that when you hit a window opened by showModalDialog() you don't hang in IE.
+2011-04-11T07:50:10  <jimevans> :)
+2011-04-11T07:50:27  <simonstewart> I saw that go in
+2011-04-11T07:50:47  <simonstewart> It seemed a little too easy for solving the problems you were talking about at selenium conf
+2011-04-11T07:51:30  <jimevans> oh, no, i've been struggling with making the damn thing work for almost a week, now.
+2011-04-11T07:51:40  <simonstewart> grief
+2011-04-11T07:51:42  <jimevans> off and on.
+2011-04-11T07:51:46  <simonstewart> Is there anything useful I can do to help?
+2011-04-11T07:51:56  <simonstewart> Other than act as a sounding board and someone to vent at?
+2011-04-11T07:52:14  <jimevans> Thanks, mate, but I think I've got the gist of it now. Just need to implement.
+2011-04-11T07:52:23  <simonstewart> SMOP
+2011-04-11T07:52:54  <jimevans> righ.
+2011-04-11T07:52:57  <jimevans> right.
+2011-04-11T07:53:16  <simonstewart> I'm going to spend some time looking at server-side webdriver-backed selenium
+2011-04-11T07:53:18  *** foobarbaz has quit IRC
+2011-04-11T07:53:30  <simonstewart> I suspect that I need to make sure that the session id is shared by both selenium and a webdriver session
+2011-04-11T07:54:00  <simonstewart> If I get it right, we should be able to delete the client side pieces
+2011-04-11T07:54:14  <jimevans> oh my. that'd be something.
+2011-04-11T07:54:31  <simonstewart> Though I fear the selenium server code. It's a dark place to spend time in
+2011-04-11T07:55:02  <jimevans> heh. don your hard hat and protective vest.
+2011-04-11T07:55:19  <simonstewart> spelunking for fun and profit
+2011-04-11T07:55:46  <AutomatedTester> jimevans/ simonstewart was speaking to charleyb yesterday and he is/was willing to help out
+2011-04-11T07:55:53  <AutomatedTester> with the IE stuff
+2011-04-11T07:56:48  <jimevans> oooh. i might prevail on him for that.
+2011-04-11T07:57:41  <AutomatedTester> cross pollination of teams ftw
+2011-04-11T07:57:48  <simonstewart> +1
+2011-04-11T07:58:25  <ahfeel_> hi guys :)
+2011-04-11T07:59:08  <ahfeel_> What's the state of the Chrome driver at the moment ? we tested it again our usual test suite a few days ago and it was seriously out of work
+2011-04-11T07:59:15  <QAguy> AutomatedTester: Hello. With regard to http://code.google.com/p/selenium/issues/detail?id=1502 I have a repro script but its for a site that is not realeased yet. Can I email to you directly the repro script and I'll update the ticket to that effect.
+2011-04-11T07:59:19  <ahfeel_> is this known ? not yet officially supported ?
+2011-04-11T07:59:21  <simonstewart> If you're on HEAD, the new chrome driver is out
+2011-04-11T07:59:27  <ahfeel_> oh
+2011-04-11T07:59:43  <simonstewart> http://code.google.com/p/selenium/downloads/list
+2011-04-11T07:59:51  <simonstewart> You'll need that binary on your PATH
+2011-04-11T07:59:58  <ahfeel_> mh, we're using a HEAD from the IE patch you did, so probably a little bit out of date (like 2 weeks ago)
+2011-04-11T08:00:21  <AutomatedTester> QAguy: please update it with that info
+2011-04-11T08:00:43  <QAguy> Yes I will. where I can email to repro script?
+2011-04-11T08:01:02  <AutomatedTester> since its ruby, maybe emailing jarib ?
+2011-04-11T08:01:05  <simonstewart> ahfeel_: The chromedriver was released at the end of selenium conf
+2011-04-11T08:01:15  <AutomatedTester> but we have rewritten the current chrome stuff
+2011-04-11T08:01:22  <AutomatedTester> so you could try the latest stuff in trunk
+2011-04-11T08:01:32  <QAguy> Yea I was thinking that.
+2011-04-11T08:01:41  <ahfeel_> simonstewart: oh okay, so yes our version is a little bit too old
+2011-04-11T08:01:53  <AutomatedTester> QAguy: try that and then if it still fails email me the script
+2011-04-11T08:01:56  <simonstewart> We're getting ever closer to the next release
+2011-04-11T08:01:57  <AutomatedTester> or jarib
+2011-04-11T08:02:04  <QAguy> Ok let me give that a go then. Thanks.
+2011-04-11T08:02:46  <adamgoucher> batch delayed expansion is a pain. grr magic characters
+2011-04-11T08:03:08  <AutomatedTester> right, breakfast
+2011-04-11T08:03:10  <AutomatedTester> bbiab
+2011-04-11T08:04:37  *** csanchez has quit IRC
+2011-04-11T08:14:24  * jarib reads backlog
+2011-04-11T08:16:16  *** xirkus has joined #selenium
+2011-04-11T08:16:24  <jarib> QAguy: do `gem install selenium-webdriver --pre` and try it again
+2011-04-11T08:16:52  <QAguy> jarib: that's so funny I was just emailing you that question.
+2011-04-11T08:16:59  <QAguy> ha
+2011-04-11T08:17:03  <QAguy> Ok doing that now
+2011-04-11T08:17:04  <QAguy> thanks
+2011-04-11T08:17:37  <jarib> the reason it's --pre is because we haven't entirely figured out how to do proper shutdown, so you may need to watch for zombie chromedriver processes (especially if your scripts don't call driver.quit())
+2011-04-11T08:17:59  <jarib> well, not really zombie processes, but you get what i mean
+2011-04-11T08:19:49  *** AutomatedTester has quit IRC
+2011-04-11T08:23:41  <QAguy> jarib: /Library/Ruby/Gems/1.8/gems/selenium-webdriver-0.2.0.dev/lib/selenium/webdriver/chrome/service.rb:18:in `executable_path': Unable to find the chromedriver executable.
+2011-04-11T08:23:58  <QAguy> Is that because I have the latest version of chrome on my machine as 10.0
+2011-04-11T08:25:13  <simonstewart> QAguy: You need to be on the dev channel for now
+2011-04-11T08:25:25  <simonstewart> Which is version 12+
+2011-04-11T08:25:35  <QAguy> Ah.
+2011-04-11T08:26:07  * QAguy goes to figure out how to set that up from the wiki page
+2011-04-11T08:26:18  <simonstewart> Also, take a look at the downloads page of the site
+2011-04-11T08:26:51  <QAguy> chromedriver_mac_12.0.712.0.zip	 ChromeDriver server for Mac OSX - see notes (requires Chrome 12.0.712.0+)
+2011-04-11T08:26:53  <QAguy> Got it
+2011-04-11T08:26:59  <simonstewart> See the notes!
+2011-04-11T08:27:02  <QAguy> thank you good sir
+2011-04-11T08:27:10  <simonstewart> 'tis a pleasure
+2011-04-11T08:28:07  <jarib> QAguy: the error message does link there, doesn't it?
+2011-04-11T08:28:29  <QAguy> jarib: No it links to the wiki page.
+2011-04-11T08:28:34  <QAguy> instead
+2011-04-11T08:28:47  <QAguy> O no my bad it does
+2011-04-11T08:28:50  <QAguy> to both actually
+2011-04-11T08:29:09  <QAguy> Going to try it out now
+2011-04-11T08:29:21  <jarib> cool
+2011-04-11T08:29:56  *** keturn_ is now known as keturn
+2011-04-11T08:32:55  *** zmijunkie has quit IRC
+2011-04-11T08:34:24  <ato> jarib: Is there a way to check if a browser resource has fully loaded?
+2011-04-11T08:34:57  <jarib> use a proxy :)
+2011-04-11T08:35:34  <ato> Pardon?
+2011-04-11T08:35:34  <jarib> in other words, no, nothing like that in the webdriver api
+2011-04-11T08:35:43  <ato> OK.
+2011-04-11T08:37:17  <adamgoucher> dont know whats worse; the code that i just churned out -- of the fact i understand what it does
+2011-04-11T08:38:18  <adamgoucher> http://pastebin.mozilla.org/1202464 -- but it works!
+2011-04-11T08:38:58  *** new2b has joined #selenium
+2011-04-11T08:39:22  <new2b> Hi, is it possible for me to call a selenium script from inside another selenium script (in selenium IDE)?
+2011-04-11T08:40:17  <adamgoucher> simple answer, is no. the complex answer is yes, but involves /a lot/ of hackery
+2011-04-11T08:41:45  *** ygerasimov has joined #selenium
+2011-04-11T08:42:00  *** QAguy has quit IRC
+2011-04-11T08:42:45  <ygerasimov> hi! please advise how to set up headers (User Agent) to selenium server standalone from php test?
+2011-04-11T08:43:42  <new2b> dang it =( was hoping that wasn't the case. Argh wish there was time to setup the server right now, i guess I will be creating a really ugly long script
+2011-04-11T08:44:15  *** towski has joined #selenium
+2011-04-11T08:44:22  *** brettporter has quit IRC
+2011-04-11T08:44:57  *** vrockai has quit IRC
+2011-04-11T08:46:41  <ygerasimov> I have tried to use addCustomHeaders function but got error in selenium console: "Unknown command: 'addCustomHeaders'"
+2011-04-11T08:51:53  *** AaronBarr is now known as Kaczynski
+2011-04-11T08:52:03  *** leftmoose has quit IRC
+2011-04-11T08:55:51  *** AutomatedTester has joined #selenium
+2011-04-11T09:00:30  *** towski has quit IRC
+2011-04-11T09:01:19  <AutomatedTester> back in the office
+2011-04-11T09:01:24  <AutomatedTester> having a cold sucks!
+2011-04-11T09:02:18  *** pnitin has quit IRC
+2011-04-11T09:03:28  *** ygerasimov has quit IRC
+2011-04-11T09:04:20  *** QAguy has joined #selenium
+2011-04-11T09:06:01  <QAguy> jarib: A little help if you can. I download from the chromium dev channel the latest version of chrome and installed. then downloaded the new chrome driver from http://code.google.com/p/selenium/downloads/detail?name=chromedriver_mac_12.0.712.0.zip&can=2&q= I'm not trying to follow the instructions, but this doesn't work
+2011-04-11T09:06:28  <QAguy> ln -s "/Applications/Google Chrome.app"/ \  "/Applications/Chromium.app"
+2011-04-11T09:06:40  <QAguy> I get: ln:  /Applications/Chromium.app: No such file or directory
+2011-04-11T09:06:58  <QAguy> Not sure what I'm doing wrong. Pardon my ingorance.
+2011-04-11T09:17:05  *** antlong has joined #selenium
+2011-04-11T09:17:24  *** ManaPirat has joined #selenium
+2011-04-11T09:20:37  <jimevans> want opinions. if you read the backlog above, you'll see i'm working on windows created by showModalDialog().
+2011-04-11T09:21:17  <jimevans> The window used for regular browsing, and the window used for hosting an html dialog are descended from the same base class.
+2011-04-11T09:21:36  <jimevans> What do I call the base class (the subclasses are "Browser" and "HtmlDialog", at the moment).
+2011-04-11T09:22:41  * jimevans is usually pretty good at the whole "figuring out what to name stuff", but is drawing a blank on this one.
+2011-04-11T09:24:18  <QAguy> simonstewart: ^^ not sure what I'm missing.
+2011-04-11T09:24:56  <simonstewart> AQGuy: Try
+2011-04-11T09:25:08  <simonstewart> ln -sf "Google Chrome.app" Chromium.app
+2011-04-11T09:25:24  <simonstewart> That should create a "chromium.app" in your /Applications directory
+2011-04-11T09:25:36  *** lfryc has quit IRC
+2011-04-11T09:25:54  <QAguy> simonstewart: indeed
+2011-04-11T09:26:09  <simonstewart> Done that?
+2011-04-11T09:26:13  <QAguy> yessir
+2011-04-11T09:26:27  <simonstewart> cool. Now run
+2011-04-11T09:26:43  *** bebef_1987 has quit IRC
+2011-04-11T09:26:45  <simonstewart> ln -s "/Applications/Chromium.app/Contents/MacOS/Google Chrome" "/Applications/Chromium.app/Contents/MacOS/Chromium"
+2011-04-11T09:27:10  <simonstewart> jimevans: AbstractBrowser?
+2011-04-11T09:27:13  <QAguy> simonstewart: done
+2011-04-11T09:27:21  <simonstewart> OK.
+2011-04-11T09:27:32  <simonstewart> So now make sure that the chromedriver binary is on the PATH
+2011-04-11T09:27:43  <simonstewart> (I put mine in $HOME/bin, but you can put it anywhere)
+2011-04-11T09:28:03  <QAguy> simonstewart: Ok. once I do that I should just work?
+2011-04-11T09:28:08  <simonstewart> Right
+2011-04-11T09:28:09  <QAguy> it*
+2011-04-11T09:28:14  <QAguy> ok, trying now. thank you.
+2011-04-11T09:28:34  <simonstewart> I'll stay online til you know one way or the other :)
+2011-04-11T09:28:41  <QAguy> simonstewart: BTW, really enjoyed your talk at Google NYC a few weeks back.
+2011-04-11T09:28:46  <QAguy> Cool.
+2011-04-11T09:28:47  <simonstewart> Thank you!
+2011-04-11T09:28:49  <jimevans> simonstewart: well, it's not *technically* abstract, because it does include some common implementation, but i guess that's as good as any. :)
+2011-04-11T09:28:59  <simonstewart> BaseBrowser?
+2011-04-11T09:29:15  <jimevans> i was using BrowserBase to begin with.
+2011-04-11T09:29:38  <simonstewart> IBrowser?
+2011-04-11T09:29:57  <jimevans> but using classes with *Base* and *Abstract* feel hacky to me.
+2011-04-11T09:30:36  <simonstewart> OK. So, this is the main "interface" we use throughout the code
+2011-04-11T09:30:40  <simonstewart> With two specializations?
+2011-04-11T09:30:53  <jimevans> yeah, pretty much.
+2011-04-11T09:30:58  <simonstewart> In that case, "abstract" or "base" ain't right
+2011-04-11T09:31:08  <simonstewart> We should name it after the central concept it represents
+2011-04-11T09:31:19  <simonstewart> "Driver", perhaps. Or "Window"?
+2011-04-11T09:31:28  <jimevans> I was leaning toward
+2011-04-11T09:31:45  *** towski has joined #selenium
+2011-04-11T09:31:54  <jimevans> Window, but that lends itself to "WindowHandle" for the smart-pointer typedef of it which is an overloaded term.
+2011-04-11T09:32:03  *** esteele is now known as esteele|away
+2011-04-11T09:32:07  <simonstewart> BrowserInstance?
+2011-04-11T09:32:26  <simonstewart> DrivenWindow?
+2011-04-11T09:32:32  <jimevans> Now we're getting somewhere. That has possibilities.
+2011-04-11T09:33:11  <simonstewart> DrivenBrowser?
+2011-04-11T09:33:38  <jimevans> Maybe the "most-of-the-time-used" class (currently called "Browser") is wrong.
+2011-04-11T09:33:49  <simonstewart> Quite possibly
+2011-04-11T09:35:28  <simonstewart> When I did the original work on the C++ code I was concentrating more on getting things working
+2011-04-11T09:35:40  <simonstewart> It's unlikely I got the names right
+2011-04-11T09:36:19  <jimevans> Oh, taking a cue from the IE COM interfaces, the base is an HtmlWindow, which can be a Browser or an HtmlDialog.
+2011-04-11T09:36:32  <simonstewart> Works for me
+2011-04-11T09:37:11  *** ssims has left #selenium
+2011-04-11T09:37:50  <QAguy> simonstewart: Works and http://code.google.com/p/selenium/issues/detail?id=1502 is fixed by the new driver so I will close with comments. thank you for the help.
+2011-04-11T09:38:06  <simonstewart> Hurrah!
+2011-04-11T09:38:14  <simonstewart> The new chrome driver is awesome :)
+2011-04-11T09:38:19  <QAguy> truly
+2011-04-11T09:40:02  *** AutomatedTester has quit IRC
+2011-04-11T09:40:40  *** AutomatedTester has joined #selenium
+2011-04-11T09:42:30  *** sassda has joined #selenium
+2011-04-11T09:42:42  * jimevans has to go back through .NET tests with the new ChromeDriver
+2011-04-11T09:46:00  *** rbalent has quit IRC
+2011-04-11T09:46:20  <simonstewart> Right. I can't put it off any more. Must. Do. Coding
+2011-04-11T09:46:22  <simonstewart> TTFN
+2011-04-11T09:46:40  *** simonstewart has quit IRC
+2011-04-11T09:50:05  *** sfbrian has joined #selenium
+2011-04-11T09:50:34  *** skiphuffman__ has joined #selenium
+2011-04-11T09:55:28  *** pnitin has joined #selenium
+2011-04-11T09:57:52  *** cgoldberg has joined #selenium
+2011-04-11T09:59:40  <cgoldberg> AutomatedTester, ping
+2011-04-11T10:00:39  <AutomatedTester> hey cgoldberg
+2011-04-11T10:01:07  <cgoldberg> AutomatedTester, hey there.  i'm looking for the latest source of the python bindings.. got a link?
+2011-04-11T10:01:50  <AutomatedTester> http://selenium.googlecode.com/svn/trunk/
+2011-04-11T10:01:59  <AutomatedTester> in there is a directory called py
+2011-04-11T10:02:06  <AutomatedTester> and the python clientside code is there
+2011-04-11T10:02:45  <cgoldberg> AutomatedTester, got it.. thanks!
+2011-04-11T10:03:22  <AutomatedTester> anything in particular I can point you to?
+2011-04-11T10:03:56  <cgoldberg> AutomatedTester, well.. are therer anyh API docs?  I'm having trouble finding documentation for sel 2.0.. so just using the source as a reference
+2011-04-11T10:05:04  <AutomatedTester> cgoldberg: i am cleaning up the docstrings so I can run epydoc over the clientside code
+2011-04-11T10:05:24  *** Spanktar has joined #selenium
+2011-04-11T10:05:30  <cgoldberg> AutomatedTester, that would be great
+2011-04-11T10:06:07  <AutomatedTester> cgoldberg: will definitely be available by the next release
+2011-04-11T10:06:20  <AutomatedTester> which is hopefully within the next couple of weeks
+2011-04-11T10:06:30  <cgoldberg> AutomatedTester, cool
+2011-04-11T10:08:31  *** dhackner has joined #selenium
+2011-04-11T10:09:07  *** toseter has quit IRC
+2011-04-11T10:12:51  <AutomatedTester> cgoldberg: do you work remote or is there a canonical office in the US?
+2011-04-11T10:14:56  <cgoldberg> AutomatedTester, i work remote (im in Boston, USA)
+2011-04-11T10:15:56  <AutomatedTester> yea, I know there is offices in London so was just curious
+2011-04-11T10:17:21  <AutomatedTester> cgoldberg:  adamgoucher sent me this https://code.launchpad.net/~canonical-isd-qa/selenium-simple-test/trunk
+2011-04-11T10:17:30  <AutomatedTester> saying this is why you were asking
+2011-04-11T10:17:38  *** antlong has left #selenium
+2011-04-11T10:17:54  <AutomatedTester> the example in there is dated but thats because I have cleaned up the API and made it more idiomatic
+2011-04-11T10:18:18  <cgoldberg> AutomatedTester, yep!  what i'm doing now is updating that code to use the newest API
+2011-04-11T10:18:49  * adamgoucher retracts his earlier comment about his crufty code working. still not working. sigh
+2011-04-11T10:19:12  <AutomatedTester> if you run epydoc from the py/ directory you will get stuff thats mostly right
+2011-04-11T10:19:48  <AutomatedTester> there is a few methods that need docstrings
+2011-04-11T10:35:12  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Actually implement the missing moveto command. Only implementation using native events is working at the moment. This is a stop-gap solution until we can figure out why the approach using synthetic events is not working (rendering the synthetic mouse useless) and why unwrapping elements inside the synthetic mouse is not possible. - http://code.google.com/p/selenium/source/detail?r=11973
+2011-04-11T10:39:11  *** esteele|away is now known as esteele
+2011-04-11T10:43:02  *** andytinkham has quit IRC
+2011-04-11T10:48:53  *** nirvdrum has joined #selenium
+2011-04-11T10:52:56  *** Rajan has joined #selenium
+2011-04-11T10:53:24  *** esteele is now known as esteele|away
+2011-04-11T10:58:27  *** keturn has quit IRC
+2011-04-11T11:07:52  *** santiycr has joined #selenium
+2011-04-11T11:22:02  *** ygerasimov has joined #selenium
+2011-04-11T11:28:05  *** jezozwierzak has joined #selenium
+2011-04-11T11:28:21  <jezozwierzak> hello
+2011-04-11T11:28:54  <jezozwierzak> Is there anybody I can ask about javascript in webdriver ?
+2011-04-11T11:29:33  <jimevans> jezozwierzak: ask your question. if anybody can answer it, they will.
+2011-04-11T11:31:32  *** carze has joined #selenium
+2011-04-11T11:33:05  <jezozwierzak> Ok. I try to submit input: <input type="submit" onclick="return nom();" src="/sms.szyderca.com/images/wyslij_sms.jpg" alt="Wyślij" value="Wyślij SMS !" class="btn">
+2011-04-11T11:33:34  <jezozwierzak> guess I need to do: HtmlUnitDriver driver = new HtmlUnitDriver();
+2011-04-11T11:33:34  <jezozwierzak>         driver.setJavascriptEnabled(true);
+2011-04-11T11:34:12  <jezozwierzak> but I got Error 2011-04-11 20:15:21 com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl notify
+2011-04-11T11:34:13  <jezozwierzak> WARNING: Expected content type of 'application/javascript' or 'application/ecmascript' for remotely loaded JavaScript element at 'http://diff3.smartadserver.com/call2/pubjall/22785/155483/6630,6631,6632/422323072/?', but got 'application/x-javascript'.
+2011-04-11T11:34:13  <jezozwierzak> 2011-04-11 20:15:21 com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl notify
+2011-04-11T11:34:13  <jezozwierzak> WARNING: Expected content type of 'application/javascript' or 'application/ecmascript' for remotely loaded JavaScript element at 'http://sms.priv.pl/SiteSpeed/SiteSpeed.php', but got 'application/x-javascript'.
+2011-04-11T11:34:13  <jezozwierzak> 2011-04-11 20:15:21 com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter error
+2011-04-11T11:34:13  <jezozwierzak> SEVERE: error: message=[syntax error] sourceName=[http://sms.priv.pl/SiteSpeed/SiteSpeed.php] line=[375] lineSource=[	} else {] lineOffset=[2]
+2011-04-11T11:34:22  <AutomatedTester> please use a pastebin
+2011-04-11T11:34:36  <AutomatedTester> jezozwierzak: ^
+2011-04-11T11:35:01  <AutomatedTester> cgoldberg: i forgot to mention, I verified that python 2.7 works with Selenium
+2011-04-11T11:35:12  <AutomatedTester> only 1 test failed
+2011-04-11T11:36:06  <jarib> jezozwierzak: looks like htmlunit is choking on your JS (the syntax error), so it's either a bug in htmlunit or your code
+2011-04-11T11:37:22  <cgoldberg> AutomatedTester, sweet
+2011-04-11T11:37:48  <jezozwierzak> It is trown while making new object of htmlunit, so I don't do anything complicated
+2011-04-11T11:37:58  <cgoldberg> AutomatedTester, so just to verify.. with the newer Python bindings, if I use the webdriver API, it no longer uses the Java server to drive tests?
+2011-04-11T11:38:09  <AutomatedTester> yup
+2011-04-11T11:38:16  <cgoldberg> AutomatedTester, noyce
+2011-04-11T11:38:32  <AutomatedTester> got the bindings installed?
+2011-04-11T11:38:37  <cgoldberg> AutomatedTester, i just upgraded that framework to use webdriver.. its working great
+2011-04-11T11:38:44  <AutomatedTester> sweet
+2011-04-11T11:38:58  <AutomatedTester> i use the Java server for remote stuff
+2011-04-11T11:39:08  <AutomatedTester> but if its on my machine I bind directly
+2011-04-11T11:39:10  <cgoldberg> AutomatedTester, i'm pip installing the 2.0b3 bindings (which i then need to comment out that line in before usable)
+2011-04-11T11:39:49  <AutomatedTester> well just doing driver = webdriver.Firefox() should start the browser
+2011-04-11T11:40:01  <AutomatedTester> except for when I forget to checkin something
+2011-04-11T11:40:10  <AutomatedTester> stupid multiplatform support :P
+2011-04-11T11:40:30  <cgoldberg> AutomatedTester, lol.. yea.. its ok.. i just comment out that line for now
+2011-04-11T11:41:39  <AutomatedTester> i finished the chrome drive rewrite and that I verified worked on each platform with clean checkouts so this shouldnt happen again
+2011-04-11T11:42:24  <AutomatedTester> jarib/ato: I cant use jython for opera bindings
+2011-04-11T11:42:56  <AutomatedTester> so protobuf is going to become my new friend
+2011-04-11T11:43:49  <jarib> what's the jython problem?
+2011-04-11T11:44:07  <AutomatedTester> jython doesnt like some of the python ways I did thing
+2011-04-11T11:44:18  <jarib> i see
+2011-04-11T11:44:28  <AutomatedTester> so either I go through and change the approach
+2011-04-11T11:44:35  *** andytinkham has joined #selenium
+2011-04-11T11:44:45  <jimevans> AutomatedTester: i'm going to be doing the same thing for .net's operadriver. someday.
+2011-04-11T11:44:46  <jarib> the problem with doing the protobuf stuff is that the .proto files aren't included in operadriver
+2011-04-11T11:44:52  <jarib> just the generated java code
+2011-04-11T11:44:57  <jarib> we should probably make them fix that
+2011-04-11T11:45:09  <jimevans> ato: yeah, can we get the .proto files available?
+2011-04-11T11:45:21  <jarib> Stuk: possible to get the .proto files added to the operadriver repo?
+2011-04-11T11:45:24  *** ivog has joined #selenium
+2011-04-11T11:45:27  <AutomatedTester> to work or ato gets it working with JSON over the wire
+2011-04-11T11:45:37  <AutomatedTester> i vote for the latter
+2011-04-11T11:45:38  <jarib> jimevans: Stuk is the guy maintaining the webdriver bits
+2011-04-11T11:45:56  <jimevans> jarib: thanks.
+2011-04-11T11:46:05  <jarib> AutomatedTester: as soon as they push what they have internally it will work with the java server
+2011-04-11T11:46:16  <jarib> it's all set up on our side
+2011-04-11T11:46:31  <AutomatedTester> Stuk: can you implement JSON over the wire and then have an executable that does the protobuf stuff
+2011-04-11T11:46:53  <AutomatedTester> jarib: the python community loves the tight binding so wanna try support that
+2011-04-11T11:48:20  <AutomatedTester> but if I cant, I cant
+2011-04-11T11:48:22  <jarib> sure, i've argued this as well
+2011-04-11T11:48:45  <jarib> the only difference is that the server is in java instead of c though :)
+2011-04-11T11:49:44  <keshureddyp1> any one experienced issues with selenium rc 1.0.3 on  ff4?
+2011-04-11T11:50:04  <ygerasimov> good evening gents. Can anyone assist how to set up headers of the browser that runs?
+2011-04-11T11:50:23  <ygerasimov> I need to set User Agent property badly
+2011-04-11T11:50:36  <jarib> AutomatedTester: convincing opera to re-implement their scope stuff in c/c++ just because we don't like java isn't super realistic
+2011-04-11T11:51:00  <jarib> although i do share your sentiment here :)
+2011-04-11T11:51:06  <AutomatedTester> jarib: I dont mind them doing it java
+2011-04-11T11:51:21  <jimevans> AutomatedTester, jarib: I do. :)
+2011-04-11T11:51:31  <jimevans> no, really, i don't.
+2011-04-11T11:51:52  <jimevans> I'd just like to be able to run single-language stacks where possible.
+2011-04-11T11:51:54  <AutomatedTester> the chrome way is the most amout of work I want to do to make it work
+2011-04-11T11:52:07  <AutomatedTester> which I guess I could do
+2011-04-11T11:52:32  <AutomatedTester> but the current javaserver is a little bloated
+2011-04-11T11:52:36  <jarib> right, none of us doe a LocalRemoteDriver atm :)
+2011-04-11T11:52:52  <jarib> shouldn't be hard to do a webdriver-only server
+2011-04-11T11:52:55  <jarib> *too
+2011-04-11T11:53:39  <jimevans> i did a .NET implementation of a webdriver-only server.
+2011-04-11T11:53:44  <jarib> uhm, not *too :P
+2011-04-11T11:54:00  *** csanchez has joined #selenium
+2011-04-11T11:54:03  <jimevans> it wasn't that tough.
+2011-04-11T11:54:07  <jarib> you have a .NET remote server implementation?
+2011-04-11T11:54:44  <jarib> what i meant is we could do a build rule that builds the java server without the Se1 bits
+2011-04-11T11:54:46  <jimevans> jarib: yes. it's out of date, but wouldn't need too much to bring it into line with the current wire protocol
+2011-04-11T11:54:55  <jarib> cool
+2011-04-11T11:55:10  <jimevans> http://code.google.com/p/strontium
+2011-04-11T11:56:05  <QAguy> fyi... the new chrome driver is FAST!
+2011-04-11T11:57:55  <jarib> at least perceived performance :)
+2011-04-11T11:58:16  <jarib> i've yet to see benchmarks where it outperforms the firefox driver
+2011-04-11T11:58:22  <keshureddyp1> (11:56:57 AM) keshureddyp1: any one experienced issues with selenium rc 1.0.3 on  ff4?
+2011-04-11T11:58:39  <jarib> keshureddyp1: yes, you need to move to the 2.0 betas
+2011-04-11T11:58:42  <keshureddyp1> my tests are just blocking
+2011-04-11T11:58:50  <jarib> latest one has a bunch of fixes for Fx4
+2011-04-11T11:58:55  <keshureddyp1> thank you
+2011-04-11T11:58:56  *** jezozwierzak has quit IRC
+2011-04-11T11:59:07  <ivog> Hi, could it be that there are problems with building using go.bat on win7 64?
+2011-04-11T11:59:18  <jimevans> ivog: like what?
+2011-04-11T11:59:29  <ivog> the build aborts on firefox tests
+2011-04-11T11:59:41  <ivog> alot of ff tests work but at some point it aborts
+2011-04-11T11:59:49  <jimevans> building java?
+2011-04-11T11:59:51  <ivog> also go.bat release doesn't seem to work
+2011-04-11T11:59:52  <QAguy> jarib: true. But I do perceive it to be smoking fast. ;)
+2011-04-11T12:00:14  <ivog> just building everything using just go.bat
+2011-04-11T12:00:37  <ivog> building seems to go fine, runnign the firefox tests breaks at some point
+2011-04-11T12:01:04  <jimevans> ivog: the build is set up to run the java tests by default. however, the java tests are also set to abort on the first test failure.
+2011-04-11T12:01:17  *** toseter has joined #selenium
+2011-04-11T12:01:29  <jarib> QAguy: perceived performance is important too :)
+2011-04-11T12:02:16  <jimevans> ivog: last time i tried it, there was at least one firefox failure that i knew of. where does it fail?
+2011-04-11T12:02:16  <jarib> ivog: running `./go log=true` should give you more output
+2011-04-11T12:02:58  <ivog> jimevans: let me have another look at the buildlog file
+2011-04-11T12:03:00  <jimevans> ivog: there's also a log file in build\test_logs, which you can look at.
+2011-04-11T12:03:54  <ivog> jimevans: so basically im trying to build the binaries so that i can try out the current state of grid
+2011-04-11T12:04:10  <ivog> jimevans: what target can i use to get the needed binaries
+2011-04-11T12:07:50  <jimevans> ivog: well to build grid itself, "go //java/server/src/org/openqa/grid" should get the grid binaries.
+2011-04-11T12:09:36  <AutomatedTester> jarib: i have been getting people in platform excited about a firefox driver
+2011-04-11T12:09:48  <ivog> jimevans: ok but thats a non packaged version right? isn't it integrated in the server right now?
+2011-04-11T12:09:49  *** adamgoucher has quit IRC
+2011-04-11T12:10:09  <jarib> AutomatedTester: that sounds awesome if platform is a group at moz :)
+2011-04-11T12:10:26  <jimevans> ivog: not yet, as far as I know, though I could be wrong. the new grid is still pretty new.
+2011-04-11T12:10:30  <AutomatedTester> platform is the group that makes firefox for desktop and mobile
+2011-04-11T12:10:46  <jarib> cool
+2011-04-11T12:11:48  <jarib> so when simon puts "mozilla is on board" in his standardization slides it doesn't just mean "we have a mozillan on the team" anymore? :)
+2011-04-11T12:12:06  <AutomatedTester> but the client-side code for firefoxdriver looks like it will integrated to a few things
+2011-04-11T12:12:11  <ivog> jimevans: ok i'll have a look, looks like testSendingKeysToAFocusedElementShouldNotBlurThatElement is failing
+2011-04-11T12:12:20  <AutomatedTester> internal projects
+2011-04-11T12:12:28  <jarib> great
+2011-04-11T12:12:43  <AutomatedTester> i mean the python client-side stuff
+2011-04-11T12:13:03  <jarib> right
+2011-04-11T12:13:37  <AutomatedTester> but means that we will be dogfooding both sides
+2011-04-11T12:13:47  <AutomatedTester> and then we just need to manage the other languages
+2011-04-11T12:13:56  <jimevans> ivog: ok good to know where it's failing. i'm not normally a java guy, so i'm not sure how much help i'll be going forward.
+2011-04-11T12:15:39  <cgoldberg> AutomatedTester:  how would i suppress "*** LOG addons.xpi:"  messages?
+2011-04-11T12:15:40  <jarib> AutomatedTester: but not yet any concrete plans to move the actual driver out of our tree, right?
+2011-04-11T12:16:11  <AutomatedTester> no concrete plans but its coming
+2011-04-11T12:16:35  <AutomatedTester> cgoldberg: is that when doing driver = webdriver.Firefox()?
+2011-04-11T12:16:39  <jarib> if you start using the client internally i guess it's just a matter of time :)
+2011-04-11T12:16:44  <cgoldberg> AutomatedTester, yes
+2011-04-11T12:17:03  <ivog> jimevans: ok i'll have a look, do you ever use go release for building the release bits? i get a filenotfound exception on during Zip: //java/client/src/org/openqa/selenium:client-combined:zip
+2011-04-11T12:17:17  <AutomatedTester> cgoldberg: this using the one on pypi or from trunk
+2011-04-11T12:17:25  <AutomatedTester> I ask because I thought i fixed that in trunk
+2011-04-11T12:17:30  <cgoldberg> AutomatedTester, 2.0b3 from PyPi
+2011-04-11T12:17:44  <jimevans> ivog: i never build the java release bits. i work almost exclusively on the .net bindings.
+2011-04-11T12:17:55  <jimevans> well, almost never.
+2011-04-11T12:17:59  <jimevans> not in awhile anyway.
+2011-04-11T12:18:12  <ivog> ok
+2011-04-11T12:18:53  <AutomatedTester> cgoldberg: it should look like http://code.google.com/p/selenium/source/browse/trunk/py/selenium/webdriver/firefox/firefox_binary.py#64
+2011-04-11T12:19:21  <ivog> sorry for the load of questions im trying to find my way around this project :)
+2011-04-11T12:19:39  <AutomatedTester> since I dont really care about the output I just PIPE it
+2011-04-11T12:19:55  <jimevans> ivog: it's understandable; the project is pretty complex.
+2011-04-11T12:22:00  <jarib> AutomatedTester, jimevans: do you shut down the chrome server on exit?
+2011-04-11T12:22:05  <cgoldberg> AutomatedTester, nice.. i'm trying it now and its working great
+2011-04-11T12:22:28  <AutomatedTester> i should really release a new version
+2011-04-11T12:22:30  <jarib> the scenario where people don't call quit() is the only thing that's preventing me from pushing a release for real.
+2011-04-11T12:22:46  *** santiycr has quit IRC
+2011-04-11T12:22:54  <AutomatedTester> jarib: do we care?
+2011-04-11T12:23:03  <cgoldberg> AutomatedTester, an updated version on PyPI would be awesome.  is that feasible soon?
+2011-04-11T12:23:21  <jarib> AutomatedTester: yes, because we'll leave a bunch of chromedriver processes running
+2011-04-11T12:23:43  <jarib> and it's pretty common for people to don't call quit() if they want to debug why their tests fail
+2011-04-11T12:23:43  <AutomatedTester> but if people dont call quit() in firefox and Ie we leave them open
+2011-04-11T12:24:07  <jarib> right, but that tears down the server when you manually close the browser (since it's the same process)
+2011-04-11T12:24:17  <AutomatedTester> ahh I get you
+2011-04-11T12:24:45  <AutomatedTester> cgoldberg: I need to blow my nose and then I will see about a interim release
+2011-04-11T12:24:49  <AutomatedTester> stupid cold
+2011-04-11T12:24:51  <jarib> jleyba and i discussed some solutions, but for now i'm thinking of just cleaning up at_exit
+2011-04-11T12:25:46  <jarib> jleyba: btw, i'm pretty convinced i prefer "shut down server with browsers running" over --autoclose
+2011-04-11T12:26:09  <jarib> (the first behaviour could still be enabled by a switch of course)
+2011-04-11T12:30:59  *** erwan has quit IRC
+2011-04-11T12:32:08  <jarib> AutomatedTester: nice work going through issues today
+2011-04-11T12:32:25  *** esteele|away is now known as esteele
+2011-04-11T12:32:27  <AutomatedTester> jarib: was bored in my hotel with a cold
+2011-04-11T12:32:32  <AutomatedTester> gave me something to do
+2011-04-11T12:33:32  <jarib> much appreciated
+2011-04-11T12:34:57  <AutomatedTester> jarib: what I want to do is go to all the chrome bugs and do needsclarification and get them to retest it
+2011-04-11T12:35:18  <AutomatedTester> but we need to release
+2011-04-11T12:35:18  *** RossPatterson has quit IRC
+2011-04-11T12:37:07  *** ygerasimov has left #selenium
+2011-04-11T12:38:58  <jarib> makes sense
+2011-04-11T12:40:17  <AutomatedTester> i do foresee people complaining that they cant go to the dev channel
+2011-04-11T12:40:30  <AutomatedTester> and we broke all their chrome tests
+2011-04-11T12:40:53  <jimevans> AutomatedTester: yeah, we really need to message that ahead of time.
+2011-04-11T12:41:34  <jimevans> mind, i don't know what the right mechanism is for messaging that, but there you go.
+2011-04-11T12:41:35  <jarib> how long until the current dev channel goes becomes stable?
+2011-04-11T12:41:38  *** adamgoucher has joined #selenium
+2011-04-11T12:41:46  <jarib> s/goes//
+2011-04-11T12:42:19  <jarib> people always have the choice of not updating
+2011-04-11T12:42:30  *** dave_miles_wfh has joined #selenium
+2011-04-11T12:43:31  <jimevans> i'm thinking we still need to let people know ahead of time, because we're likely going to remove 2.0b3 when 2.0b4 arrives.
+2011-04-11T12:43:52  *** dave_miles has quit IRC
+2011-04-11T12:44:39  <AutomatedTester> jarib: at worse its 12 weeks away
+2011-04-11T12:45:12  <AutomatedTester> jleyba: how far away is dev channel to release channel for 12?
+2011-04-11T12:52:41  *** erwan has joined #selenium
+2011-04-11T12:53:56  *** keturn has joined #selenium
+2011-04-11T12:56:12  *** mashiara has joined #selenium
+2011-04-11T13:01:11  *** adamgoucher has quit IRC
+2011-04-11T13:01:28  *** ivog has quit IRC
+2011-04-11T13:07:15  *** erwan has quit IRC
+2011-04-11T13:11:06  *** keturn has quit IRC
+2011-04-11T13:13:00  *** cburroughs has quit IRC
+2011-04-11T13:14:57  *** csgeek has quit IRC
+2011-04-11T13:18:28  *** santiycr has joined #selenium
+2011-04-11T13:18:57  *** foobarbaz has joined #selenium
+2011-04-11T13:21:14  <nirvdrum> Man, httpclient is a fucking mess.
+2011-04-11T13:21:53  <charleyb> eh?
+2011-04-11T13:22:13  <ato> How is that?
+2011-04-11T13:24:37  <charleyb> depends on which one you're referring to, tho oddly most libraries calling themselves that seem to be a mess
+2011-04-11T13:24:45  <nirvdrum> All I want is a handle to the raw response body.
+2011-04-11T13:24:59  <nirvdrum> I've yet to find a way of doing that.
+2011-04-11T13:25:04  *** skiphuffman_ has quit IRC
+2011-04-11T13:25:13  *** mbeierl has quit IRC
+2011-04-11T13:25:16  <nirvdrum> Oh, this is the Java apache one.
+2011-04-11T13:28:42  <selbot2> james.h.evans.jr less than 20 seconds ago - JimEvans: Fixing SessionCookieTest to handle response from IE9. Also renamed the test to the more proper ShouldPropagateSessionCookies. - http://code.google.com/p/selenium/source/detail?r=11974
+2011-04-11T13:30:44  <jimevans> nirvdrum: just for you, i'm considering moving a bunch of files around in the cpp/IEDriver tree. :)
+2011-04-11T13:31:14  <nirvdrum> Bah.
+2011-04-11T13:34:37  <jimevans> can you forward me the link on what i need to do to port the appropriate snapsie bits into the screenshot code?
+2011-04-11T13:43:12  <nirvdrum> It's more an article of how I made SnapsIE work.
+2011-04-11T13:43:14  <nirvdrum> http://nirvdrum.com/2010/03/25/how-to-take-full-page-or-full-canvas-screenshots-in-windows.html
+2011-04-11T13:43:40  *** kylls has quit IRC
+2011-04-11T13:43:41  <jimevans> thanks. that'll help.
+2011-04-11T13:43:57  <nirvdrum> Note that I took a pretty big shortcut in this case and as such there's a race condition when running multiple IE instances at the same time.
+2011-04-11T13:44:38  <charleyb> jimevans: i hate to ask, but i have a question :)
+2011-04-11T13:44:58  <jimevans> charleyb: no problem, happy to help. fire away.
+2011-04-11T13:45:23  <charleyb> ie showmodal support, we have it in watir
+2011-04-11T13:45:33  <charleyb> but it's fairly hacky
+2011-04-11T13:45:55  <jimevans> yep. i think i'm vaguely familiar with the implementation.
+2011-04-11T13:46:02  <charleyb> i'd love to pick your brain about how to support it properly
+2011-04-11T13:46:18  <charleyb> it's a pain in the neck
+2011-04-11T13:46:20  <charleyb> :\
+2011-04-11T13:46:44  <charleyb> i know you're dealing with that now for the se code
+2011-04-11T13:46:56  <jimevans> yep, i'm elbows deep in trying to get it working.
+2011-04-11T13:47:03  <charleyb> indeed :)
+2011-04-11T13:47:17  <charleyb> i got warned about asking you this question :)
+2011-04-11T13:47:44  <jimevans> no warning necessary; i try not to shoot the messenger. :)
+2011-04-11T13:47:56  <jimevans> but you're right, it's a pain in the neck.
+2011-04-11T13:48:05  <charleyb> yes it is
+2011-04-11T13:48:18  <jimevans> mainly because the window displayed by showModalDialog() doesn't implement IWebBrowser2.
+2011-04-11T13:48:36  <charleyb> yup
+2011-04-11T13:48:37  *** toseter has quit IRC
+2011-04-11T13:49:08  <jimevans> the webdriver api has the concept of the list of currently managed windows (i.e., driver.getWindowHandles())
+2011-04-11T13:49:21  <charleyb> it's a wholly fantastical aberration of a "window"
+2011-04-11T13:49:47  <jimevans> well, yes, because it must be dealt with before you can go back to another "real" browser window.
+2011-04-11T13:50:34  <jimevans> but, it also doesn't fit the concept of an "alert" as defined by the webdriver api, because it makes sense you'd want to examine the contents while it's up.
+2011-04-11T13:51:48  <jimevans> so the way i'm approaching it is that it will be added to the list of managed browser windows, just like clicking on a link with target="_blank"
+2011-04-11T13:52:27  <jimevans> the implementation won't prevent you from shooting yourself in the foot by calling switchTo().window() back to a blocked window.
+2011-04-11T13:52:30  <charleyb> that makes sense
+2011-04-11T13:52:45  <jimevans> but it's better than nothing.
+2011-04-11T13:52:46  *** nirvdrum has quit IRC
+2011-04-11T13:52:56  <charleyb> how are you connecting to it?
+2011-04-11T13:53:17  *** nirvdrum has joined #selenium
+2011-04-11T13:53:51  <jimevans> same way as with an IWebBrowser2. grab the IHTMLDocument2 using WM_HTML_GETOBJECT.
+2011-04-11T13:54:31  <jimevans> there's a base class (right now called HtmlWindow, but I'll probably change that) of which Browser and HtmlDialog are subclasses.
+2011-04-11T13:54:43  <jimevans> (this is in the unmanaged C++/COM code)
+2011-04-11T13:55:20  *** anatoli has joined #selenium
+2011-04-11T13:55:23  <jimevans> Browser maintains a pointer to the IWebBrowser2 object; HtmlDialog maintains a pointer to the IHTMLDocument2 object.
+2011-04-11T13:56:04  <jimevans> There are abstract methods implemented in the subclasses for things like GetDocument, Close, GetTitle and so on.
+2011-04-11T13:56:20  <charleyb> ah, ok
+2011-04-11T13:56:40  <jimevans> The things that *require* an IWebBrowser2 object (like navigation), will return an error if attempted on an HtmlDialog.
+2011-04-11T13:57:12  <jimevans> Most stuff that we do, oddly enough, doesn't actually require the browser object.
+2011-04-11T13:57:34  <jimevans> Navigation is the big one.
+2011-04-11T13:57:51  <jimevans> The other big hassle is knowing when the dialog is dismissed.
+2011-04-11T13:58:15  <jimevans> With IWebBrowser2, we can sink an OnQuit event. With an IHTMLDocument2, no such luck.
+2011-04-11T13:58:59  *** melter has quit IRC
+2011-04-11T13:59:13  <jimevans> Turns out to be a pretty big deal for us too, since we're in unmanaged code, and we need to clean up the resources thoroughly when we're done using them.
+2011-04-11T13:59:25  <charleyb> that's fine, then the tests should know, although if you're maintaining the list, that sucks
+2011-04-11T13:59:43  *** anatoli has quit IRC
+2011-04-11T13:59:48  <jimevans> and we are maintaining the list, so it does, in fact, suck.
+2011-04-11T13:59:54  <charleyb> yeah
+2011-04-11T14:00:26  <charleyb> guh, can you not poll through the list and determine what's still valid?
+2011-04-11T14:00:34  <charleyb> nasty solution
+2011-04-11T14:00:34  <jimevans> The saving grace is that using showModalDialog() is not exactly encouraged practice.
+2011-04-11T14:00:51  <charleyb> dig this
+2011-04-11T14:01:02  <charleyb> so you're right for most public websites
+2011-04-11T14:01:19  <charleyb> internal enterprise applications, not so much
+2011-04-11T14:02:04  <charleyb> one of the company's internal sites used up to 8 showModals
+2011-04-11T14:02:40  <jimevans> yikes. my thought process was along the lines of making modal dialogs work *just* well enough.
+2011-04-11T14:02:54  <charleyb> these are well used and known order management and warehouse management systems
+2011-04-11T14:03:14  <charleyb> yikes indeed
+2011-04-11T14:03:56  <charleyb> watir's quick hack has worked well
+2011-04-11T14:04:23  <jimevans> sounds like you're more familiar with the in-the-wild usage of showModalDialog(), how common is it to navigate from one page to another within the modal?
+2011-04-11T14:04:36  *** keturn has joined #selenium
+2011-04-11T14:04:36  <charleyb> very common
+2011-04-11T14:04:44  <charleyb> at least in my experience
+2011-04-11T14:05:00  <jimevans> i can envision wizard-like behavior being common.
+2011-04-11T14:05:07  <jimevans> and others.
+2011-04-11T14:05:33  <charleyb> and popping out into additional "modals" also common, so nesting is an issue
+2011-04-11T14:07:00  <charleyb> i'm not sure if it's wizard like, but can be
+2011-04-11T14:07:03  <jimevans> and unlike window.open(), you can't set a name within the showModalDialog() call, so our API makes it challenging to find the new window.
+2011-04-11T14:07:12  <charleyb> calls centers are using it as well
+2011-04-11T14:07:17  <jimevans> i think i've got the nesting issue under control.
+2011-04-11T14:07:24  <jimevans> conceptually anyway.
+2011-04-11T14:08:17  <charleyb> i've mostly handled it through the test framework and modal access
+2011-04-11T14:09:35  <charleyb> and not relying on anything else to keep track of the windows
+2011-04-11T14:10:21  <jimevans> that would make life simpler, but the webdriver api demands it.
+2011-04-11T14:10:23  <charleyb> you're right about title and anything else to denote the window
+2011-04-11T14:10:48  <charleyb> fair enough
+2011-04-11T14:11:19  <charleyb> i can poke around your code where?
+2011-04-11T14:11:28  *** dave_miles has joined #selenium
+2011-04-11T14:11:33  <charleyb> on watir i'm somewhat on the outside looking in
+2011-04-11T14:11:59  *** dave_miles_wfh has quit IRC
+2011-04-11T14:12:28  <jimevans> well, the showModalDialog handling hasn't been committed yet, but you can find the IE driver code in the Selenium SVN repository.
+2011-04-11T14:12:44  <jimevans> http://selenium.googlecode.com/svn/trunk
+2011-04-11T14:13:00  <charleyb> yeah, it's the showmodal stuff i really want :)
+2011-04-11T14:13:09  *** melter has joined #selenium
+2011-04-11T14:13:20  <jimevans> i'm actively working on it now.
+2011-04-11T14:13:33  <charleyb> though i'll poke around at what's in there now :)
+2011-04-11T14:13:37  *** sassda has left #selenium
+2011-04-11T14:13:51  <jimevans> i keep thinking i'm close to having something i can check in, but then something comes up that i didn't consider. :)
+2011-04-11T14:14:42  <charleyb> i like transparency, can't you check in and mark as not ready for use :)
+2011-04-11T14:15:43  <charleyb> maybe not the greatest idea, i'm not sure how you do checkins on selenium
+2011-04-11T14:16:09  <charleyb> given you're stuck with SVN!!! :)
+2011-04-11T14:16:21  <jimevans> this would be pretty core to the IE driver, and I'd really not want to destablize it.
+2011-04-11T14:16:43  <charleyb> git svn bridge and checkin on github? :D
+2011-04-11T14:17:02  <jimevans> I should be able to check something in tonight. more likely tomorrow morning, as the workday is almost over here, and I need to pick up the kids in a bit.
+2011-04-11T14:17:13  <charleyb> btw, I'm a royal pain in the ass in case you can't tell :)
+2011-04-11T14:17:29  <jimevans> notice how i'm tactfully ignoring the github suggestions :D
+2011-04-11T14:17:37  <charleyb> indeed :)
+2011-04-11T14:17:57  <jimevans> being on windows primarily, i've not found a git implementation that doesn't feel hacky to me.
+2011-04-11T14:18:06  <charleyb> thanks for that, sorry to suck up the time on the channel
+2011-04-11T14:18:18  *** andytinkham has quit IRC
+2011-04-11T14:18:19  *** andytinkham1 has joined #selenium
+2011-04-11T14:18:21  <charleyb> that's a good question
+2011-04-11T14:18:34  <charleyb> i'm forced to work on windows and have
+2011-04-11T14:18:39  <jimevans> no worries. i'm happy, even eager to discuss the ie stuff with anyone who wants to know about it.
+2011-04-11T14:18:50  <charleyb> count me in, i do :)
+2011-04-11T14:19:37  <charleyb> sad i missed you at seconf
+2011-04-11T14:19:40  <jimevans> if you're skilled with C++ (i maintain that i am not), please feel free to give me a review of how we're doing our IE bits.
+2011-04-11T14:19:51  <charleyb> i used to be
+2011-04-11T14:19:56  <charleyb> a lifetime ago
+2011-04-11T14:20:11  <jimevans> likewise! i think i knew you were there, but never got the chance to seek you out.
+2011-04-11T14:20:12  <charleyb> i started with c++
+2011-04-11T14:20:34  <charleyb> since done perl, php, java, ruby, etc
+2011-04-11T14:20:42  <selbot2> nirvdrum less than 20 seconds ago - KevinMenard: Fixed issue proxying commands that returned chunked HTTP results (e.g., CaptureScreenshotToString and CaptureEntirePageScreenshotToString). - http://code.google.com/p/selenium/source/detail?r=11975
+2011-04-11T14:20:57  <nirvdrum> And that ladies and gentlemen is the last two days of my life.
+2011-04-11T14:21:17  <charleyb> my c++ skills are rusty at best
+2011-04-11T14:21:19  <jimevans> nirvdrum: heh. i know how that fee.s
+2011-04-11T14:21:26  <jimevans> s/fee.s/feels
+2011-04-11T14:21:32  <nirvdrum> I really hate this shit at times.
+2011-04-11T14:21:54  <nirvdrum> Since I did absolutely nothing of value here.  I just had to work around some proxying madness.
+2011-04-11T14:22:17  <jimevans> charleyb: i come from a background on the Microsoft stack, starting with VB3, progressing to the .NET Framework
+2011-04-11T14:22:46  <jimevans> i do java under duress, have found ruby to be fun, and do C++ in self-defense.
+2011-04-11T14:22:48  <charleyb> i keep thinking i should be a rancher/farmer/film director/photographer/writer/editor/cook/etc and dump the computer industry
+2011-04-11T14:22:57  <charleyb> hasn't happened yet :)
+2011-04-11T14:23:17  <jimevans> i already tried my hand at being a rock star, but there wasn't enough money in it.
+2011-04-11T14:23:24  <jimevans> :yt jim evans better every day
+2011-04-11T14:23:25  <selbot2> Jim Evans - Better Angels - 01 Better Every Day - http://www.youtube.com/watch?v=ptn9d61e3ZI&feature=youtube_gdata
+2011-04-11T14:24:24  <charleyb> i came close grew up with primus, metallica, managed buckethead, played guitar in several bands, etc
+2011-04-11T14:25:48  <nirvdrum> charleyb: I go through the same cycle.  I think I'm reluctantly good at it.  I'd much rather be good at something else, but sadly that's not the case.
+2011-04-11T14:25:48  <ahfeel_> jimevans: hey, you rock ! :D
+2011-04-11T14:26:13  <charleyb> you sound like a good guy, i've been a mac guy for years, but made a chunk of change in windows
+2011-04-11T14:26:14  <jimevans> ahfeel_: thanks, mate.
+2011-04-11T14:26:18  <nirvdrum> I'll have to check that out later.  If I load YouTube on a plane I think someone will stab me.
+2011-04-11T14:26:44  * jimevans has to upload the rest of the Better Angels album when he gets a chance.
+2011-04-11T14:26:44  <charleyb> nirvdrum: yeah it's interesting eh?
+2011-04-11T14:26:51  <ahfeel_> jimevans: you composed the music and the lyrics of the whole album by yourself ?
+2011-04-11T14:27:06  <charleyb> my degree is double major in english/french lit
+2011-04-11T14:27:31  <charleyb> and odd fit, but whatever
+2011-04-11T14:27:33  <jimevans> ahfeel_: most of it. there were a couple of tracks that were collaborations, but yeah, all of the music and lyrics were at least co-written by me.
+2011-04-11T14:28:09  <jimevans> i didn't play much on the album, had the rest of the band do that, but i am the voice there.
+2011-04-11T14:28:38  <ahfeel_> jimevans: that's really not bad at all, pretty brilliant !
+2011-04-11T14:28:57  <jimevans> you're very kind.
+2011-04-11T14:30:55  <nirvdrum> I should check out watir-grid and see how that works.
+2011-04-11T14:36:35  *** foobarbaz has quit IRC
+2011-04-11T14:41:53  *** AutomatedTester has quit IRC
+2011-04-11T14:42:22  *** AutomatedTester has joined #selenium
+2011-04-11T14:44:09  *** cgoldberg has quit IRC
+2011-04-11T14:44:44  <charleyb> nirvdrum: would love to have you work with tim on watir-grid
+2011-04-11T14:45:22  <charleyb> he's a great guy
+2011-04-11T14:45:35  <nirvdrum> I meant to meet up with him at the conf, but never did.
+2011-04-11T14:45:48  <charleyb> haha
+2011-04-11T14:45:48  <nirvdrum> I'm intrigued at the very least because the threading situation on ruby is abysmal.
+2011-04-11T14:46:00  <charleyb> i ended up sharing a small bed with him
+2011-04-11T14:46:36  <nirvdrum> Is that an awkward segue from the "he's a great guy" comment?
+2011-04-11T14:46:38  <charleyb> not optimal, but got a good 4 hours sleep
+2011-04-11T14:46:43  <charleyb> hahaha
+2011-04-11T14:46:59  <nirvdrum> Actually, I don't think I met you either.
+2011-04-11T14:47:24  <charleyb> he assured me he's married and worked in the military
+2011-04-11T14:47:46  <charleyb> not entirely sure how that plays out
+2011-04-11T14:48:29  <charleyb> yeah, that's the downside of confs, too many people that i don't get to meet
+2011-04-11T14:48:51  <charleyb> happens every time
+2011-04-11T14:48:59  <nirvdrum> Heh.
+2011-04-11T14:49:17  <nirvdrum> Well, I got to meet people using grid that have never contributed anything back.  That was a bit frustrating.
+2011-04-11T14:49:26  *** andytinkham1 has quit IRC
+2011-04-11T14:49:33  <nirvdrum> Like, they actually fixed things but never submitted the patch.
+2011-04-11T14:49:40  <charleyb> yeah, that's always the case too
+2011-04-11T14:49:56  <nirvdrum> Like Yahoo and eBay.
+2011-04-11T14:50:02  <nirvdrum> Not exactly places short on resources.
+2011-04-11T14:50:14  <nirvdrum> They certainly have more than I do anyway.
+2011-04-11T14:50:16  <charleyb> i'm pushing FB to make their stuff more open source
+2011-04-11T14:50:20  <nirvdrum> But, yeah, that's life.
+2011-04-11T14:50:44  *** SL-BWood has quit IRC
+2011-04-11T14:50:45  <charleyb> they're also working on gridding solutions, so i put tim in contact with them
+2011-04-11T14:50:46  *** dmachi has quit IRC
+2011-04-11T14:51:07  *** dmachi has joined #selenium
+2011-04-11T14:54:01  <charleyb> nirvdrum: not sure who you are
+2011-04-11T14:54:32  <nirvdrum> Kevin Menard
+2011-04-11T14:54:34  <charleyb> nm
+2011-04-11T14:54:40  <charleyb> yeah just saw that
+2011-04-11T14:54:47  *** andytinkham has joined #selenium
+2011-04-11T14:54:52  <nirvdrum> Yeah.  My handle is hard to relate, but changing it now is too much work.
+2011-04-11T14:55:22  <charleyb> do you have resources for generic gridding solutions?
+2011-04-11T14:55:46  <charleyb> i kinda told tim to look at more generic solutions
+2011-04-11T14:56:25  <charleyb> i don't see any reason why we shouldn't be able to share that for watir, selenium, whatever
+2011-04-11T14:56:47  <AutomatedTester> charleyb: Grid 2 supports automation of win32 apps
+2011-04-11T14:57:00  <AutomatedTester> well from speaking to Francois
+2011-04-11T14:57:09  <charleyb> ah interesting
+2011-04-11T14:57:17  <AutomatedTester> its a clean multiplexer
+2011-04-11T14:57:26  <charleyb> but only on windows?
+2011-04-11T14:58:08  <charleyb> sorry for my ignorance :)
+2011-04-11T14:58:09  <nirvdrum> Not quite.
+2011-04-11T14:58:11  <AutomatedTester> he told me anything but he has used it for win32 apps in eBay
+2011-04-11T14:58:16  <charleyb> i haven't checked it out
+2011-04-11T14:58:19  <nirvdrum> Grid 2 is a generic grid for anything speaking the JSON wire protocol.
+2011-04-11T14:58:23  <AutomatedTester> i havent looked at it
+2011-04-11T14:58:28  <charleyb> ooh cool
+2011-04-11T14:58:39  *** towski_ has joined #selenium
+2011-04-11T14:58:41  <charleyb> rope tim in
+2011-04-11T14:58:41  <jarib> "the JSON wire protocol" or any similar JSON wire protocol?
+2011-04-11T14:58:42  <selbot2> james.h.evans.jr half a minute ago - JimEvans: Preparation for implementation of showModalDialog() handling in IE driver native code. - http://code.google.com/p/selenium/source/detail?r=11976
+2011-04-11T14:58:42  <nirvdrum> Francois wrote a Win32 automation tool that speaks that wire protocol.  And thus he gained gridding of it.
+2011-04-11T14:58:59  <jimevans> charleyb: ^^ got it done before i left.
+2011-04-11T14:58:59  <charleyb> jarib: good question :)
+2011-04-11T14:59:07  <nirvdrum> jarib: I believe any similar.  At its core, it's just a dispatcher.
+2011-04-11T14:59:12  <jarib> right
+2011-04-11T14:59:17  <jarib> that's pretty cool
+2011-04-11T14:59:23  <nirvdrum> I'd have to verify with Francois.
+2011-04-11T14:59:34  <nirvdrum> We obviously added in special support for the old Se 1 protocol.
+2011-04-11T14:59:44  <jimevans> at the moment, i wouldn't actually try it with showModalDialog(), because it's likely to crash horribly, but you can see where my thinking is at this point.
+2011-04-11T14:59:46  <charleyb> jimevans: sweet, i'll take a look
+2011-04-11T15:00:23  <charleyb> jimevans: i haven't seen anything close to what i'm looking for, so that's a godsend
+2011-04-11T15:00:24  *** towski has quit IRC
+2011-04-11T15:01:34  <jimevans> i'll be around tomorrow, and i try to be responsive to email, so if you have questions about the architecture or about how things work, feel free to ask.
+2011-04-11T15:01:42  <jimevans> gotta run. later guys.
+2011-04-11T15:01:45  *** jimevans has left #selenium
+2011-04-11T15:01:46  <charleyb> wtf am i doing spending so much time on the selenium channel lately :)
+2011-04-11T15:01:54  <jarib> haha
+2011-04-11T15:02:42  <charleyb> kidnapped and drugged is the only way to explain it
+2011-04-11T15:04:42  <charleyb> watir still rocks for those concerned :D
+2011-04-11T15:05:01  <nirvdrum> Heh.
+2011-04-11T15:05:44  <nirvdrum> Sent out first set of basic instructions on how to use grid 2.  It's still much terser than it ultimately should be, but hopefully some others can start playing around with it.
+2011-04-11T15:06:09  <charleyb> saw that, so it's all java eh?
+2011-04-11T15:06:23  <nirvdrum> Yeah.
+2011-04-11T15:06:42  <nirvdrum> Well, the server portion.
+2011-04-11T15:06:45  <charleyb> fair enough
+2011-04-11T15:06:47  <nirvdrum> The clients can be whatever.
+2011-04-11T15:06:51  <charleyb> sure
+2011-04-11T15:06:55  <nirvdrum> I'm using it with selenium-webdriver.
+2011-04-11T15:07:15  <nirvdrum> I.e., the ruby gem.
+2011-04-11T15:07:33  <nirvdrum> Do you see it being written in Java as problematic?
+2011-04-11T15:07:56  <charleyb> no, that's probably for the best
+2011-04-11T15:07:58  <nirvdrum> For all its other faults, Java / JVM do incredibly well with handling loads of concurrent connections.
+2011-04-11T15:08:07  *** santiycr has quit IRC
+2011-04-11T15:08:16  <charleyb> i haven't done serious java for a few years :)
+2011-04-11T15:08:27  <nirvdrum> Me neither ;-)
+2011-04-11T15:08:52  <charleyb> what are you working in?
+2011-04-11T15:09:41  <charleyb> i think java probably makes the most sense, might be fun to do it in jruby :)
+2011-04-11T15:10:01  <nirvdrum> I'm in Ruby for the most part.
+2011-04-11T15:10:07  <nirvdrum> I fall back into Java and C++ when needed.
+2011-04-11T15:10:34  <nirvdrum> I used to do Python & some variants of assembly, too, but I've been out of that for a few years.
+2011-04-11T15:17:37  <charleyb> same here, though i don't fall into assembler
+2011-04-11T15:18:11  <nirvdrum> I used to own a company that made hardware devices.
+2011-04-11T15:18:20  <nirvdrum> So, sorta had to.
+2011-04-11T15:18:47  <charleyb> i used to work at a company many lifes ago that did scanners and image editing
+2011-04-11T15:20:13  <charleyb> learned enough assembler to crack apps, but that was about it
+2011-04-11T15:21:38  <nirvdrum> It was actually pretty cool.  On the PICs there were only 32 opcodes so I could read hex output and decode in my head.  I learned to appreciate writing tight code.
+2011-04-11T15:22:01  <nirvdrum> Reducing from 4k words code => 2k words allowed us to save $0.50 / chip.  We were ordering in batches of 10,000.
+2011-04-11T15:22:07  <nirvdrum> So, the savings was real.
+2011-04-11T15:22:45  <nirvdrum> Okay.  Starting to descend.  Gotta lose the laptop.  See you guys later.
+2011-04-11T15:22:48  *** nirvdrum has quit IRC
+2011-04-11T15:29:03  *** brettporter has joined #selenium
+2011-04-11T15:31:32  *** cheezy has joined #selenium
+2011-04-11T15:32:22  *** cheezy has joined #selenium
+2011-04-11T15:37:47  *** santiycr has joined #selenium
+2011-04-11T15:42:48  *** cburroughs has joined #selenium
+2011-04-11T15:48:00  *** new2b has quit IRC
+2011-04-11T15:48:40  *** cburroughs has quit IRC
+2011-04-11T15:48:55  *** andytinkham has quit IRC
+2011-04-11T15:49:31  *** QAguy has quit IRC
+2011-04-11T15:50:33  *** ian_mac has quit IRC
+2011-04-11T15:53:22  *** anatoli_ has joined #selenium
+2011-04-11T16:15:57  *** Archdude has quit IRC
+2011-04-11T16:16:17  *** Archdude has joined #selenium
+2011-04-11T16:17:18  *** Archdude has quit IRC
+2011-04-11T16:18:02  *** Archdude has joined #selenium
+2011-04-11T16:24:53  *** Archdude has quit IRC
+2011-04-11T16:25:10  *** Archdude has joined #selenium
+2011-04-11T16:26:15  *** Archdude has quit IRC
+2011-04-11T16:27:01  *** Archdude has joined #selenium
+2011-04-11T16:29:47  *** kylls has joined #selenium
+2011-04-11T16:32:30  *** Archdude has quit IRC
+2011-04-11T16:32:50  *** Archdude has joined #selenium
+2011-04-11T16:33:52  *** Archdude has quit IRC
+2011-04-11T16:34:38  *** Archdude has joined #selenium
+2011-04-11T16:40:29  *** Archdude has quit IRC
+2011-04-11T16:41:15  *** Archdude has joined #selenium
+2011-04-11T16:42:40  *** Archdude has joined #selenium
+2011-04-11T16:47:15  *** jleyba_ has joined #selenium
+2011-04-11T16:47:34  *** jleyba_ has quit IRC
+2011-04-11T16:48:43  *** Archdude has quit IRC
+2011-04-11T16:49:03  *** Archdude has joined #selenium
+2011-04-11T16:50:01  *** Archdude has quit IRC
+2011-04-11T16:50:43  *** Archdude has joined #selenium
+2011-04-11T16:56:31  *** Archdude has quit IRC
+2011-04-11T16:56:51  *** Archdude has joined #selenium
+2011-04-11T16:57:47  *** Archdude has quit IRC
+2011-04-11T16:58:32  *** Archdude has joined #selenium
+2011-04-11T17:04:32  *** Archdude has quit IRC
+2011-04-11T17:05:15  *** Archdude has joined #selenium
+2011-04-11T17:05:51  *** Archdude has quit IRC
+2011-04-11T17:06:34  *** Archdude has joined #selenium
+2011-04-11T17:10:56  *** Archdude has quit IRC
+2011-04-11T17:11:41  *** Archdude has joined #selenium
+2011-04-11T17:13:02  *** Archdude has joined #selenium
+2011-04-11T17:14:37  *** csanchez has quit IRC
+2011-04-11T17:16:38  *** Archdude has quit IRC
+2011-04-11T17:16:42  <selbot2> berrada@google.com half a minute ago - DouniaBerrada: Moving permissions before the application tag, due to an android bug, permissions after the app tag fail to be picked up sometimes. - http://code.google.com/p/selenium/source/detail?r=11977
+2011-04-11T17:17:25  *** Archdude has joined #selenium
+2011-04-11T17:17:35  *** mbeierl has joined #selenium
+2011-04-11T17:17:52  *** mbeierl has left #selenium
+2011-04-11T17:18:04  *** Archdude has quit IRC
+2011-04-11T17:18:48  *** Archdude has joined #selenium
+2011-04-11T17:20:31  *** SpankyFromBRC has joined #selenium
+2011-04-11T17:22:48  *** Spanktar has quit IRC
+2011-04-11T17:30:15  *** Archdude has quit IRC
+2011-04-11T17:30:34  *** Archdude has joined #selenium
+2011-04-11T17:31:25  *** ian_mac has joined #selenium
+2011-04-11T17:31:38  *** Archdude has quit IRC
+2011-04-11T17:32:24  *** Archdude has joined #selenium
+2011-04-11T17:35:59  *** sfbrian has quit IRC
+2011-04-11T17:43:20  *** csgeek has joined #selenium
+2011-04-11T17:52:25  *** cheezy has quit IRC
+2011-04-11T17:53:28  *** Archdude has quit IRC
+2011-04-11T17:53:41  <AutomatedTester> charleyb: I should have started following you on twitter a while ago
+2011-04-11T17:53:45  *** Archdude has joined #selenium
+2011-04-11T17:54:36  <AutomatedTester> say it as it is.... <3 cander
+2011-04-11T17:54:43  *** Archdude has quit IRC
+2011-04-11T17:55:28  *** Archdude has joined #selenium
+2011-04-11T17:58:52  *** kylls has quit IRC
+2011-04-11T18:01:19  *** Archdude has quit IRC
+2011-04-11T18:01:39  *** Archdude has joined #selenium
+2011-04-11T18:03:28  *** Archdude has joined #selenium
+2011-04-11T18:11:42  *** towski_ has quit IRC
+2011-04-11T18:12:38  *** dmachi has quit IRC
+2011-04-11T18:18:51  *** AutomatedTester has quit IRC
+2011-04-11T18:22:26  *** dhackner has quit IRC
+2011-04-11T18:23:58  *** dmachi has joined #selenium
+2011-04-11T18:36:08  *** santiycr has quit IRC
+2011-04-11T18:44:29  *** esteele is now known as esteele|away
+2011-04-11T18:53:20  *** ian_mac has quit IRC
+2011-04-11T18:57:09  *** nirvdrum has joined #selenium
+2011-04-11T18:59:31  *** BryanLemon has joined #selenium
+2011-04-11T19:00:16  <BryanLemon> I was wondering if anyone has had any success getting HtmlUnitDriver to be able to load a page with jQuery on it and javascript enabled?
+2011-04-11T19:05:41  *** AutomatedTester has joined #selenium
+2011-04-11T19:14:23  <BryanLemon> AutomatedTester, I have a quick question. Have you had any luck using HtmlUnitDriver with js enabled on a page with jQuery?
+2011-04-11T19:14:49  <AutomatedTester> i dont use htmlunit
+2011-04-11T19:15:15  *** ian_mac has joined #selenium
+2011-04-11T19:15:20  <AutomatedTester> but would be suprised if it doesnt work
+2011-04-11T19:16:00  <BryanLemon> It isn't working when you load http://www.racingjunk.com
+2011-04-11T19:16:31  <BryanLemon> Let me find a stacktrace (if you don't mind trying to point me in the right direction)
+2011-04-11T19:18:21  <AutomatedTester> sure
+2011-04-11T19:19:58  <BryanLemon> http://bryanlemon.com/trace.txt
+2011-04-11T19:20:35  <BryanLemon> Actually, the tops chopped off.
+2011-04-11T19:21:44  <BryanLemon> Fixed
+2011-04-11T19:28:25  <AutomatedTester> glad its sorted
+2011-04-11T19:29:13  <BryanLemon> Oh, no, I was meaning I got the trace fixed so the top is there. Sorry about the poor choice of words.
+2011-04-11T19:30:45  <AutomatedTester> can I have the code that caused
+2011-04-11T19:30:48  <AutomatedTester> it
+2011-04-11T19:31:44  <BryanLemon> Sure. Want the whole java file, or just the interesting parts?
+2011-04-11T19:32:09  <AutomatedTester> the interesting part is good for me
+2011-04-11T19:32:25  <BryanLemon>         driver = new HtmlUnitDriver(true);          Logger logger = Logger.getLogger ("");         logger.setLevel (Level.OFF);          driver.get("http://www.racingjunk.com/");
+2011-04-11T19:34:07  <AutomatedTester> so the HtmlUnitDriver() line is blowing up?
+2011-04-11T19:34:14  <AutomatedTester> or the get?
+2011-04-11T19:34:40  <BryanLemon> Sorry, its the get
+2011-04-11T19:34:47  <AutomatedTester> ok cool
+2011-04-11T19:35:03  <BryanLemon> Also, if the logger is taken out, it generates a lot of SEVERE errors like this one:
+2011-04-11T19:35:03  <BryanLemon> SEVERE: runtimeError: message=[The data necessary to complete this operation is not yet available.] sourceName=[http://static.racingjunk.com/common/js/jquery-1.4.2.min.js] line=[16] lineSource=[null] lineOffset=[0] Apr 11, 2011 10:39:59 PM com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter runtimeError
+2011-04-11T19:38:26  *** ner0x has joined #selenium
+2011-04-11T19:38:52  <AutomatedTester> http://www.test.com
+2011-04-11T19:38:54  <AutomatedTester> doh
+2011-04-11T19:39:08  <AutomatedTester> BryanLemon: just a sec, my IRC theme is annoying me
+2011-04-11T19:39:12  <BryanLemon> ok
+2011-04-11T19:39:23  <AutomatedTester> links are blue on black
+2011-04-11T19:39:32  <AutomatedTester> which makes them unreadable
+2011-04-11T19:40:05  *** jonathanrwallace has quit IRC
+2011-04-11T19:40:36  <AutomatedTester> www.test.com
+2011-04-11T19:40:46  <AutomatedTester> IDEA is loading
+2011-04-11T19:40:46  <AutomatedTester> \
+2011-04-11T19:41:25  <AutomatedTester> www.test.com
+2011-04-11T19:46:09  <AutomatedTester> BryanLemon: can you try pass in Firefox as DesiredCapabilities
+2011-04-11T19:46:14  <AutomatedTester> instead of true
+2011-04-11T19:46:39  <BryanLemon> Sure.
+2011-04-11T19:47:09  <BryanLemon> BrowserVersion.FIREFOX_3 ?
+2011-04-11T19:48:13  <AutomatedTester> DesiredCapabilities.firefox
+2011-04-11T19:50:02  <BryanLemon> Same exceptions
+2011-04-11T19:50:56  <AutomatedTester> one sec
+2011-04-11T19:52:52  *** pnitin has quit IRC
+2011-04-11T19:55:44  <AutomatedTester> BryanLemon: HtmlUnit is not liking your CSS
+2011-04-11T19:55:50  <AutomatedTester> and a few other things
+2011-04-11T19:56:07  <AutomatedTester> I think you may have hit a htmlunit bug
+2011-04-11T19:56:23  <AutomatedTester> but I dont use htmlunit or java regularly
+2011-04-11T19:58:47  *** BryanLemon has quit IRC
+2011-04-11T20:02:44  *** ner0x has quit IRC
+2011-04-11T20:14:21  *** AutomatedTester has quit IRC
+2011-04-11T20:14:35  *** AutomatedTester has joined #selenium
+2011-04-11T20:14:44  <AutomatedTester> http://www.test.com
+2011-04-11T20:21:16  <AutomatedTester> http://www.test.com please work
+2011-04-11T20:21:18  <AutomatedTester> doh
+2011-04-11T20:22:39  <AutomatedTester> finally
+2011-04-11T20:25:49  <nirvdrum> Verified grid 2 hub works well for mogotest in staging.  So I'm happy.
+2011-04-11T20:26:02  <nirvdrum> I may be ballsy enough to push into production tomorrow.
+2011-04-11T20:26:06  <AutomatedTester> nice one nirvdrum
+2011-04-11T20:26:09  <nirvdrum> And really test it that way.
+2011-04-11T20:26:25  <nirvdrum> I don't like making my customers be beta testers though :-P
+2011-04-11T20:26:32  <nirvdrum> Hell, pre-alpha testers.
+2011-04-11T20:26:47  <AutomatedTester> nirvdrum: cant you make it a subset of them?
+2011-04-11T20:26:57  *** BryanLemon has joined #selenium
+2011-04-11T20:27:03  <nirvdrum> Yeah, but I'd have to have two separate grids.
+2011-04-11T20:27:08  <nirvdrum> Doable, but annoying.
+2011-04-11T20:27:19  <AutomatedTester> fair enough
+2011-04-11T20:27:22  <nirvdrum> But, at the very least I've demonstrated it's backwards compatible.
+2011-04-11T20:27:23  <BryanLemon> Hey AutomatedTester, don't know what happened, but I got disconnected.
+2011-04-11T20:27:38  <nirvdrum> All I did was change the hub startup code.  Everything else is the same and my grid is kicking along like a champ.
+2011-04-11T20:27:50  <AutomatedTester> so BryanLemon I think either you may have hit a bug in htmlunit
+2011-04-11T20:28:10  <nirvdrum> Well, think I'm gonna call it a night.  Gotta try to get up early tomorrow.
+2011-04-11T20:28:28  <AutomatedTester> when i load your site, htmlunit gets very upset
+2011-04-11T20:28:36  <AutomatedTester> laters nirvdrum
+2011-04-11T20:28:50  *** nirvdrum has quit IRC
+2011-04-11T20:30:01  <BryanLemon> Yeah. Its not my site, just one I am trying to write some automation for. I was afraid of it being a bug in HtmlUnit, but there is nothing that can be done about it I guess. Time to look into HtmlUnit, and see if I can solve it.
+2011-04-11T20:32:05  <AutomatedTester> i know there was a RemoteWebdriver bug about outofmemory
+2011-04-11T20:32:12  <selbot2> nirvdrum less than 20 seconds ago - KevinMenard: Better comment. - http://code.google.com/p/selenium/source/detail?r=11978
+2011-04-11T20:32:19  <AutomatedTester> thats been fixed so you could try the code from trunk
+2011-04-11T20:33:26  <BryanLemon> Will do.
+2011-04-11T21:49:17  *** andytinkham has joined #selenium
+2011-04-11T21:49:42  *** pnitin has joined #selenium
+2011-04-11T21:51:42  <selbot2> theautomatedtester less than 10 seconds ago - DavidBurns Docstrings for the Python ChromeDriver - http://code.google.com/p/selenium/source/detail?r=11979
+2011-04-11T21:53:38  *** andytinkham has quit IRC
+2011-04-11T22:11:00  *** erwan has joined #selenium
+2011-04-11T22:11:12  <selbot2> theautomatedtester half a minute ago - DavidBurns allowing people to choose their own ports for the chrome service if inclined - http://code.google.com/p/selenium/source/detail?r=11980
+2011-04-11T22:23:42  <selbot2> theautomatedtester less than 10 seconds ago - DavidBurns Allow users to overwrite the max script timeout in Firefox mimicing r11923 - http://code.google.com/p/selenium/source/detail?r=11981
+2011-04-11T22:23:57  *** andialbrecht_ is now known as andialbrecht
+2011-04-11T22:29:52  *** andialbrecht is now known as andialbrecht_
+2011-04-11T22:45:10  *** mokki has left #selenium
+2011-04-11T22:50:04  *** erwan has quit IRC
+2011-04-11T23:04:13  *** andialbrecht_ is now known as andialbrecht
+2011-04-11T23:10:11  *** rbalent has joined #selenium
+2011-04-11T23:35:41  *** AutomatedTester has quit IRC

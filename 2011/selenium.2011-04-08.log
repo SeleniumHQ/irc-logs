@@ -1,0 +1,482 @@
+2011-04-08T00:01:15  *** carze has quit IRC
+2011-04-08T00:02:08  <mashiara> hi, I'm trying to use webdriver (remote execution) with python and get WebDriverException when trying to add_cookie (this is done before first driver.get(), in case it matters)
+2011-04-08T00:03:24  <mashiara> also: is there a way to specify the domain for the cookies ? my problem is that I need to set sessions cookies before opening the URL
+2011-04-08T00:04:03  *** plightbo has joined #selenium
+2011-04-08T00:04:24  <mashiara> doing a get() before add_cookie makes no difference, I get the exception anyway. is there a way to see the actual response from the remote webdriver ?
+2011-04-08T00:04:44  *** csanchez has quit IRC
+2011-04-08T00:05:05  *** csanchez has joined #selenium
+2011-04-08T00:05:08  <plightbo> yo yo yo
+2011-04-08T00:05:42  *** santiycr has quit IRC
+2011-04-08T00:07:21  *** plightbo has quit IRC
+2011-04-08T00:07:31  *** plightbo has joined #selenium
+2011-04-08T00:11:11  <mashiara> gah, the fsckin documentation is wrong for add_cookie, let's try again with a more correct looking cookie_dict...
+2011-04-08T00:12:37  <jarib> plightbo: regret i didn't get to say hi at the conference, great talk
+2011-04-08T00:12:45  <mashiara> or at least get_cookies returns a wholly different looking list of dictionaries
+2011-04-08T00:16:00  <mashiara> nope, changin the format of cookie_dict didn't help
+2011-04-08T00:20:00  <plantian> mashiara: I know this sounds terrible but I just call the login url with some login info and then call the url that requires that the user is logged in.
+2011-04-08T00:20:21  <plantian> I just started using selenium two days ago though so that's all I know pretty much.
+2011-04-08T00:21:16  <mashiara> I'm back to looking at selenium after two years or so, the webdriver looks much nicer than the old api
+2011-04-08T00:21:45  <plantian> Yeah I never used it before, I'm using it from python too.
+2011-04-08T00:21:46  <mashiara> but seems to be a bit flaky at time. fact remains I really need to be able to set the session cookies
+2011-04-08T00:22:23  *** Fyrespray^ has joined #selenium
+2011-04-08T00:22:55  <mashiara> or of course there's always a workaround or two but setting the cookies will save a lot of time when running the tests
+2011-04-08T00:23:33  <mashiara> since each test doesn't have to go through the whole login thing before it can do what it was actually supposed to do
+2011-04-08T00:24:59  *** csanchez_ has joined #selenium
+2011-04-08T00:25:01  <plightbo> jarib: Yeah sorry about that, but glad you were able to make it out and meet everyone else!
+2011-04-08T00:25:16  *** andialbrecht_ is now known as andialbrecht
+2011-04-08T00:26:02  *** Fyrespray has quit IRC
+2011-04-08T00:26:41  <jarib> plightbo: yeah, had a lot of fun
+2011-04-08T00:27:17  <jarib> plightbo: btw, as soon as more of the browsermob proxy api is exposed through rest, i'd do a ruby client in a heartbeat :)
+2011-04-08T00:28:35  <jarib> bedtime here, ttyl
+2011-04-08T00:29:17  <ato> jarib: Have a good flight tomorrow!
+2011-04-08T00:29:18  *** csanchez has quit IRC
+2011-04-08T00:29:18  *** csanchez_ is now known as csanchez
+2011-04-08T00:29:31  <mashiara> ah, the create_cookie throws an exception on the selenium server end: http://friendpaste.com/23O445jo36VRojSakJ5Mkl
+2011-04-08T00:29:46  <mashiara> s/create_cookie/add_cookie/
+2011-04-08T00:30:06  <jarib> ato: thanks, enjoy your remaining days :)
+2011-04-08T00:34:21  *** Bebe has joined #selenium
+2011-04-08T00:34:32  *** Bebe is now known as bebe
+2011-04-08T00:34:37  *** bebe is now known as Bebe
+2011-04-08T00:34:48  <plantian> mashiara: Oh I'm using it locally with the binary.
+2011-04-08T00:34:57  <plantian> I watch each test login, ha.
+2011-04-08T00:35:50  <mashiara> running locally gets me a much more sane error message :) "WebDriverException: You may only set cookies for the current domain"
+2011-04-08T00:36:22  <mashiara> I wonder what is considered current domain if I haven get() anything yet...
+2011-04-08T00:38:08  <mashiara> if trying to set a cookie before a get I get error: WebDriverException: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIDOMLocation.host]
+2011-04-08T00:44:58  <jarib> mashiara: you need to navigate to the domain you want to add the cookie to.
+2011-04-08T00:45:38  * jarib calls it a day
+2011-04-08T00:45:50  <mashiara> jarib thanks, any way around it ?
+2011-04-08T00:45:57  <jarib> no
+2011-04-08T00:46:04  <mashiara> since the whole domain is behind shibboleth
+2011-04-08T00:46:22  <jarib> sorry, webdriver will only let you set cookies on the current domain
+2011-04-08T00:46:24  <jarib> good night!
+2011-04-08T00:49:55  <mashiara> ha, I can call domain/Shibboleth.sso/ (it will return error 500, but selenium won't choke on that yet) and *then* set my cookies...
+2011-04-08T00:50:24  <mashiara> and since that's shibboleths own magic url it won't trap the request...
+2011-04-08T00:58:55  *** sburjan has joined #selenium
+2011-04-08T00:58:58  *** anatoli_ has quit IRC
+2011-04-08T01:06:41  <mashiara> ok, got it working locally but remotely it still fails, the add_cookie causes nullPointerException on the selenium server.
+2011-04-08T01:12:24  *** carze has joined #selenium
+2011-04-08T01:30:27  <mashiara> ok, added an issue (http://code.google.com/p/selenium/issues/detail?id=1526), I can continue making my test using the local webdriver for now.
+2011-04-08T01:40:49  *** kiorky has left #selenium
+2011-04-08T01:42:47  *** vrockai has joined #selenium
+2011-04-08T01:44:18  *** zmijunkie has joined #selenium
+2011-04-08T01:56:33  *** carze has quit IRC
+2011-04-08T02:08:12  *** krosenvold has quit IRC
+2011-04-08T02:08:51  *** krosenvold has joined #selenium
+2011-04-08T02:14:27  *** dasilvj has quit IRC
+2011-04-08T02:26:02  *** alp82 has quit IRC
+2011-04-08T02:31:11  *** dereke_ has joined #selenium
+2011-04-08T02:43:11  *** dereke_ has quit IRC
+2011-04-08T02:43:21  *** dereke has joined #selenium
+2011-04-08T02:49:33  *** Ammar has quit IRC
+2011-04-08T02:49:48  *** ammar01 has joined #selenium
+2011-04-08T02:52:41  *** dereke_ has joined #selenium
+2011-04-08T02:52:42  *** dereke has quit IRC
+2011-04-08T02:52:50  *** dereke_ has quit IRC
+2011-04-08T02:58:24  *** ammar01 has quit IRC
+2011-04-08T03:12:10  *** |izzie has joined #selenium
+2011-04-08T03:14:12  *** ammar01 has joined #selenium
+2011-04-08T03:15:02  *** ammar01 has joined #selenium
+2011-04-08T03:22:45  <krosenvold> Anyone know how I can avoid the new "startup" page in firebux 1.6.2 ?
+2011-04-08T03:52:04  *** plightbo has quit IRC
+2011-04-08T04:11:38  *** Mayank has quit IRC
+2011-04-08T04:12:21  *** strtok has quit IRC
+2011-04-08T04:12:29  *** strtok has joined #selenium
+2011-04-08T04:14:58  *** matt1s has quit IRC
+2011-04-08T04:16:39  *** kylls has joined #selenium
+2011-04-08T04:16:59  *** matt1s has joined #selenium
+2011-04-08T04:21:35  <mashiara> does someone know how *exactly* webdriver.get() handles redirects ? I know it follows them but does the method return after the first response or will it wait until redirections have completed (for the moment supposing the redirect is done on server level returning 302/301)
+2011-04-08T04:25:06  *** adamgoucher has joined #selenium
+2011-04-08T04:25:27  *** skiphuffman_ has joined #selenium
+2011-04-08T04:28:12  *** Davbo has joined #selenium
+2011-04-08T04:30:52  <krosenvold> mashiara: It follows up to 10 redirecs or so
+2011-04-08T04:31:38  <mashiara> ok, and does not return before all redirects (done on server level) have completed
+2011-04-08T04:35:07  <krosenvold> Yes
+2011-04-08T04:36:51  <mashiara> ok, thanks. what if we have a javascript form submit done at document.ready() ? (Shibboleth handles logins "interestingly")
+2011-04-08T04:37:27  <mashiara> I'd suppose get() returns once page has loaded and then I need to wait for the javascript submit ?
+2011-04-08T04:37:58  <mashiara> and after the submit wait for the next page to load and then I can continue my test
+2011-04-08T04:52:07  *** ner0x has joined #selenium
+2011-04-08T05:10:50  *** RossPatterson has joined #selenium
+2011-04-08T05:12:05  *** cburroughs has joined #selenium
+2011-04-08T05:17:12  *** rbalent_ has joined #selenium
+2011-04-08T05:17:33  *** mbeierl has joined #selenium
+2011-04-08T05:17:57  *** rbalent has quit IRC
+2011-04-08T05:20:06  *** ian_mac has quit IRC
+2011-04-08T05:30:24  *** tyrion-mx has joined #selenium
+2011-04-08T05:31:13  <tyrion-mx> Hello, I've installed selenium from pypi with "pip install selenium"
+2011-04-08T05:31:21  <tyrion-mx> and tried to run an example from the doc
+2011-04-08T05:31:36  <tyrion-mx> from selenium import webdriver; driver = webdriver.Firefox()
+2011-04-08T05:33:52  <tyrion-mx> But I get an Exception: http://bpaste.net/show/15262/
+2011-04-08T05:34:18  *** lfryc has quit IRC
+2011-04-08T05:35:51  *** mandric has joined #selenium
+2011-04-08T05:35:59  <RossPatterson> tyrion-mx: When AutomatedTester shows up, he's probably the guy to ask.
+2011-04-08T05:36:20  <tyrion-mx> thanks
+2011-04-08T05:36:39  <tyrion-mx> however I just commented out the lines referring to "LOGGER" (which is not defined anywhere)
+2011-04-08T05:36:47  <tyrion-mx> and firefox shows up
+2011-04-08T05:42:06  <adamgoucher> automatedtester is at a meeting all week and may/may not show up
+2011-04-08T05:42:39  <RossPatterson> Slacker :-)
+2011-04-08T05:42:57  <adamgoucher> hes been at seconf all week slacking from his meeting :)
+2011-04-08T05:44:25  <krosenvold> It's the penatly of "off time" from work right, twice the amount of todo-things when you return
+2011-04-08T05:45:40  *** SL-BWood has joined #selenium
+2011-04-08T05:46:37  <RossPatterson> I've been off the conference circuit for years, but part of the game back then was to count your inbox-unread depth upon return and post it to the group.  Of course, we didn't have office-email access when traveling, so big numbers were the norm ;-)
+2011-04-08T05:48:53  <krosenvold> I think I have email too many places ATM, I should probably try to get off my online addiction
+2011-04-08T05:49:07  * krosenvold will do it "next week"
+2011-04-08T05:49:18  <RossPatterson> +1
+2011-04-08T05:50:51  *** carze has joined #selenium
+2011-04-08T05:57:39  *** cgoldberg has joined #selenium
+2011-04-08T06:06:45  *** toseter has joined #selenium
+2011-04-08T06:09:21  <mashiara> just checking (suing webdriver via python): if I have gotten element = self.driver.find_element_by_whatever() then element.find_element_by_xpath() I need to specify the path starting from said element and not from root of the document ?
+2011-04-08T06:11:31  <tyrion-mx> css ftw
+2011-04-08T06:14:15  <mashiara> yes but for some reason I get 'invalid string' (or something) when I try to use the more advanced CSS selectors
+2011-04-08T06:14:40  <mashiara> I'll doublecheck the exception from css later, right now I just want to get this one test working.
+2011-04-08T06:20:04  <mashiara> find_element_by_css_selector('li:nth(2) > a') throws: WebDriverException: An invalid or illegal string was specified
+2011-04-08T06:21:19  <mashiara> ditto for ul.find_element_by_css_selector('a[href*=/midcom-logout-]')
+2011-04-08T06:21:40  <mashiara> ul.find_element_by_xpath('li[2]/a') works fine.
+2011-04-08T06:21:59  <mashiara> and ul is something I have gotten via CSS selector earlier
+2011-04-08T06:22:55  <mashiara> I must say I like the webdriver+python approach, but the CSS selectors behaving erratically is more than a bit annoying (especially since I'm used to jQuery)
+2011-04-08T06:23:15  <mashiara> or maybe I have a brainfart somewhere
+2011-04-08T06:23:47  *** anatoli has joined #selenium
+2011-04-08T06:27:57  *** anatoli has quit IRC
+2011-04-08T06:37:00  *** carze has quit IRC
+2011-04-08T06:43:44  *** pnitin has quit IRC
+2011-04-08T06:53:32  <tyrion-mx> does selenium 2 have any assert* methods?
+2011-04-08T06:54:05  <tyrion-mx> I have to check if a page fails to load
+2011-04-08T06:58:46  <selbot2> kristian.rosenvold@gmail.com 1 minute ago - KristianRosenvold: Introduced a handler constructor that takes a session object - http://code.google.com/p/selenium/source/detail?r=11928
+2011-04-08T07:01:17  *** adamgoucher has quit IRC
+2011-04-08T07:01:25  *** adamgoucher has joined #selenium
+2011-04-08T07:14:28  <adamgoucher> tyrion-mx: assert* etc is all provided by your choice of runner; not selenium
+2011-04-08T07:14:50  <tyrion-mx> I understand
+2011-04-08T07:15:13  <tyrion-mx> adamgoucher, does selenium provide a way to check if the page fails to load?
+2011-04-08T07:15:21  <tyrion-mx> I am doing driver.get("http://page")
+2011-04-08T07:15:42  <adamgoucher> assert something unique on the page perhaps?
+2011-04-08T07:17:42  <tyrion-mx> ok
+2011-04-08T07:20:26  *** AutomatedTester has joined #selenium
+2011-04-08T07:22:06  *** andialbrecht is now known as andialbrecht_
+2011-04-08T07:22:08  *** Denjerec has joined #selenium
+2011-04-08T07:22:15  <Denjerec> Evenin all
+2011-04-08T07:22:19  *** gtailleb1 has joined #selenium
+2011-04-08T07:22:33  *** gtailleb has quit IRC
+2011-04-08T07:22:48  <Denjerec> I'm trying (desperately) to figure out a way to read inputs from a file so I can iterate through a test and each time, enter from a line in the input file an entry into a textbox.
+2011-04-08T07:23:01  *** AutomatedTester has quit IRC
+2011-04-08T07:23:09  <Denjerec> I've given up on trying to read from a file, so I'm using getEval to try and use a JS array
+2011-04-08T07:23:16  <Denjerec> (Selenium IDE with Flow Control extension)
+2011-04-08T07:23:26  *** rbalent_ has quit IRC
+2011-04-08T07:23:40  <Denjerec> The looping is working OK, but I'm stuck on how to push the JS variable into an XPath targetted textarea.
+2011-04-08T07:23:56  <Denjerec> normally it's just    type | XPATH TARGET | value
+2011-04-08T07:24:08  <Denjerec> I just don't know how to use the JS var in the value bit... any offers?
+2011-04-08T07:25:22  *** QAguy has joined #selenium
+2011-04-08T07:26:04  <tyrion-mx> does selenium 2 provide any functionality to check if a xhr has been done?
+2011-04-08T07:26:29  <tyrion-mx> (it would be great :)
+2011-04-08T07:26:39  <Denjerec> I've got this so far:  javascript{items[x]}   where  x was stored via   store  |  0  |  x
+2011-04-08T07:26:45  <Denjerec> but it tells me x is not defined :/
+2011-04-08T07:47:19  *** ssims has joined #selenium
+2011-04-08T07:50:12  *** ssims has quit IRC
+2011-04-08T07:50:34  *** ssims has joined #selenium
+2011-04-08T07:52:48  *** sburjan has quit IRC
+2011-04-08T07:55:29  *** nirvdrum has joined #selenium
+2011-04-08T07:56:20  *** Bebe has quit IRC
+2011-04-08T07:56:57  *** stephendonner has joined #selenium
+2011-04-08T07:57:05  *** stephendonner is now known as stephend|mtg
+2011-04-08T07:57:39  <Denjerec> You lot sure are lively :/
+2011-04-08T08:02:19  *** zmijunkie has quit IRC
+2011-04-08T08:04:11  *** reddevil is now known as reddeviL
+2011-04-08T08:04:21  *** reddeviL is now known as reddevil
+2011-04-08T08:04:26  *** reddevil is now known as reddeviL
+2011-04-08T08:07:32  *** davehunt has joined #selenium
+2011-04-08T08:10:50  *** erwan has quit IRC
+2011-04-08T08:12:21  *** pnitin has joined #selenium
+2011-04-08T08:13:41  *** andytinkham has joined #selenium
+2011-04-08T08:14:19  <mashiara> probably most of them are actually sleeping or something (or in meetings or whatever)
+2011-04-08T08:14:26  *** davehunt has quit IRC
+2011-04-08T08:14:46  *** davehunt has joined #selenium
+2011-04-08T08:15:04  <mashiara> and I have no idea how to help you, I use the python client (with which your problem would be trivial to solve)
+2011-04-08T08:16:20  <mashiara> sorry misunderstood the question
+2011-04-08T08:16:41  <mashiara> so you have a textarea already found via xpath ? and you want to add text to it ?
+2011-04-08T08:16:41  *** toseter has quit IRC
+2011-04-08T08:18:17  <mashiara> anyway, best of luck, I'm heading out
+2011-04-08T08:19:28  *** ssims has quit IRC
+2011-04-08T08:24:49  *** ssims has joined #selenium
+2011-04-08T08:29:20  *** AutomatedTester has joined #selenium
+2011-04-08T08:31:04  *** Archdude has quit IRC
+2011-04-08T08:42:30  *** new2b has joined #selenium
+2011-04-08T08:43:27  <new2b> hi is it possible to call tests from inside other tests for Selenium IDE? (will be moving to selenium server soon but not for a few weeks, would be nice to get this working inside the IDE)
+2011-04-08T08:48:32  *** Denjerec has left #selenium
+2011-04-08T08:58:15  *** Archdude has joined #selenium
+2011-04-08T09:02:23  *** charleyb has joined #selenium
+2011-04-08T09:11:25  *** dmachi1 has quit IRC
+2011-04-08T09:11:37  *** dmachi has joined #selenium
+2011-04-08T09:16:29  *** krosenvold has quit IRC
+2011-04-08T09:16:44  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Introducing an invalid element state exception and fixing the build - http://code.google.com/p/selenium/source/detail?r=11929
+2011-04-08T09:20:37  *** krosenvold has joined #selenium
+2011-04-08T09:23:42  *** ammar01 has quit IRC
+2011-04-08T09:28:55  *** nirvdrum has quit IRC
+2011-04-08T09:29:39  *** ssims has quit IRC
+2011-04-08T09:31:03  *** davehunt has quit IRC
+2011-04-08T09:34:39  *** towski has joined #selenium
+2011-04-08T09:34:44  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Starting the process of deleting RenderedWebElement by lifting methods up to WebElement and deprecating the RWE. - http://code.google.com/p/selenium/source/detail?r=11930
+2011-04-08T09:37:34  *** mattp_ has joined #selenium
+2011-04-08T09:37:53  <mattp_> hey guys, im kind of confused on the selenium rc/1/2 comparison
+2011-04-08T09:37:53  *** sfbrian has joined #selenium
+2011-04-08T09:38:01  <mattp_> where does selenium 2 stand regarding writing perl tests?
+2011-04-08T09:38:23  *** charleyb has quit IRC
+2011-04-08T09:38:32  *** charleyb has joined #selenium
+2011-04-08T09:38:39  *** ssims has joined #selenium
+2011-04-08T09:41:48  *** andytinkham has left #selenium
+2011-04-08T09:41:56  *** andytinkham has joined #selenium
+2011-04-08T09:42:17  *** andytinkham has left #selenium
+2011-04-08T09:42:32  *** ssims has left #selenium
+2011-04-08T09:42:41  *** andytinkham has joined #selenium
+2011-04-08T09:42:45  *** ssims has joined #selenium
+2011-04-08T09:45:12  *** davehunt has joined #selenium
+2011-04-08T09:48:10  *** mandric has quit IRC
+2011-04-08T09:51:04  *** sassda has joined #selenium
+2011-04-08T09:51:46  *** stephend|mtg has quit IRC
+2011-04-08T09:52:27  *** freynaud has joined #selenium
+2011-04-08T09:52:35  *** stephendonner has joined #selenium
+2011-04-08T09:52:45  *** jonathanrwallace has quit IRC
+2011-04-08T09:53:06  *** jonathanrwallace has joined #selenium
+2011-04-08T09:54:08  *** freynaud has quit IRC
+2011-04-08T09:55:53  <adamgoucher> mattp_: if by selenium 2 you mean webdriver, then whomever steps up to the plate to write the bindings wins -- but right now it is not on the core team's plate
+2011-04-08T09:56:30  *** greis has joined #selenium
+2011-04-08T10:00:48  *** csanchez has quit IRC
+2011-04-08T10:03:58  *** freynaud has joined #selenium
+2011-04-08T10:05:08  *** dave_miles_cf has joined #selenium
+2011-04-08T10:06:22  <mattp_> adamgoucher: interesting. and ruby has webDriver / 2.0 bindings?
+2011-04-08T10:06:58  <adamgoucher> yup. the selenium-webdriver gem that jarib handles
+2011-04-08T10:07:49  *** dave_miles has quit IRC
+2011-04-08T10:08:03  *** greis1 has joined #selenium
+2011-04-08T10:10:10  *** greis2 has joined #selenium
+2011-04-08T10:10:43  *** greis has quit IRC
+2011-04-08T10:10:53  *** greis1 has quit IRC
+2011-04-08T10:12:49  *** freynaud has quit IRC
+2011-04-08T10:14:10  *** nirvdrum has joined #selenium
+2011-04-08T10:14:38  *** greis2 has quit IRC
+2011-04-08T10:14:41  *** greis has joined #selenium
+2011-04-08T10:22:32  *** greis1 has joined #selenium
+2011-04-08T10:22:43  *** sfbrian_ has joined #selenium
+2011-04-08T10:23:44  *** seangrove has joined #selenium
+2011-04-08T10:24:04  *** sfbrian has quit IRC
+2011-04-08T10:24:05  *** sfbrian_ is now known as sfbrian
+2011-04-08T10:25:41  *** greis has quit IRC
+2011-04-08T10:27:34  <mashiara> mattp_: also there is no strict need to use the server jar when using webdriver
+2011-04-08T10:27:44  *** sfbrian has quit IRC
+2011-04-08T10:27:47  *** sfbrian_ has joined #selenium
+2011-04-08T10:40:44  *** santiycr has joined #selenium
+2011-04-08T10:43:32  <mattp_> is webDriver a distinct entity from selelniumRC/selenium 1 control modules?
+2011-04-08T10:43:32  *** stephendonner has quit IRC
+2011-04-08T10:43:39  <mattp_> or is it an extension
+2011-04-08T10:44:10  *** stephendonner has joined #selenium
+2011-04-08T10:53:11  <sfbrian_> mattp_: it's distinct
+2011-04-08T10:56:02  <sfbrian_> mattp_: it was a separate project that was merged into the Selenium project, but they are separate
+2011-04-08T11:01:25  *** new2b has left #selenium
+2011-04-08T11:03:13  *** santiycr has quit IRC
+2011-04-08T11:04:09  *** santiycr has joined #selenium
+2011-04-08T11:10:23  *** toseter has joined #selenium
+2011-04-08T11:15:30  *** reddeviL is now known as reddevil
+2011-04-08T11:22:22  *** sfbrian_ has quit IRC
+2011-04-08T11:22:31  *** sfbrian has joined #selenium
+2011-04-08T11:32:27  *** jleyba has joined #selenium
+2011-04-08T11:32:58  *** seangrove has quit IRC
+2011-04-08T11:34:05  *** nirvdrum has quit IRC
+2011-04-08T11:38:25  <santiycr> yesterday I ended bringing up the 3 nodes in our bamboo CI system
+2011-04-08T11:38:37  <santiycr> I set them up to be able to run the python tests
+2011-04-08T11:38:55  <santiycr> upgraded both the XP both and the mac one
+2011-04-08T11:39:15  <santiycr> tests sometimes get stuck though
+2011-04-08T11:39:18  <santiycr> dunno why
+2011-04-08T11:39:37  *** freynaud has joined #selenium
+2011-04-08T11:39:41  <santiycr> I think it's a bamboo problem
+2011-04-08T11:39:51  <santiycr> adamgoucher: could you check the current activity in bamboo?
+2011-04-08T11:40:24  <santiycr> python webdriver firefox tests:  Building for 759 mins (Build Hung)
+2011-04-08T11:40:34  *** freynaud has quit IRC
+2011-04-08T11:41:07  <santiycr> python webdriver chrome tests (XP): Building for 759 mins (Build Hung)
+2011-04-08T11:41:27  <adamgoucher> about to get the boy from school; but will look at it in the quick lapse between picking him up and going camping for the night
+2011-04-08T11:41:48  <santiycr> adamgoucher: cool
+2011-04-08T11:41:54  <santiycr> don't worry if you can't make it
+2011-04-08T11:42:13  <santiycr> Between us, I think bamboo is a piece of crap
+2011-04-08T11:42:37  <santiycr> Notice this is a conclusion taken from only 4/5 hours working on it, I'm open to be convinced otherwise
+2011-04-08T11:43:14  <selbot2> jmleyba half a minute ago - JasonLeyba: Allow dom.max_script_run_time to be set to 0 (infinity) - http://code.google.com/p/selenium/source/detail?r=11931
+2011-04-08T11:43:25  *** freynaud has joined #selenium
+2011-04-08T11:45:23  <adamgoucher> santiycr: our servers are underpowered for what we make them do. every time it gets stuck its either a bad test or our of memory
+2011-04-08T11:45:53  <santiycr> 3 vms is not so bad for an xserve
+2011-04-08T11:46:12  <santiycr> but really didn't get to figure out what's going on there
+2011-04-08T11:46:23  <santiycr> maybe a fresh install in the host would help
+2011-04-08T11:48:34  *** anatoli has joined #selenium
+2011-04-08T11:53:04  *** anatoli has quit IRC
+2011-04-08T11:58:35  *** davehunt has quit IRC
+2011-04-08T12:06:18  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Alpha 6 is a dead release - http://code.google.com/p/selenium/source/detail?r=11932
+2011-04-08T12:06:45  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Modifying the webdriver idl to include an spi section - http://code.google.com/p/selenium/source/detail?r=11933
+2011-04-08T12:09:15  *** vrockai has quit IRC
+2011-04-08T12:11:17  <krosenvold> santiycr: bamboo is probably the best ci out there
+2011-04-08T12:25:26  *** pnitin has quit IRC
+2011-04-08T12:25:31  *** Archdude_ has joined #selenium
+2011-04-08T12:27:11  *** Archdude_ has joined #selenium
+2011-04-08T12:28:56  *** Davbo has quit IRC
+2011-04-08T12:29:12  *** Archdude has quit IRC
+2011-04-08T12:29:13  *** Archdude_ is now known as Archdude
+2011-04-08T12:30:32  <mattp_> how stable is the webdriver API at the current moment in time?
+2011-04-08T12:33:38  <mattp_> are things still in flux?
+2011-04-08T12:36:18  *** RossPatterson has quit IRC
+2011-04-08T12:38:01  *** davehunt has joined #selenium
+2011-04-08T12:39:50  *** skiphuffman_ has quit IRC
+2011-04-08T12:54:17  *** davehunt has quit IRC
+2011-04-08T12:55:22  *** davehunt has joined #selenium
+2011-04-08T13:11:34  *** cburroughs has quit IRC
+2011-04-08T13:12:29  *** mbeierl has quit IRC
+2011-04-08T13:13:36  *** eghm_ has joined #selenium
+2011-04-08T13:13:51  *** eghm has quit IRC
+2011-04-08T13:15:38  *** new2b has joined #selenium
+2011-04-08T13:27:47  *** ssims_ has joined #selenium
+2011-04-08T13:29:02  *** ssims has quit IRC
+2011-04-08T13:29:02  *** ssims_ is now known as ssims
+2011-04-08T13:29:25  <santiycr> krosenvold: that's clearly not enough to convince me :)
+2011-04-08T13:31:44  <selbot2> kristian.rosenvold@gmail.com half a minute ago - KristianRosenvold: Removed some of idea's workspace local files - http://code.google.com/p/selenium/source/detail?r=11934
+2011-04-08T13:32:18  *** new2b has left #selenium
+2011-04-08T13:36:53  *** anatoli_ has joined #selenium
+2011-04-08T13:39:36  *** Spanktar has joined #selenium
+2011-04-08T13:41:15  <selbot2> kristian.rosenvold half a minute ago - KristianRosenvold: Further project adjustments, reverted change to iml file - http://code.google.com/p/selenium/source/detail?r=11935
+2011-04-08T13:43:39  *** eghm_ is now known as eghm
+2011-04-08T13:43:42  *** nirvdrum has joined #selenium
+2011-04-08T13:53:08  *** kylls has quit IRC
+2011-04-08T13:58:40  <krosenvold> santiycr: You're entitled to make up your own opinion ;)
+2011-04-08T14:00:04  <santiycr> I'll get back to you if that changes after using it for a more reasonable amount of time :)
+2011-04-08T14:00:18  <krosenvold> The thing is, immaturity in CI systems tend to cost you a *lot* of time
+2011-04-08T14:00:53  <krosenvold> If webdriver's tests hang, that can't really be blamed on bamboo, I think
+2011-04-08T14:01:32  <santiycr> well, I've noticed bamboo will not kill the build after over 10 hours of them running
+2011-04-08T14:01:41  <santiycr> even though I did my best to configure it to do that
+2011-04-08T14:02:14  <santiycr> so, if I didn't configure correctly, that means that the tool is not usable enough for a reasonable skilled person to make it do what's expected
+2011-04-08T14:02:37  <santiycr> OTOH, if I did configure correctly, that means it's broken, which is even worse
+2011-04-08T14:02:37  <krosenvold> Interesting; bamboo used to be able to kill processes well
+2011-04-08T14:02:52  <krosenvold> It's probably a bug, I'll as i386
+2011-04-08T14:02:57  <krosenvold> s/as/ask
+2011-04-08T14:03:11  <santiycr> alright
+2011-04-08T14:03:22  <santiycr> I'm planning to restart it later today
+2011-04-08T14:03:30  <santiycr> and give a second look to the config
+2011-04-08T14:03:32  <krosenvold> It's bamboo 3.x right ?
+2011-04-08T14:04:21  * krosenvold thinks its 2.7
+2011-04-08T14:05:08  <krosenvold> Well anyway, timeout used to work well. BUt this stuff is jus software ;)
+2011-04-08T14:05:43  <santiycr> yeah, it's 2.7
+2011-04-08T14:06:08  <santiycr> of course, that's sometimes acceptable
+2011-04-08T14:06:28  <santiycr> but having used jenkins for a long time, I'm way more inclined to that
+2011-04-08T14:06:38  <santiycr> plus the fact that it's open source software
+2011-04-08T14:06:58  * krosenvold thinks jenkins is a big pile of crap. Pardon the french
+2011-04-08T14:07:10  <santiycr> hah
+2011-04-08T14:07:48  <krosenvold> Oh well, my local TZ says bedtime ;)
+2011-04-08T14:07:58  <santiycr> alright, have a good night
+2011-04-08T14:08:02  <santiycr> and weekend
+2011-04-08T14:08:27  *** tyrion-mx has quit IRC
+2011-04-08T14:16:10  *** plightbo has joined #selenium
+2011-04-08T14:23:24  *** stephendonner has quit IRC
+2011-04-08T14:37:59  *** ssims has quit IRC
+2011-04-08T14:43:54  *** reddevil is now known as reddeviL
+2011-04-08T14:48:53  *** brettporter has joined #selenium
+2011-04-08T14:49:25  *** SL-BWood has quit IRC
+2011-04-08T14:53:15  *** toseter has quit IRC
+2011-04-08T14:53:16  *** QAguy has quit IRC
+2011-04-08T14:54:05  *** brettporter has joined #selenium
+2011-04-08T14:59:55  *** nirvdrum has quit IRC
+2011-04-08T15:10:20  *** cgoldberg has quit IRC
+2011-04-08T15:16:16  *** andytinkham has quit IRC
+2011-04-08T15:16:17  *** brettporter has quit IRC
+2011-04-08T15:16:24  *** andytinkham has joined #selenium
+2011-04-08T15:20:48  *** andytinkham has quit IRC
+2011-04-08T15:42:03  *** scrummy has joined #selenium
+2011-04-08T15:47:42  *** AutomatedTester has quit IRC
+2011-04-08T15:49:13  *** greis1 has quit IRC
+2011-04-08T15:52:39  *** davehunt has quit IRC
+2011-04-08T16:00:11  *** ner0x has quit IRC
+2011-04-08T16:03:42  <scrummy> I just ported the rspec report from ph7's selenium-client to use webdriver and rspec 2.0.  An html report with screenshots and interative html (example http://bit.ly/3FbOV but the new one is a bit better) .  If you have a bit check it out and let me know what you think.  http://bit.ly/eXLTda
+2011-04-08T16:09:58  *** scrummy has quit IRC
+2011-04-08T16:13:34  *** plightbo has quit IRC
+2011-04-08T16:16:22  *** plantian has left #selenium
+2011-04-08T16:17:57  *** Archdude has quit IRC
+2011-04-08T16:18:16  *** Archdude has joined #selenium
+2011-04-08T16:19:39  *** sfbrian_ has joined #selenium
+2011-04-08T16:20:05  *** Archdude has joined #selenium
+2011-04-08T16:23:46  *** plightbo has joined #selenium
+2011-04-08T16:23:59  *** sfbrian_ has quit IRC
+2011-04-08T16:24:30  *** sfbrian has quit IRC
+2011-04-08T16:27:07  *** Archdude has quit IRC
+2011-04-08T16:27:30  *** Archdude has joined #selenium
+2011-04-08T16:28:28  *** Archdude has quit IRC
+2011-04-08T16:29:17  *** Archdude has joined #selenium
+2011-04-08T16:33:55  *** benh is now known as Guest5130
+2011-04-08T16:35:32  *** Archdude has quit IRC
+2011-04-08T16:36:19  *** Archdude has joined #selenium
+2011-04-08T16:37:37  *** Archdude has joined #selenium
+2011-04-08T16:39:37  *** Archdude has quit IRC
+2011-04-08T16:40:22  *** Archdude has joined #selenium
+2011-04-08T16:41:44  *** Archdude has joined #selenium
+2011-04-08T16:44:41  *** towski_ has joined #selenium
+2011-04-08T16:44:42  *** Archdude has quit IRC
+2011-04-08T16:45:17  *** towski has quit IRC
+2011-04-08T16:45:22  *** Archdude has joined #selenium
+2011-04-08T16:46:23  *** towski_ has quit IRC
+2011-04-08T16:46:44  *** Archdude has joined #selenium
+2011-04-08T16:47:04  *** plightbo has quit IRC
+2011-04-08T16:50:17  *** mstockton has joined #selenium
+2011-04-08T16:51:44  *** plightbo has joined #selenium
+2011-04-08T16:57:42  *** Archdude has quit IRC
+2011-04-08T16:58:01  *** Archdude has joined #selenium
+2011-04-08T16:59:08  *** Archdude has quit IRC
+2011-04-08T16:59:56  *** Archdude has joined #selenium
+2011-04-08T17:02:13  *** plightbo has quit IRC
+2011-04-08T17:03:58  *** kylls has joined #selenium
+2011-04-08T17:05:34  *** brettporter has joined #selenium
+2011-04-08T17:09:45  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Adding a missing test to the atoms which verifies that futzing with the object prototype doesn't break element location - http://code.google.com/p/selenium/source/detail?r=11936
+2011-04-08T17:11:46  *** Archdude has quit IRC
+2011-04-08T17:12:05  *** Archdude has joined #selenium
+2011-04-08T17:13:04  *** Archdude has quit IRC
+2011-04-08T17:13:49  *** Archdude has joined #selenium
+2011-04-08T17:18:19  *** SpankyFromBRC has joined #selenium
+2011-04-08T17:20:21  *** seangrove has joined #selenium
+2011-04-08T17:21:50  *** Spanktar has quit IRC
+2011-04-08T17:24:16  *** ian_mac has joined #selenium
+2011-04-08T17:33:15  *** esteele has joined #selenium
+2011-04-08T17:42:26  *** santiycr has quit IRC
+2011-04-08T17:44:26  *** Archdude has quit IRC
+2011-04-08T17:44:48  *** Archdude has joined #selenium
+2011-04-08T17:46:30  *** nirvdrum has joined #selenium
+2011-04-08T17:46:32  *** Archdude has joined #selenium
+2011-04-08T17:55:50  *** brettporter has quit IRC
+2011-04-08T17:57:36  *** Archdude has quit IRC
+2011-04-08T17:57:55  *** Archdude has joined #selenium
+2011-04-08T17:58:57  *** Archdude has quit IRC
+2011-04-08T17:59:43  *** Archdude has joined #selenium
+2011-04-08T18:01:03  *** towski has joined #selenium
+2011-04-08T18:06:43  *** kylls1 has joined #selenium
+2011-04-08T18:08:34  *** kylls has quit IRC
+2011-04-08T18:20:51  *** sassda has left #selenium
+2011-04-08T18:24:54  *** greis has joined #selenium
+2011-04-08T18:36:17  *** greis has quit IRC
+2011-04-08T18:43:18  *** santiycr has joined #selenium
+2011-04-08T18:54:55  *** towski has quit IRC
+2011-04-08T18:56:10  *** greis has joined #selenium
+2011-04-08T19:06:45  *** seangrove has quit IRC
+2011-04-08T19:09:37  *** mstockton has quit IRC
+2011-04-08T19:09:46  *** nirvdrum has quit IRC
+2011-04-08T19:13:19  *** nirvdrum has joined #selenium
+2011-04-08T19:15:18  *** pnitin has joined #selenium
+2011-04-08T19:21:42  *** santiycr has quit IRC
+2011-04-08T19:41:11  *** Rajan has quit IRC
+2011-04-08T19:53:36  *** ssims has joined #selenium
+2011-04-08T20:00:11  *** pnitin has quit IRC
+2011-04-08T20:05:45  <selbot2> nirvdrum half a minute ago - FrancoisReynaud: Allow the starting of grid from the selenium-standalone jar. - http://code.google.com/p/selenium/source/detail?r=11937
+2011-04-08T20:21:38  *** |izzie has quit IRC
+2011-04-08T20:28:41  *** ssims has quit IRC
+2011-04-08T20:35:33  *** greis has quit IRC
+2011-04-08T20:48:26  *** greis has joined #selenium
+2011-04-08T20:54:03  *** greis has quit IRC
+2011-04-08T21:09:16  *** pnitin has joined #selenium
+2011-04-08T21:09:39  *** Rajan has joined #selenium
+2011-04-08T21:11:33  *** dmachi1 has joined #selenium
+2011-04-08T21:11:33  *** dmachi has quit IRC
+2011-04-08T21:24:20  *** kylls1 has quit IRC
+2011-04-08T22:00:33  *** pnitin has quit IRC
+2011-04-08T22:11:14  <selbot2> nirvdrum less than 20 seconds ago - KevinMenard: Grid 1.0 clients can now connect to a Grid 2.0 hub. - http://code.google.com/p/selenium/source/detail?r=11938
+2011-04-08T22:15:29  <nirvdrum> Wow.
+2011-04-08T22:15:32  <nirvdrum> I might actually get this to work.
+2011-04-08T22:44:50  *** erwan has joined #selenium
+2011-04-08T22:46:59  *** nirvdrum has quit IRC
+2011-04-08T22:51:43  *** nirvdrum has joined #selenium
+2011-04-08T23:17:20  *** pnitin has joined #selenium
+2011-04-08T23:18:51  *** nirvdrum has quit IRC
+2011-04-08T23:22:31  *** nirvdrum has joined #selenium

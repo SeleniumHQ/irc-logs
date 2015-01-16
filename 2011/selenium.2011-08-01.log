@@ -1,0 +1,948 @@
+2011-08-01T00:04:12  *** lfryc has quit IRC
+2011-08-01T00:04:46  *** davehunt|away has joined #selenium
+2011-08-01T00:08:31  *** Darren_Rowley has joined #selenium
+2011-08-01T00:14:59  *** zmijunkie has joined #selenium
+2011-08-01T00:23:24  *** hexa has joined #selenium
+2011-08-01T00:27:01  <pngl> Does send_keys implicitly wait on ajax? If I use send_keys on a field which auto-triggers an an ajax request, my next Webdriver commands aren't processed until that request is complete. Is it possible to avoid that behaviour?
+2011-08-01T00:31:06  <pngl> I've tried changing implicit_wait and script_wait to 1 and it stayed the same.
+2011-08-01T00:35:17  <pngl> Here are the logs: https://gist.github.com/1117757
+2011-08-01T00:49:21  *** csanchez has joined #selenium
+2011-08-01T00:50:57  *** lfryc has joined #selenium
+2011-08-01T01:25:03  *** nitin has quit IRC
+2011-08-01T01:42:36  *** dave_miles_cf has joined #selenium
+2011-08-01T01:50:34  <Binken_> Hi
+2011-08-01T01:51:29  <ato> Yo
+2011-08-01T01:52:37  *** Darren_Rowley has quit IRC
+2011-08-01T01:56:17  <Binken_> I met a issue on firefox 3.6. The webdriver do not sendkeys(Keys.Tab)
+2011-08-01T01:56:26  <Binken_> it works on ChromeDriver
+2011-08-01T01:57:04  <Binken_> It's on windows 7 64bit
+2011-08-01T01:57:12  <Binken_> using latesting 2.2 version net bings
+2011-08-01T02:03:32  <eranm> Binken_, are you focused on any element beforehand?
+2011-08-01T02:03:54  <Binken_> no
+2011-08-01T02:03:55  <eranm> pngl, implicit wait will not help here - it's only for waiting for an element to exist.
+2011-08-01T02:04:09  <eranm> pngl, you should implement a condition that is passed to a WebDriverWait.
+2011-08-01T02:04:28  <Binken_> I try the same code in IEDriver and ChromeDriver
+2011-08-01T02:04:33  <Binken_> both work
+2011-08-01T02:04:34  <eranm> Binken_, try that. Also, does it work on later versions of Firefox?
+2011-08-01T02:05:12  <Binken_> I'll try it now
+2011-08-01T02:08:04  *** jimevans has joined #selenium
+2011-08-01T02:08:37  *** pnitin has joined #selenium
+2011-08-01T02:09:35  *** AutomatedTester has joined #selenium
+2011-08-01T02:10:05  <jimevans> Hi AutomatedTester
+2011-08-01T02:10:11  <AutomatedTester> hey jimevans
+2011-08-01T02:10:24  <AutomatedTester> arrived safely?
+2011-08-01T02:10:44  <Binken_> Anyone met the sendkeys issue in firefox?
+2011-08-01T02:11:03  <jimevans> In Moscow now. To Kiev in about an hour.
+2011-08-01T02:12:22  <Binken_> it do not works in sendkes using something like sendKeys(keys.enter)
+2011-08-01T02:12:31  <jimevans> I'm hoping to be at my hotel by 3:00 London time.
+2011-08-01T02:14:54  *** lfryc has quit IRC
+2011-08-01T02:15:01  <jimevans> If simonstewart pops on and wants to try to push a 2.3.0 today, I should be able to accommodate later in the afternoon.
+2011-08-01T02:15:32  *** lfryc has joined #selenium
+2011-08-01T02:16:39  *** Binken_ has quit IRC
+2011-08-01T02:16:43  <selbot2> eran.mes@gmail.com less than 20 seconds ago - Edited wiki page FrequentlyAskedQuestions through web user interface. - http://code.google.com/p/selenium/source/detail?r=13142
+2011-08-01T02:19:42  <AutomatedTester> jimevans: ok
+2011-08-01T02:20:02  <AutomatedTester> I won't really be around this morning because of errands but will let him know
+2011-08-01T02:21:03  *** dawagner has joined #selenium
+2011-08-01T02:22:10  <mrchrisadams> hi all, what's the recommended version of Firefox to use with selenium IDE these days?
+2011-08-01T02:22:11  <AutomatedTester> jimevans: tell dawagner so he can relay the message if Simon is already in the office
+2011-08-01T02:22:21  <AutomatedTester> bbl
+2011-08-01T02:22:23  *** AutomatedTester has quit IRC
+2011-08-01T02:22:23  <pngl> eranm: I don't want it to wait -- I wonder why it waits at all.
+2011-08-01T02:22:48  <jimevans> dawagner: Hi
+2011-08-01T02:22:57  <dawagner> Hi
+2011-08-01T02:24:09  <eranm> pngl, how is WebDriver supposed to figure out the exact condition, specific to your test, that should be met before the test should proceed?
+2011-08-01T02:24:21  <jimevans> Just mentioned it to AutomatedTester, but I should be at my hotel by around 3:00 PM London time. If Simon wants to push 2.3.0 today, I can do so after that.
+2011-08-01T02:24:40  <jimevans> Didn't see eranm online.
+2011-08-01T02:24:47  <jimevans> eranm: ^^
+2011-08-01T02:24:57  * dawagner catches up with selbot
+2011-08-01T02:24:57  <dawagner> jimevans: Haven't seen him in yet, but will pass on the message
+2011-08-01T02:25:07  <pngl> eranm: sorry, I wasn't very clear. I meant that sendKeys seems to *automatically* be waiting, when I want it to *not wait at all* and just move on to the next command.
+2011-08-01T02:25:09  *** ammar01 has joined #selenium
+2011-08-01T02:25:10  <jimevans> Thanks mate.
+2011-08-01T02:26:48  <eranm> jimevans, I'll let Simon know
+2011-08-01T02:27:01  <jimevans> Thanks.
+2011-08-01T02:27:07  <eranm> pngl, ah, which platform is it on?
+2011-08-01T02:27:31  <pngl> eranm: webdriver, firefox, mac os x
+2011-08-01T02:28:13  <selbot2> dawagner half a minute ago - DanielWagnerHall: Actually make method a class method. Fixes issue 2156. - http://code.google.com/p/selenium/source/detail?r=13143
+2011-08-01T02:29:02  <eranm> On Firefox we use synthesized events, not native ones - it may do less waiting with native events (which are unavailable on Mac). However, the explicit waiting is only for page loads, not other AJAX requests AFAIK
+2011-08-01T02:30:22  *** Lorenzour has joined #selenium
+2011-08-01T02:31:38  <pngl> eranm: what precisely happens is that I send_keys to a file_upload field. This field is event bound to start uploading as soon as it is modified and to show an upload meter during the process. Then, when the upload is complete, it updates a DIV to show the newly uploaded item. I'm trying to test the presence of the upload bar, but Selenium only resumes command execution *after* the upload has completed and the div was updated, so the upload mete
+2011-08-01T02:31:38  <pngl> r is already gone.
+2011-08-01T02:37:47  <eranm> Ah, a file upload is a special case in send_keys. I can't think of a way to change WebDriver's behaviour, but perhaps you can have some code in the page that would look for the presence of the upload meter and later use executeScript to find out what this code reported.
+2011-08-01T02:39:52  *** vrockai has joined #selenium
+2011-08-01T02:40:55  *** andreashaas has joined #selenium
+2011-08-01T02:52:29  *** jonathanrwallace has joined #selenium
+2011-08-01T02:54:08  *** jimevans has left #selenium
+2011-08-01T03:01:41  <dawagner> andreashaas: Have you had any success with the Eclipse problem?
+2011-08-01T03:03:58  *** Darren_Rowley has joined #selenium
+2011-08-01T03:05:21  *** cheezy has joined #selenium
+2011-08-01T03:10:54  *** Lorenzour has quit IRC
+2011-08-01T03:28:27  *** dotz has joined #selenium
+2011-08-01T03:28:42  <dotz> Guys, what should I use for newly created tests in Python -- webdriver or selenium?
+2011-08-01T03:28:46  *** csanchez has quit IRC
+2011-08-01T03:28:47  <dotz> I can afford a separate server.
+2011-08-01T03:30:02  *** cheezy has quit IRC
+2011-08-01T03:30:40  *** cerber0s has joined #selenium
+2011-08-01T03:31:00  *** jonathanrwallace has quit IRC
+2011-08-01T03:31:21  *** rbalent has joined #selenium
+2011-08-01T03:31:21  *** rbalent has joined #selenium
+2011-08-01T03:34:55  *** cerberos has quit IRC
+2011-08-01T03:42:44  *** cgoldberg has joined #selenium
+2011-08-01T03:43:46  <eranm> dotz, the new API that's being actively maintained and developed is WebDriver
+2011-08-01T03:44:06  <eranm> You can use it remotely with a server or let it start a browser itself on the local machine.
+2011-08-01T03:44:11  <eranm> brb.
+2011-08-01T03:44:13  <dotz> eranm: OK, thanks
+2011-08-01T03:44:14  *** eranm has quit IRC
+2011-08-01T03:47:05  *** gogo` has joined #selenium
+2011-08-01T03:47:47  <gogo`> hello nice people
+2011-08-01T03:48:08  <gogo`> wanted to know if we are looking at upgrading the iOS SDK support to the latest anytime soon
+2011-08-01T03:48:11  <gogo`> TIA
+2011-08-01T04:02:14  *** Darren_Rowley has quit IRC
+2011-08-01T04:02:36  *** OperaDriver has joined #selenium
+2011-08-01T04:02:36  <OperaDriver> [operadriver] Stuk pushed 3 new commits to master: https://github.com/operasoftware/operadriver/compare/8a7ceb8...c36e4cb
+2011-08-01T04:02:36  <OperaDriver> [operadriver/master] Adding danielb to AUTHORS, sorting in vim - Andreas Tolf Tolfsen
+2011-08-01T04:02:36  <OperaDriver> [operadriver/master] Correctly return WebElements when they are in another JS object - Stuart Knightley
+2011-08-01T04:02:36  <OperaDriver> [operadriver/master] Add test for array of elements - Stuart Knightley
+2011-08-01T04:02:36  *** OperaDriver has left #selenium
+2011-08-01T04:17:20  *** OperaDriver has joined #selenium
+2011-08-01T04:17:20  <OperaDriver> [operadriver] Stuk pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/aca63d76b6c83f5a6c9e12466fe77f7b7f32db0a
+2011-08-01T04:17:20  <OperaDriver> [operadriver/master] Cleanup imports and warnings - Stuart Knightley
+2011-08-01T04:17:20  *** OperaDriver has left #selenium
+2011-08-01T04:20:37  *** nirvdrum has joined #selenium
+2011-08-01T04:23:35  *** rbalent has quit IRC
+2011-08-01T04:24:08  *** dave_miles_cf has quit IRC
+2011-08-01T04:24:22  *** rbalent has joined #selenium
+2011-08-01T04:24:22  *** rbalent has joined #selenium
+2011-08-01T04:29:49  *** hexa has quit IRC
+2011-08-01T04:34:52  *** dotz_ has joined #selenium
+2011-08-01T04:38:10  *** dotz has quit IRC
+2011-08-01T04:46:12  *** cerberos has joined #selenium
+2011-08-01T04:48:57  *** boily has joined #selenium
+2011-08-01T04:51:31  *** cgoldberg has quit IRC
+2011-08-01T04:52:36  *** miker2 has joined #selenium
+2011-08-01T04:58:54  *** gogo` has quit IRC
+2011-08-01T05:02:10  *** dave_miles_cf has joined #selenium
+2011-08-01T05:03:50  *** cerberos has quit IRC
+2011-08-01T05:08:38  *** csanchez has joined #selenium
+2011-08-01T05:10:05  *** DarkRift has quit IRC
+2011-08-01T05:10:21  *** simonstewart has joined #selenium
+2011-08-01T05:10:39  <simonstewart> I have the lurgy
+2011-08-01T05:11:12  <simonstewart> But any reason we can't push 2.3 today?
+2011-08-01T05:11:59  *** cgoldberg has joined #selenium
+2011-08-01T05:13:21  *** angshu has quit IRC
+2011-08-01T05:13:49  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Bumping the version number to 2.3 - http://code.google.com/p/selenium/source/detail?r=13144
+2011-08-01T05:15:09  <ato> Is it possible to run a single test in selenium?
+2011-08-01T05:17:40  <simonstewart> yes.
+2011-08-01T05:17:43  <simonstewart> use the singletestsuite
+2011-08-01T05:17:45  <simonstewart> and modify it
+2011-08-01T05:17:51  <simonstewart> (I'm working to make it nicer)
+2011-08-01T05:19:28  *** csanchez has quit IRC
+2011-08-01T05:22:11  <selbot> New news from builds: IDE-EDITOR-147 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-147>
+2011-08-01T05:23:57  *** cburroughs has joined #selenium
+2011-08-01T05:23:59  <selbot> New news from builds: IDE-IDE-129 was SUCCESSFUL : Dependant of IDE-EDITOR-147 <http://xserve.openqa.org:8085/browse/IDE-IDE-129>
+2011-08-01T05:25:52  *** Binken_ has joined #selenium
+2011-08-01T05:26:23  *** hexa has joined #selenium
+2011-08-01T05:28:29  *** eranm has joined #selenium
+2011-08-01T05:28:58  <Ajay> Hi Simon
+2011-08-01T05:29:02  <simonstewart> Hi
+2011-08-01T05:32:35  <Ajay> just curious to know about r13140 , Where SeleneseTestBase setUp() throws Exception would break the backward compatibility of existing TestCases ?
+2011-08-01T05:32:40  <selbot2> simon.m.stewart about 15 hours ago - SimonStewart: Automated code reformatting and import organization. No logical changes - http://code.google.com/p/selenium/source/detail?r=13140
+2011-08-01T05:32:48  <simonstewart> Furrfu
+2011-08-01T05:33:05  <simonstewart> That file should have been left alone
+2011-08-01T05:33:24  <Binken_> Hi, Simon
+2011-08-01T05:33:52  <Binken_> Can I ask you one regression issue for firefox driver
+2011-08-01T05:34:01  <simonstewart> you can ask :)
+2011-08-01T05:34:21  <Binken_> For now, the sendkeys(Keys.enter) or sendkeys(Keys.tab) not work
+2011-08-01T05:34:33  <simonstewart> ?
+2011-08-01T05:34:34  <Binken_> in windows 7 64bit firefox 3.6
+2011-08-01T05:34:55  <Ajay> Are we going to revert ?
+2011-08-01T05:34:55  <simonstewart> What are you expecting to happen
+2011-08-01T05:35:38  <Binken_> sendkeys(Keys.tab) should act like enter the 'Tab' keboard
+2011-08-01T05:35:49  <simonstewart> Not all of it Ajay
+2011-08-01T05:36:54  *** rbalent has quit IRC
+2011-08-01T05:38:04  <eranm> Binken_, have you documented this problem in an bugreport or post to the list?
+2011-08-01T05:39:06  <Binken_> not yet.
+2011-08-01T05:39:16  <Binken_> I am doing it now.
+2011-08-01T05:39:18  *** rbalent has joined #selenium
+2011-08-01T05:39:18  *** rbalent has joined #selenium
+2011-08-01T05:39:36  <Ajay> is there any need for issue  to be created (SeleneseTestBase) or is it fine ?
+2011-08-01T05:44:26  <eranm> Binken_, make sure to provide an HTML.
+2011-08-01T05:44:40  <eranm> Binken_, which element do you call send_keys(Keys.TAB) on?
+2011-08-01T05:44:48  <Binken_> TextField
+2011-08-01T05:44:56  <Binken_> #2166
+2011-08-01T05:44:57  <selbot2>  open/new FirefoxDriver sendkeys not work as descripted - http://code.google.com/p/selenium/issues/detail?id=2166
+2011-08-01T05:45:13  <Binken_> I use the google site as example
+2011-08-01T05:47:33  <eranm> Binken_, you didn't specify if the same problem manifests itself on newer versions. And what is the expected effect of this button being focused?
+2011-08-01T05:48:11  <Binken_> I am only installed the firefox 3.6
+2011-08-01T05:48:54  <Binken_> This is only a example. In our production, when we send the tab key to the textfield. One new element will be created
+2011-08-01T05:49:32  <Binken_> There is another example is the login page
+2011-08-01T05:52:42  <Binken_> eranm, does this issue make any sense to you?
+2011-08-01T05:52:55  <Binken_> this do work in 2.0 release
+2011-08-01T05:52:59  *** rpk has joined #selenium
+2011-08-01T05:53:11  <Binken_> But in the latest 2.1 and 2.2 it fails
+2011-08-01T05:54:01  <eranm> This issue depends on several things: whether native events are used, which version of Firefox is used, which event handlers are on the element(s) interacted with.
+2011-08-01T05:54:19  <eranm> There may be an issue there, but without an explicit test case it'd be hard to debug.
+2011-08-01T05:55:09  <Binken_> Is the google site ok for you to debug?
+2011-08-01T05:55:34  <eranm> Since I've been working with native events a lot I'd like to go in and fix the problem, but the Google.com site is not a good example - the element having focus is not enough.
+2011-08-01T05:55:52  *** Lorenzour has joined #selenium
+2011-08-01T05:56:06  <eranm> This is exactly where a hermetic test-case would help - it would show *exactly* what you expect send_keys(Keys.Tab) to do.
+2011-08-01T05:56:49  <eranm> (otherwise I may end up fixing the wrong thing or just changing the behaviour in a way that would still not help you).
+2011-08-01T05:57:21  <eranm> It's also very valuable to know in which releases it worked as you expected and in which releases it didn't - all of this information is missing from the bug.
+2011-08-01T05:57:25  <Binken_> ok, thanks. I'll try to do a hermetic test-case for you.
+2011-08-01T05:57:33  <eranm> That'd be very helpful, thanks.
+2011-08-01T05:57:43  <Binken_> in the 2.0 release it works
+2011-08-01T05:57:55  <Binken_> And the release afterwards do not work
+2011-08-01T05:58:41  <dawagner> simonstewart: Should I be able to add preconditions to methods in firefoxDriver.js?
+2011-08-01T05:59:39  <simonstewart> Yes
+2011-08-01T06:00:33  <simonstewart> dawagner: what kinds of things are you trying to check?
+2011-08-01T06:01:00  *** dotz_ has quit IRC
+2011-08-01T06:01:11  <dawagner> I'm adding alertPresent preconditions to the alert methods.  Running the tests in-IDE is falling over- just trying to do so from the command line
+2011-08-01T06:01:30  <simonstewart> Other than "switchTo" that's fine
+2011-08-01T06:01:40  <simonstewart> The switch to needs to wait for the alert to actually open
+2011-08-01T06:01:51  *** AutomatedTester has joined #selenium
+2011-08-01T06:02:05  <dawagner> Of course :)
+2011-08-01T06:02:20  <simonstewart> and make sure the tests pass for 3.0->5.0
+2011-08-01T06:02:28  <simonstewart> I don't want a last minute change screwing up 2.3
+2011-08-01T06:02:35  <dawagner> I'm not landing this until after 2.3 :)
+2011-08-01T06:03:13  <simonstewart> Heh.
+2011-08-01T06:03:17  <dawagner> It's a wire protocol change, so I don't want to land it until it works in IE as well
+2011-08-01T06:03:21  <simonstewart> Are the tests passing for all firefox versions
+2011-08-01T06:03:22  <simonstewart> ?
+2011-08-01T06:03:33  <AutomatedTester> hi hi
+2011-08-01T06:03:49  <selbot2> stuidge@gmail.com half a minute ago - Add Opera to SingleTestStuite.java - http://code.google.com/p/selenium/source/detail?r=13145
+2011-08-01T06:03:49  <selbot2> jari.bakken half a minute ago - JariBakken: Add some docs to Chrome::Profile - http://code.google.com/p/selenium/source/detail?r=13146
+2011-08-01T06:04:06  <dawagner> Not gotten that far either, but my guess is they will when I run them, as the actual underlying calls haven't changed
+2011-08-01T06:04:27  <dawagner> Bleugh, yeah, getting issues adding preconditions
+2011-08-01T06:04:32  <dawagner> Firefox opens and hangs
+2011-08-01T06:04:39  <Stuk> oops, forgot to prepend my name to the commit
+2011-08-01T06:04:42  <simonstewart> Check the error console
+2011-08-01T06:04:42  <Stuk> I thought it was done automatically
+2011-08-01T06:04:48  <simonstewart> Stuk: we forgive you
+2011-08-01T06:04:55  <Stuk> simonstewart: thank you :)
+2011-08-01T06:04:58  <dawagner> org.openqa.selenium.firefox.NotConnectedException: Unable to connect to host 127.0.0.1 on port 7055 after 45000 ms
+2011-08-01T06:05:19  <simonstewart> dawagner: check the error console
+2011-08-01T06:05:24  <simonstewart> It will tell what's wrong
+2011-08-01T06:05:33  <dawagner> webdriver is not defined
+2011-08-01T06:06:52  <simonstewart> Then I'd suggest that's the problem
+2011-08-01T06:07:04  <simonstewart> (though I think you're missing something else
+2011-08-01T06:07:05  <simonstewart> )
+2011-08-01T06:07:09  <adamgoucher> can someone pastbin or email the exact output that the webdriverbackedselenium spits out for sizzly locators (no urgency)
+2011-08-01T06:07:15  <simonstewart> gist your precondition?
+2011-08-01T06:07:41  <simonstewart> adamgoucher: it's in the ElementFinder
+2011-08-01T06:07:53  <simonstewart> :gist
+2011-08-01T06:07:53  <selbot2> Please paste >3 lines of text to http://gist.github.com
+2011-08-01T06:08:12  <simonstewart> https://gist.github.com/1118105
+2011-08-01T06:08:27  <simonstewart> That log.warning is the interesting one for you
+2011-08-01T06:09:41  <adamgoucher> thanks
+2011-08-01T06:10:06  <dawagner> simonstewart: Using an existing precondition.  https://gist.github.com/1118107
+2011-08-01T06:10:08  <Binken_> #2166
+2011-08-01T06:10:11  <selbot2>  open/new FirefoxDriver sendkeys not work as descripted - http://code.google.com/p/selenium/issues/detail?id=2166
+2011-08-01T06:10:40  <simonstewart> That's pulled from one of the files in the 'js' directory, right?
+2011-08-01T06:10:46  <Binken_> eranm, I add some new code here
+2011-08-01T06:10:56  <simonstewart> You need to make sure that 'webdriver' is one of the EXPORTED_SYMBOLS of that library
+2011-08-01T06:12:04  <Ajay> findCommiterByName('samit')
+2011-08-01T06:13:03  <Ajay> i am trying to find samit for past few days , so he can push few patches for IDE , hard luck finding him :)
+2011-08-01T06:13:11  *** csanchez has joined #selenium
+2011-08-01T06:14:48  <selbot2> simon.m.stewart less than a minute ago - SimonStewart: Putting back the exceptions thrown on setup - http://code.google.com/p/selenium/source/detail?r=13147
+2011-08-01T06:15:02  *** melter has joined #selenium
+2011-08-01T06:15:05  <simonstewart> :seen samit
+2011-08-01T06:15:05  <selbot2> samit was last seen 20 days ago, quitting.
+2011-08-01T06:15:18  <dawagner> aha, I think this is scoping issues...
+2011-08-01T06:15:42  <simonstewart> dawagner: you're going to make me read code and tell you
+2011-08-01T06:15:45  <selbot2> stuidge@gmail.com half a minute ago - StuartKnightley: Correct changes in r13145 - http://code.google.com/p/selenium/source/detail?r=13148
+2011-08-01T06:15:46  <dawagner> We import the atoms in to firefoxDriver in the constructor (whereas in wrappedElement, which does use preconditions, we import it in global)
+2011-08-01T06:16:08  <dawagner> But I'm trying to set the preconditions in global scope, so they're not loaded
+2011-08-01T06:16:24  <simonstewart> And we do the import in the constructor because Firefox has wonky behaviour if you load the imports too soon
+2011-08-01T06:16:50  <dawagner> Ugh, I really don't want to add preconditions in the constructor, that's nowhere near the method definition :(
+2011-08-01T06:17:08  <simonstewart> No, we do the imports in the constructor
+2011-08-01T06:17:22  <dawagner> Yeah, but I can't add the preconditions until the import is done
+2011-08-01T06:18:40  <Ajay> in SeleneseTestNgHelper  setUp should also throw an Exception
+2011-08-01T06:19:47  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Exceptions propagate up the stack - http://code.google.com/p/selenium/source/detail?r=13149
+2011-08-01T06:20:24  <Ajay> simon : that was fast :)
+2011-08-01T06:20:59  <simonstewart> Aye
+2011-08-01T06:21:30  <dawagner> simonstewart: Yeah, I can add FirefoxDriver.prototype.dismissAlert.preconditions = [ atoms.webdriver.preconditions.alertPresent ]; to the constructor after the atoms are imported, and use them... Doesn't seem ideal, though...
+2011-08-01T06:22:11  *** RossPatterson has joined #selenium
+2011-08-01T06:23:32  <eranm> Binken_, much better.
+2011-08-01T06:24:01  <Ajay> leaving 2 home , will login after i reach for the 2.3 :)
+2011-08-01T06:24:06  <simonstewart> If we compiled the driver as a library using closure, this would be a lot easier
+2011-08-01T06:24:09  <Binken_> I add another one
+2011-08-01T06:24:24  <Binken_> eranm, i think it even better
+2011-08-01T06:24:27  <eranm> though it'd be nice to have a stripped-down HTML page as well, but I think now I can write this against one of our testing pages.
+2011-08-01T06:24:36  <dawagner> simonstewart: Yeah, I think I may just skip the preconditions until we do...
+2011-08-01T06:24:43  <Binken_> #2166
+2011-08-01T06:24:44  <selbot2>  open/new FirefoxDriver sendkeys not work as descripted - http://code.google.com/p/selenium/issues/detail?id=2166
+2011-08-01T06:24:48  *** Binken_ has quit IRC
+2011-08-01T06:26:25  <simonstewart> Anyone want to be push master for 2.3?
+2011-08-01T06:26:50  <simonstewart> I think we're mostly set....
+2011-08-01T06:27:11  *** nirvdrum has quit IRC
+2011-08-01T06:28:25  *** nirvdrum has joined #selenium
+2011-08-01T06:28:27  *** Ajay has quit IRC
+2011-08-01T06:30:46  <adamgoucher> anything major in 2.3 or 'just' bug fixes?
+2011-08-01T06:30:58  <simonstewart> There's been some pretty big changes in the atoms
+2011-08-01T06:31:31  <adamgoucher> should i be concerned about propogation of these big changes into se-ide?
+2011-08-01T06:31:52  <simonstewart> As long as SIDE uses core correctly, they'll "just happen"
+2011-08-01T06:32:08  <adamgoucher> which i believe it is
+2011-08-01T06:32:14  <adamgoucher> (or hope at any rate)
+2011-08-01T06:32:30  <simonstewart> run the mozmill tests?
+2011-08-01T06:32:54  <adamgoucher> i think they get run nightly by davehunt|away and gang
+2011-08-01T06:33:10  <adamgoucher> did anything else get atomized? or was it just a refactoring?
+2011-08-01T06:33:39  <simonstewart> more "recoding" than "refactoring"
+2011-08-01T06:34:28  <simonstewart> holy crap, the chrome driver is fast
+2011-08-01T06:34:44  <simonstewart> though the opera driver is choking on some tests
+2011-08-01T06:35:36  <adamgoucher> so who is going to volunteer to do some code review of java stuff from one of the gsoc projects tomorrow or the next day? :)
+2011-08-01T06:38:43  <simonstewart> if the reviews go up on codereview then I can take a look
+2011-08-01T06:38:46  <simonstewart> probabl
+2011-08-01T06:40:13  <eranm> simonstewart, there's a code review from andreashaas waiting for you there...
+2011-08-01T06:40:21  <simonstewart> k
+2011-08-01T06:41:10  <simonstewart> context click? synthetic mouse?
+2011-08-01T06:41:41  <eranm> http://codereview.appspot.com/4806056/
+2011-08-01T06:41:42  <eranm> yes
+2011-08-01T06:41:49  <simonstewart> k
+2011-08-01T06:41:53  <eranm> (yes to the context click)
+2011-08-01T06:42:49  <AutomatedTester> if a user has to pass in a profile directory for FirefoxProfile, is it a reasonable expectation they should keep track of that dir and not be the problem of WebDriver
+2011-08-01T06:42:56  *** XRayCulver has joined #selenium
+2011-08-01T06:44:12  <adamgoucher> yes
+2011-08-01T06:44:47  <XRayCulver> i see jimevans decided to go with one dll for .net
+2011-08-01T06:44:53  <XRayCulver> well 2 if you include support
+2011-08-01T06:48:08  *** Mayank1 has joined #selenium
+2011-08-01T06:49:30  * AutomatedTester is obviously not in the mood for looking at the bug tracker
+2011-08-01T06:51:22  <dawagner> ok I think I'm going to run our test suite ignoring any @Ignores, they're very out of date :S
+2011-08-01T06:52:28  <simonstewart> good lad
+2011-08-01T06:53:22  <simonstewart> OK. So we're waiting on jimevans to know if the IE bindings are good to go
+2011-08-01T06:53:32  <dawagner> He should be appearing shortly
+2011-08-01T06:53:33  <simonstewart> (I suspect we need to refresh the prebuilt DLLs)
+2011-08-01T06:53:45  <adamgoucher> could be waiting awhile. given he is in kiev
+2011-08-01T06:53:50  <simonstewart> dawagner or eranm: can you please make sure that the ie prebuilts are up to date?
+2011-08-01T06:53:59  <dawagner> He was on earlier, said he'd probably be around nowish
+2011-08-01T06:54:12  <adamgoucher> key word was 'could' :)
+2011-08-01T06:54:46  <eranm> simonstewart, I can do that.
+2011-08-01T06:54:48  <simonstewart> Fortunately, more than one of the team has access to a windows box to compile "stuff"
+2011-08-01T06:54:51  <simonstewart> Thanks, ernam
+2011-08-01T06:59:18  *** QAGuy has joined #selenium
+2011-08-01T07:00:48  <simonstewart> Right. Back to the sick bed for an hour's rest
+2011-08-01T07:00:51  <simonstewart> Biab
+2011-08-01T07:04:15  <selbot2> dawagner less than 20 seconds ago - DanielWagnerHall: Fixing compile error - http://code.google.com/p/selenium/source/detail?r=13150
+2011-08-01T07:06:18  *** Ajay has joined #selenium
+2011-08-01T07:08:15  <selbot2> david.burns@theautomatedtester.co.uk less than 20 seconds ago - DavidBurns bumping version to 2.3 - http://code.google.com/p/selenium/source/detail?r=13151
+2011-08-01T07:08:24  <AutomatedTester> is there a place where I can get the latest chromedriver?
+2011-08-01T07:08:39  <AutomatedTester> something less than 2 months old?
+2011-08-01T07:10:43  *** carze has joined #selenium
+2011-08-01T07:11:26  <dawagner> AutomatedTester: https://code.google.com/p/chromium/downloads/list
+2011-08-01T07:11:37  <dawagner> We should probably remove the chromedriver from our downloads page
+2011-08-01T07:12:43  <AutomatedTester> as long the link we use is painfully obvious to the user
+2011-08-01T07:16:36  *** ksinkar has quit IRC
+2011-08-01T07:18:10  *** Lorenzour is now known as italiano
+2011-08-01T07:28:17  <adamgoucher> oh. and if anyone notices that xserve drops off the interents for a few minutes -- that me. :)
+2011-08-01T07:34:57  *** pnitin has quit IRC
+2011-08-01T07:38:46  *** csanchez has quit IRC
+2011-08-01T07:40:06  *** aradriel_ has joined #selenium
+2011-08-01T07:41:21  *** aradriel has quit IRC
+2011-08-01T07:42:09  *** andytinkham has joined #selenium
+2011-08-01T07:43:36  <adamgoucher> hmmm. either the act of rebooting xserve or applying the queue of updates seems to have caused the vms to fall back onto the internets
+2011-08-01T07:47:12  <adamgoucher> (rebooting is not supposed to be part of the osx troubleshooting kit)
+2011-08-01T07:52:19  *** ian_mac has quit IRC
+2011-08-01T07:54:44  <selbot2> dawagner less than 10 seconds ago - DanielWagnerHall: Fixing typos.  Fixes issue 2161. - http://code.google.com/p/selenium/source/detail?r=13152
+2011-08-01T08:02:43  *** pnitin has joined #selenium
+2011-08-01T08:02:54  <adamgoucher> jarib: in the linux vm, is there a magic command/set-of-commands that i should run to upgrade it to the latest and greatest patch level
+2011-08-01T08:03:11  * adamgoucher is in maintenance mode in xserve 
+2011-08-01T08:05:11  <jarib> adamgoucher: `sudo apt-get update && sudo apt-get upgrade`
+2011-08-01T08:05:17  <jarib> maybe
+2011-08-01T08:05:27  <jarib> depends on what you want to upgrade
+2011-08-01T08:05:35  <adamgoucher> heh. it sounded a lot more confident without the maybe
+2011-08-01T08:06:02  <adamgoucher> it hasnt been patched/updated since you built it which is usually not a good idea
+2011-08-01T08:07:34  *** AJ_ has joined #selenium
+2011-08-01T08:07:38  <eranm> adamgoucher, if that's an Ubuntu VM, this combination would work
+2011-08-01T08:07:49  <adamgoucher> ya, its ubunto
+2011-08-01T08:07:52  *** cakehero has joined #selenium
+2011-08-01T08:07:55  <adamgoucher> u even
+2011-08-01T08:08:02  <Ajay> i can take up of updating if it is ubuntu
+2011-08-01T08:08:02  <eranm> you could do apt-get dist-upgrade
+2011-08-01T08:08:34  *** zmijunkie has quit IRC
+2011-08-01T08:09:24  <adamgoucher> how bomb-proof is that?
+2011-08-01T08:10:27  <adamgoucher> nevermind. i logged in and it told m to 'do-release-upgrade' -- lets see how badly this backfires :)
+2011-08-01T08:12:15  <adamgoucher> xserve has an impressive pipe onto the internets
+2011-08-01T08:13:02  <Ajay> what is the current version of ubuntu now on xserve ?
+2011-08-01T08:13:07  *** bxsatwork has joined #selenium
+2011-08-01T08:13:12  <bxsatwork> hi
+2011-08-01T08:14:17  <bxsatwork> the selenium site said you could ask here for quick fixes
+2011-08-01T08:15:00  <bxsatwork> i have a debian box and want to run selenium (webdriver) code from inside junit
+2011-08-01T08:15:12  <bxsatwork> i use ant as a build tool
+2011-08-01T08:15:40  <bxsatwork> and i used both xvnc and xvfb at times as a virtual desktop
+2011-08-01T08:16:02  <bxsatwork> both configurations get me the sam e error:     [junit] Build info: version: '2.1.0', revision: '12971', time: '2011-07-18 11:18:42'
+2011-08-01T08:16:05  <bxsatwork>     [junit] System info: os.name: 'Linux', os.arch: 'amd64', os.version: '2.6.32-5-amd64', java.version: '1.6.0_26'
+2011-08-01T08:16:08  <bxsatwork>     [junit] Driver info: driver.version: FirefoxDriver
+2011-08-01T08:16:10  <bxsatwork>     [junit] org.openqa.selenium.WebDriverException: win is null
+2011-08-01T08:16:25  <bxsatwork> google does not have a lot on this error, so i thought, i might check in here
+2011-08-01T08:16:26  <selbot> http://www.askapache.com/htaccess/apache-status-code-headers-errordocument.html
+2011-08-01T08:17:27  <bxsatwork> can anyone point me in the rigth direction to further debug this?
+2011-08-01T08:18:50  <eranm> that's a very partial stack trace.
+2011-08-01T08:19:10  <eranm> Do you see this constantly? sometimes?
+2011-08-01T08:19:31  <bxsatwork> yes, i did not want to paste the whole trace all at once
+2011-08-01T08:19:41  *** jimevans has joined #selenium
+2011-08-01T08:19:43  <bxsatwork> i do get it every time
+2011-08-01T08:20:09  <bxsatwork> i figured out, it is not the error i get when no virtual desktop is running.
+2011-08-01T08:20:36  <bxsatwork> do you want to see the java code?
+2011-08-01T08:22:34  <eranm> The stack trace would be interesting as well - post both into pastebin
+2011-08-01T08:25:28  *** csanchez has joined #selenium
+2011-08-01T08:27:24  *** lfryc has quit IRC
+2011-08-01T08:28:48  <bxsatwork> the java code: http://pastebin.com/JdVZ345x
+2011-08-01T08:29:04  <bxsatwork> the complete messages after calling ant: http://pastebin.com/yiUV3Tq6
+2011-08-01T08:30:34  *** jimevans has quit IRC
+2011-08-01T08:31:15  <eranm> Does it happen with Xvnc? I'd imagine not
+2011-08-01T08:32:10  <bxsatwork> i was using xvfb at first, then switched to Xvnc4
+2011-08-01T08:32:27  <bxsatwork> currently i am using Xvnc4 and that is where the message is from
+2011-08-01T08:34:12  <bxsatwork> no xvfb is runnig at the moment, i just checked. it is just `Xvnc :99` run as the same user that the junit test are run.
+2011-08-01T08:37:56  *** jimevans has joined #selenium
+2011-08-01T08:39:28  *** lfryc has joined #selenium
+2011-08-01T08:42:53  *** jimevans_ has joined #selenium
+2011-08-01T08:43:09  *** jimevans has quit IRC
+2011-08-01T08:43:16  *** jimevans_ is now known as jimevans
+2011-08-01T08:43:35  <jimevans> ok, i'm back now.
+2011-08-01T08:44:02  <adamgoucher> welcome back comrade
+2011-08-01T08:44:05  <jimevans> until my machine mysteriously shuts off again.
+2011-08-01T08:44:07  <jimevans> da.
+2011-08-01T08:44:27  <RossPatterson> Type fast!
+2011-08-01T08:44:33  <jimevans> no kidding.
+2011-08-01T08:44:50  <eranm> simonstewart, the IE pre-built binaries are up-to-date.
+2011-08-01T08:46:11  <bxsatwork> hm, maybe i should ask the selenium user group ....
+2011-08-01T08:46:31  * adamgoucher is now in the scary the-machine-is-updating part of the restart of the linux vm
+2011-08-01T08:48:46  *** angshu has joined #selenium
+2011-08-01T08:48:48  *** UBi has quit IRC
+2011-08-01T08:49:08  <adamgoucher> woo! upgrade produces a blinking cursor.
+2011-08-01T08:51:50  *** anjelica has joined #selenium
+2011-08-01T08:52:46  *** pnitin has quit IRC
+2011-08-01T08:53:07  *** lfryc has quit IRC
+2011-08-01T08:54:00  *** AJ_ has quit IRC
+2011-08-01T08:58:23  <bxsatwork> ok, i wrote to the user group
+2011-08-01T08:58:37  *** bxsatwork has quit IRC
+2011-08-01T09:01:30  *** davi has joined #selenium
+2011-08-01T09:01:40  *** angshu has quit IRC
+2011-08-01T09:02:13  *** tunabum has joined #selenium
+2011-08-01T09:03:44  *** dylan has joined #selenium
+2011-08-01T09:03:46  <selbot2> dawagner half a minute ago - DanielWagnerHall: First stage in unifying error codes: generate their documentation - http://code.google.com/p/selenium/source/detail?r=13153
+2011-08-01T09:03:59  <adamgoucher> ...and we're back with the linux vm. at least for the moment. or at least i can login. (was assuming i wanted a gui i think)
+2011-08-01T09:04:07  *** dylan is now known as pavelko
+2011-08-01T09:04:14  *** stephend has joined #selenium
+2011-08-01T09:06:36  <Ajay> adamgoucher : linux never fails
+2011-08-01T09:06:52  <adamgoucher> heh. thats certainly not been my experience
+2011-08-01T09:07:25  <adamgoucher> now for the great bamboo upgrade. now taking bets on it working or not
+2011-08-01T09:07:46  <Ajay> lets hope it works
+2011-08-01T09:08:59  <adamgoucher> this time i at least know there is a database in addition to whats on the disk :)
+2011-08-01T09:09:21  <selbot2> dawagner less than a minute ago - DanielWagnerHall: Let test_single run REMOTE tests - http://code.google.com/p/selenium/source/detail?r=13154
+2011-08-01T09:10:12  *** stuk1 has joined #selenium
+2011-08-01T09:11:18  *** angshu has joined #selenium
+2011-08-01T09:11:49  <dawagner> Is someone running a release today? (This is not me volunteering ;))
+2011-08-01T09:12:38  <Ajay> see simonstewart
+2011-08-01T09:13:18  *** lfryc has joined #selenium
+2011-08-01T09:14:02  *** hexa has quit IRC
+2011-08-01T09:15:45  *** lord1234 has joined #selenium
+2011-08-01T09:15:57  <simonstewart> Right. Back
+2011-08-01T09:16:08  <simonstewart> jarib, AutomatedTester, jimevans: yt?
+2011-08-01T09:17:31  <simonstewart> dawagner: are the firefox tests okay on your machine?
+2011-08-01T09:17:48  <dawagner> They were when I ran them on Friday
+2011-08-01T09:18:15  <simonstewart> And today, after the changes I've seen going in?
+2011-08-01T09:18:20  <jarib> simonstewart: i am
+2011-08-01T09:18:33  <simonstewart> How are the ruby bindings? Ready for 2.3?
+2011-08-01T09:19:30  <dawagner> Don't think anything's actually functionally changed today, but I'll run them again :)
+2011-08-01T09:19:45  <simonstewart> groovy
+2011-08-01T09:20:53  <Ajay> dawagner can u ping the command for running ff tests
+2011-08-01T09:21:04  <dawagner> ./go test_firefox
+2011-08-01T09:21:33  <lord1234> hi guys
+2011-08-01T09:21:42  <Ajay> Thanks
+2011-08-01T09:21:55  *** Spanktar has joined #selenium
+2011-08-01T09:21:59  <lord1234> i'm finally switching aroudn to starting my server inside my code, as opposed to a standalone server...how can I do this via ruby?
+2011-08-01T09:22:16  <lord1234> i can't seem to find a code example of starting the server
+2011-08-01T09:22:29  <jarib> simonstewart: more or less
+2011-08-01T09:22:48  <simonstewart> Should we hold the release until tomorrow?
+2011-08-01T09:23:03  <jarib> not for me
+2011-08-01T09:23:08  <simonstewart> k
+2011-08-01T09:23:11  <jarib> either today or tomorrow is fine by me
+2011-08-01T09:23:45  *** jimevans_ has joined #selenium
+2011-08-01T09:23:54  <simonstewart> Hi jimevans_
+2011-08-01T09:24:02  <jimevans_> hi simonstewart
+2011-08-01T09:24:29  <simonstewart> How's the IE driver? Ready for 2.3?
+2011-08-01T09:24:34  <simonstewart> Or should we wait until tomorrow?
+2011-08-01T09:25:06  <jimevans_> i'm not sure what my availability for tomorrow will be.
+2011-08-01T09:25:20  <simonstewart> I've got the keys and a Win7 machine
+2011-08-01T09:25:26  <simonstewart> But not your vast array of VMs
+2011-08-01T09:25:35  <jarib> simonstewart: sounds like you'd like to wait?
+2011-08-01T09:25:52  <simonstewart> Just want to be sure we've got a good release.
+2011-08-01T09:25:53  <jimevans_> top of the head, what was the revision for 2.2?
+2011-08-01T09:26:06  *** jimevans has quit IRC
+2011-08-01T09:26:09  <simonstewart> (Will go and look it up)
+2011-08-01T09:26:30  * jarib is running ruby tests
+2011-08-01T09:26:33  *** jimevans_ is now known as jimevans
+2011-08-01T09:26:38  <dawagner> r13073
+2011-08-01T09:26:40  <selbot2> simon.m.stewart 6 days ago - SimonStewart: Tagging r13072 as Selenium 2.2 - http://code.google.com/p/selenium/source/detail?r=13073
+2011-08-01T09:27:09  <jimevans> There have been no native code changes to the IE driver since 2.2, then
+2011-08-01T09:27:39  <simonstewart> OK.
+2011-08-01T09:27:49  *** vrockai has quit IRC
+2011-08-01T09:28:03  <simonstewart> dawagner/eranm: Can you do a quick test of ./go test_ie on a windows machine and confirm that it passes?
+2011-08-01T09:28:20  <jimevans> actually, that's a fib. there were atoms changes. my bad
+2011-08-01T09:30:43  <simonstewart> Indeed. I'm OOO today, but if the IE tests pass on one machine we're in good shape
+2011-08-01T09:30:56  <simonstewart> As I know that the changes going in were tested in a range of IEs
+2011-08-01T09:31:13  <jimevans> i'm running test_ie now
+2011-08-01T09:31:14  <lord1234> what ruby gem is the ServerManager stuff in?
+2011-08-01T09:31:23  <lord1234> selenium-webdriver or seleniumrc?
+2011-08-01T09:31:51  <dawagner> Running
+2011-08-01T09:31:53  <selbot> New news from builds: IDE-IDE-129 was SUCCESSFUL : Dependant of IDE-EDITOR-147 <http://xserve.openqa.org:8085/browse/IDE-IDE-129> || IDE-EDITOR-147 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-147> || WEB-SEHQ-183 was SUCCESSFUL : Updated by Paul Grandjean <http://xserve.openqa.org:8085/browse/WEB-SEHQ-183> || WEB-SEHQ-182 was SUCCESSFUL : Updated by Daniel Wagner-Hall <http://xserve.openqa.org:8085/browse/WEB-SEHQ-182> || WEB-SEHQ-181 was SUCCESSFUL : Updated by PaulHammant <http://xserve.openqa.org:8085/browse/WEB-SEHQ-181> || WEB-SEHQ-180 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-180> || WEB-SEHQ-179 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-179> || WEB-SEHQ-178 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-178> || WEB-SEHQ-177 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-177> || WEB-SEHQ-176 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-176>
+2011-08-01T09:33:01  <dawagner> Negative number top offset clicking failed
+2011-08-01T09:33:24  <simonstewart> Arse.
+2011-08-01T09:33:46  <simonstewart> Failed as in "spectacularly brought down the machine" or "didn't pass"?
+2011-08-01T09:33:49  <dawagner> Didn't pass
+2011-08-01T09:33:59  <simonstewart> The major problem we had with that was crashing the JVM.
+2011-08-01T09:34:02  <simonstewart> Hmph.
+2011-08-01T09:34:10  <simonstewart> Does it pass when run alone
+2011-08-01T09:34:15  <simonstewart> (have we got a flaky test?)
+2011-08-01T09:34:51  *** netcarver has joined #selenium
+2011-08-01T09:35:53  <lord1234> ....what am I doing wrong? http://pastie.org/private/sfeh90ioogd5scorutdaq
+2011-08-01T09:35:54  <dawagner> Computer says flaky
+2011-08-01T09:36:02  <lord1234> am I not including something correct?
+2011-08-01T09:36:04  <simonstewart> OK
+2011-08-01T09:36:08  <simonstewart> The other tests pass?
+2011-08-01T09:36:13  <dawagner> Re-running with halfonfailure=false
+2011-08-01T09:36:20  <simonstewart> Thanks
+2011-08-01T09:37:05  *** towski has joined #selenium
+2011-08-01T09:37:16  <dawagner> By the way jimevans: I've been hacking on the IEDriver today, your code's beautiful :)
+2011-08-01T09:37:29  <jimevans> thanks mate
+2011-08-01T09:37:30  <jimevans> i try
+2011-08-01T09:38:31  <lord1234> anyone anyone?  bueller?
+2011-08-01T09:39:14  <simonstewart> lord1234: not seen that before, but try breaking up the args into separate strings
+2011-08-01T09:40:16  <Ajay> dawagner when i run tests, i am getting an buildexception http://pastebin.com/3b5ST1gp
+2011-08-01T09:40:36  <lord1234> simon this is the error text: http://pastie.org/private/h2brpyh2nptimx73uv5xa
+2011-08-01T09:40:58  <dawagner> Ajay: Is anything dumped in build/test_logs/*.txt?
+2011-08-01T09:41:22  <lord1234> i got my samples from https://gist.github.com/797615 and http://selenium.rubyforge.org/document.html but i don't know what I am doing wrong....
+2011-08-01T09:41:24  *** dlam has joined #selenium
+2011-08-01T09:41:28  <adamgoucher> it takes a /long/ time to backup bamboo.
+2011-08-01T09:41:32  *** sfbrian has joined #selenium
+2011-08-01T09:41:44  * adamgoucher is also however erring on the side of caution and backing up too much he thinks
+2011-08-01T09:42:32  <dawagner> simonstewart: IE9 passed on Win7x64 with one flaky test failing
+2011-08-01T09:42:45  <simonstewart> I can live with that
+2011-08-01T09:42:52  <dawagner> Firefox still got a fair few versions to test
+2011-08-01T09:43:03  <Ajay> yeah i see the logs
+2011-08-01T09:43:15  <simonstewart> So, java is good to go.
+2011-08-01T09:43:16  <Ajay> one test failed  for ie on windows xp
+2011-08-01T09:43:22  <simonstewart> jarib says that Ruby is good to go
+2011-08-01T09:43:29  <simonstewart> AutomatedTester? Python?
+2011-08-01T09:43:35  <simonstewart> jimevans: .Net?
+2011-08-01T09:43:47  <selbot2> jari.bakken less than 20 seconds ago - JariBakken: require base64 for selenium-client - http://code.google.com/p/selenium/source/detail?r=13155
+2011-08-01T09:45:00  <jarib> just running the last tests now. looking good
+2011-08-01T09:46:23  <jimevans> .net should be good to go
+2011-08-01T09:46:28  <jimevans> running tests now
+2011-08-01T09:49:20  <Ajay> dawagner testDragAndDrop on FF5 on winxp failing
+2011-08-01T09:52:44  *** stuk1 has left #selenium
+2011-08-01T09:52:46  <dawagner> drag and drop is pretty flaky...
+2011-08-01T09:53:28  <selbot2> jari.bakken 2 minutes ago - JariBakken: Adding some missing requires in the specs. - http://code.google.com/p/selenium/source/detail?r=13156
+2011-08-01T09:53:30  <selbot2> jari.bakken 2 minutes ago - JariBakken: Adding some missing requires in the specs. - http://code.google.com/p/selenium/source/detail?r=13156
+2011-08-01T09:53:33  <selbot2> jari.bakken 2 minutes ago - JariBakken: Adding some missing requires in the specs. - http://code.google.com/p/selenium/source/detail?r=13156
+2011-08-01T09:53:42  <jarib> ugh
+2011-08-01T09:53:43  <AutomatedTester> python is ready
+2011-08-01T09:54:00  <simonstewart> OK. Just waiting on jarib to give us a thumbs up
+2011-08-01T09:54:03  <simonstewart> (or not)
+2011-08-01T09:54:16  <jarib> one sec
+2011-08-01T09:55:01  <simonstewart> no worries
+2011-08-01T09:56:27  *** ian_mac has joined #selenium
+2011-08-01T09:57:17  <adamgoucher> phew. bamboo upgrade from 2.7.0 -> 2.7.4 worked. now for 2.7.4 -> 3.2
+2011-08-01T09:59:25  <jarib> simonstewart: will you update java/CHANGELOG?
+2011-08-01T09:59:32  <simonstewart> Will do
+2011-08-01T10:01:44  *** retornam has joined #selenium
+2011-08-01T10:02:04  <dawagner> simonstewart: Last linux non-native firefox testing
+2011-08-01T10:02:56  *** anjelica has quit IRC
+2011-08-01T10:03:13  *** Rotham__ has joined #selenium
+2011-08-01T10:03:21  *** anjelica has joined #selenium
+2011-08-01T10:05:17  <selbot> New news from builds: IDE-IDE-129 was SUCCESSFUL : Dependant of IDE-EDITOR-147 <http://xserve.openqa.org:8085/browse/IDE-IDE-129> || IDE-EDITOR-147 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-147> || WEB-SEHQ-183 was SUCCESSFUL : Updated by Paul Grandjean <http://xserve.openqa.org:8085/browse/WEB-SEHQ-183> || WEB-SEHQ-182 was SUCCESSFUL : Updated by Daniel Wagner-Hall <http://xserve.openqa.org:8085/browse/WEB-SEHQ-182> || WEB-SEHQ-181 was SUCCESSFUL : Updated by PaulHammant <http://xserve.openqa.org:8085/browse/WEB-SEHQ-181> || WEB-SEHQ-180 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-180> || WEB-SEHQ-179 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-179> || WEB-SEHQ-178 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-178> || WEB-SEHQ-177 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-177> || WEB-SEHQ-176 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-176>
+2011-08-01T10:05:26  <dawagner> simonstewart: Firefoxes 3, 3.5, 3.6.6, 3.6.18, 4, 5 passed
+2011-08-01T10:05:34  <simonstewart> Sweet.
+2011-08-01T10:05:43  <simonstewart> I'll update the CHANGELOG and release
+2011-08-01T10:05:47  <jarib> all good here
+2011-08-01T10:06:27  *** Rotham_ has quit IRC
+2011-08-01T10:06:33  <AutomatedTester> we have a go?
+2011-08-01T10:07:05  <davehunt|away> adamgoucher: Mozmill tests are not run nightly yet
+2011-08-01T10:07:23  <simonstewart> We have a go
+2011-08-01T10:07:33  <simonstewart> Will tag the release once I've updated the changelog
+2011-08-01T10:10:11  <simonstewart> #1650
+2011-08-01T10:10:12  <selbot2>  closed/fixed Internet Explorer crashes in getText for an element with empty text - http://code.google.com/p/selenium/issues/detail?id=1650
+2011-08-01T10:11:18  <simonstewart> #2136
+2011-08-01T10:11:19  <selbot2>  closed/fixed i have found another bug in source code in the same method - http://code.google.com/p/selenium/issues/detail?id=2136
+2011-08-01T10:11:27  <adamgoucher> is there a python egg for dealing with har files?
+2011-08-01T10:11:27  *** Archdude_ has joined #selenium
+2011-08-01T10:13:36  *** ian_mac has quit IRC
+2011-08-01T10:14:17  *** Archdude has quit IRC
+2011-08-01T10:14:17  *** Archdude_ is now known as Archdude
+2011-08-01T10:14:49  *** aculich has quit IRC
+2011-08-01T10:15:00  <selbot2> simon.m.stewart 2 minutes ago - SimonStewart: Updating the java changelog - http://code.google.com/p/selenium/source/detail?r=13157
+2011-08-01T10:15:21  <selbot2> simon.m.stewart 2 minutes ago - SimonStewart: Updating the java changelog - http://code.google.com/p/selenium/source/detail?r=13157
+2011-08-01T10:15:42  <jarib> google code is acting weird
+2011-08-01T10:15:43  <selbot> http://www.3dbuzz.com/vbforum/showthread.php?189017-My-sprite-animation-code-is-acting-weird-have-I-hit-a-limit-within-xna
+2011-08-01T10:15:55  <simonstewart> jarib: so i notice
+2011-08-01T10:16:08  <simonstewart> that one file commit took forever, and an svn up is also taking a long time
+2011-08-01T10:16:10  <simonstewart> *grr*
+2011-08-01T10:16:23  <dawagner> simonstewart: I thought I was the only one who had google code issues? ;)
+2011-08-01T10:16:47  <jarib> r13156 went in, but the commit failed on my side
+2011-08-01T10:16:53  <jarib> and now it refuses to pull it down..
+2011-08-01T10:17:08  <selbot2> jari.bakken 26 minutes ago - JariBakken: Adding some missing requires in the specs. - http://code.google.com/p/selenium/source/detail?r=13156
+2011-08-01T10:17:17  <simonstewart> What was in the change?
+2011-08-01T10:17:27  <jarib> that ^
+2011-08-01T10:17:52  <jarib> my working copy has 13155 -> 13157 :/
+2011-08-01T10:18:03  <jarib> (may be a combination of google code and git-svn though)
+2011-08-01T10:18:17  <simonstewart> I've got the changes
+2011-08-01T10:19:03  <simonstewart> Looks like google code is flaking out again
+2011-08-01T10:19:21  <simonstewart> Can't commit the "tagging the release" revision
+2011-08-01T10:19:45  <jarib> bad timing
+2011-08-01T10:19:49  <tunabum> (time to move to git?) ;)
+2011-08-01T10:19:54  <simonstewart> Oops
+2011-08-01T10:19:59  <simonstewart> Helps if I have the right URLs
+2011-08-01T10:20:02  <simonstewart> *cough*
+2011-08-01T10:20:55  <selbot2> simon.m.stewart less than a minute ago - Tagging Selenium 2.3 at r13157 - http://code.google.com/p/selenium/source/detail?r=13158
+2011-08-01T10:21:02  <simonstewart> Time to build a release
+2011-08-01T10:21:14  <jimevans> starting .net build now
+2011-08-01T10:21:28  <jimevans> (let's see if the automated post to nuget gallery works)
+2011-08-01T10:22:02  <Ajay> tunabum #2168
+2011-08-01T10:22:02  <selbot2>  open/new Updating the download  targets to point to 2.3.0 in seleniumhq.org/download - http://code.google.com/p/selenium/issues/detail?id=2168
+2011-08-01T10:22:39  <tunabum> Ajay: the downloads have to exist first! ;)
+2011-08-01T10:23:39  <XRayCulver> jimevans: nice job with the nuget setup and thanks for doing that
+2011-08-01T10:23:53  <simonstewart> Good work everyone.
+2011-08-01T10:24:06  <simonstewart> Very impressed that we're able to turn out a release every week
+2011-08-01T10:24:10  <Ajay> tunabum i was making things faster
+2011-08-01T10:24:37  <tunabum> Ajay: np :) i like the eagerness
+2011-08-01T10:24:44  <jarib> still can't `svn up` here :/
+2011-08-01T10:24:59  <simonstewart> Working for me here
+2011-08-01T10:25:40  <Ajay> yeah working for me
+2011-08-01T10:26:33  <Ajay> simon how is the maven release process  for selenium ?
+2011-08-01T10:28:05  <tunabum> Ajay: another team member (usually MichaelTamm) will create the maven artifacts off the branch and push them to the central repo... he's not always around immediately when the release happens, but has been pretty good about it lately
+2011-08-01T10:28:07  <XRayCulver> I realize you guys are pushing a release right now, but does anybody have a few minutes to answer some questions about PageFactory in .Net?
+2011-08-01T10:28:47  <simonstewart> Ajay: tunabum has it right
+2011-08-01T10:29:45  <adamgoucher> the website will be updated in a bit -- messing with bamboo right now
+2011-08-01T10:29:52  <Ajay> :) is there plan to automate the maven
+2011-08-01T10:30:50  <Ajay> i can take up the task when MichaelTamm is not around
+2011-08-01T10:32:49  *** aculich has joined #selenium
+2011-08-01T10:32:54  <AutomatedTester> lol
+2011-08-01T10:33:00  <AutomatedTester> Saucelabs now supports 2.1
+2011-08-01T10:33:33  <AutomatedTester> Python bindings away
+2011-08-01T10:34:00  <tunabum> Ajay: lot's of volunteers for that, very few have the keys though... I think I offered too, but haven't gotten a response.
+2011-08-01T10:36:11  <Ajay> Thanks for the info luke :)
+2011-08-01T10:36:38  *** dawagner is now known as dawagner_away
+2011-08-01T10:36:55  <Ajay> AutomatedTester  saucelabs will have a hard time to catch up with the weekly releases
+2011-08-01T10:40:30  *** Briareos1 has joined #selenium
+2011-08-01T10:42:07  *** lfryc has quit IRC
+2011-08-01T10:42:12  *** AutomatedTester has quit IRC
+2011-08-01T10:44:29  <simonstewart> SauceLabs are doing their best to speed up
+2011-08-01T10:44:32  <simonstewart> And succeeding, I think
+2011-08-01T10:44:47  *** trapni has quit IRC
+2011-08-01T10:45:07  *** lord1234 has quit IRC
+2011-08-01T10:45:08  *** Ajay_ has joined #selenium
+2011-08-01T10:45:51  *** Ajay has quit IRC
+2011-08-01T10:47:31  <jimevans> .net build is done
+2011-08-01T10:47:43  *** AutomatedTester has joined #selenium
+2011-08-01T10:48:04  <jimevans> (including *sigh* nuget)
+2011-08-01T10:48:16  <simonstewart> Fast move
+2011-08-01T10:48:45  <jimevans> the nuget piece is now integrated into the //dotnet:release target if you pass the api key on the command line
+2011-08-01T10:48:52  <simonstewart> clever
+2011-08-01T10:49:24  *** ian_mac has joined #selenium
+2011-08-01T10:49:27  <jimevans> and now i've been on the go for something like 30 hours, so i'm going to bed.
+2011-08-01T10:49:54  <simonstewart> 30 hours?
+2011-08-01T10:49:56  <simonstewart> Wow.
+2011-08-01T10:49:57  <Ajay_> jimevans: wow
+2011-08-01T10:49:57  <simonstewart> Sleep!
+2011-08-01T10:50:11  <jimevans> i'm in kiev, and didn't sleep on the plane.\
+2011-08-01T10:50:11  <AutomatedTester> das va danya Mr Evans
+2011-08-01T10:50:24  <simonstewart> For a conference?
+2011-08-01T10:50:50  <jimevans> no, working onsite with our contractors
+2011-08-01T10:51:03  <jarib> phew, finally got my checkout sorted
+2011-08-01T10:51:05  <simonstewart> Good luck
+2011-08-01T10:51:46  *** jimevans has left #selenium
+2011-08-01T10:56:10  *** brettporter has quit IRC
+2011-08-01T10:57:03  <jarib> ooo, nice http://codereview.chromium.org/7461095
+2011-08-01T10:57:23  <simonstewart> Very nice
+2011-08-01T11:00:30  <jarib> google code is giving me all kinds of 500 errors
+2011-08-01T11:00:31  <selbot> http://hostmonsterforum.com/showthread.php?7148-mod_expires-and-optimization-giving-me-500-error
+2011-08-01T11:00:36  <selbot2> jari.bakken 2 minutes ago - JariBakken: Test order shouldn't matter. - http://code.google.com/p/selenium/source/detail?r=13159
+2011-08-01T11:01:01  <selbot2> jari.bakken 2 minutes ago - JariBakken: Test order shouldn't matter. - http://code.google.com/p/selenium/source/detail?r=13159
+2011-08-01T11:02:58  <adamgoucher> well, bamboo 3.2 appears to have started. and appears not to have lost all the build information (which is better than last time)
+2011-08-01T11:02:59  *** angshu has quit IRC
+2011-08-01T11:03:24  <selbot2> jari.bakken 1 minute ago - JariBakken: Update rb/CHANGES, bump version to 2.3.0 - http://code.google.com/p/selenium/source/detail?r=13160
+2011-08-01T11:04:27  *** Ajay has joined #selenium
+2011-08-01T11:04:40  *** Ajay_ has quit IRC
+2011-08-01T11:15:33  <selbot2> jari.bakken 4 minutes ago - JariBakken: Update Ruby docs for 2.3.0 - http://code.google.com/p/selenium/source/detail?r=13161
+2011-08-01T11:15:33  <selbot2> jari.bakken half a minute ago - JariBakken: Bump gem version to 2.3.1.dev - http://code.google.com/p/selenium/source/detail?r=13162
+2011-08-01T11:21:07  *** rbalent has quit IRC
+2011-08-01T11:21:40  *** cburroughs has quit IRC
+2011-08-01T11:21:59  *** cburroughs has joined #selenium
+2011-08-01T11:26:55  <carze> anyone know if in the python bindings that the ActionChains double_click works? I found a StackOverflow post saying that it does not work
+2011-08-01T11:29:21  *** AutomatedTester has quit IRC
+2011-08-01T11:29:32  <simonstewart> Try  the latest versions
+2011-08-01T11:29:45  <simonstewart> There have been a number of fixes added in recent releases
+2011-08-01T11:29:47  <adamgoucher> ok. that was less painful than last time. bamboo now a version 3.2 (current; though 3.3 should be out in a bit) and all four agents are updated and running
+2011-08-01T11:29:51  *** Rotham__ is now known as rotham
+2011-08-01T11:30:01  <simonstewart> Which agents?
+2011-08-01T11:30:19  * simonstewart loads the bamboo home page
+2011-08-01T11:30:33  <adamgoucher> linux, xp, osx for building the project and the sehq one for the website and docs
+2011-08-01T11:31:11  *** Ajay_ has joined #selenium
+2011-08-01T11:32:01  <adamgoucher> in the 3.x server, we should, in theory, be able to better chain builds to reduce the amount of the internets that are downloaded and for speed improvements
+2011-08-01T11:32:11  <simonstewart> Yay!
+2011-08-01T11:32:17  *** Ajay has quit IRC
+2011-08-01T11:32:21  <simonstewart> Can they start VM images on demand?
+2011-08-01T11:32:36  <adamgoucher> that, i do not know. :P
+2011-08-01T11:32:56  <simonstewart> I could really do with that as a built in feature
+2011-08-01T11:33:10  <simonstewart> Might ping the Atlassian guys to see if they know if it's possible
+2011-08-01T11:33:11  *** Ajay has joined #selenium
+2011-08-01T11:33:24  <adamgoucher> i'll ping the bamboo lead when he wakes up
+2011-08-01T11:33:35  <simonstewart> That'd be good
+2011-08-01T11:33:49  <simonstewart> If bamboo can build our project, it can cope with a lot of stuff
+2011-08-01T11:34:04  <adamgoucher> in theory though, what you do is have the agent run a command against the vmware server to start the snapshot
+2011-08-01T11:34:31  <simonstewart> hmmm
+2011-08-01T11:34:36  <simonstewart> I may actually have to read some docs
+2011-08-01T11:35:07  <adamgoucher> you can do pre/post actions on a build. the trick would be to say 'start this vm /and then use it/'
+2011-08-01T11:35:54  <adamgoucher> its less than helpful when google returns my email to se-dev on the subject
+2011-08-01T11:35:57  *** Ajay_ has quit IRC
+2011-08-01T11:36:06  <simonstewart> lol
+2011-08-01T11:36:58  *** dkakkad has joined #selenium
+2011-08-01T11:37:05  <adamgoucher> http://confluence.atlassian.com/display/BAMBOODEV/Pre-Build+Queued+Action even has the example you want
+2011-08-01T11:37:27  <adamgoucher> but thats in the 'how to build your own plugin' section
+2011-08-01T11:37:37  *** andreashaas has quit IRC
+2011-08-01T11:38:18  *** AutomatedTester has joined #selenium
+2011-08-01T11:44:31  *** hubc has joined #selenium
+2011-08-01T11:46:58  <simonstewart> Right. I'm about to pull the old chrome drivers off our main download page
+2011-08-01T11:47:09  <simonstewart> as people can grab what they want from the chromium site
+2011-08-01T11:49:39  <selbot> New news from builds: S2RB-WDUNIT-116 was SUCCESSFUL (with 77 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-116>
+2011-08-01T11:50:06  *** dave_miles has quit IRC
+2011-08-01T11:50:47  <AutomatedTester> simonstewart: can you make it painfully obvious for users looking for it
+2011-08-01T11:50:56  <simonstewart> I can try
+2011-08-01T11:51:34  * AutomatedTester w
+2011-08-01T11:51:43  <AutomatedTester> i just want to avoid people moaning...
+2011-08-01T11:52:21  <adamgoucher> put it on the sehq site -- and then stop pointing people at google code
+2011-08-01T11:52:47  <adamgoucher> the whole having two places to download is unnecessarily confusing i think
+2011-08-01T11:54:51  <simonstewart> Is that clear enough: http://code.google.com/p/selenium/downloads/list
+2011-08-01T11:54:57  <simonstewart> adamgoucher: people will always visit both places
+2011-08-01T11:55:05  <simonstewart> So documenting in both probably makes sense
+2011-08-01T11:56:18  <AutomatedTester> simonstewart: +1
+2011-08-01T11:56:39  <simonstewart> Looks like the uptake of selenium 2 is picking up
+2011-08-01T11:56:45  <selbot2> simon.m.stewart 15 minutes ago - SimonStewart: Updating the javadocs to match the 2.3 release - http://code.google.com/p/selenium/source/detail?r=13163
+2011-08-01T11:56:59  <adamgoucher> i think there are two categories of people; i like that solution on gcode, but i still think we should point people at the sehq site first
+2011-08-01T11:57:16  * adamgoucher is on an opinionated tear today :)
+2011-08-01T11:57:20  <simonstewart> The downloads for all three java downloads reached 10949 in 6 days
+2011-08-01T11:57:37  <simonstewart> We started at around 1000 downloads a day
+2011-08-01T11:57:44  <simonstewart> and are now just over 1800 a day
+2011-08-01T11:57:46  <simonstewart> for java
+2011-08-01T11:58:00  *** csanchez has quit IRC
+2011-08-01T11:58:06  <simonstewart> Having a small "holy heck" moment
+2011-08-01T11:58:53  <adamgoucher> my python selenium framework has 41 downloads. in a week. :D
+2011-08-01T11:58:56  *** davi is now known as UBi
+2011-08-01T11:59:19  <simonstewart> Holy shit
+2011-08-01T11:59:27  <simonstewart> Haw-Bin Chai just started at google
+2011-08-01T12:00:04  <adamgoucher> and not as one of your minions? you're slipping
+2011-08-01T12:00:13  <simonstewart> I didn't even think he was interested
+2011-08-01T12:00:25  <simonstewart> Will ping him when I'm in the office and find out more
+2011-08-01T12:00:37  <AutomatedTester> simonstewart: in the NYC office?
+2011-08-01T12:00:44  <simonstewart> No idea
+2011-08-01T12:00:49  <simonstewart> But that's great news :)
+2011-08-01T12:01:54  <Ajay> Who is Haw-Bin Chai ?
+2011-08-01T12:02:13  <simonstewart> He was the guy who wrote the original code for IDE
+2011-08-01T12:02:25  <Ajay> Cool
+2011-08-01T12:02:25  <simonstewart> He's not been seen in the codebase for many a year
+2011-08-01T12:04:20  *** csanchez has joined #selenium
+2011-08-01T12:05:28  <adamgoucher> actually, shiniya wrote the original code. haw-bin is best known for his ui-map stuff
+2011-08-01T12:06:10  <adamgoucher> (which no-one seems to use and is entangled in se-core and should likely be ripped out)
+2011-08-01T12:06:16  <AutomatedTester> HawBin did work on Core
+2011-08-01T12:06:23  <simonstewart> Damn it.
+2011-08-01T12:06:26  <simonstewart> Yes, you're right
+2011-08-01T12:06:44  <simonstewart> the idea with merging the ui-map stuff into core was to make it easier to use it
+2011-08-01T12:06:54  <simonstewart> But since no-one pushes it, it's withered
+2011-08-01T12:07:00  <simonstewart> Meh, I say. Meh.
+2011-08-01T12:07:41  <adamgoucher> ya. and its out of scope for 'browser automation' now. ui-map stuff should be handled in script by the runner.
+2011-08-01T12:07:49  <simonstewart> Right
+2011-08-01T12:08:06  <adamgoucher> (its on my never-ending hit list -- but wow is it tangled in there)
+2011-08-01T12:08:31  <simonstewart> Right. Time to spend some time with The Wife
+2011-08-01T12:08:34  <simonstewart> G'night all
+2011-08-01T12:08:35  *** simonstewart has left #selenium
+2011-08-01T12:11:20  <Ajay> tunabum: its time for #2168  download bits are available
+2011-08-01T12:11:21  <selbot2> luke.sem...@gmail.com open/accepted Updating the download  targets to point to 2.3.0 in seleniumhq.org/download - http://code.google.com/p/selenium/issues/detail?id=2168
+2011-08-01T12:13:30  <jarib> hmm
+2011-08-01T12:13:34  <jarib> seeing some nasty errors with 2.3
+2011-08-01T12:14:50  <jarib> when you've specified a log file for firefox
+2011-08-01T12:15:10  <jarib> i think
+2011-08-01T12:15:12  * jarib investigates
+2011-08-01T12:16:19  *** santiycr has joined #selenium
+2011-08-01T12:22:15  <selbot2> jari.bakken less than 20 seconds ago - JariBakken: Fix Firefox hang on launch when webdriver.log.file is set in the profile. - http://code.google.com/p/selenium/source/detail?r=13164
+2011-08-01T12:25:01  <jarib> eranm: you around? where would be a good place to test for that ^?
+2011-08-01T12:25:21  <AutomatedTester> jarib: in the profile tests?
+2011-08-01T12:25:33  <jarib> FirefoxDriverTest.java maybe
+2011-08-01T12:31:23  <Archdude> one of my scripts keeps getting "Exception: ERROR: There was an unexpected Alert! [Error: error]" but there's no alerts as far as I can tell
+2011-08-01T12:31:42  <jarib> dawagner_away: ^
+2011-08-01T12:32:18  *** RossPatterson has quit IRC
+2011-08-01T12:32:31  *** Ajay has quit IRC
+2011-08-01T12:33:50  <Archdude> any ideas
+2011-08-01T12:35:42  *** Ajay has joined #selenium
+2011-08-01T12:35:52  *** ian_mac has quit IRC
+2011-08-01T12:38:21  *** lord1234 has joined #selenium
+2011-08-01T12:39:26  <lord1234> so...if starting a framework from scratch using seleniumRC, what language would you choose?
+2011-08-01T12:39:35  <Archdude> py
+2011-08-01T12:39:57  <AutomatedTester> lord1234: the language you feel comfortable with and that the rest of your team will feel comfortable using
+2011-08-01T12:40:11  <hubc> riny
+2011-08-01T12:40:14  <hubc> ruby*
+2011-08-01T12:40:17  <lord1234> AutomatedTester: which language is most supported?
+2011-08-01T12:40:23  <lord1234> with the most available documentation/examples out there?
+2011-08-01T12:40:27  <tunabum> if you're starting one, why not use WebDriver?
+2011-08-01T12:40:44  <hubc> i think java has the most support?
+2011-08-01T12:40:54  <hubc> or at least there are a lot of java examples
+2011-08-01T12:41:14  <AutomatedTester> lord1234: python, ruby, .net and Java are prety much on a par
+2011-08-01T12:41:26  <lord1234> ok
+2011-08-01T12:41:27  <hubc> ruby driver for RC isn't that good though
+2011-08-01T12:41:32  <hubc> oh
+2011-08-01T12:41:37  <hubc> well i guess you could use webdriver
+2011-08-01T12:41:38  <hubc> ?
+2011-08-01T12:41:39  <lord1234> hubc: actually, I use the ruby driver, but might be switching
+2011-08-01T12:41:49  <hubc> are you using selenium-client
+2011-08-01T12:41:50  <AutomatedTester> i would agree webdriver is the way forward
+2011-08-01T12:41:56  <lord1234> webdriver?
+2011-08-01T12:42:15  <hubc> http://rubygems.org/gems/selenium-webdriver
+2011-08-01T12:42:20  <hubc> it's selenium 2.0
+2011-08-01T12:42:40  <lord1234> http://seleniumhq.org/docs/03_webdriver.html  is this it?
+2011-08-01T12:42:53  <hubc> that's it
+2011-08-01T12:43:04  <hubc> instead of using a javascript frame to contorl the browser like RC
+2011-08-01T12:43:07  <lord1234> and php is not supported?
+2011-08-01T12:43:10  <hubc> it uses built in browser stuff
+2011-08-01T12:43:29  <lord1234> I'm currently in an enviroment running a LAMP stack, and as such, they are really trying for PHP
+2011-08-01T12:43:52  <hubc> well you can run your selenium test with whatever language you'd like right
+2011-08-01T12:43:54  <AutomatedTester> lord1234: dont use php for testing
+2011-08-01T12:44:06  <AutomatedTester> and if they want LAMP suggest python over php
+2011-08-01T12:44:07  <lord1234> really?  why?
+2011-08-01T12:44:29  <lord1234> i've used php and ruby, so it seems ruby might end up being the way to go
+2011-08-01T12:44:37  <hubc> goooo ruby!
+2011-08-01T12:44:44  <AutomatedTester> lord1234: PHP bindings are not supported by the project
+2011-08-01T12:44:51  <lord1234> i see
+2011-08-01T12:46:18  <lord1234> and you don't need a Seleniium server running for Webdriver to work?
+2011-08-01T12:46:21  <lord1234> can run standalone eh?
+2011-08-01T12:46:30  <AutomatedTester> it can
+2011-08-01T12:46:41  <AutomatedTester> or you can use remotewebdriver
+2011-08-01T12:46:56  <AutomatedTester> which is the same priniciple as RC
+2011-08-01T12:47:19  <lord1234> any reason to do one over the other?
+2011-08-01T12:47:41  <hubc> lord1234: webdriver controls the browser directly
+2011-08-01T12:49:19  <lord1234> anywhere that all the webdriver methods are located?
+2011-08-01T12:49:31  <hubc> for ruby?
+2011-08-01T12:49:45  <selbot2> jari.bakken half a minute ago - JariBakken: Fix indentation, convert tabs to spaces in FirefoxDriverTest.java - http://code.google.com/p/selenium/source/detail?r=13165
+2011-08-01T12:49:45  <selbot2> jari.bakken half a minute ago - JariBakken: Add test for bug fixed in r13164. - http://code.google.com/p/selenium/source/detail?r=13166
+2011-08-01T12:49:56  <AutomatedTester> lord1234: remotewebdriver is just like firefoxdriver or IEDriver
+2011-08-01T12:49:59  <lord1234> hubc: sure why not?
+2011-08-01T12:50:07  <lord1234> AutomatedTester: i see
+2011-08-01T12:50:10  <hubc> :wiki ruby
+2011-08-01T12:50:11  <selbot2> 1: FrequentlyAskedQuestions: WebDriver FAQs - http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions
+2011-08-01T12:50:11  <selbot2> 2: RubyBindings: Ruby bindings - http://code.google.com/p/selenium/wiki/RubyBindings
+2011-08-01T12:50:11  <selbot2> 3: BuildingWebDriver: Instructions on how to build WebDriver - http://code.google.com/p/selenium/wiki/BuildingWebDriver
+2011-08-01T12:50:11  <selbot2> (+ 15 more)
+2011-08-01T12:50:14  <AutomatedTester> just the remotewebdriver can be on different machines
+2011-08-01T12:50:44  <lord1234> i see
+2011-08-01T12:50:46  <hubc> lord1234: it's #2 there, for a summary, you'll have to look at the docs for more (that's what i did)
+2011-08-01T12:50:47  <selbot2> dawagner closed/fixed DOCS: Typo in PageFactory documentation - http://code.google.com/p/selenium/issues/detail?id=2
+2011-08-01T12:50:54  <AutomatedTester> so you can control IEDriver via RemoteWebDriver on a windows machine by running test on a Mac
+2011-08-01T12:52:25  <lord1234> I know we discussed this a while back, but any chance for providing "download dialog" support for at least firefox in the future?
+2011-08-01T12:57:47  *** ian_mac has joined #selenium
+2011-08-01T12:58:45  <selbot2> jari.bakken less than 20 seconds ago - JariBakken: Bump gem to 2.3.1, update CHANGES - http://code.google.com/p/selenium/source/detail?r=13167
+2011-08-01T12:58:45  <selbot2> jari.bakken less than 10 seconds ago - JariBakken: Fix missing imports from last commit. - http://code.google.com/p/selenium/source/detail?r=13168
+2011-08-01T13:02:29  <hubc> :wiki grid
+2011-08-01T13:02:30  <selbot2> 1: Documentation: Details of the official Selenium documentation - http://code.google.com/p/selenium/wiki/Documentation
+2011-08-01T13:02:30  <selbot2> 2: Grid2: gridseleniumwebdriver - http://code.google.com/p/selenium/wiki/Grid2
+2011-08-01T13:02:30  <selbot2> 3: ReleasingSelenium: The release process for a new selenium - http://code.google.com/p/selenium/wiki/ReleasingSelenium
+2011-08-01T13:02:30  <selbot2> (+ 1 more)
+2011-08-01T13:05:59  *** Spanktar has quit IRC
+2011-08-01T13:07:35  *** Spanktar has joined #selenium
+2011-08-01T13:08:25  *** lord1234 has quit IRC
+2011-08-01T13:14:51  <jarib> gah
+2011-08-01T13:15:02  <jarib> i must be tired
+2011-08-01T13:15:02  <hubc> :ask any grid2 experts? anyway to flag certain nodes for tests to be run on?
+2011-08-01T13:15:03  <selbot2> If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+2011-08-01T13:15:20  <jarib> making too many mistakes today.
+2011-08-01T13:16:45  <selbot2> jari.bakken half a minute ago - JariBakken: Bump gem version to 2.3.2. - http://code.google.com/p/selenium/source/detail?r=13169
+2011-08-01T13:18:05  *** AutomatedTester has quit IRC
+2011-08-01T13:21:29  *** dlam has quit IRC
+2011-08-01T13:26:29  *** boily has quit IRC
+2011-08-01T13:26:33  *** cburroughs has quit IRC
+2011-08-01T13:38:34  *** miker2 has quit IRC
+2011-08-01T13:42:25  *** Briareos1 has quit IRC
+2011-08-01T13:43:12  *** santiycr has quit IRC
+2011-08-01T13:44:02  <adamgoucher> so if you have external files to suck into a junit script, whats the preferred magic way to do that?
+2011-08-01T13:44:45  <adamgoucher> store them in the same dir as the script or put them somewhere on the classpath or something else?
+2011-08-01T13:53:51  *** Spanktar has quit IRC
+2011-08-01T13:56:43  *** whitecat has quit IRC
+2011-08-01T13:58:02  *** Spanktar has joined #selenium
+2011-08-01T14:03:37  <XRayCulver> is there a difference between Driver.Navigate().GoToUrl(); and Driver.URL = string;
+2011-08-01T14:03:53  <XRayCulver> well Driver.Navigate().GoToUrl(string); and Driver.URL = string;
+2011-08-01T14:17:45  <selbot2> luke.semerau@gmail.com half a minute ago - LukeIS: bumping release number to 2.3.0, removed release announcements, comment block to track all potential release announcements, not sure where to put it though - http://code.google.com/p/selenium/source/detail?r=13170
+2011-08-01T14:26:15  <selbot> New news from builds: WEB-SEHQ-185 was SUCCESSFUL : Updated by luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-185>
+2011-08-01T14:33:43  *** sdimkov has joined #selenium
+2011-08-01T14:42:03  *** QAGuy has quit IRC
+2011-08-01T14:42:12  *** pavelko has quit IRC
+2011-08-01T14:42:30  *** rpk has quit IRC
+2011-08-01T14:43:08  *** cgoldberg has quit IRC
+2011-08-01T14:46:11  *** dkakkad has left #selenium
+2011-08-01T14:46:46  *** rcg1 has joined #selenium
+2011-08-01T14:46:53  *** rcg1 has left #selenium
+2011-08-01T14:51:45  <selbot2> dawagner half a minute ago - DanielWagnerHall: Adding an RPC to switchTo().alert() which checks for the alert being present.  Cleans up the semantics, brings it more in line with the other switchTo methods, avoids having to wait on every alert command.  Tested on Firefox 3.0-5.0, and IE9.  IE code could do with a little tidy-up, but I'd like to get this in and working before messing with things. - ...
+2011-08-01T14:51:45  <selbot2> ... http://code.google.com/p/selenium/source/detail?r=13171
+2011-08-01T14:55:04  <rotham> Is there an easy way to switch to a request for authentication window from a proxy server?
+2011-08-01T14:55:37  *** Spanktar has quit IRC
+2011-08-01T14:56:53  *** Spanktar has joined #selenium
+2011-08-01T15:06:08  *** santiycr has joined #selenium
+2011-08-01T15:06:30  *** santiycr has quit IRC
+2011-08-01T15:09:58  *** UBi has quit IRC
+2011-08-01T15:10:22  *** algard has joined #selenium
+2011-08-01T15:11:57  *** netcarver has quit IRC
+2011-08-01T15:13:52  *** hubc has quit IRC
+2011-08-01T15:35:58  *** pavelko has joined #selenium
+2011-08-01T15:39:34  *** tunabum has quit IRC
+2011-08-01T15:54:17  *** Siph0n has joined #selenium
+2011-08-01T15:55:20  *** brettporter has joined #selenium
+2011-08-01T15:58:54  *** towski_ has joined #selenium
+2011-08-01T15:59:25  *** towski has quit IRC
+2011-08-01T16:05:22  *** ahal has joined #selenium
+2011-08-01T16:13:55  *** tomazk has joined #selenium
+2011-08-01T16:15:41  <tomazk> I'm using webdriver API. Since this API is blocking... how can I limit the "get" command to try to load the page for the maximum number of seconds and than throw an error or something
+2011-08-01T16:21:44  <tomazk> anyone?
+2011-08-01T16:24:33  *** andytinkham has quit IRC
+2011-08-01T16:30:28  *** tomazk has quit IRC
+2011-08-01T16:42:03  *** Siph0n has quit IRC
+2011-08-01T16:57:55  *** pavelko has quit IRC
+2011-08-01T17:11:43  *** retornam has quit IRC
+2011-08-01T17:32:26  *** Spanktar has quit IRC
+2011-08-01T17:33:57  *** Binken_ has joined #selenium
+2011-08-01T17:34:20  <Binken_> Morning
+2011-08-01T17:39:06  *** sfbrian has quit IRC
+2011-08-01T17:43:11  <Binken_> eranm?
+2011-08-01T18:06:10  *** ahal has quit IRC
+2011-08-01T18:19:16  *** ian_mac has quit IRC
+2011-08-01T18:23:51  *** ian_mac has joined #selenium
+2011-08-01T18:29:29  *** Mayank1 has quit IRC
+2011-08-01T18:32:30  *** csanchez has quit IRC
+2011-08-01T18:32:36  *** csanchez has joined #selenium
+2011-08-01T18:39:31  <Binken_> #2166
+2011-08-01T18:39:32  <selbot2>  open/new FirefoxDriver sendkeys not work as descripted - http://code.google.com/p/selenium/issues/detail?id=2166
+2011-08-01T18:46:20  *** cerberos has joined #selenium
+2011-08-01T18:57:14  *** stephend has quit IRC
+2011-08-01T19:15:38  *** ian_mac has quit IRC
+2011-08-01T19:45:52  *** towski_ has quit IRC
+2011-08-01T20:00:52  *** Mayank has joined #selenium
+2011-08-01T20:11:53  *** towski has joined #selenium
+2011-08-01T20:18:18  *** Mayank has quit IRC
+2011-08-01T20:21:29  *** sdimkov has quit IRC
+2011-08-01T20:48:04  *** westy has joined #selenium
+2011-08-01T21:10:01  *** angshu has joined #selenium
+2011-08-01T21:30:54  *** pnitin has joined #selenium
+2011-08-01T21:41:40  *** Mayank has joined #selenium
+2011-08-01T21:52:25  *** Mayank has quit IRC
+2011-08-01T22:06:50  *** |izzie has quit IRC
+2011-08-01T22:10:30  *** Fyrespray has joined #selenium
+2011-08-01T22:12:03  *** cakehero has quit IRC
+2011-08-01T22:13:54  *** brettporter has quit IRC
+2011-08-01T22:14:18  *** brettporter has joined #selenium
+2011-08-01T22:19:36  *** Fyrespray has quit IRC
+2011-08-01T22:24:17  *** Mayank has joined #selenium
+2011-08-01T22:43:47  *** rajan has joined #selenium
+2011-08-01T22:55:04  *** rbalent has joined #selenium
+2011-08-01T22:55:04  *** rbalent has joined #selenium
+2011-08-01T23:12:01  *** lfryc has joined #selenium
+2011-08-01T23:30:33  *** Mayank has quit IRC
+2011-08-01T23:31:52  *** Mayank has joined #selenium
+2011-08-01T23:46:56  *** Mayank has quit IRC
+2011-08-01T23:56:30  *** zmijunkie has joined #selenium
+2011-08-01T23:57:05  *** westy has quit IRC
+2011-08-01T23:58:51  *** retornam has joined #selenium

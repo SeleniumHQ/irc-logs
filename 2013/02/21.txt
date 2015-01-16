@@ -1,0 +1,717 @@
+[IRC logfile - Started Thu Feb 21 00:06:24 2013]
+[00:06:24] samphippen has joined #selenium
+[00:17:09] admc1 has joined #selenium
+[00:25:56] alkemist has joined #selenium
+[00:30:02] plightbo_work has joined #selenium
+[00:35:51] totic has left #selenium
+[00:37:01] plightbo_work has joined #selenium
+[00:45:52] zeljkof has joined #selenium
+[00:47:29] garndt: anyone know if there is a way to have IE driver crash gracefully and not have it block the next test?  Windows prompts when IE driver has crashed and stopped responding and the next test does not being until that dialog is dismissed
+[00:47:57] kentor has joined #selenium
+[00:48:07] kentor: dude-x, how would i do something like "return jsVar != null"
+[00:50:19] rpereira_ has joined #selenium
+[00:56:52] zsawyer: garndt, is that like a popup dialog?
+[00:57:20] dude-x: kentor: return jsVar != nil;
+[00:57:29] dude-x: or is that null...
+[00:57:34] dude-x: google it :p
+[00:59:09] kentor: hrmmm, but that is a call from Java
+[IRC logfile - Started Thu Feb 21 01:00:49 2013]
+[01:00:49] garndt: zsawyer: It's a native Windows dialog for when a process crashes.  
+[01:01:04] zsawyer: ouch that sounds really bad
+[01:03:39] sayd has joined #selenium
+[01:03:55] zsawyer: garndt, are you interested in me suggesting dirty work-arounds?
+[01:04:05] sayd: i'm trying to run -help from the jar but getting: xception in thread "main" java.lang.ExceptionInInitializerError at org.openqa.grid.selenium.GridLauncher.main(GridLauncher.java:44)
+[01:08:58] sayd: did that message make it to the channel?
+[01:08:58] admc has joined #selenium
+[01:09:00] zsawyer: yes
+[01:09:19] zsawyer: (2:08:25 AM) sayd: i'm trying to run -help ...
+[01:09:25] sayd: yep thanks
+[01:10:12] zsawyer: no idea but have you tried with --help or -version --version?
+[01:10:41] sayd: zsawyer: yeah well it shows a bunch of info then bails out towards the end (im guessign where the grid info would be)
+[01:10:52] sayd: maybe its because im only using server-standalone.jar
+[01:11:02] zsawyer: it is possible that you are missing a dependency?
+[01:11:48] sayd: zsawyer: yeah possible, not sure how to check
+[01:11:49] zsawyer: are you trying to run the standalone in grid mode?
+[01:11:53] sayd: zsawyer: yeah
+[01:12:14] sayd: well im trying to see what the ghostdriver is all about. it wants to connect to a wd/hub on 8080
+[01:13:27] zsawyer: "Use this if you want to use the Selenium RC or Remote WebDriver or use Grid 2 without needing any additional dependencies" sounds like you might want to file a bug report?
+[01:14:12] brettporter has joined #selenium
+[01:16:05] zsawyer: i believe this error means that in one of the static functions or blocks of that class an exception is thrown - if you are using wrong parameters an initializer exception is a bad way to tell the user... so i'd say it's a bug
+[01:16:19] sayd: zsawyer: yeah im upgrading to 2.30 
+[01:16:38] sayd: works
+[01:16:44] farlan has joined #selenium
+[01:17:24] zsawyer: nice - so nn for the report it's been fixed :)
+[01:17:37] sayd: :)
+[01:23:21] richkazin has joined #selenium
+[01:37:46] jost_ has joined #selenium
+[01:45:12] smccarthy has joined #selenium
+[01:46:31] jost_ has joined #selenium
+[01:49:43] garndt: zsawyer: sorry that it took me awhile to checkback and respond, was making dinner.  I thought about using something like pywinauto in Python to control windows and dismiss that box if I can determine that the IE driver has crashed, but that seems nasty and problematic itself
+[01:50:40] JackDandy has joined #selenium
+[01:50:53] vtali_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 02:17:20 2013]
+[02:17:20] plightbo_work has joined #selenium
+[02:18:33] mreedell-work has joined #selenium
+[02:24:37] sent_hil has joined #selenium
+[02:25:41] sent_hil: What's the simplest way to wait for an element/something in selenium-webdriver?
+[02:28:00] nirvdrum has joined #selenium
+[02:28:48] sent_hil: I was thinking of having those elements fire 'ready' event, but I don't know how to catch that event from Selenium webdrivejs
+[02:28:50] sent_hil: Any help?
+[02:35:53] garndt: http://docs.seleniumhq.org/docs/04_webdriver_advanced.jsp#explicit-and-implicit-waits
+[02:38:02] stephend: sent_hil: also, one sec
+[02:38:28] stephend: https://blog.mozilla.org/webqa/2012/07/12/webdrivers-implicit-wait-and-deleting-elements/
+[02:38:49] stephend: https://blog.mozilla.org/webqa/2012/07/12/webdrivers-implicit-wait-and-deleting-elements/
+[02:38:53] stephend: oops
+[02:39:07] stephend: https://blog.mozilla.org/webqa/2012/07/12/how-to-webdriverwait/
+[02:39:08] stephend: sorry
+[02:48:07] stephend has joined #selenium
+[IRC logfile - Started Thu Feb 21 03:13:17 2013]
+[03:13:17] plightbo_work has joined #selenium
+[03:13:22] intchanter: Should ./go --trace be hanging on "Listening for transport dt_socket at address: 5005"?  I'm guessing no.  What can be done about it?
+[03:27:31] smccarthy has joined #selenium
+[03:30:05] zsawyer: garndt: have a look at AutoHotkey or AutoIt its pretty simple scripting to scan for the window and have the script dismiss it instantly. But thats not a really neat "solution". 
+[03:31:46] zsawyer: Rereading your last - i  guess that's what pywinauto does too. Since the window contains information about the process that died you could make the script fairly safe i believe. 
+[03:32:03] zsawyer: The biggest issue is that this should never happen in the first place. xD
+[03:32:27] zsawyer: Bug report it?
+[03:38:40] sent_hil: garndt: i was hoping do something like this: driver.executeScript(//add event listener);
+[03:39:18] sent_hil: garndt: this is a very ajax heavy app and i'm emitting a lot of events, so it makes sense to add another listener and use that, instead of waiting
+[03:43:38] plightbo_work has joined #selenium
+[03:49:44] stephend has joined #selenium
+[03:50:17] smccarthy has joined #selenium
+[03:57:46] lukeis has joined #selenium
+[IRC logfile - Started Thu Feb 21 04:01:29 2013]
+[04:01:29] jarib has joined #selenium
+[04:08:49] lukeis1 has joined #selenium
+[04:09:58] lukeis1 has joined #selenium
+[04:37:04] SamuraiJack has joined #selenium
+[04:37:13] admc has joined #selenium
+[04:49:30] llaskin has joined #selenium
+[04:53:28] jarib has joined #selenium
+[IRC logfile - Started Thu Feb 21 05:36:25 2013]
+[05:36:25] rananda has joined #selenium
+[05:42:00] jarib has joined #selenium
+[05:43:18] phishy has joined #selenium
+[IRC logfile - Started Thu Feb 21 06:00:52 2013]
+[06:00:52] stephend|dinner has joined #selenium
+[06:16:31] jarib has joined #selenium
+[IRC logfile - Started Thu Feb 21 07:05:22 2013]
+[07:05:22] papegaaij has joined #selenium
+[07:13:49] barancev has joined #selenium
+[07:14:38] stackedsax has joined #selenium
+[07:18:31] jarib_ has joined #selenium
+[07:19:34] plightbo_work has joined #selenium
+[07:21:12] Turzai has joined #selenium
+[07:53:41] SamuraiJack has joined #selenium
+[IRC logfile - Started Thu Feb 21 08:06:31 2013]
+[08:06:31] jarib has joined #selenium
+[08:06:33] zac_sel has joined #selenium
+[08:15:05] Ardesco has joined #selenium
+[08:25:30] jamesoram has joined #selenium
+[08:42:21] freynaud_ has joined #selenium
+[08:50:33] rbalent has joined #selenium
+[08:55:17] annette has joined #selenium
+[08:55:38] bogus_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 09:05:33 2013]
+[09:05:33] Archdude_ has joined #selenium
+[09:09:00] stan has joined #selenium
+[09:10:21] annette has left #selenium
+[09:29:50] sburjan has joined #selenium
+[09:41:20] millenium has joined #selenium
+[09:44:16] Bebe_sel has joined #selenium
+[IRC logfile - Started Thu Feb 21 10:00:58 2013]
+[10:00:58] alkemist has joined #selenium
+[10:01:14] barancev: :ci
+[10:01:15] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[10:02:32] ibot1 has joined #selenium
+[10:07:17] dawagner has joined #selenium
+[10:10:21] santiycr has joined #selenium
+[10:13:28] jamesoram has joined #selenium
+[10:14:38] samphippen has joined #selenium
+[10:18:00] testingb0t has joined #selenium
+[10:23:01] soc42 has joined #selenium
+[10:28:11] icio has joined #selenium
+[10:41:05] Manoj_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 11:03:27 2013]
+[11:03:27] _kW has joined #selenium
+[11:06:55] ibot1 has left #selenium
+[11:16:45] davehunt has joined #selenium
+[11:25:54] Ardesco: is the prebuilt safari extension going to be added to the selenium download page
+[11:26:28] Ardesco: as a standalone download
+[11:28:39] Ardesco: or is that 2.31.0?
+[11:32:51] freynaud has joined #selenium
+[11:37:45] Dave_B has joined #selenium
+[11:48:58] Dave_B: hi guys - quick question about node configuration
+[11:49:57] Dave_B: does platform 'Windows' match with XP & Vista? Will there be further options added for new flavours of windows?
+[11:54:42] jimevans has joined #selenium
+[11:57:37] barancev: Ardesco: it's bundled
+[11:58:07] Ardesco: not seen it
+[11:58:20] Ardesco: in the selenium-server zip
+[11:58:28] Ardesco: do you know what it's bundled with
+[IRC logfile - Started Thu Feb 21 12:00:28 2013]
+[12:00:28] barancev: it's bundled into selenium-java
+[12:01:18] barancev: I see it inside selenium-server-2.30.0.jar too
+[12:01:21] Phil37 has joined #selenium
+[12:01:34] jimevans: Ardesco: if you're talking about the Safari extension, it's now bundled into the jar (and the .NET assembly for .NET), and is installed/uninstalled on-demand at runtime.
+[12:01:50] Ardesco: ah so i need to do nothing then
+[12:01:54] jimevans: indeed
+[12:01:56] Ardesco: fair enough
+[12:01:57] Ardesco: :)
+[12:02:41] jimevans: screw you IT departments worldwide for forcing me to create a trial account at mcafee.
+[12:02:58] Ardesco: s/mcaffe/norton/
+[12:03:25] Ardesco: which is even worse IMHO
+[12:04:30] jimevans: yeah, but i hear about UnhandledAlertExceptions from mcafee users.
+[12:06:01] Ardesco: I'm just being facetious because norton bought mcafee and IMHO they have been going downhill ever since
+[12:06:07] Phil37: moving a test fraework from using the firefoxdriver to chromedriver shouldn't present too many issues no?  i've tried moving to the IEDriver before and it was a tad bothersome
+[12:06:40] jimevans: norton bought mcafee? did intel then buy norton?
+[12:07:04] jimevans: Phil37: that's because the IE driver is a piece of shit.
+[12:07:18] Phil37: lol
+[12:07:25] Phil37: i didnt want to say it in those words
+[12:07:37] barancev: IE driver atm passes more tests than Opera or Chrome
+[12:07:51] Phil37: thats surprising
+[12:08:13] jimevans: Phil37: but as the IE driver developer always says, "patches welcome"
+[12:08:26] barancev: at least it's my impression of :ignores
+[12:08:27] selbot2: http://ignores.ci.seleniumhq.org/
+[12:08:33] Ardesco: Phil37: my experience is that you will need to add more explicit waits to get chrome working
+[12:08:52] Phil37: alright, good to know
+[12:08:56] Ardesco: and you will probably come across one or two chrome oddities
+[12:09:58] Ardesco: one we have right now is that when running tests against chrome in sauce elements that require a hover to show the element and then a click to got to a link don't work, we have to do a senKeys(Keys.RETURN) instead
+[12:10:03] Ardesco: it all works fine locally though
+[12:10:16] Ardesco: and stepping through it does everything, the click just doesn't seem to register
+[12:10:22] Ardesco: not sure what that's all about yet
+[12:10:28] Phil37: hmm
+[12:10:29] Ardesco: but it's only when running against sauce
+[12:10:46] Ardesco: o_O
+[12:11:06] Phil37: we can find out what driver we're currently using somehow cant we?  in case there needs to be driver specific code somwhere
+[12:11:26] Phil37: like do this with FFDriver or this for Chrome
+[12:12:35] Ardesco: ((RemoteWebDriver) driver).getCapabilities().getBrowserName()
+[12:12:50] Phil37: sick, thx
+[12:13:16] Hronom has joined #selenium
+[12:15:38] jeichar has joined #selenium
+[12:31:58] vtali has joined #selenium
+[12:37:25] Bebe_ has joined #selenium
+[12:51:32] jimevans has joined #selenium
+[12:57:38] jamesoram has joined #selenium
+[12:57:55] girija has joined #selenium
+[12:57:57] p_l has joined #selenium
+[IRC logfile - Started Thu Feb 21 13:19:15 2013]
+[13:19:15] aweiteka has joined #selenium
+[13:21:14] rpereira_ has joined #selenium
+[13:25:58] RossPatterson has joined #selenium
+[13:25:58] ChanServ has altered RossPatterson's mode: +o
+[13:25:58] selbot2: RossPatterson: note from santiycr about 15 hours ago: lol 
+[13:30:42] girija has joined #selenium
+[13:31:19] samphippen has joined #selenium
+[13:33:03] gdennis has joined #selenium
+[13:41:43] Ardesco: coordinates.onPage().x is returning a null in FF
+[13:42:09] Ardesco: having to use coordinates.locationInViewPort.x instead
+[13:42:40] jimevans has joined #selenium
+[13:44:35] mreedell-work has joined #selenium
+[13:47:43] icio_ has joined #selenium
+[13:51:02] jarib has joined #selenium
+[13:51:29] davehunt has joined #selenium
+[13:55:14] farlan has joined #selenium
+[13:56:10] samphippen has joined #selenium
+[13:57:05] barancev: Ardesco: what language binding?
+[IRC logfile - Started Thu Feb 21 14:01:15 2013]
+[14:01:15] ibot1 has joined #selenium
+[14:05:42] p_l has joined #selenium
+[14:12:12] cmcgraw has joined #selenium
+[14:12:26] dude-x has joined #selenium
+[14:16:19] llaskin has joined #selenium
+[14:19:07] Ardesco: java
+[14:19:24] Ardesco: sorry change x to getX()
+[14:19:24] alkemist has joined #selenium
+[14:19:27] Ardesco: (groovy)
+[14:19:48] Ardesco: just making our tests green again atm :)
+[14:23:33] barancev: Ardesco: in Java element.getCoordinates().onPage() just calls down to element.getLocation()
+[14:24:22] barancev: and getX() returns int, how can it be null?
+[14:25:01] Ardesco: no idea haven't tried to debug it yet
+[14:25:06] Ardesco: works fine in Safari/Chrome
+[14:25:17] Ardesco: was failing in Firefox
+[14:25:22] Ardesco: IE runs haven't completed yet
+[14:25:27] barancev: type int does not allow null :)
+[14:25:48] Ardesco: let me step through
+[14:25:52] Ardesco: (again)
+[14:27:19] p_l has joined #selenium
+[14:27:46] jimevans: stay tuned for our next episode where our intrepid hero bows to the pressure of the masses and dies a little death to mcafee and its ilk.
+[14:28:05] Ardesco: ok
+[14:28:16] Ardesco: ((Locatable) rectElement).getCoordinates().onPage() is throwing a NPE for me
+[14:28:30] dude-x: jimevans: back in 2000 i liked McAfee
+[14:28:31] nirvdrum has joined #selenium
+[14:28:47] dude-x: by 2003 mcaffee was becoming bloatware as bad as symantec/norton
+[14:28:57] *jimevans is sick and tired of the bitching;.
+[14:28:58] p_l: jimevans: ... why 'little death'?
+[14:29:34] dude-x: it's like a piece of his 'soul' dies or fades away
+[14:29:46] dude-x: or he loses a few years of his lifespan :p
+[14:30:04] cgoldberg has joined #selenium
+[14:30:18] p_l: dude-x: http://en.wikipedia.org/wiki/La_petite_mort
+[14:30:39] RossPatterson: Not quite the same thing.  Except for viruses :-)
+[14:31:06] zeljkof has joined #selenium
+[14:31:15] jimevans: p_l: i'm well aware of the colloquialism, but not what i meant. my usage is much close to dude-x's interpretation.
+[14:32:06] dude-x: never knew of the orgasm connection; but i don't tihnk passing out is the same as dying; when i got a CT scan with contrast, the dye made me feel like i was dying
+[14:32:07] p_l: jimevans: I know. It's just that when that line of yours was the *only* one I had seen (due to flaky network)...
+[14:32:15] barancev: Ardesco: what's runtime type of rectElement?
+[14:32:55] barancev: is it a "pure" RemoteWebElement or a wrapper?
+[14:33:06] Ardesco: it's going through PageFactory
+[14:33:11] Ardesco: maybe that's what the problem is
+[14:33:37] barancev: aha.. I see.. there should be a proxy
+[14:33:42] barancev: I'll check
+[14:33:54] barancev: http://hsmaker.com/harlemshake.asp?url=http://www.seleniumhq.org/
+[14:34:05] barancev: just for fun :)
+[14:34:23] testingb0t: :)
+[14:35:01] Ardesco: ((Locatable) driver.findElement(org.openqa.selenium.By.cssSelector("#analysis-overlay-chart-activity > div > *"))).getCoordinates().onPage() is also returning a null
+[14:36:08] dude-x: it seems the original harlem shake video has 4 japanese dudes fooling around, but i wonder who was the first to make a 1 guy, then eveyone flip out video
+[14:38:40] barancev: Ardesco: can't reproduce, works for me
+[14:38:52] barancev: does it throw on any element?
+[14:39:30] Ardesco: I'm using it to work out where to hover on a high charts chart
+[14:39:41] Ardesco: looks like something is going wrong in getLocation() for me
+[14:40:04] Ardesco: inViewPort(0 seems to be fine so maybe its
+[14:40:17] Ardesco: GET_ELEMENT_LOCATION rather than GET_ELEMENT_LOCATION_ONCE_SCROLLED_INTO_VIEW
+[14:40:21] *Ardesco is guessing
+[14:40:55] Ardesco: i'll try to get a minimised test case put together tonight
+[14:41:38] barancev: https://code.google.com/p/selenium/source/browse/java/client/src/org/openqa/selenium/remote/RemoteWebElement.java#329 -- I can't understand how can this method return null?
+[14:42:03] barancev: it can throw, may be
+[14:42:10] barancev: but it can't return null!
+[14:42:25] barancev: unless you use a wrapper
+[14:44:23] Ardesco: it's throwing an NPE
+[14:44:52] Ardesco: did i say returns null?
+[14:44:55] *Ardesco loos back
+[14:45:12] Ardesco: I did the second time
+[14:45:26] Ardesco: sorry i should have said
+[14:45:31] Ardesco: ((Locatable) driver.findElement(org.openqa.selenium.By.cssSelector("#analysis-overlay-chart-activity > div > *"))).getCoordinates().onPage() is also returning a null pointer error
+[14:45:36] gkuhl has joined #selenium
+[14:46:02] *Ardesco slaps self
+[14:46:21] barancev: ok, much better, it's quite posssible :)
+[14:47:02] Ardesco: i'll look at it in more detail tonight when I get back from work
+[14:47:34] barancev: Ardesco: do you know which line of code throws?
+[14:47:59] jimevans: allow me to issue a hearty "screw you" to all of the IT departments everywhere who've forced me to install mcafee just to try to figure out why it fscks up the IE driver.
+[14:48:05] barancev: full stack trace would help
+[14:48:07] Ardesco: nope 
+[14:48:43] Ardesco: actually yes
+[14:48:44] Ardesco: at org.openqa.selenium.remote.RemoteWebElement.getLocation(RemoteWebElement.java:334)
+[14:48:51] Ardesco: gimmie a sec to gist
+[14:48:52] barancev: jimevans: I hope you reproduced the issue, at least :)
+[14:49:01] jarib has joined #selenium
+[14:49:33] jimevans: barancev: oh, i've reproduced it. doesn't mean there's an easy way around it.
+[14:49:36] Ardesco: https://gist.github.com/Ardesco/5005206
+[14:49:42] barancev: Ardesco: 334: int x = ((Number) rawPoint.get("x")).intValue();
+[14:49:58] jibay has joined #selenium
+[14:50:22] RossPatterson: jimevans: Declare an unsupported environment and claim victory?
+[14:50:26] barancev: so the browser returned null instead of x coordinate. interesting. what's the element it is?
+[14:50:37] Ardesco: it's part of an SVG
+[14:50:46] RossPatterson: s/an/it an/
+[14:50:48] Ardesco: just to make things really awkward
+[14:51:08] barancev: hmm... yes, awkward you call it
+[14:51:19] jimevans: RossPatterson: i prefer Ardesco's approach. slap the IT team upside the head.
+[14:51:41] Ardesco: jimevans it works surprisingly well sometimes
+[14:51:41] *RossPatterson slaps IT around a bit with a large trout
+[14:51:59] *RossPatterson gives jimevans the /slap
+[14:52:03] Ardesco: others you find out they are bigger than you and can slap harder, but at least you get a warm feeling for trying
+[14:59:24] dude-x: jimevans: that reminds of the time i would call dell tech support and they would have me go through their script
+[14:59:30] dude-x: somtimes i'd fake it
+[IRC logfile - Started Thu Feb 21 15:00:21 2013]
+[15:00:21] Ardesco: I remember the time I had to call a BT hell desk when my broadband wasn't working and got routed through to india
+[15:00:31] Ardesco: they aced me if the router was plugged into the wall
+[15:00:55] Ardesco: and stupidly I said, "Well no it's plugged into a micro filter, and that is plugged into the wall"
+[15:01:34] dude-x: i once called dell tech support and got someone who didn't make me go through the song and dance, and actually told me about a hidden bios trick
+[15:01:36] Ardesco: (we need to use micro filters here to stop interference between the data and voice signals just in case you don't need to do that in your country of origin and have no idea what i'm talking about
+[15:01:40] dude-x: it actually fixed the problem
+[15:01:53] Ardesco: they told me that my problem was because I was using a mircofilter and told me to remove it
+[15:01:54] dude-x: i wish i wrote down that bios trick....
+[15:02:09] Ardesco: and refused to believe that in the UK we need to use mircofilters 
+[15:02:10] dude-x: Ardesco: that sounds like bad advice
+[15:02:13] Ardesco: and would not test my line
+[15:02:17] Ardesco: (which was b0rked)
+[15:02:27] Ardesco: had to phone back 3 times
+[15:02:43] qaguy has joined #selenium
+[15:02:44] Ardesco: bsaicall BT sucks :)
+[15:11:41] richkazin has joined #selenium
+[15:11:51] dude-x: they're the monopoly telco aren't they?
+[15:13:12] gkuhl: I'm using a drop down menu (jquery) with 2.30 and firefox 19 (ruby, Mac) but i keep getting Selenium::WebDriver::Error::MoveTargetOutOfBoundsError: Element cannot be scrolled into view: when I try to click an item on the drop down, even though it's clearly visible in the window. anybody seen this or have any idea why? thx.
+[15:16:37] zeljkof has joined #selenium
+[15:17:16] samphipp_ has joined #selenium
+[15:19:11] intchanter-work has joined #selenium
+[15:19:27] stackedsax has joined #selenium
+[15:22:50] eranm has joined #selenium
+[15:22:57] eranm: jimevans, yt?
+[15:23:05] jimevans: eranm: i am. s'up?
+[15:23:19] eranm: Good! Doing alright?
+[15:24:00] jimevans: meh. i'm a little peeved at stubborn IT departments who won't let their users configure their machines right now, but yeah, i'm good.
+[15:24:06] jimevans: you feeling better?
+[15:24:29] eranm: You know, it could be worse. Those IT departments could force their users to stay on IE6.
+[15:24:46] jimevans: eranm: many do! :)
+[15:24:46] eranm: I'm better, thanks. not with a fever anymore, anyway
+[15:24:56] jimevans: good that.
+[15:25:04] eranm: I was wondering: Are full-page screenshots expected to work with IE10?
+[15:25:32] eranm: I've never tried taking a screenshot on IE10, on account of not having windows 8 anywhere
+[15:26:06] jimevans: i doubt it. i don't have a windows 8 environment to test on, but screenshots are one of the things that dawagner noted as not working entirely correctly when we first started looking at IE10 compatibility.
+[15:26:22] barancev: dawagner: hi! jenkins missed several commits, it is alive?
+[15:26:58] jimevans: i suspect something got borked by MSFT in windows 8, screwing with the hack we use to get full-page screenshots.
+[15:27:13] jimevans: but that's pure speculation on my part.
+[15:27:33] barancev: where are pull-requests from MS people?
+[15:27:54] jimevans: barancev: nonexistent as of yet. (which was my fear/prediction)
+[15:28:40] jimevans: eranm: glad you're here. i've a question on the interactions lib.\
+[15:29:11] jimevans: for firefox specifically
+[15:29:16] eranm: I can try my best to answer
+[15:31:34] jimevans: in interactions.h, you've #define'd BOOL_TYPE to be "boolean" for microsoft compilers. any reason not to define it as "bool
+[15:31:35] jimevans: "?
+[15:33:43] eranm: jimevans, I believe it's because 'boolean' was exported to a type that matches the gecko sdk, while 'bool' wasn't. If it compiles with 'bool', by all means, change it.
+[15:34:03] jimevans: let's take a look.
+[15:35:56] jimevans: seems to build incrementally. let me try a clean first.
+[15:36:56] jimevans: eranm: also, would you mind updating the firefox native events prebuilts when you get a chance?
+[15:37:02] jimevans: for FF19, i mean.
+[15:38:48] eranm: jimevans, you may have to include stdbool.h 
+[15:39:08] eranm: jimevans, I'll be happy to. It may take until tomorrow though
+[15:39:10] jimevans: eranm: don't seem to. looks like it builds just fine for me on windows.
+[15:42:42] eranm: then feel free to remove it
+[15:53:51] rmartin_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 16:01:41 2013]
+[16:01:41] bluescreen10 has joined #selenium
+[16:02:35] zac_sel has joined #selenium
+[16:02:35] girija has joined #selenium
+[16:14:17] dawagner: barancev: hi
+[16:14:32] dawagner: What commits did it miss?
+[16:15:29] intchanter-work: When I run SmallTests, the ThreadGuard test throws an assertion, terminates the run and reports it as a failure.  The message I get is exactly what ThreadGuard is throwing, though.
+[16:15:54] intchanter-work: Is this expected to not pass on OpenJDK (64-bit, 1.7.0_09-icedtea)?
+[16:16:56] smccarthy has joined #selenium
+[16:17:13] gkuhl has left #selenium
+[16:17:31] kaawee has joined #selenium
+[16:21:15] bogus_ has joined #selenium
+[16:25:14] admc has joined #selenium
+[16:25:23] stephend has joined #selenium
+[16:34:31] SamuraiJack has joined #selenium
+[16:37:34] RossPatterson has joined #selenium
+[16:37:35] ChanServ has altered RossPatterson's mode: +o
+[16:37:51] Selenium-Git has joined #selenium
+[16:37:51] Selenium-Git: [13selenium] 15intchanter opened pull request #17: Typo in ThreadGuard.java (06master...06master)  02http://git.io/TEcxqg
+[16:37:51] Selenium-Git has left #selenium
+[16:37:52] selbot2: 03 closed/duplicate Se-IDE formatters for Se-2 bindings - https://code.google.com/p/selenium/issues/detail?id=17 [Type-Defect Priority-Medium Component-IDE] (duplicate of https://code.google.com/p/selenium/issues/detail?id=2003)
+[16:44:58] farlan: is there a schedule out for SeConf yet?
+[16:45:14] stackedsax has joined #selenium
+[16:48:21] jimevans: farlan: not yet.
+[16:49:23] farlan: jimevans: thanks, any idea when it will be posted?  Trying to figure out if I the team is going to find it helpful to attend
+[16:50:40] jimevans: farlan: the speaker selection committee just finished selecting talks. speaker notifications whole be going out soon-ish, and i'd expect a public listing of speakers and topics soon afterward.
+[16:50:50] llaskin: we expect next weekish
+[16:50:58] llaskin: probably early in the week I think
+[16:51:02] farlan: cool thanks
+[16:51:09] llaskin: (I'm not on the speaker committee but am involved w/ SE Conf)
+[16:51:16] llaskin: I would assume that the talks are going to be beneficial
+[16:54:38] Selenium-Git has joined #selenium
+[16:54:38] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 5 new commits to 06master: 02http://git.io/V4-oGA
+[16:54:38] Selenium-Git: 13selenium/06master 14f4b4019 15Jim Evans: Supressing warnings when building Firefox native components on Windows.
+[16:54:38] Selenium-Git: 13selenium/06master 14378ecaf 15Jim Evans: Disabling builds for newly created Firefox C++ projects on unsupported platforms
+[16:54:38] Selenium-Git: 13selenium/06master 14e251cc1 15Jim Evans: Allow extraction of IEDriverServer components to custom directory in .NET...
+[16:54:38] Selenium-Git has left #selenium
+[16:55:15] nhirata has joined #selenium
+[16:55:34] plightbo_work has joined #selenium
+[16:57:03] stephend_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 17:05:16 2013]
+[17:05:16] samphippen has joined #selenium
+[17:05:19] lukeis has joined #selenium
+[17:08:36] zeljkof has joined #selenium
+[17:14:53] sfbrian has joined #selenium
+[17:15:54] jcarr has joined #selenium
+[17:20:26] barancev: dawagner: np, this time jenkins started jobs
+[17:22:43] diminoten: hm does anyone have a link for self signed certs and chrome driver?
+[17:22:51] diminoten: I remember there's a thing, I forget what it is though
+[17:25:06] dawagner: barancev: It has some filters for which directories it pays attention to
+[17:26:46] diminoten: hm, what's this?: selenium.common.exceptions.WebDriverException: Message: "Can't load the profile. Profile Dir: /var/folders/xp/q5nqjwwx1ns0c29g_q6w29bw0000gn/T/tmpIsvaoy Firefox output: *** LOG addons.xpi: startup\n*** LOG addons.xpi: Skipping unavailable install location app-system-share\n*** LOG addons.xpi: checkForChanges\n*** LOG addons.xpi: No changes found\n"
+[17:28:55] diminoten: when I call webdriver.Firefox()
+[17:28:59] diminoten: python bindings
+[17:29:28] diminoten: os x, selenium 2.30 heh
+[17:29:49] dude-x: diminoten: what version of firefox?
+[17:30:08] diminoten: 16.0.2
+[17:30:14] gdennis has joined #selenium
+[17:30:21] dude-x: upgrade to at least version 17-18-19
+[17:30:42] diminoten: okay
+[17:31:11] dude-x: latest version will only support the current and last (two) versions reliably
+[17:31:46] diminoten: that's fair, I didn't even think to check that
+[17:34:21] sassda has joined #selenium
+[17:34:50] jleyba_ has joined #selenium
+[17:37:03] alkemist has joined #selenium
+[17:38:12] diminoten: bleh my mac python site-packages dir was the wrong one, easy_install was throwing stuff elsewhere
+[17:38:16] diminoten: all fixed, works now :D
+[17:39:45] dude-x: i use pip
+[17:39:49] dude-x: in a virtual env
+[17:39:51] dude-x: on my mac
+[17:40:14] zeljkof has joined #selenium
+[17:46:16] nhirata has joined #selenium
+[17:47:13] barancev: so Firefox 19 Linux Native Java Tests fails as well as other FF versions
+[17:47:21] barancev: all the other tests are ok
+[17:54:08] smccarthy has joined #selenium
+[17:54:54] qaguy has joined #selenium
+[17:56:57] zeljkof has joined #selenium
+[17:57:16] stephend has joined #selenium
+[IRC logfile - Started Thu Feb 21 18:01:31 2013]
+[18:01:31] dawagner: lukeis: yt?
+[18:01:41] lukeis: si señor
+[18:01:57] dawagner: Do you know the app id of our appengine stuff?
+[18:02:19] lukeis: it's in the source :)… i'll look it up
+[18:02:49] lukeis: sehq-docs ? or is there another id?
+[18:03:48] lukeis: dawagner: https://appengine.google.com/dashboard?&app_id=s~sehq-docs   :)
+[18:03:51] jeichar has joined #selenium
+[18:04:44] dawagner: Cheers :)
+[18:05:06] lukeis: dawagner: heh, billing failed apparently ;)
+[18:05:58] barancev: jimevans: can you explain what #1364 means?
+[18:05:59] selbot2: 03 open/new Snapsie - Failed to get HWND for browser (is this a frame?) - https://code.google.com/p/selenium/issues/detail?id=1364 [Type-Defect Priority-Medium]
+[18:06:28] barancev: (I guess it is related to IE)
+[18:08:52] qaguy has joined #selenium
+[18:08:53] Swadq has joined #selenium
+[18:10:58] jamesoram has joined #selenium
+[18:15:10] rbalent has joined #selenium
+[18:15:11] rbalent has joined #selenium
+[18:17:52] sent_hil: I keep getting  Timed out waiting for asyncrhonous script result after 7 ms (WARNING: The server did not provide any stacktrace information)" if I call executeAsyncScript from webdriver.js even for the examples in webdriver.js
+[18:19:07] barancev: dawagner: any plans to make another attempt to move from jetty to webbit?
+[18:19:16] barancev: (test server, I mean)
+[18:20:06] dawagner: barancev: I'd love for it to happen, but I doubt I'm personally going to get to it any time soon...
+[18:20:53] barancev: iirc, there was a plan to use webbit for the grid too, right?
+[18:20:59] rpereira_ has joined #selenium
+[18:23:25] linguini has joined #selenium
+[18:24:16] diminoten: is delete_all_cookies in the python bindings async?
+[18:24:38] icio has joined #selenium
+[18:27:06] Swadq_ has joined #selenium
+[18:39:09] Archdude_ has joined #selenium
+[18:41:29] santiycr has joined #selenium
+[18:43:05] vtali_ has joined #selenium
+[18:43:17] awilson820 has joined #selenium
+[18:45:39] jcarr has joined #selenium
+[18:46:12] diminoten: iterating through the list of cookies and deleteing them was more successful than just calling "delete_all_cookies"
+[18:55:02] llaskin has joined #selenium
+[18:57:47] Archdude has joined #selenium
+[18:59:15] Archdude_ has joined #selenium
+[IRC logfile - Started Thu Feb 21 19:00:41 2013]
+[19:00:41] Archdude has joined #selenium
+[19:03:37] zeljkof has joined #selenium
+[19:06:06] bogus_ has joined #selenium
+[19:14:45] jimevans: barancev: sorry, was out to lunch. near as i can tell, that bug is dealing with snapsie, which was a browser plugin to help RC take screenshots of IE (if memory serves).
+[19:15:19] jimevans: if nirvdrum is around, he'd probably be better informed as to its disposition.
+[19:19:14] barancev: ok, it's RC issue, al least some information
+[19:19:31] vtali has joined #selenium
+[19:23:42] kaawee has joined #selenium
+[19:31:34] Archdude_ has joined #selenium
+[19:32:06] nirvdrum: I've been summoned?
+[19:32:46] Archdude has joined #selenium
+[19:33:01] llaskin: nirvdrum:  nirvdrum nirvdrum  (its like saying candyman)
+[19:36:10] markalanevans has joined #selenium
+[19:38:41] barancev: nirvdrum: I was asking what #1364 means :)
+[19:38:43] selbot2: 03 open/new Snapsie - Failed to get HWND for browser (is this a frame?) - https://code.google.com/p/selenium/issues/detail?id=1364 [Type-Defect Priority-Medium]
+[19:39:42] nirvdrum: barancev: Is he running it as a service?  I'm not sure why he'd get that.
+[19:40:02] zeljkof has joined #selenium
+[19:40:10] nirvdrum: There's also the problem that the "fixed" version of SnapsIE isn't compatible with Selenium RC right now, IIRC.
+[19:40:19] nirvdrum: I ought to fix that.
+[19:40:35] barancev: the issue is dated Mar 4, 2011
+[19:40:38] nirvdrum: It had to do with the IDispatch method changing the number of parameters.
+[19:41:01] nirvdrum: barancev: Arguably the issue should be closed.  SnapsIE has its own issue tracker.
+[19:41:28] nirvdrum: That apparently I've ignored because the issue is already filed over there :-P
+[19:56:03] admc has joined #selenium
+[IRC logfile - Started Thu Feb 21 20:02:46 2013]
+[20:02:46] Archdude_ has joined #selenium
+[20:13:26] garndt: jimevans: yt?
+[20:13:32] jimevans: i am. s'up?
+[20:13:56] garndt: I wanted to get your opinion on something.  Sometimes the ie driver will become unresponsive and windows will popup a dialog indicating that with a button to close the program.  However this still keeps the process around and the script just waits there forever.  So far I've been just manually killing the process and closing the browser window to get it to
+[20:13:56] garndt: error out and continue onto the next test.  Any suggestions of handling that programmatically?
+[20:14:24] garndt: Was just having a brain fart right now and wanted to see if you had an idea.
+[20:14:55] garndt: It doesn't happen often, but when it does happen I would just like it to fail silently and continue on
+[20:15:57] jimevans: garndt: i'd wager what's happening is that the IEDriverServer.exe is actually crashing. you're not going to silently fail and continue from that. the executable needs to be fixed.
+[20:17:21] garndt: Oh ok, well good to know so I don't spend time trying to hack some solution together
+[20:18:22] jimevans: reproducible test cases and/or patches are always welcome. :)
+[20:18:29] garndt: yes yes, I know :)
+[20:19:00] garndt: I'm trying to reproduce it.  my logs got blown away last time (whoops) so I'm trying to track it down.  like I said, it's not all the time when running this series of tests, so it's not the same failure point every time
+[20:19:34] jimevans: and if you can't reproduce it reliably, there's no way on earth i'll be able to.
+[20:20:27] garndt: You're a C++ hacker, IE master, and computer mind reader.  You have the qualifications to do it!
+[20:21:17] jimevans: i remind you, sir, that i am none of those things. :)
+[20:21:22] garndt: heh
+[20:30:41] dude-x: he is merely Jim Evans
+[20:32:57] kallisti has joined #selenium
+[20:32:57] kallisti has joined #selenium
+[20:37:46] alkemist has joined #selenium
+[20:42:21] santiycr has joined #selenium
+[20:44:41] phishy has joined #selenium
+[20:48:04] zeljkof has joined #selenium
+[20:51:49] barancev: lukeis: is #1930 complete?
+[20:51:51] selbot2: 03luke.semerau open/accepted [Documentation] Selenium Python documentation - https://code.google.com/p/selenium/issues/detail?id=1930 [Type-Enhancement Priority-Medium Lang-Python Component-Docs]
+[20:54:37] Phasze has joined #selenium
+[20:55:50] Phasze: What environments would you recommend to run webdriver tests in? Currently I'm using NUnit but when I run in the console it won't give me a play by play of each command like Remote Control does.  Anyone have solutions?
+[20:57:27] zeljkof has joined #selenium
+[20:57:50] jimevans: well let's just see how badly this screws everything up.
+[20:57:59] diminoten: no pressure
+[20:59:36] llaskin: ashley: u in charge of the SEConf twitter?
+[IRC logfile - Started Thu Feb 21 21:00:31 2013]
+[21:00:31] kaawee has joined #selenium
+[21:01:35] qaguy has joined #selenium
+[21:02:20] digismack has joined #selenium
+[21:04:30] jimevans: hmm.. oddly enough that didn't break things too badly.
+[21:05:29] barancev: jimevans: which commit do you expect to break the world?
+[21:05:42] jimevans: barancev: not a commit. local change.
+[21:06:10] barancev: :ci
+[21:06:11] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[21:06:52] barancev: andreastt: how is the new operadriver jar coming?
+[21:08:08] dude-x: PSA: the PC/Mac client of Spotify acts as a P2P node to stream music
+[21:08:19] dude-x: dosen't matter if you pay Spotify
+[21:08:59] jimevans: jleyba: yt?
+[21:10:25] llaskin: dude-x i *LOVE* spotify
+[21:10:34] dude-x: i use it too
+[21:10:41] dude-x: but mostly on my mobile
+[21:10:55] dude-x: now i guess i'll have to firewall or turn off the spotify client
+[21:11:01] dude-x: on my home pc
+[21:12:59] llaskin: yea i run it all day at work
+[21:13:07] llaskin: welp guess they can use my bw
+[21:14:46] llaskin: dude: you going to SEconf?
+[21:15:16] dude-x: yes, but i have to yet to registre
+[21:15:27] dude-x: i'm still waiting to hear if they will expense the trip/ticket
+[21:16:22] llaskin: awilson820: does marcus ever hop into the chat room here?
+[21:18:08] qaguy has joined #selenium
+[21:18:28] awilson820: llaskin: i don't think i've seen him. but i'd email him to see if he can
+[21:18:39] awilson820: he may not know about it
+[21:18:52] llaskin: s'ok
+[21:19:54] phishy has joined #selenium
+[21:23:14] zeljkof has joined #selenium
+[21:27:12] freynaud has joined #selenium
+[21:29:26] testingb0t has joined #selenium
+[21:31:23] runnyspot has joined #selenium
+[21:31:34] runnyspot: does add_cookie() not work on IE?
+[21:32:27] vtali has joined #selenium
+[21:33:27] lukeis: it works
+[21:34:54] runnyspot: let me get my stacktrace gisted
+[21:37:58] santiycr has joined #selenium
+[21:39:15] runnyspot: gist and code for ie cookie problem: https://gist.github.com/anonymous/08152e9b2edc186f3e9f
+[21:40:25] runnyspot: santiycr: the gist i just posted is happening on sauce, so feel free to take a look ;)
+[21:43:11] santiycr: runnyspot:  got the link to the job in the sauce end?
+[21:43:34] runnyspot: santiycr: https://saucelabs.com/tests/b76e290208d2493a81a835a778565017
+[21:43:41] runnyspot: do i need to make it public for you?
+[21:44:17] doktrin has joined #selenium
+[21:44:38] santiycr: nope
+[21:44:57] santiycr: wonder wether the fact that you're missing :8000 in the cookie domain could be connected
+[21:45:07] runnyspot: yeah i was thinking the same
+[21:45:19] runnyspot: it works on firefox fyi
+[21:45:38] runnyspot: i could try hacking that really quick
+[21:45:44] santiycr: yeah, try it out
+[21:45:51] runnyspot: ok thx, give me a few
+[21:45:55] doktrin: does the -htmlSuite parameter only take 1 single HTML file? (new to selenium, looking at an existing set of what-look-like IDE generated test cases (HTML files + java files)
+[21:46:10] santiycr: different drivers have different levels of control over the browser
+[21:46:52] santiycr: that would explain firefoxdriver being able to create cookies on a domain that is not loaded while iedriver may not 
+[21:47:22] runnyspot: well if i do it from about:blank, no browser will add the cookie, which is expected
+[21:47:27] runnyspot: so i load my blank page before
+[21:47:32] runnyspot: and that got it working on ffx
+[21:48:35] santiycr: interesting 
+[21:48:38] santiycr: not surprised, though 
+[21:48:49] santiycr: I'm sure some of the ninjas here can explain this in detail
+[21:49:08] runnyspot: well i just hope concatenating the port works
+[21:51:08] jamesoram has joined #selenium
+[21:52:38] runnyspot: nope :(
+[21:52:43] runnyspot: https://saucelabs.com/tests/59ed1698c82f415891c19cd8568b5511
+[21:54:08] jimevans: runnyspot: for IE, try adding the cookie using the javascript console in the F12 developer tools. if you can't add it there, the IE driver will never be able to add it, full stop.
+[21:54:36] bluescreen10 has joined #selenium
+[21:55:09] runnyspot: i'll try that
+[21:55:31] runnyspot: i think i'll also try logging in normally
+[21:55:38] runnyspot: then dumping the cookie with the webdriver
+[21:55:42] runnyspot: seeing if i can spot the diff
+[21:59:36] barancev: a question about WebElement.submit() method:
+[21:59:43] barancev: according to the javadoc it @throws NoSuchElementException If the given element is not within a form
+[IRC logfile - Started Thu Feb 21 22:00:00 2013]
+[22:00:00] barancev: actually FF and Chrome throw InvalidElementStateException
+[22:00:19] barancev: what's more correct -- docs or implementation?
+[22:00:54] barancev: context: IE does not throw any exception, and I wonder what to implement
+[22:01:38] stephend has joined #selenium
+[22:06:51] Swadq has joined #selenium
+[22:07:49] gdennis has left #selenium
+[22:11:30] dude-x: i thought .submit was one day going to be deprecated… 
+[22:12:54] barancev: unfortunately it was not
+[22:13:25] barancev: :spec
+[22:13:26] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[22:14:35] barancev: yes, the spec does not list it, cool!
+[22:17:06] runnyspot: santiycr: i have a feeling it might be due to the fact that on IE 9/Windows 2008, 'Protected Mode' is enabled. haven't checked other OS/browser combos
+[22:20:42] santiycr: hm, afaik protected mode doesn't do much
+[22:20:45] santiycr: jimevans?
+[22:21:07] jimevans: santiycr: no idea. sorry.
+[22:21:13] runnyspot: ok, i'm going to keep experimenting to try and narrow it down
+[22:21:45] jimevans: again, the litmus test is can you do it via javascript in the F12 developer tools. if you can there, and webdriver can't, then we have an issue.
+[22:22:54] runnyspot: yeah i'm working through that currently
+[22:23:30] barancev: :wiki JsonWireProtocol
+[22:23:31] selbot2: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[22:24:58] barancev: hmm... protocol specification tell nothing on submit of an element that is not whithin any form
+[22:29:50] sayd: is there a way to determine if a particular ajax call happened?
+[22:30:16] runnyspot: jimevans: i was able set the cookie through the JS console
+[22:30:53] jimevans: then we've got something strange happening. under the covers, the IE driver is doing document.cookie = "<cookie string>
+[22:30:54] jimevans: "
+[22:31:34] runnyspot: then i'll try removing the domain, etc from the cookie and setting the main key/val pair
+[22:32:12] jimevans: you could try bumping up the log level of the IEDriverServer and see what the log tells you.
+[22:34:23] jimevans: if you set the log level to at least WARN, we'll at least be able to tell what operation is failing in attempting to add the cookie.
+[22:34:31] runnyspot: ok
+[22:37:59] admc has joined #selenium
+[22:38:05] runnyspot: sorry, but what do i set in desired_caps to up the log level?
+[22:38:24] runnyspot: i'm running in sauce, no local instance unfortunately
+[22:40:44] jimevans: santiycr: ^^
+[22:42:49] jimevans: jleyba: could use an atoms consult when you're available.
+[22:44:46] zeljkof has joined #selenium
+[22:45:51] runnyspot: jimevans: is there any sample code or test that might add a cookie in IE that I could compare with?
+[22:46:09] jimevans: runnyspot: how comfortable are you in java?
+[22:46:44] runnyspot: rusty, but i am surrounded by java devs
+[22:47:01] jimevans: http://selenium.googlecode.com/git/java/client/test/org/openqa/selenium/CookieImplementationTest.java
+[22:47:41] jimevans: if you prefer c#: http://selenium.googlecode.com/git/dotnet/test/WebDriver.Common.Tests/CookieImplementationTest.cs
+[22:48:31] jimevans: these are the tests from the actual integration suite for the webdriver project itself. the java ones are run on all browsers, including IE6-10.
+[22:48:51] jimevans: (though they're failing on IE10 for an as-yet-unknown reason)
+[22:53:04] runnyspot: yeah im gonna need the logs :)
+[22:53:11] runnyspot: maybe i can dig up a windows machine
+[IRC logfile - Started Thu Feb 21 23:00:35 2013]
+[23:00:35] zeljkof has joined #selenium
+[23:01:04] kentor has joined #selenium
+[23:02:34] jarib has joined #selenium
+[23:02:35] kentor: hello, I'm having this weird issue with WebDriverWait which I can't figure out... I'm simply trying to wait for an element which is clearly on the page already but keep getting an exception..
+[23:02:43] kentor: I have this in the html side
+[23:02:43] kentor: <body> <div id="hello" class="hello"> hello </div> 	... 	...
+[23:02:54] kentor: my java snippet is
+[23:02:54] kentor: 	    WebElement myDynamicElement = (new WebDriverWait(driver, 10)) 	    		  .until(ExpectedConditions.presenceOfElementLocated(By.id("hello")));
+[23:03:47] kentor: and the debugger crashes and opens this http://screencast.com/t/MlMSzxr0sk2T
+[23:03:59] kentor: FluentWait.class error... 
+[23:05:53] kentor: why does it say that the class is not found? I've included the jar selenium-server-standalone-2.28.0...
+[23:08:02] kentor: anyone :)
+[23:09:37] lukeis: kentor: that's just your IDE not finding the sources to the class :) you're real error is in the bottom left… timeout exception :)
+[23:10:15] phishy has joined #selenium
+[23:10:19] kentor: yea it went over 10 seconds right?
+[23:10:23] lukeis: yes
+[23:10:32] kentor: but why didn't it find the element :( it is there 100%
+[23:10:39] kentor: i can see it
+[23:11:07] lukeis: iframe?
+[23:11:11] kentor: yes
+[23:11:18] lukeis: did you switch to it? :)
+[23:11:19] kentor: this is on fb
+[23:11:30] kentor: this is in a fb app
+[23:11:39] kentor: no.. :) let me google
+[23:11:50] lukeis: driver.switchTo().frame(….)
+[23:12:08] lukeis: where … could be driver.findElement(By.tagName("iframe"))
+[23:13:01] arcee123 has joined #selenium
+[23:13:18] jost has joined #selenium
+[23:13:43] kentor: oh nice!
+[23:14:32] arcee123: greetings...I am a Selenium noob.  I have been asked to test a html/jquery input.  If i put in a value, then value should be in the drop down box that appears via ajax.  I have the list of items in a text file.  I need to know how to get started....thanks.
+[23:15:03] runnyspot: what language are you using?
+[23:16:07] arcee123: Java
+[23:16:44] arcee123: but I'm open to others.
+[23:17:24] kaawee has joined #selenium
+[23:18:07] smccarthy2 has joined #selenium
+[23:18:13] lukeis: arcee123: have you read the docs? seleniumhq.org/docs/03_webdriver.jsp   and sounds like you'll want to click the drop down element, wait (read chapter 4 of the docs) for the contents to appear, and then assert the options are what is to be expected?
+[23:19:19] arcee123: yes...and if the term is in at least one of the drop downs....then it's a pass.
+[23:19:24] arcee123: I have a large list of terms to check against.
+[23:20:14] lukeis: that's wait Arrays.contains() is for :)
+[23:20:24] lukeis: or you can write a for loop
+[23:22:32] arcee123: ok....I think I see where your going with this...
+[23:24:26] zeljkof has joined #selenium
+[23:31:53] vtali has joined #selenium
+[23:35:09] vtali_ has joined #selenium
+[23:36:52] detroniz_ has joined #selenium
+[23:37:02] detroniz_: http://cdn.memegenerator.net/instances/1024x/35216517.jpg
+[23:37:18] dude-x: ha
+[23:37:26] lukeis: lol
+[23:41:10] dude-x: i should make a grumpy cat meme about selenium IDE questions
+[23:41:36] dude-x: although IDE will live on..
+[23:43:45] lukeis1 has joined #selenium
+[23:45:24] detroniz_: dude-x: what about this one? http://cdn.memegenerator.net/instances/1000x/35217322.jpg
+[23:45:38] barancev: jimevans: is #2002 still true?
+[23:45:40] selbot2: 03 open/accepted click on element in iframe containing cross domain content does nothing when using InternetExplorerDriver - https://code.google.com/p/selenium/issues/detail?id=2002 [Type-Defect Priority-Medium Component-WebDriver Browser-IE]
+[23:49:35] Selenium-Git has joined #selenium
+[23:49:35] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/ydC3pw
+[23:49:35] Selenium-Git: 13selenium/06master 1400b8304 15Santiago Suarez Ordoñez: small changelog update
+[23:49:35] Selenium-Git has left #selenium
+[23:52:24] jimevans: y
+[23:57:26] plightbo_work has joined #selenium
+[23:59:30] jimevans: barancev: the provided example no longer works with the current website, but finding a different link on that page as currently built does work, even when hosted inside an iframe.

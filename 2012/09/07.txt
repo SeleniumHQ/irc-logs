@@ -1,0 +1,172 @@
+[IRC logfile - Started Fri Sep  7 16:37:51 2012]
+[16:38:01] selloggingbot has joined #selenium
+[16:38:30] andreastt: dawagner: Which XML deserialization libraries should I be looking at?  I like GSON for JSON, but I've never done anything with XML in Java before.
+[16:38:48] andreastt: A colleague of mine wrote a piece of code that deserializes some XML files, and it's justâ€¦ horrible.
+[16:38:54] andreastt: There must be a better way.
+[16:40:06] dawagner: andreastt: I've avoided XML in Java my entire life.  I fundamentally object.
+[16:40:09] dawagner: (Sorry :p)
+[16:40:29] andreastt: Wise choice.
+[16:40:46] ccooper1: are you looking for object marshalling?
+[16:40:51] ccooper1: or just xml parsing
+[16:41:27] andreastt: Just parsing.
+[16:41:43] andreastt: Apparently we store test profiles for builds in XML for some insane reason.
+[16:42:18] andreastt: dawagner: STP/0 (the predecessor of STP/1 in Scope) used XML.  We luckily averted disaster before writing OperaDriver. d-:
+[16:43:01] ccooper1: its too bad you can't use groovy
+[16:43:04] ccooper1: makes it real easy
+[16:47:26] dmachi1 has joined #selenium
+[16:48:17] dawagner: Ick :(
+[16:49:26] lfryc has joined #selenium
+[16:49:26] lfryc has joined #selenium
+[16:51:12] dmachi has joined #selenium
+[16:55:37] lucabox has joined #selenium
+[16:55:43] lukeis: andreastt: just write a script to convert it all to json ;)
+[16:57:19] stackedsax has joined #selenium
+[IRC logfile - Started Fri Sep  7 17:00:16 2012]
+[17:00:16] dmachi1 has joined #selenium
+[17:02:05] teodosia_sel has left #selenium
+[17:10:44] zac_sel has joined #selenium
+[17:11:07] stephend has joined #selenium
+[17:14:09] stephend_ has joined #selenium
+[17:16:59] stackedsax has joined #selenium
+[17:24:18] jleyba has joined #selenium
+[17:28:02] rpereira_ has joined #selenium
+[17:40:25] sassda has joined #selenium
+[17:45:43] towski has joined #selenium
+[17:48:16] llaskin has joined #selenium
+[17:48:27] llaskin: what is the browser name for chrome to initiate a chrome session?
+[17:48:29] llaskin: chromium?
+[17:50:11] lukeis: llaskin: just chrome i thought
+[17:50:45] o3u has joined #selenium
+[17:51:22] rbalent has joined #selenium
+[17:51:23] rbalent has joined #selenium
+[17:54:15] jimevans: llaskin: for rc?
+[17:54:18] jimevans: googlechrome
+[17:56:00] llaskin: no for WD
+[17:56:29] lukeis: "chrome" then
+[17:56:55] *lukeis just looked at what they python bindings say ;)
+[IRC logfile - Started Fri Sep  7 18:03:48 2012]
+[18:03:48] nhirata has joined #selenium
+[18:04:32] simonstewart has left #selenium
+[18:12:30] awilson820 has joined #selenium
+[18:13:52] brokenthumbs has joined #selenium
+[18:30:33] santiycr has joined #selenium
+[18:36:13] nhirata has joined #selenium
+[18:37:24] stackedsax1 has joined #selenium
+[18:41:08] xeranas has joined #selenium
+[18:41:31] jleyba: andreastt: Is it possible to start Opera with the popup blocker disabled?
+[18:43:53] *jimevans sighs heavily, as if the weight of the world was on his shoulders.
+[18:47:17] anlee has joined #selenium
+[18:47:42] jimevans: can we as a group of influencers please beat people up every time they use the INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS capability in IE?
+[18:48:25] jimevans: (unless they can prove they really, Really, REALLY know what they're doing)
+[18:51:43] jimevans: i mean, i really would've thought something with a big honkin' scary name like INTRODUCE_FLAKINESS would discourage its use, but i guess not.
+[18:54:25] anlee: have anyone encountered a behaviour when running multiple tests in parallel using the grid, when there are 2 or more tests waiting for a node, the node stalled (browser stop doing anything), and I see exception: "OpenQA.Selenium.WebDriverException: No response from server for url http://prdev-goliath:4444/wd/hub/session".  I found something with issue 2424 but its already closed... 
+[18:55:35] stackedsax has joined #selenium
+[IRC logfile - Started Fri Sep  7 19:12:38 2012]
+[19:12:38] santiycr: adamgoucher:  yt?
+[19:12:42] jimevans has left #selenium
+[19:13:22] adamgoucher: yup
+[19:13:25] andreastt: jleyba: The later versions of OperaDriver disable the popup blocker by default.
+[19:13:45] toabctl has joined #selenium
+[19:14:16] andreastt: jleyba: But if you want to do it explicitly, do this:
+[19:14:20] andreastt: driver.preferences().set("User Prefs", "Ignore Unrequested Popups", false);
+[19:14:50] andreastt: jleyba: Since OperaProfile also share the same OperaArguments interface, you can do that on profile.arguments() too if you want to do it before startup.
+[19:15:43] santiycr: adamgoucher:  looking for how to get the session id from your php-webdriver lib
+[19:15:49] santiycr has left #selenium
+[19:15:53] jleyba: andreastt: Any way to do this through DesiredCapabilities? 
+[19:15:58] santiycr has joined #selenium
+[19:17:05] santiycr: adamgoucher:  trying to build links to sauce jobs
+[19:19:00] andreastt: jleyba: Nope.
+[19:19:25] jfunk has joined #selenium
+[19:19:26] adamgoucher: santiycr: $this->sessionId = substr($this->session->getURL(), strrpos($this->session->getURL(), "/") + 1);
+[19:19:29] andreastt: jleyba: Well.
+[19:19:49] santiycr: adamgoucher:  oh wow
+[19:19:50] andreastt: jleyba: Technically you can create a new OperaProfile instance and pass that in through the opera.profile capability.
+[19:19:51] santiycr: thanks :)
+[19:20:00] andreastt: jleyba: But are you using a very old version?
+[19:20:44] adamgoucher: santiycr: in saunterphp i get that out in setup() and then set the tags, etc. afterwards with it
+[19:21:16] santiycr: I see
+[19:21:31] santiycr: the clean session id is never stored by itself
+[19:21:55] adamgoucher: santiycr: see also https://github.com/Element-34/saunter.php/blob/master/SaunterPHP/Framework/Listeners/StatusListener.php#L41
+[19:24:37] adamgoucher: santiycr: nope. feel free to do something around https://github.com/Element-34/php-webdriver/blob/master/PHPWebDriver/WebDriverBase.php#L95 though is likely the right place for it
+[19:25:58] santiycr: thanks for the details
+[19:26:21] santiycr: I'll fork and make a pull request
+[19:29:27] Swadq has joined #selenium
+[19:30:21] jimevans has joined #selenium
+[19:30:42] jimevans has left #selenium
+[19:32:40] santiycr has joined #selenium
+[19:44:37] dmachi has joined #selenium
+[IRC logfile - Started Fri Sep  7 20:22:13 2012]
+[20:22:13] ignacio_ has joined #selenium
+[20:33:00] jfunk has joined #selenium
+[20:42:22] jarib: :note jimevans did you see http://google-opensource.blogspot.no/2012/09/wicked-good-xpath-faster-javascript.html ?
+[20:42:22] selbot2: ok!
+[20:43:42] andreastt: jarib: That's interesting.
+[20:44:16] andreastt: Greg, what a coincidence. (-:
+[20:45:38] lukeis: jarib: he did see... we talked about it (yesterday? ~ I've lost track of time)
+[IRC logfile - Started Fri Sep  7 21:07:17 2012]
+[21:07:17] santiycr has joined #selenium
+[21:12:44] jibay has joined #selenium
+[21:21:11] stackedsax has joined #selenium
+[21:28:37] zac_sel has joined #selenium
+[21:51:53] dmachi1 has joined #selenium
+[21:51:55] DaveIngram: I'm trying to the element() method that's on an element to select child elements in saunter.php and it's not giving me any results… anyone have any success with this?
+[21:52:07] DaveIngram: *trying to use
+[21:52:08] adamgoucher: ya. i think thats a bug
+[21:52:25] DaveIngram: meh
+[21:52:26] *adamgoucher fixed that in py.saunter but will likely have to on saunterphp over the weekend
+[21:53:14] adamgoucher: (its annoyingly hard to keep two things in synch in terms of behaviour and bug fixens)
+[21:55:07] DaveIngram: I can believe that
+[21:55:19] DaveIngram: I guess it's something with WebDriverContainer.php?
+[21:56:00] adamgoucher: nope. its in saunter. its not casting the returned objects properly
+[21:58:38] adamgoucher: actually. that should work looking at the code. is your element object of type SaunterPHP_Framework_Bindings_SaunterWebDriverSession or PHPWebDriver_WebDriverSession
+[21:59:40] DaveIngram: thought it was a WebDriverElement ...checking
+[IRC logfile - Started Fri Sep  7 22:01:38 2012]
+[22:01:38] DaveIngram: yea, PHPWebDriver_WebDriverElement
+[22:01:52] DaveIngram: This is what I'm doing: $parent = self::$session->find_element_by_locator($element['locator']);
+[22:01:52] DaveIngram:         $inputs = $parent->elements('css selector', 'input');
+[22:02:33] *adamgoucher fires up some editors
+[22:03:12] *DaveIngram just realized he should be using 'tag name' there instead of css selector
+[22:04:22] adamgoucher: that should still work
+[22:07:27] DaveIngram: yeah, didn't make a difference.. just seemed more logical
+[22:09:46] DaveIngram: In WebDriverContainer.php the element method is posting to '/element' …should it not be 'element/:id/element'? (I don't have a clue, just looking at the JsonWireProtocol and wondering)
+[22:13:31] adamgoucher: this looks like a legit oversite. the WebDriverElement doesn't know how to do that it seems.
+[22:14:06] adamgoucher: actually. nevermind. its in the parent.
+[22:14:40] DaveIngram: so the WebDriverElement needs to override the WebDriverContainer's implementation of the element method?
+[22:15:44] adamgoucher: yes. i think that is the case
+[22:15:57] adamgoucher: (and was just changing windows to say that)
+[22:16:05] DaveIngram: :)
+[22:17:09] adamgoucher: feel free to fork and issue a pull request. between this and santiycr's session change its looking like i'm going to spin out a release this weekend
+[22:17:14] jfunk has joined #selenium
+[22:17:42] DaveIngram: OK… I'm trying this: '/element/' . $this->getID() . '/element' …does that look right to you?
+[22:18:58] DaveIngram: oh, and I'm not sure what I've done here.. you have a separate PHPWebDriver project, but I have a PHPWebDriver directory in my SaunterPHP directory… is that something weird that I've done or is that correct?
+[22:20:33] adamgoucher: i think this is something you have done :)
+[22:20:47] DaveIngram: I thought so.. just looking at that in the repo
+[22:21:01] DaveIngram: I had only just noticed that and not sure how I managed that
+[22:21:04] *DaveIngram goes to fix that
+[22:22:28] adamgoucher: in theory, something lik http://pastebin.com/QYawT6LC needs to go in the element class
+[22:23:28] adamgoucher: heck, heres even the test i whipped up to see if it would work http://pastebin.com/d80fhadn
+[22:24:03] *adamgoucher is off to go get pizza otherwise might do it himself
+[22:31:17] DaveIngram: hmm… that didn't work
+[22:36:47] DaveIngram: adamgoucher: the problem doesn't seem to be with the post url.. that change made it post to 'element/7/element/7/element' …not quite right… reverted and checked the actual post url and it's posting to 'element/7/element' which looks right, but I'm getting an empty array returned from that call
+[22:37:57] o3u has joined #selenium
+[22:41:06] DaveIngram: bingo
+[22:42:45] DaveIngram: adamgoucher: problem was in webDriverElement() ..is_a($this, "PHPWebDriver_WebDriverSession") was wrapping the return, so when $this was a WebDriverElement, as in this case, the method was returning null
+[22:45:36] stephend has joined #selenium
+[22:51:17] DaveIngram: adamgoucher: hmm… but it looks like you've taken that check out of HEAD already
+[22:51:44] adamgoucher: hrm. are you curent?
+[22:52:05] DaveIngram: apparently not
+[22:56:04] adamgoucher: last release was on monday last week
+[22:56:13] DaveIngram: adamgoucher: will pear upgrade get me the latest?
+[22:56:25] adamgoucher: in theory
+[22:59:29] DaveIngram: yeah, that did it
+[22:59:32] *DaveIngram shakes his head
+[22:59:38] DaveIngram: looks like that should fix it for me
+[22:59:55] DaveIngram: well, at least I'm a good bit more familiar with the code now
+[22:59:56] adamgoucher: you also just got android support
+[IRC logfile - Started Fri Sep  7 23:00:15 2012]
+[23:00:15] DaveIngram: cool
+[23:00:27] DaveIngram: thanks once again for all your help
+[23:11:02] zac_sel has joined #selenium
+[23:18:35] santiycr1 has joined #selenium
+[23:21:43] sisook has joined #selenium
+[23:44:16] stephend_ has joined #selenium

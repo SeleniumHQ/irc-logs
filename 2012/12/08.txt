@@ -1,0 +1,338 @@
+[IRC logfile - Started Sat Dec  8 00:03:56 2012]
+[00:03:56] rbalent has joined #selenium
+[00:06:07] ShawnM has joined #selenium
+[00:06:32] ShawnM: anyone know anything about selenium grid and how it determines temp file\dir naming conventions?
+[00:15:07] jarib: ShawnM: naming conventions? can you be more specific?
+[00:15:08] AutomatedTester: ShawnM: what do you mean?
+[00:15:19] ShawnM: sure can
+[00:15:29] ShawnM: i have a bug open ont he website i can refer you to
+[00:16:38] ShawnM: http://code.google.com/p/selenium/issues/detail?id=4875&can=1&q=shawn%40instructure.com&colspec=ID%20Stars%20Type%20Status%20Priority%20Milestone%20Owner%20Summary
+[00:17:11] jarib: #4875
+[00:17:12] selbot2: 03 open/new Selenium grid temp file conflict with multiple nodes using 1 hub on the same box. - https://code.google.com/p/selenium/issues/detail?id=4875 [Type-Defect Priority-Medium Status-Untriaged]
+[00:18:20] jarib: those look like timestamps
+[00:18:41] ShawnM: Cannot create temp directory: /tmp/1354729932160
+[00:18:51] jarib: yeah
+[00:18:54] ShawnM: the number is a timestamp
+[00:19:03] ShawnM: thats what i was assuming since i've later
+[00:19:08] ShawnM: setup a dedicated hub to each node
+[00:19:11] *AutomatedTester fires up intellij
+[00:19:12] ShawnM: havingt he same problem
+[00:19:26] AutomatedTester: they look like timestamps
+[00:19:40] ShawnM: so temp files/dirs are named by time stamps or perhaps im confused?
+[00:19:40] AutomatedTester: why dont we just ask for a tmpdir
+[00:22:28] jarib: ah, it's the sessionId
+[00:22:34] plightbo has joined #selenium
+[00:22:52] ShawnM: i've got some better logs since the bug submission
+[00:23:00] ShawnM: that print out threads and tries in the error to
+[00:23:06] jarib: the attached log doesn't contain the error, btw
+[00:23:08] jarib: afaict
+[00:25:07] mreedell has joined #selenium
+[00:26:34] ShawnM: the log should include something liek
+[00:26:36] ShawnM: Error attempting to start remote webdriver: Cannot create temp directory: /tmp/1354817116178
+[00:27:11] ShawnM: so this is more in depth
+[00:27:26] jarib: since it's just using the /tmp/<sessionId>, it may very well be that both the hub and the node tries to create this directory, and one of them fails
+[00:27:30] jarib: it's not an unlikely bug
+[00:27:37] ShawnM: hmm interesting
+[00:28:07] AutomatedTester: ShawnM: is it causing issues?
+[00:28:15] jarib: actually, you're running multiple nodes on the same box
+[00:28:29] jarib: so even if it worked for hub + node, hub + node + node may very well fail
+[00:28:35] ShawnM: yes 8 nodes 1 hub
+[00:28:40] jarib: why?
+[00:28:58] ShawnM: headless xvfb selenium on aws network
+[00:29:00] ShawnM: 1 massive box
+[00:29:01] jarib: why not have 1 node with higher thresholds?
+[00:29:21] ShawnM: our specs see problems on the same display 
+[00:29:41] jarib: right
+[00:29:43] ShawnM: the specs ran fine running linux to
+[00:29:45] ShawnM: windows
+[00:29:58] ShawnM: currently on the same iwndows box but not on a shared xvfb display
+[00:30:14] ShawnM: so each node has its own xvfb display
+[00:30:17] jarib: ideally grid would make it simple to launch a display with each browser, still on one node
+[00:30:30] ShawnM: i found that not to be the case :D
+[00:30:31] jarib: i actually have code to do this as a grid plugin
+[00:30:57] jarib: where there's a separate service that manages a pool of displays
+[00:31:11] jarib: but it's on my work computer and not battle-tested yet 
+[00:31:46] ShawnM: btw automated tester it isn't causing a direct problem anymore but it sits in loops trying to secure temp resources and gets worse with the more threads that go so its hendering scabaility and slows builds
+[00:32:01] AutomatedTester: i wonder if Francois has something like that on his github
+[00:32:07] ShawnM: well i can battle test it
+[00:33:03] ShawnM: scability = scalability*
+[00:33:24] AutomatedTester: he doesnt 
+[00:33:39] AutomatedTester: i think he might have something like that at eBay
+[00:34:17] AutomatedTester: html5 standard says just add markup you need right, no need for boiler plate
+[00:34:35] AutomatedTester: as long as the doctype is right
+[00:35:43] jarib: ShawnM: try launching each node with -Djava.io.tmpdir=/tmp/node{1..8}  and see what happens
+[00:35:52] ShawnM: i have :D
+[00:36:07] ShawnM: and it throws other errors but it was awhile back i'll give it another shot
+[00:36:38] plightbo_ has joined #selenium
+[00:36:38] jarib: make sure the dirs exist :)
+[00:37:31] ShawnM: will do and i'll be on monday maybe i'll hit you up for the plugin you mentioned if that could potentially help
+[00:38:04] jarib: sure
+[00:38:14] ShawnM: ty for the feed back everyone i've got to run
+[00:38:27] jarib: have fun
+[00:40:19] stackedsax has joined #selenium
+[00:42:03] AutomatedTester: yea... over-engineered solution is now sane
+[00:43:35] nirvdrum has joined #selenium
+[00:44:57] jarib: AutomatedTester: what are you up to?
+[00:45:13] AutomatedTester: clearing a blocker for Marionette
+[00:45:24] AutomatedTester: Monday is d-day for Firefox OS
+[00:46:09] AutomatedTester: I had until 2pm off today and then started work
+[00:46:22] AutomatedTester: and then stopped for a few hours around 5
+[00:48:06] AutomatedTester: jarib: off to Kiev again next year?
+[00:48:30] jarib: maybe
+[00:48:37] jarib: i did get an email
+[00:48:54] AutomatedTester: i think Ivan is going
+[00:51:25] jarib: sort of depends on whether i feel i have anything interesting to speak about, i haven't really been exploring anything in the selenium/web testing space since the last conference
+[00:52:35] AutomatedTester: I know that feeling
+[00:52:56] jarib: also, march is very close to the launch of the PMO site, i have a feeling i'll be super busy around then
+[00:53:29] jarib: on the other hand, would be fun to go back, especially if other committers are going
+[00:53:58] jarib: do you plan to go? will speak about marionette probably?
+[00:54:11] AutomatedTester: I am not going
+[00:54:16] fatguylaughing has joined #selenium
+[00:54:32] AutomatedTester: my 2nd child is due ~20 Feb so it would be extremely unfair on my wife
+[00:54:57] AutomatedTester: and if something goes wrong...
+[00:55:02] AutomatedTester: its better to be at home
+[00:55:22] jarib: oh, congrats
+[00:55:29] jarib: i didn't know you were at it again :) 
+[00:55:40] AutomatedTester: for the last time :D
+[00:56:30] jarib: hehe
+[00:59:33] AutomatedTester: sod, that didnt work
+[00:59:54] farlan has joined #selenium
+[IRC logfile - Started Sat Dec  8 01:00:49 2012]
+[01:00:49] jarib: AutomatedTester: so do you have an estimate for m-day?
+[01:00:50] selbot2: M-Day: day in the future when Marionette is made available for non-debug builds
+[01:00:59] AutomatedTester: jarib: no :(
+[01:01:13] AutomatedTester: we arent feature complete, but not too far away
+[01:01:19] AutomatedTester: then stabilising
+[01:01:38] AutomatedTester: then looking at opt-builds
+[01:02:19] jarib: did jim build it himself?
+[01:02:33] AutomatedTester: no
+[01:02:40] AutomatedTester: you can play with it in debug builds
+[01:02:49] jarib: aha
+[01:03:08] AutomatedTester: the "in firefox all the time" part scares security
+[01:03:17] AutomatedTester: so I need to add runtime flags
+[01:03:21] jarib: right
+[01:03:52] AutomatedTester: so if firefox is started with these arguments the user has voided their gaurantee
+[01:05:07] jarib: yeah, that'd be fine
+[01:05:45] AutomatedTester: oh and profile
+[01:06:10] AutomatedTester: so we need to add new profile things, which is easy, and add a new arg to start firefox
+[01:07:01] jarib: cool
+[01:07:03] jarib: bedtime for me
+[01:07:08] AutomatedTester: laters
+[01:07:17] jarib: tomorrow is the christmas party at work
+[01:07:35] jarib: not sure if this is a scandinavian thing
+[01:07:56] AutomatedTester: we have christmas parties
+[01:08:01] AutomatedTester: but normally on a Friday
+[01:08:15] AutomatedTester: since weekend is normally family time
+[01:08:25] jarib: we take it pretty seriously
+[01:08:43] jarib: they rented a venue that can fit 1800 people :P
+[01:08:46] AutomatedTester: the drnking?
+[01:08:56] AutomatedTester: how many people work there?
+[01:09:28] jarib: it's an award show, dinner, awards, free drinks
+[01:09:31] jarib: ~350
+[01:09:59] AutomatedTester: it will feel empty if it can fit 1800 and only 350 go
+[01:10:54] jarib: yeah, just the main floor probably, and at tables, not standing
+[01:11:31] jarib: excessive drinking with colleagues and then head out into around -20 C
+[01:11:45] AutomatedTester: beer blankets to keep people warm
+[01:11:45] jarib: recipe for success
+[01:12:20] jarib: i bet this is the weekend of the year the oslo police hates the most :)
+[01:12:37] AutomatedTester: probably
+[01:12:45] AutomatedTester: adb shell
+[01:12:47] AutomatedTester: doh
+[01:13:07] jarib: anyway, better get a good night's sleep 
+[01:13:08] jarib: ttyl
+[01:13:48] AutomatedTester: waves
+[01:14:58] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 02:00:58 2012]
+[02:00:58] plightbo has joined #selenium
+[02:05:44] smccarthy has joined #selenium
+[02:08:52] farlan has joined #selenium
+[02:16:03] zuppy has joined #selenium
+[02:16:08] plightbo has joined #selenium
+[02:20:55] alexglow has joined #selenium
+[02:40:48] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 03:11:44 2012]
+[03:11:44] alexglow has joined #selenium
+[03:11:53] farlan has joined #selenium
+[03:23:42] plightbo has joined #selenium
+[03:57:26] DaveI has joined #selenium
+[IRC logfile - Started Sat Dec  8 04:03:50 2012]
+[04:03:50] plightbo has joined #selenium
+[04:44:25] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 05:19:05 2012]
+[05:19:05] websel has joined #selenium
+[05:26:12] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 06:04:57 2012]
+[06:04:57] plightbo has joined #selenium
+[06:16:35] Nari19 has joined #selenium
+[06:17:15] nerd has joined #selenium
+[06:25:48] plightbo has joined #selenium
+[06:46:02] plightbo_ has joined #selenium
+[06:47:03] smccarthy has joined #selenium
+[06:56:42] SamuraiJack has joined #selenium
+[IRC logfile - Started Sat Dec  8 07:05:16 2012]
+[07:05:16] caddoo has joined #selenium
+[07:10:04] Nari19 has joined #selenium
+[07:11:06] Manoj has joined #selenium
+[07:25:47] plightbo has joined #selenium
+[07:51:30] alexglow has joined #selenium
+[IRC logfile - Started Sat Dec  8 08:02:36 2012]
+[08:02:36] plightbo has joined #selenium
+[08:45:38] Nari110 has joined #selenium
+[08:47:12] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 09:13:48 2012]
+[09:13:48] rdk has joined #selenium
+[09:18:36] Nari110 has joined #selenium
+[09:25:17] rdk: someone suggested me this https://github.com/mde/flex-pilot for testing flash app. How can I use this? anyone has idea. Please help.
+[09:27:50] plightbo has joined #selenium
+[09:59:10] stackedsax has joined #selenium
+[IRC logfile - Started Sat Dec  8 10:10:21 2012]
+[10:10:21] plightbo has joined #selenium
+[10:20:39] Nari111 has joined #selenium
+[10:29:56] stan has joined #selenium
+[10:43:00] rdk has left #selenium
+[10:46:24] testingb0t has joined #selenium
+[10:50:53] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 11:27:26 2012]
+[11:27:26] plightbo has joined #selenium
+[11:37:40] samphippen has joined #selenium
+[IRC logfile - Started Sat Dec  8 12:01:41 2012]
+[12:01:41] zeljkof has joined #selenium
+[12:12:29] plightbo has joined #selenium
+[12:18:02] rbalent has joined #selenium
+[12:21:36] Sowmya has joined #selenium
+[12:22:15] pratan has joined #selenium
+[12:22:18] Sowmya: hi All
+[12:23:21] Sowmya: I'm trying to select an option from a drop down select box which is NOT visible. Whatever i do using the WebDriver, i'm unable to select the particular option.
+[12:23:34] Sowmya: Can someone please help me with the syntax of how to do this?
+[12:23:56] Sowmya: caused by: ElementNotVisibleException: Element is not currently visible and so may not be interacted 
+[12:24:19] Sowmya: That is the exception i'm getting while trying to select an option
+[12:25:26] pratan: Hi. I am having an issue with is_element_present (using python). Here is the code:
+[12:26:18] pratan: I am trying to scrape a page where, if data exists, the page has the following "Table view" element:
+[12:26:18] pratan:     <div class="floatRight">
+[12:26:18] pratan:        <a id="MainContent_TabContainerUsageAndCost_TabPanelGasUsage_GasUsageView_UCGasUsage_lnkTableView2" title="Table View" href="javascript:__doPostBack(&#39;ctl00$ctl00$MainContent$TabContainerUsageAndCost$TabPanelGasUsage$GasUsageView$UCGasUsage$lnkTableView2&#39;,&#39;&#39;)" style="color:NoColor;">Table View</a>
+[12:26:18] pratan:     </div>
+[12:26:18] pratan: Else, the page has the following error message.
+[12:26:18] pratan:     <div class="error display">
+[12:26:18] pratan:                     <span id="MainContent_TabContainerUsageAndCost_TabPanelElectricityUsage_ElectricityUsageView_UCElectricityUsage_lblMesg" style="font-weight:bold;">The account selected has no usage and costs data currently to be displayed.</span>
+[12:26:19] pratan:     </div>
+[12:26:19] pratan: In selenium I am trying to check for the above two conditions before beginning to scrape data. I tried the following:
+[12:26:20] pratan:     if self.selenium.is_element_present('link=Table view'):
+[12:26:20] pratan:        self.selenium.click('link=Table view')
+[12:26:21] pratan:     else:
+[12:30:47] pratan0 has joined #selenium
+[12:33:10] pratan0: Trying to use is_element_present (python) but always seems to return True. Please help.
+[12:37:10] Sowmya: caused by: ElementNotVisibleException: Element is not currently visible and so may not be interacted 
+[12:54:42] plightbo has joined #selenium
+[12:56:24] jab416171|Cloud has joined #selenium
+[IRC logfile - Started Sat Dec  8 13:06:49 2012]
+[13:06:49] testingb0t has joined #selenium
+[13:11:49] Nari111 has joined #selenium
+[13:31:33] pratan: Hi Folks: repeating my ques here --- hoping to get some help.
+[13:33:05] pratan: I am using is_element_present (python lib) in order to check if a link is on a page before selenium.click() on the link. However, is_element_present seems to always return true, so the click happens even though the element isn't present. This raises an exception of course.
+[13:33:35] pratan: My syntax for checking for the element is:
+[13:34:10] pratan: if self.selenium.is_element_present('link=Table view'): 
+[13:34:45] pratan: Really simple and straightforward, I think -- how can it have gone wrong?
+[13:36:05] plightbo has joined #selenium
+[13:42:23] Manoj has joined #selenium
+[IRC logfile - Started Sat Dec  8 14:16:16 2012]
+[14:16:16] SamuraiJack has joined #selenium
+[14:16:52] plightbo has joined #selenium
+[14:31:28] JackDandy has joined #selenium
+[14:33:12] tgecho has joined #selenium
+[14:33:13] tgecho has left #selenium
+[14:37:51] DarkRift has joined #selenium
+[14:49:34] samphippen has joined #selenium
+[14:55:56] nerd has joined #selenium
+[14:59:00] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 15:08:48 2012]
+[15:08:48] plightbo_ has joined #selenium
+[15:09:11] Nari111 has joined #selenium
+[15:10:04] nirvdrum has joined #selenium
+[15:22:42] testingb0t has joined #selenium
+[15:22:59] farlan has joined #selenium
+[15:36:20] DarkRift_lp has joined #selenium
+[15:36:20] DarkRift_lp has joined #selenium
+[15:40:42] DarkRift has joined #selenium
+[15:40:43] DarkRift has joined #selenium
+[15:49:57] mreedell has joined #selenium
+[15:56:52] Swadq has joined #selenium
+[IRC logfile - Started Sat Dec  8 16:10:57 2012]
+[16:10:57] xiaoli has joined #selenium
+[16:13:26] farlan has joined #selenium
+[16:25:42] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 17:11:03 2012]
+[17:11:03] smccarthy has joined #selenium
+[17:20:34] Nari112 has joined #selenium
+[17:26:30] plightbo has joined #selenium
+[17:50:12] stackedsax has joined #selenium
+[17:58:17] Nari112 has joined #selenium
+[IRC logfile - Started Sat Dec  8 18:24:03 2012]
+[18:24:03] stephend has joined #selenium
+[18:25:36] plightbo has joined #selenium
+[18:44:06] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Increasing timeouts to tune tests for CI environment | https://code.google.com/p/selenium/source/detail?r=18283 | http://seleniumhq.org/ci.jsp?r=18283
+[18:56:18] alexglow has joined #selenium
+[IRC logfile - Started Sat Dec  8 19:05:08 2012]
+[19:05:08] barancev: I've found where getText() method for text areas was discussed -- #2443
+[19:05:09] selbot2: 03 open/needsclarification Clarify JavaDoc for getting text of Texarea - https://code.google.com/p/selenium/issues/detail?id=2443 [Type-Defect Priority-Medium Component-WebDriver Browser-Atoms]
+[19:07:49] plightbo has joined #selenium
+[19:16:35] mreedell has joined #selenium
+[19:29:19] nirvdrum has joined #selenium
+[19:36:20] stackedsax has joined #selenium
+[19:36:57] stackedsax has joined #selenium
+[19:37:18] garndt_ has joined #selenium
+[19:37:28] vosloco_ has joined #selenium
+[19:38:29] jtfairbank__ has joined #selenium
+[19:39:09] hugs___ has joined #selenium
+[19:40:00] barancev: :note santiycr look at https://saucelabs.com/jobs/a8c26682918f4d7eba51b4248ebe2c3b/selenium-server.log ans search for "java.lang.OutOfMemoryError"
+[19:40:00] selbot2: ok!
+[19:44:32] jmathes has joined #selenium
+[19:45:05] jab416171|Cloud has joined #selenium
+[19:45:46] jezuz has joined #selenium
+[19:49:38] plightbo has joined #selenium
+[19:52:06] nerd has joined #selenium
+[IRC logfile - Started Sat Dec  8 20:21:35 2012]
+[20:21:35] barancev: AutomatedTester: yt?
+[20:21:40] AutomatedTester: I am
+[20:22:27] barancev: I've found a patch in #2655 you were going to apply
+[20:22:28] selbot2: 03david.bu...@theautomatedtester.co.uk open/new Python Driver: Improper tab conversion and string preference value quoting - https://code.google.com/p/selenium/issues/detail?id=2655 [Type-Defect Priority-Medium Lang-Python Component-WebDriver]
+[20:23:54] AutomatedTester: barancev: added to my todo
+[20:24:00] barancev: ok
+[20:32:24] plightbo has joined #selenium
+[20:35:29] AutomatedTester: plightbo: yt?
+[20:40:47] barancev: AutomatedTester: would you please look at the patch in #2684 too
+[20:40:48] selbot2: 03 open/accepted The Python FirefoxDriver leaves behind an empty directory - https://code.google.com/p/selenium/issues/detail?id=2684 [Type-Defect Component-WebDriver Lang-Python]
+[20:41:05] barancev: (provided in comment 3)
+[20:43:10] jobicoppola has joined #selenium
+[20:43:43] plightbo_ has joined #selenium
+[20:49:21] AutomatedTester: :cla
+[20:49:21] selbot2: http://goo.gl/qC50R
+[20:49:37] plightbo_: !seen jimevans
+[20:49:41] plightbo_: sad
+[20:49:49] plightbo_: clearly I don't know how to use the  bot
+[20:49:54] plightbo_: :seen jimevans
+[20:49:54] selbot2: jimevans was last seen 1 day ago, leaving.
+[20:53:24] AutomatedTester: plightbo_: can I have one of the new relic t-shirts please?
+[20:56:38] alexglow has joined #selenium
+[20:59:13] Dude-X_: today i found out my regular barber passed away in late october. :( young guy too
+[IRC logfile - Started Sat Dec  8 21:01:56 2012]
+[21:01:56] plightbo_: AutomatedTester: sure, i can probably pry one of of marketing. email me your work address and i'll get a few sent out to the office
+[21:02:19] AutomatedTester: plightbo_: <3
+[21:13:56] plightbo has joined #selenium
+[21:43:42] ner0x has joined #selenium
+[21:53:49] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 22:00:10 2012]
+[22:00:10] barancev: updated htmlunit 2.11 wants a new dependency -- jetty-websocket
+[22:00:14] barancev: is this acceptable?
+[22:06:36] Swadq has joined #selenium
+[22:33:29] plightbo has joined #selenium
+[IRC logfile - Started Sat Dec  8 23:05:03 2012]
+[23:05:03] Mkop has joined #selenium
+[23:09:53] plightbo has joined #selenium
+[23:10:27] plightbo_ has joined #selenium
+[23:10:49] plightbo has joined #selenium
+[23:11:08] plightbo_ has joined #selenium
+[23:14:20] nerd has joined #selenium
+[23:26:00] Mkop has joined #selenium
+[23:34:01] samphippen has joined #selenium
+[23:49:18] Mkop has joined #selenium
+[23:53:30] plightbo has joined #selenium

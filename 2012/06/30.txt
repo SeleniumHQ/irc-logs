@@ -1,0 +1,73 @@
+[IRC logfile - Started Sat Jun 30 00:16:02 2012]
+[00:16:02] jarib: freeone3000: even for localhost, curl (and other clients) will use the proxy if an http_proxy env var is set (unless there's also a no_proxy var that excludes localhost)
+[00:17:13] freeone3000: jarib: Okay. Well, there's no IE proxy settings, there's no HTTP_PROXY set, it's just me, selenium, firefox, VirtualBox, two levels of NAT, and selenium-webdriver. And curl is giving me the json just fine, it just seems like when I ask firefox for source it gives me what firefox displayed, instead of what the server sent.
+[00:40:05] pentabular has joined #selenium
+[00:49:17] jarib: freeone3000: ah, i misunderstood. that's the intended behaviour. we give you the live document, not the server response
+[00:50:13] jarib: in general, you don't want to use selenium to test JSON resources.
+[00:50:48] freeone3000: Yeah. Found the message thread. I'm now using selenium to log in (because the login is all ajaxified) and copy the session cookie to curl, where I get the actual response.
+[IRC logfile - Started Sat Jun 30 01:18:35 2012]
+[01:18:35] klrmn has joined #selenium
+[01:36:18] SpankyFromBRC has joined #selenium
+[01:37:30] awilson8201 has left #selenium
+[01:37:36] dmachi has joined #selenium
+[01:52:22] ian_mac has joined #selenium
+[IRC logfile - Started Sat Jun 30 02:11:32 2012]
+[02:11:32] freeone3000 has left #selenium
+[IRC logfile - Started Sat Jun 30 03:28:57 2012]
+[03:28:57] bmulholland has joined #selenium
+[03:40:51] bmulholland has joined #selenium
+[03:56:41] detronizator has joined #selenium
+[IRC logfile - Started Sat Jun 30 04:12:22 2012]
+[04:12:22] Dude-X_ has joined #selenium
+[04:24:36] ian_mac has joined #selenium
+[04:35:42] bmulholland has joined #selenium
+[04:46:42] santius has joined #selenium
+[04:47:12] santius: Hi guys, this is my first time here, first of all I want to say hello!
+[04:49:28] santius: Can I ask you a question?
+[IRC logfile - Started Sat Jun 30 05:00:24 2012]
+[05:00:24] klrmn has joined #selenium
+[05:02:15] Dude-X_: :ask
+[05:02:15] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[05:02:49] Dude-X_: and hi
+[05:12:07] santius: Thanks guys
+[05:12:14] santius: ok
+[05:13:31] santius: The question is, why can be possible that a test case runs well with local web driver, but when I use grid, at some point they can't find an element? Same test case, same browser version
+[05:14:25] santius: in my case, Im using xpath, and I have almost 2000 tests that never run using grid, and now I want them to do, but this is driving me crazy
+[05:14:38] santius: and please, sorry for my english
+[05:17:42] Dude-X_: santius, yes there may be timing differences that affect the test
+[05:18:29] Dude-X_: also using grid means it's going to use a lot of network traffic so make sure you have a good network connection between nodes
+[05:19:03] santius: I understand, but it does not seems to be a timing problem, I added timeouts and also try running them from debug, and the element is present, I can see it and the path is ok, but selenium says it does not exist… weird
+[05:19:56] santius: In the "core" of web driver api, is the same code that is executed when is local and when remote? 
+[05:20:15] Dude-X_: i would like to think so...
+[05:20:34] Dude-X_: but obviously this is not the case
+[05:20:41] dmachi has joined #selenium
+[05:28:41] santius: Its really weird :/
+[05:29:47] Dude-X_: timeouts?
+[05:29:56] Dude-X_: have you added sleeps?
+[05:40:36] santius: I modified the implicitytimeout, not sleeps, but when debugging I see the element in the page, and then not begin recognized… 
+[05:41:13] santius: I asked this question in stack overflow http://stackoverflow.com/questions/11271320/i-have-an-issue-running-tests-using-remote-webdriver-grid2-that-works-on-local
+[05:48:03] Dude-X_: implicit wait or even explicit wait won't help even if you set the time out to 10 years
+[05:48:23] Dude-X_: typically a good strategy is after clicking on something
+[05:49:03] Dude-X_: you use a web driver wait to look up an element that becomes visible
+[05:49:20] Dude-X_: or you can query the javascript engine for some signal that an action is complete
+[05:49:42] Dude-X_: for example it the site uses query, you can wait on jQuery.active == 0
+[05:50:40] ian_mac has joined #selenium
+[05:54:18] santius: I understand
+[05:55:05] santius: Ok, thank you very much Dude! I will try this :)
+[05:55:13] dmachi has joined #selenium
+[05:59:50] Dude-X_ has joined #selenium
+[IRC logfile - Started Sat Jun 30 06:02:19 2012]
+[06:02:19] Dude-X has joined #selenium
+[06:02:39] baijum has joined #selenium
+[06:05:52] xtian_ has joined #selenium
+[06:17:14] stephend has joined #selenium
+[06:37:21] Dude-X has joined #selenium
+[06:45:10] ian_mac has joined #selenium
+[06:59:14] detronizator has joined #selenium
+[IRC logfile - Started Sat Jun 30 07:00:13 2012]
+[07:00:13] stephend_ has joined #selenium
+[07:15:03] baijum has joined #selenium
+[07:49:29] detronizator has joined #selenium
+[07:56:17] toabctl has joined #selenium
+[IRC logfile - Started Sat Jun 30 08:12:31 2012]
+[08:12:31] Dude-X has joined #selenium

@@ -1,0 +1,1257 @@
+2011-10-03T00:00:17  *** Fyrespray has quit IRC
+2011-10-03T00:03:43  *** krosenvold1 has joined #selenium
+2011-10-03T00:06:51  <Ajay> krosenvold1: Greetings
+2011-10-03T00:11:14  <krosenvold1> Ajay: Good morning
+2011-10-03T00:11:50  *** krosenvold1 has left #selenium
+2011-10-03T00:12:48  *** ammar01 has joined #selenium
+2011-10-03T00:20:29  *** Yxven has quit IRC
+2011-10-03T00:21:41  *** Ammar has joined #selenium
+2011-10-03T00:22:16  *** Ammar has quit IRC
+2011-10-03T00:22:34  *** Ammar has joined #selenium
+2011-10-03T00:25:29  *** amobile has joined #selenium
+2011-10-03T00:25:58  <amobile> hi all ! I am wondering what could I use to test if a paren/sibling... is td or p or so
+2011-10-03T00:34:41  *** mcr_mfc has joined #selenium
+2011-10-03T00:47:38  *** mates has joined #selenium
+2011-10-03T00:48:01  <darius_w> amobile: you can do it with xpath
+2011-10-03T00:48:51  *** mcr_mfc1 has joined #selenium
+2011-10-03T00:48:51  *** mcr_mfc has quit IRC
+2011-10-03T00:53:20  <amobile> darius_w I have a xpathc corect //table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')] but cannot select /parent of it
+2011-10-03T00:53:56  <amobile>  //table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')]/parent did not work
+2011-10-03T00:54:26  <darius_w> parent: //table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')]/..
+2011-10-03T00:54:37  <darius_w> parent ot the parent: //table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')]/../..
+2011-10-03T00:54:55  <amobile> [error] locator not found: parent://table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')]./parent
+2011-10-03T00:55:05  <amobile> aha
+2011-10-03T00:55:14  <amobile>  /..
+2011-10-03T00:55:15  <darius_w> its like path ;) you go up with ..
+2011-10-03T00:55:34  <amobile> itworks :)
+2011-10-03T00:55:37  <amobile> thank you
+2011-10-03T00:57:05  <amobile> tried also from a while to add /following-sibling to that above darius_w
+2011-10-03T00:57:22  <amobile> in fact /following-sibling/a[contains(@href,'generateform/editpage')]
+2011-10-03T00:57:38  <amobile> because I have a table with edit and delete for the rows presented
+2011-10-03T00:57:54  <amobile> and need to click edit only on the editpage link where that text is
+2011-10-03T00:58:40  <amobile>  //table[@id='formlistTbl']/tbody/tr/td[1][contains(text(),'KAP Applications Review for Panelists')]/following-sibling/a[contains(@href,'generateform/editpage')]
+2011-10-03T00:59:15  <amobile> or this is not ok darius_w
+2011-10-03T01:01:33  <darius_w> well.. edit link is in the other cell then text
+2011-10-03T01:01:34  <darius_w> yes?
+2011-10-03T01:02:41  <amobile> yes
+2011-10-03T01:02:51  <darius_w> so if you are in the cell with text, you go up to the parent (tr in the case) and one tr will have one edit link, yes? so just use // (duoble slash) to find child at eny depth in case /td/a
+2011-10-03T01:02:51  *** mcr_mfc1 has quit IRC
+2011-10-03T01:03:20  *** mcr_mfc1 has joined #selenium
+2011-10-03T01:04:04  <darius_w> for exampel: //cell/with/text/../td/a[text()='edit'] or so..
+2011-10-03T01:08:39  <amobile> thank you ! it worked
+2011-10-03T01:16:07  <esto_> selenium.wait_for_condition("selenium.browserbot.getCurrentWindow().document.getElementById('loadindicator').style.visibility=='hidden'") <- how can i make this in python ?
+2011-10-03T01:16:19  <esto_> TypeError: unbound method wait_for_condition() must be called with selenium instance as first argument (got str instance instead)
+2011-10-03T01:16:23  <esto_> it says this
+2011-10-03T01:17:27  *** AutomatedTester has joined #selenium
+2011-10-03T01:18:46  <AutomatedTester> yay, freenode access!!!
+2011-10-03T01:21:10  *** rbalent has joined #selenium
+2011-10-03T01:26:01  *** rbalent has quit IRC
+2011-10-03T01:27:49  *** ThePeach has joined #selenium
+2011-10-03T01:31:04  *** rbalent has joined #selenium
+2011-10-03T01:37:58  *** mnr has joined #selenium
+2011-10-03T01:45:22  <amobile> any ideea by chance on how to click on a button of CKEDITOR ?
+2011-10-03T01:50:37  *** amobile has quit IRC
+2011-10-03T01:52:06  *** ace_me has joined #selenium
+2011-10-03T02:02:26  *** stealthii has quit IRC
+2011-10-03T02:04:32  *** dave_miles has joined #selenium
+2011-10-03T02:08:25  <ace_me> if I do clickAtAndWait id=cke_29 in a page with a wyswyg ckeditor I got what I want but when running the test I get [error] Timed out after 30000ms on each of the click whch normally is a button for bullet list inside wyswyg editor
+2011-10-03T02:12:00  <darius_w> well maybe you button get random id... you need to find a way how to find it...
+2011-10-03T02:12:32  <darius_w> for example by the image or something like that..
+2011-10-03T02:13:05  <ace_me> it seems is always id=cke_29 darius_w
+2011-10-03T02:13:06  <Mox[NL]> could also be that there is no page refresh after the click
+2011-10-03T02:14:12  <ace_me> no page refresh after click ? should I add that >?
+2011-10-03T02:15:17  <ace_me> it looks also there isa need to wait for editor to be initialised
+2011-10-03T02:15:37  <Mox[NL]> the "wait" in clickandwait waits for the page to reload, if ajax is used there is no refresh so the "wait" will not trigger
+2011-10-03T02:15:47  <ace_me> and I do that with waitforEval ? window.CKEDITOR.instances['txtFormInformation']
+2011-10-03T02:17:23  *** eranm has joined #selenium
+2011-10-03T02:18:03  <Mox[NL]> that could work
+2011-10-03T02:18:32  *** rbalent has quit IRC
+2011-10-03T02:19:10  *** rbalent has joined #selenium
+2011-10-03T02:19:28  <jarib> AutomatedTester: did you get my note about the firefox python tests?
+2011-10-03T02:20:39  <jarib> they seem to hang at the end (with a firefox instance open)
+2011-10-03T02:20:55  <jarib> i.e. print the results of the test run, then just hang
+2011-10-03T02:24:09  <jarib> eranm: if you have a moment, i could use some help getting the native components to compile on linux; it's complaining about missing gnu/stubs-64.h and bits/c++config.h
+2011-10-03T02:24:12  *** mnr has quit IRC
+2011-10-03T02:24:44  <eranm> jarib, are you on a 64-bit platform?
+2011-10-03T02:25:17  <barancev> hi there!
+2011-10-03T02:26:01  <eranm> hi barancev
+2011-10-03T02:26:33  <barancev> anybody tried to build firefox c++ prjoect recently?
+2011-10-03T02:26:36  <barancev> cpp\webdriver-firefox\native_events.cpp(7): fatal error C1083: Cannot open include file: 'mozilla-config.h': No such file or directory
+2011-10-03T02:27:07  <barancev> the project has dependency on gecko-2/include
+2011-10-03T02:27:12  <barancev> that is empty
+2011-10-03T02:27:21  <jarib> eranm: nope
+2011-10-03T02:27:44  <eranm> barancev, remove the directory - crazy_fun will re-download it for you
+2011-10-03T02:28:01  <eranm> jarib, is it only the 64-bit binary that's failing to build?
+2011-10-03T02:28:17  <eranm> barancev, re r13945, it's duplicating existing code
+2011-10-03T02:28:23  <selbot2> barancev 8 days ago - AlexeiBarantsev: Adding a set of new tests for links with enclosed elements (img, span) - http://code.google.com/p/selenium/source/detail?r=13945
+2011-10-03T02:29:40  <barancev> eranm: what test class? i have not found such tests
+2011-10-03T02:29:49  <jarib> eranm: http://xserve.openqa.org:8085/browse/SE2-PYTHON-FX-5/log
+2011-10-03T02:29:50  <eranm> barancev, added a comment to the commit
+2011-10-03T02:30:07  <jarib> eranm: some of them are complaining about xpcom-config.h as well, i missed that
+2011-10-03T02:31:20  <jarib> eranm: what gcc version do you build with? a stack overflow post suggests this is a bug in 4.5
+2011-10-03T02:31:40  <barancev> eranm: those tests use Actions. i've added tests for plain click. do you think they are redundant?
+2011-10-03T02:31:43  <jarib> (the bits/c++config.h at least)
+2011-10-03T02:32:05  <eranm> jarib, the most common reason is that the gecko sdk was not downloaded properly (for missing xpcom-config.h)
+2011-10-03T02:32:18  <eranm> I'm compiling with gcc 4.4.3
+2011-10-03T02:32:25  *** csanchez has quit IRC
+2011-10-03T02:34:31  <jarib> eranm: ok, so in that log the sdks for ff 3 and 4 are probably missing..
+2011-10-03T02:34:58  <barancev> no, crazy_fun don't want to download gecko-2
+2011-10-03T02:35:10  <jarib> it wants to
+2011-10-03T02:35:47  <jarib> but mozilla has removed it from http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/
+2011-10-03T02:36:01  <barancev> oups....
+2011-10-03T02:36:49  <barancev> then, we have to change dependencies in the project, right?
+2011-10-03T02:36:54  <eranm> Some of the sdks still live in the nightly build directories
+2011-10-03T02:37:15  <jarib> eranm: perhaps we should just host them ourselves?
+2011-10-03T02:38:45  <jarib> eranm: also, these seem like real issues in the NativeEventsFirefoxDriverTestSuite: http://xserve.openqa.org:8085/browse/SE2-JAVA-FX-21/
+2011-10-03T02:39:59  <ace_me> Mox[NL] still not able to pass this waitforEval  window.CKEDITOR.instances['txtFormInformation']=Object()
+2011-10-03T02:40:16  <eranm> jarib, I have alternative URLs for the Gecko SDKs. Let me fix the Rakefile.
+2011-10-03T02:40:41  <barancev> eranm: as the tests I've added in r13945 passed on my Win7 + FF6 + IE9 -- click on img works. should not it?
+2011-10-03T02:40:52  <selbot2> barancev 8 days ago - AlexeiBarantsev: Adding a set of new tests for links with enclosed elements (img, span) - http://code.google.com/p/selenium/source/detail?r=13945
+2011-10-03T02:41:23  <jarib> eranm: cool, thanks
+2011-10-03T02:42:05  <ace_me> waitForCondition should work with such a syntax ? javascript{window.CKEDITOR.instances['txtFormInformation']=Object()}
+2011-10-03T02:42:24  <eranm> barancev, clicking on an img should work - sorry, what I meant is that clicking the containing div would not work
+2011-10-03T02:42:35  *** misterncw has joined #selenium
+2011-10-03T02:44:20  <eranm> barancev, I'm still convinced we somewhere have tests clicking on an img
+2011-10-03T02:44:50  <eranm> jarib, as for those failures, that depends on the window manager - sometimes copying and pasting fails with something that's not plain gnome
+2011-10-03T02:45:02  <jarib> eranm: ah..
+2011-10-03T02:45:24  <eranm> double clicking, that should pass.
+2011-10-03T02:45:38  *** barancev has quit IRC
+2011-10-03T02:46:15  <jarib> eranm: so should the VM, for the native events suite, run a full gnome install?
+2011-10-03T02:46:28  <jarib> or can i get away with something smaller
+2011-10-03T02:47:13  *** barancev has joined #selenium
+2011-10-03T02:47:44  <jarib> perhaps the gnome-core package will do the trick
+2011-10-03T02:48:12  <eranm> The only important bit is to have gnome as a session manager and metacity as a window manager
+2011-10-03T02:48:24  <eranm> other gnome packages are unimportant
+2011-10-03T02:49:05  *** misterncw has quit IRC
+2011-10-03T02:49:05  <eranm> Be right back
+2011-10-03T02:49:08  *** eranm has quit IRC
+2011-10-03T02:56:40  <barancev> r13996 - does it fix the ClassCastException issues?
+2011-10-03T02:56:43  <selbot2> simon.m.stewart about 10 hours ago - SimonStewart: bot.ErrorCode.UNHANDLED_ERROR does not exist. Attempting to set this values ends up equating the result to SUCCESS, leading to weird exceptions on the client side. - http://code.google.com/p/selenium/source/detail?r=13996
+2011-10-03T02:58:34  <jarib> interesting https://www.facebook.com/notes/facebook-engineering/watir-to-webdriver-unit-test-frameworks/10150314152278920
+2011-10-03T02:58:41  <selbot2> david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns stopping the rogue browser that is left open during Python tests - http://code.google.com/p/selenium/source/detail?r=13997
+2011-10-03T02:58:50  <jarib> looks like facebook has developed their own php client?
+2011-10-03T02:59:33  <ace_me> it looks that for me runScript javascript{el=window.CKEDITOR.instances['txtFormInformation'];} output [error] Unexpected Exception: fileName -> chrome://selenium-ide/content/selenium-core/scripts/selenium-api.js, lineNumber -> 2530
+2011-10-03T02:59:42  <ace_me> any ideea wht is wrong ?
+2011-10-03T02:59:55  <ace_me> if I put the same line in script watch expression of fiebug is fine
+2011-10-03T03:00:17  *** eranm has joined #selenium
+2011-10-03T03:01:11  <AutomatedTester> jarib: I fixed the rogue browser issue ^
+2011-10-03T03:01:18  <jarib> AutomatedTester: nice
+2011-10-03T03:01:34  <AutomatedTester> so facebook have made yet another PHP driver
+2011-10-03T03:01:35  <jarib> the tests are likely going to fail since mozilla removed 6.0.1 from http://releases.mozilla.org/pub/mozilla.org/firefox/releases/ .....
+2011-10-03T03:02:04  <jarib> so the choice is apparently 5.0.1 or 7.0.1 now
+2011-10-03T03:02:12  <jarib> (currently the VM install everything from scratch on every run)
+2011-10-03T03:03:06  <jarib> (removed 6.0.2 i mean)
+2011-10-03T03:04:12  <barancev> https://github.com/facebook/php-webdriver
+2011-10-03T03:04:17  *** vrockai_ has joined #selenium
+2011-10-03T03:04:19  <jarib> AutomatedTester: is there a good reason to delete old releases?
+2011-10-03T03:05:01  *** GitHub64 has joined #selenium
+2011-10-03T03:05:01  <GitHub64> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/o2NiGQ
+2011-10-03T03:05:01  <GitHub64> [selenium-ci/master] Add Firefox 5 manifest. - Jari Bakken
+2011-10-03T03:05:01  *** GitHub64 has left #selenium
+2011-10-03T03:05:02  *** GitHub186 has joined #selenium
+2011-10-03T03:05:02  <GitHub186> [selenium-ci] jarib pushed 2 new commits to basebox-from-veewee: http://git.io/uvsE3g
+2011-10-03T03:05:02  <GitHub186> [selenium-ci/basebox-from-veewee] Add the default windows box. - Jari Bakken
+2011-10-03T03:05:02  <GitHub186> [selenium-ci/basebox-from-veewee] Merge branch 'master' of github.com:jarib/selenium-ci into basebox-from-veewee - Jari Bakken
+2011-10-03T03:05:02  *** GitHub186 has left #selenium
+2011-10-03T03:05:18  *** cheezy has quit IRC
+2011-10-03T03:07:10  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Fix links to the gecko SDKs to point to existing files. - http://code.google.com/p/selenium/source/detail?r=13998
+2011-10-03T03:07:14  <eranm> jarib, ^
+2011-10-03T03:07:15  <AutomatedTester> i dont know, other than to stop people using it on unsupported browsers...
+2011-10-03T03:07:33  <AutomatedTester> but that is a guess
+2011-10-03T03:09:26  <jarib> eranm: nice, thanks
+2011-10-03T03:10:07  <ace_me> to verify position of a ul is ok to create the selector and last param should be zero if I know is 0 ?
+2011-10-03T03:11:18  *** GitHub50 has joined #selenium
+2011-10-03T03:11:18  <GitHub50> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/YUNsqA
+2011-10-03T03:11:18  <GitHub50> [selenium-ci/master] Remove Firefox 5 / 6 since they're no longer available. - Jari Bakken
+2011-10-03T03:11:18  *** GitHub50 has left #selenium
+2011-10-03T03:20:19  <jarib> AutomatedTester: it still seems to hang at the end (even with this run where firefox is missing): http://xserve.openqa.org:8085/browse/SE2-PYTHON-FX-6/log
+2011-10-03T03:20:45  <barancev> I've updated to HEAD -- no gecko-2 anyway
+2011-10-03T03:21:12  <jarib> barancev: did you delete third_party/gecko-2 before trying?
+2011-10-03T03:21:21  <barancev> yes
+2011-10-03T03:21:27  <AutomatedTester> jarib:something seems properly wrong there,
+2011-10-03T03:21:29  <barancev> I'm on win64
+2011-10-03T03:21:43  <ace_me>  what should I install to be able to convert my tests to PHP please ?
+2011-10-03T03:21:51  <AutomatedTester> jarib: ^
+2011-10-03T03:23:13  <barancev> aha, yes, yes, it's downloading!
+2011-10-03T03:23:38  <barancev> 'go clean' helps
+2011-10-03T03:23:40  <jarib> AutomatedTester: yes, firefox is missing - but should that hang the test suite?
+2011-10-03T03:24:06  <AutomatedTester> i wouldnt have thought so
+2011-10-03T03:24:14  <jarib> if it doesn't hang when firefox is present, i'm happy with that..
+2011-10-03T03:24:27  <AutomatedTester> it tries to connect to the browser for 30 then should time out
+2011-10-03T03:24:33  <jarib> but the fact that it's hanging now sort of indicates some other problem
+2011-10-03T03:25:03  <AutomatedTester> its a core library that is unhappy
+2011-10-03T03:25:03  <jarib> it won't be able to find the executable in this case
+2011-10-03T03:25:11  <ace_me> Generate your script into a programming language from Selenium-IDE, optionally modifying the result.
+2011-10-03T03:25:16  <ace_me> that is not working for me
+2011-10-03T03:25:19  <ace_me> http://seleniumhq.org/docs/05_selenium_rc.html
+2011-10-03T03:26:37  *** oiiii has joined #selenium
+2011-10-03T03:27:40  <barancev> ace_me: downgrade to earlier versions of IDE, if you want PHP formatter
+2011-10-03T03:28:11  <ace_me> aha anwhat I will loose ? I already created 4 test suites barancev
+2011-10-03T03:29:14  <ace_me> is this current version able to run all the test suites over and over again barancev ?
+2011-10-03T03:29:41  <barancev> you'll lose support of new FF versions, at least :)
+2011-10-03T03:29:56  *** towski has joined #selenium
+2011-10-03T03:30:36  <barancev> gecko-2 donloaded, but is wrong gecko
+2011-10-03T03:30:51  <barancev> it has no mozilla-config.h either
+2011-10-03T03:32:01  <barancev> at least 'go release' can't find it
+2011-10-03T03:33:25  <barancev> sorry, now gecko-5
+2011-10-03T03:33:53  *** cerberos has quit IRC
+2011-10-03T03:34:18  <barancev> gecko-5 can't be downloaded too
+2011-10-03T03:34:43  <jarib> seems like they're deleting 5 and 6 today..
+2011-10-03T03:34:44  <selbot`> New news from builds: SE2-PYTHON-6 has FAILED : Updated by david.burns@theautomatedtester.co.uk <http://xserve.openqa.org:8085/browse/SE2-PYTHON-6>
+2011-10-03T03:36:49  <AutomatedTester> the only place to get Firefox 5/6 now is off the FTP
+2011-10-03T03:38:46  *** towski has quit IRC
+2011-10-03T03:40:49  <barancev> what about native events om FF7? tests fail win FF7. can we build with gecko-7?
+2011-10-03T03:46:53  *** rbalent has quit IRC
+2011-10-03T03:47:12  <selbot2> barancev half a minute ago - AlexeiBarantsev: Fix link to the gecko SDK for win32 - http://code.google.com/p/selenium/source/detail?r=13999
+2011-10-03T03:47:21  *** stepheneb has joined #selenium
+2011-10-03T03:47:56  *** aquarius1973 has quit IRC
+2011-10-03T03:55:51  *** stepheneb has quit IRC
+2011-10-03T04:09:00  *** stockton has quit IRC
+2011-10-03T04:17:05  <darius_w> is php formatter open source? where can I find the code?
+2011-10-03T04:17:39  *** AutomatedTester has quit IRC
+2011-10-03T04:21:48  <Ajay> darius_w: everything is open source
+2011-10-03T04:23:06  <darius_w> I feel the need to write/update php formatter to generate webdriver php code from my IDE recorded tests.. where should I start?
+2011-10-03T04:28:16  *** rbalent has joined #selenium
+2011-10-03T04:28:16  *** rbalent has joined #selenium
+2011-10-03T04:30:06  <barancev> darius_w: https://groups.google.com/d/msg/selenium-developers/8sYO28VZ2oI/siNm6aqT6lEJ
+2011-10-03T04:30:34  <barancev> http://code.google.com/p/selenium/source/browse/#svn%2Ftrunk%2Fide%2Fplugins
+2011-10-03T04:32:21  <darius_w> thanks barancev
+2011-10-03T04:32:26  <Ajay> darius_w: http://code.google.com/p/selenium/source/browse/#svn%2Ftrunk%2Fide
+2011-10-03T04:38:30  *** cgoldberg has joined #selenium
+2011-10-03T04:44:09  <Ajay> darius_w: http://code.google.com/p/selenium/wiki/BuildingSeIDE
+2011-10-03T04:47:43  <Ajay> barancev: any luck ?
+2011-10-03T04:48:21  <darius_w> Ajay: thats a very handy bit, thanks
+2011-10-03T04:48:29  <barancev> Ajay: in what?
+2011-10-03T04:48:40  *** rbalent has quit IRC
+2011-10-03T04:48:51  <Ajay> building the DLL
+2011-10-03T04:49:21  <barancev> yes, I've done that
+2011-10-03T04:49:58  *** krosenvold1 has joined #selenium
+2011-10-03T04:50:23  <Ajay> barancev: was stuck in some production issue , how did you solve ?
+2011-10-03T04:50:28  *** krosenvold1 has left #selenium
+2011-10-03T04:51:24  <barancev> links to gecko SDKs were fixed, update to HEAD
+2011-10-03T04:51:56  *** mltolun has joined #selenium
+2011-10-03T04:52:32  <Ajay> what if i needed to build on the new gecko -7
+2011-10-03T04:53:01  <barancev> that's what I want to know too :)
+2011-10-03T04:56:14  <Ajay> we need to ping eranm to get an overview
+2011-10-03T04:58:40  <eranm> Several steps: Add Gecko SDK 7 to the Rakefile, change cpp/build.desc to build a new shared object + dll using this gecko SDK, edit Firefox's manifest to include this shared object + dll
+2011-10-03T04:58:45  <eranm> I plan on doing it later today
+2011-10-03T04:59:43  *** cerberos has joined #selenium
+2011-10-03T04:59:54  <barancev> one more think that bother me: when chromedriver will be updated?
+2011-10-03T05:00:37  <barancev> Jul 28 version is rather old
+2011-10-03T05:00:46  <Ajay> eranm: i have done some of them should i checkin them
+2011-10-03T05:00:48  <Ajay> ?
+2011-10-03T05:01:40  <eranm> Ajay, you can send me a codereview on codereview.appspot.com  if you want me to have a look before you committ
+2011-10-03T05:01:47  <eranm> s/committ/commit
+2011-10-03T05:02:11  <eranm> the tricky bit being Firefox failing back on synthesized events so it's easy to miss if native events are not actually working
+2011-10-03T05:03:31  <Ajay> eranm: i was struggling to build the dll , used vc++ first time , i just changed the Rake and .desc files
+2011-10-03T05:03:46  <selbot2> eran.mes@gmail.com less than a minute ago - EranMes: Adding Firefox6 to the list of projects built by the main solution file. - http://code.google.com/p/selenium/source/detail?r=14000
+2011-10-03T05:04:03  *** mltolun has quit IRC
+2011-10-03T05:04:13  <eranm> Ajay, are you building for Windows or Linux?
+2011-10-03T05:04:55  <Ajay> Eranm:Windows , with Vc++ 2010 Express
+2011-10-03T05:05:42  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Print out the last value, not just the expected value, when an expected condition is not met. - http://code.google.com/p/selenium/source/detail?r=14001
+2011-10-03T05:06:00  <eranm> Ajay, so for Windows you'd have to copy cpp/webdriver-firefox/webdriver-firefox-6.vcxproj to cpp/webdriver-firefox/webdriver-firefox-7.vcxproj and change all references in the new file to point to gecko 7
+2011-10-03T05:06:31  <Ajay> eranm: i had done that
+2011-10-03T05:06:51  <Ajay> eranm: was getting https://gist.github.com/1258580
+2011-10-03T05:06:54  <eranm> add dependency on this dll to javascript/firefox-driver/build.desc and modify javascript/firefox-driver/extension/chrome.manifest to include that file
+2011-10-03T05:07:41  <eranm> Ajay, my guess is that gecko 7 was not downloaded and unpacked
+2011-10-03T05:07:46  <eranm> (it only happens if you build using ./go)
+2011-10-03T05:08:17  *** RossPatterson has joined #selenium
+2011-10-03T05:08:24  <Ajay> Hmmm
+2011-10-03T05:08:26  <jarib> eranm: i've got a minimal gnome going in the VM, but it complains about hardware not supporting Unity, and that i should use Ubuntu Classic in the
+2011-10-03T05:08:49  <jarib> eranm: i find a lot of ways of doing that manually, but can't find a way to automate it. ideas?
+2011-10-03T05:08:56  <jarib> it's probably just a config file somewhere..
+2011-10-03T05:09:26  <eranm> jarib, automating what?
+2011-10-03T05:09:38  <eranm> Indeed, you don't need (or want) unity.
+2011-10-03T05:12:22  <jarib> apparently unity is the default - i'd like to automate the step of configuring it to use ubuntu classic instead
+2011-10-03T05:12:24  *** cerberos has quit IRC
+2011-10-03T05:13:17  <jarib> i'll keep googling if you don't know off hand :)
+2011-10-03T05:13:35  <eranm> jarib, nope - I mostly use Debian
+2011-10-03T05:14:06  <eranm> Though in VMs I've set it was a one-time configuration, subsequent boots of the same VM image went to Ubuntu classic
+2011-10-03T05:15:59  <jarib> right. i'd like to be able to rebuild the box from scratch, so i'm using puppet for all the configuration
+2011-10-03T05:16:10  <jarib> i'll figure it out
+2011-10-03T05:18:38  *** AutomatedTester has joined #selenium
+2011-10-03T05:20:47  <barancev> what is JSAPI? I've found it in the code but can't find any documentation
+2011-10-03T05:21:44  <eranm> barancev, we used to have  Javascript bindings for Selenium 2 (WebDriver API in Javascript).
+2011-10-03T05:21:57  <eranm> It was scrapped in favour of a newer version, but that new version is still being worked on
+2011-10-03T05:22:14  *** cburroughs has joined #selenium
+2011-10-03T05:22:58  <cgoldberg> jarib, do you need Gnome at all?
+2011-10-03T05:23:06  <jarib> yes, for native events
+2011-10-03T05:23:23  *** stepheneb has joined #selenium
+2011-10-03T05:23:24  <cgoldberg> jarib, i use Ubuntu Server.. with a minimal Gnome/FF setup
+2011-10-03T05:23:32  <cgoldberg> rather than Ubuntu Desktop
+2011-10-03T05:23:40  <jarib> that's exactly what i'm doing
+2011-10-03T05:23:55  <barancev> JS api... I'd prefer to have powershell comandlets too :)
+2011-10-03T05:24:20  <cgoldberg> jarib, so install Ubuntu Server, then just install Firefox and its deps.. no Unity
+2011-10-03T05:24:37  <jarib> cgoldberg: i only pulled in gnome-session and metacity
+2011-10-03T05:25:10  <jarib> which is what eranm said we need
+2011-10-03T05:25:16  <eranm> barancev, think about teams that do all of their work in Javascript. For them, having to use another language just for tests is inconvenient. Since we encourage the model of developers writing their own tests, the JS API is something we want
+2011-10-03T05:25:56  <eranm> jarib, it's mostly about focus behaviour: Gnome sends proper focus in / out events as transitions between windows happen
+2011-10-03T05:26:14  <jarib> cgoldberg: appears to work well and be relatively light-weight, just looking to get rid of the unity warning
+2011-10-03T05:26:28  <eranm> KDE as well, but anything else (i.e. lightweight window managers) either don't send focus events correctly or don't support clipboard properly
+2011-10-03T05:26:34  <barancev> I see, it is good to have many bingings
+2011-10-03T05:26:49  <barancev> php, perl, js, etc
+2011-10-03T05:27:46  <barancev> node.js is even better
+2011-10-03T05:34:46  <barancev> what can you say about #417?
+2011-10-03T05:34:47  <selbot2>  open/started WebDriver: Improvement - extend PageFactory to support List<WebElement>  - http://code.google.com/p/selenium/issues/detail?id=417 [Type-Enhancement Priority-Medium Component-WebDriver Lang-Java]
+2011-10-03T05:35:51  <barancev> I have a working implementation of @FindAllBy, is it worthily to add this feature to the selenium?
+2011-10-03T05:37:43  <eranm> @FindAllBy was requested some time ago, it's a good idea to add it
+2011-10-03T05:38:22  <ace_me> could yu show in the top of the IDE the name of the suite ?
+2011-10-03T05:38:42  <barancev> eranm: are you ready to to review it?
+2011-10-03T05:40:14  <AutomatedTester> eranm: have you seen the beginnings of admc's node.js webdriver client
+2011-10-03T05:41:00  <eranm> barancev, sure
+2011-10-03T05:41:06  <eranm> AutomatedTester, nope! that sounds interesting
+2011-10-03T05:41:21  <AutomatedTester> google github admc wd node
+2011-10-03T05:41:22  <selbot`> https://github.com/admc/wd
+2011-10-03T05:41:29  <AutomatedTester> eranm: ^
+2011-10-03T05:41:56  *** __mike has joined #selenium
+2011-10-03T05:42:35  <barancev> eranm: what base URL to select on http://codereview.appspot.com -- Selenium trunk or WebDriver trunk?
+2011-10-03T05:43:16  <Ajay> eranm: i give up on building dll , gecko-7 is not downloading at all
+2011-10-03T05:43:26  <eranm> barancev, Selenium trunk
+2011-10-03T05:43:32  <eranm> we should really get rid of the WebDriver trunk there
+2011-10-03T05:45:38  <barancev> eranm: http://codereview.appspot.com/5175047/
+2011-10-03T05:45:59  *** rbalent has joined #selenium
+2011-10-03T05:46:08  <barancev> I've checked that it passed go test_support
+2011-10-03T05:47:21  <barancev> if nobody changed the number of links on xhtmlTestPage :)
+2011-10-03T05:49:02  <barancev> assertEquals(12, page.links.size()); seems to be a fragile check, may be I've to change it to size > 0
+2011-10-03T05:49:03  <selbot`> New news from builds: SE2-JAVA-22 has FAILED (30 tests failed) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/SE2-JAVA-22>
+2011-10-03T05:50:16  *** ian_mac_ has joined #selenium
+2011-10-03T05:51:26  <eranm> barancev, since developers usually add to this page, it's safe to test that there are more than 12 (I'd leave the check for equality)
+2011-10-03T06:01:26  <barancev> it's interesting: FF3.6 says xhtmlTestPage contains 13 links. manually I can count 12. FF6 says they are 12
+2011-10-03T06:03:29  *** GitHub9 has joined #selenium
+2011-10-03T06:03:30  <GitHub9> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/CMjDHQ
+2011-10-03T06:03:30  <GitHub9> [selenium-ci/master] Adding minimal gnome for native events. - Jari Bakken
+2011-10-03T06:03:30  *** GitHub9 has left #selenium
+2011-10-03T06:03:33  <barancev> FF4 and FF5 agree with FF6 and me that there are 12 links
+2011-10-03T06:04:23  <jarib> anyone understand these random ClassCastExceptions? they only seem to occur every other build or similar
+2011-10-03T06:04:55  <Ajay> eranm: does the ffdriver build on VC++ 2010
+2011-10-03T06:04:56  <selbot`> New news from builds: SE2-RUBY-13 was SUCCESSFUL (with 595 tests) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-RUBY-13>
+2011-10-03T06:05:09  <jarib> andreastt: are these being either fixed or @Ignored? http://xserve.openqa.org:8085/browse/SE2-JAVA-OPERA-22
+2011-10-03T06:05:29  <jarib> uhm, sorry
+2011-10-03T06:05:35  <jarib> bad link - just restarted the tests
+2011-10-03T06:05:52  <barancev> jarib: I think r13996 fixes them
+2011-10-03T06:05:57  <selbot2> simon.m.stewart about 13 hours ago - SimonStewart: bot.ErrorCode.UNHANDLED_ERROR does not exist. Attempting to set this values ends up equating the result to SUCCESS, leading to weird exceptions on the client side. - http://code.google.com/p/selenium/source/detail?r=13996
+2011-10-03T06:06:04  <jarib> ah
+2011-10-03T06:06:06  <jarib> cool.
+2011-10-03T06:06:08  <barancev> they are all "unhandled exceptions"
+2011-10-03T06:06:17  * andreastt struggles to get OperaDriver working with obscure internal builds.
+2011-10-03T06:06:19  <jarib> i see
+2011-10-03T06:06:29  <barancev> that RemoteWebDriver is trying to convert to String or WebElement
+2011-10-03T06:06:31  * andreastt hates TV manufacturers.
+2011-10-03T06:06:39  <jarib> barancev: we'll see, if the xserve survives the build :P
+2011-10-03T06:06:58  <AutomatedTester> andreastt: thats what you get for working with them :P
+2011-10-03T06:07:26  <andreastt> Luckily I'm not.  I'm helping out the Swedish QA dept.
+2011-10-03T06:07:44  <andreastt> And they have a retarded setup for their builds.
+2011-10-03T06:07:59  <AutomatedTester> andreastt: tell us how you really feel
+2011-10-03T06:08:29  *** jimevans has joined #selenium
+2011-10-03T06:08:33  <andreastt> AutomatedTester: Well you know… We're all about bringing ze intratubes to everyone.
+2011-10-03T06:09:23  <Ajay> eranm: bumped to this error now http://www.gamedev.net/topic/484760-atlbaseh-not-found-by-vc-or-by-me/
+2011-10-03T06:09:28  <AutomatedTester> andreastt: i would prefer "the interwebs", my german is awful so having to watch "ze intratubes" would have me confused
+2011-10-03T06:10:26  * andreastt beats Qt/Trolltech for lacking documentation.
+2011-10-03T06:11:06  <Ajay> andreastt: try out vc++ express edition
+2011-10-03T06:11:21  <Ajay> you may beat microsoft too :)
+2011-10-03T06:11:22  *** Mayank has joined #selenium
+2011-10-03T06:12:14  <andreastt> Ajay: Oh I already have.
+2011-10-03T06:12:22  <andreastt> Ajay: Last when I had to recompile the Opera launcher.
+2011-10-03T06:12:27  <andreastt> Ajay: That is, indeed, very painful.
+2011-10-03T06:12:42  * andreastt subjects himself to pain every day.
+2011-10-03T06:13:13  <Ajay> Ha ha ha, i am going to have drink as i am unable to build on vc++
+2011-10-03T06:13:44  <Ajay> eranm: whenever u find time please show how you do this painful task :) ,
+2011-10-03T06:14:07  <jimevans> Ajay: what are you trying to do?
+2011-10-03T06:14:15  <barancev> well, it's true, FF3.6.17 thinks that xhtmlTestPage contains 13 links, the link <a name="text" /> found twice!
+2011-10-03T06:14:33  <Ajay> jimevans: i am trying to build a DLL
+2011-10-03T06:14:43  <barancev> no page factory, just plain driver.findElements(By.tagName("a")))
+2011-10-03T06:14:47  <Ajay> downloaded vc++ express edition
+2011-10-03T06:15:04  <jimevans> Ajay: which dll? is it one in the selenium project?
+2011-10-03T06:15:18  <Ajay> jimevans: yes
+2011-10-03T06:15:41  <jimevans> well, i know you can't build the IE driver dll with the express edition.
+2011-10-03T06:16:10  <Ajay> jimevans: what about Firefox Driver dll ?
+2011-10-03T06:16:27  <jimevans> firefox, i don't know. i've never tried building it with express.
+2011-10-03T06:17:31  *** DustinFay has joined #selenium
+2011-10-03T06:17:50  <Ajay> jimevans: Cannot open include file: 'atlstr.h'
+2011-10-03T06:17:57  *** nirvdrum has joined #selenium
+2011-10-03T06:18:12  <jimevans> yep. if it's looking for atlstr.h, you won't be able to build with express.
+2011-10-03T06:18:40  <jimevans> the express edition of Visual C++ doesn't come with the Active Template Library (ATL).
+2011-10-03T06:19:37  <jimevans> and there's no separate downloadable distribution of those headers.
+2011-10-03T06:19:56  <Ajay> jimevans:so that means i am stuck ,
+2011-10-03T06:19:57  <jimevans> s/separate/legal separate
+2011-10-03T06:20:10  <jimevans> soz.
+2011-10-03T06:20:26  <jimevans> for IE, we need the dependency on ATL, without a doubt.
+2011-10-03T06:20:50  <jimevans> doing COM programming without a framework like ATL is like trying to give yourself a root canal.
+2011-10-03T06:20:56  <Ajay> so i end up paying microsoft for a  ATL library
+2011-10-03T06:20:57  <jarib> andreastt: there.. should these be @Ignored http://xserve.openqa.org:8085/browse/SE2-JAVA-OPERA-22 ?
+2011-10-03T06:21:22  <Ajay> jimevans: Liked u r humour
+2011-10-03T06:22:18  *** Gnanam has joined #selenium
+2011-10-03T06:22:27  <jimevans> i think it's an apt analogy. you can do it, but it's extremely difficult, easy to get wrong, and going to be painful either way.
+2011-10-03T06:28:16  *** stockton has joined #selenium
+2011-10-03T06:28:51  *** stockton has joined #selenium
+2011-10-03T06:28:52  <selbot`> New news from builds: SE2-JAVA-22 has FAILED (11 tests failed) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/SE2-JAVA-22>
+2011-10-03T06:29:18  <ian_mac_> but it's also extremely exhillarating if you are successful
+2011-10-03T06:29:28  *** stepheneb has quit IRC
+2011-10-03T06:30:56  <andreastt> jarib: Odd.  We're getting different results when running OperaDriver against the Selenium test suite internally.
+2011-10-03T06:31:01  <andreastt> jarib: Mostly it's the same though.
+2011-10-03T06:31:06  *** pnitin has quit IRC
+2011-10-03T06:31:36  <andreastt> org.openqa.selenium.ClickTest.testShouldOnlyFollowHrefOnce also fails internally, but not your test run.
+2011-10-03T06:32:59  <andreastt> testCanCallGetWindowHandlesAfterClosingAWindow and testCanCloseWindowWhenMultipleWindowsAreOpen were fixed in OperaDriver HEAD I believe, so they can be left as they are.
+2011-10-03T06:33:44  *** cerberos has joined #selenium
+2011-10-03T06:34:10  <andreastt> jarib: The FormsHandlingTest and FrameSwitchingTest can be ignored.  The rest should be left unignored.
+2011-10-03T06:34:32  <andreastt> I'll release a new version sometime this week which will fix the remaining tests.
+2011-10-03T06:35:44  <andreastt> Don't be evil, except in Russia: http://code.google.com/p/chromium/issues/detail?id=81578
+2011-10-03T06:37:18  <barancev> oh, my god!
+2011-10-03T06:37:27  *** towski has joined #selenium
+2011-10-03T06:37:36  *** pnitin has joined #selenium
+2011-10-03T06:37:42  <barancev> <html><body> <a name="text" /> <p>x</p> <p>y</p> <p>z</p> </body></html> -- how many links do you think is here?
+2011-10-03T06:37:56  <barancev> FF3.6.17 thinks there are 5!
+2011-10-03T06:38:04  *** towski has quit IRC
+2011-10-03T06:38:27  <barancev> driver.findElements(By.tagName("a")).size() returns 5!
+2011-10-03T06:38:59  <andreastt> Opera parses that as one link.
+2011-10-03T06:39:12  <andreastt> Not sure what is right.
+2011-10-03T06:40:25  *** dmachi1 has joined #selenium
+2011-10-03T06:40:25  *** dmachi has quit IRC
+2011-10-03T06:42:00  <barancev> FF4, 5, 6, IE9 returns 1, I expect 1, but FF3.6 thinks different
+2011-10-03T06:42:40  <barancev> is it still supported? do we want an issue on FF3.6?
+2011-10-03T06:44:02  <barancev> eranm: how's review? what's about the patch? may I submit it?
+2011-10-03T06:44:25  <nirvdrum> barancev: I'd think so.  FF 3.6 is still widely used and still supported by Mozilla.
+2011-10-03T06:46:36  <esto_> i'm trying to export test case as python and it says suite export not implemented
+2011-10-03T06:46:40  <esto_> what i have to install?
+2011-10-03T06:47:30  <esto_> i have python formatter installed
+2011-10-03T06:51:03  *** Gnanam has quit IRC
+2011-10-03T06:51:04  <selbot`> New news from builds: SE2-RUBY-13 was SUCCESSFUL (with 595 tests) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-RUBY-13>
+2011-10-03T06:51:04  *** Dude-X has joined #selenium
+2011-10-03T06:53:07  *** pnitin has quit IRC
+2011-10-03T06:53:07  *** ian_mac_ has quit IRC
+2011-10-03T06:57:04  *** XRayCulver has joined #selenium
+2011-10-03T06:58:58  <eranm> barancev, have you sent it to my gmail address for review?
+2011-10-03T06:59:32  <eranm> Ajay, are you using the express edition of visual studio?
+2011-10-03T07:00:21  <barancev> eranm: sorry, sent now
+2011-10-03T07:02:58  *** jfunk has joined #selenium
+2011-10-03T07:05:42  *** davehunt|away has quit IRC
+2011-10-03T07:06:29  *** ThePeach has quit IRC
+2011-10-03T07:07:39  <Ajay> eranm: yes , heard from jimevans that i cannot build from it
+2011-10-03T07:08:33  <Ajay> eranm: https://gist.github.com/1259189
+2011-10-03T07:08:44  <Ajay> it might be helpful for you
+2011-10-03T07:10:02  *** ian_mac_ has joined #selenium
+2011-10-03T07:14:40  *** csanchez has joined #selenium
+2011-10-03T07:16:39  *** lord1234 has joined #selenium
+2011-10-03T07:16:40  <selbot`> New news from builds: SE2-JAVA-22 has FAILED (9 tests failed) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/SE2-JAVA-22>
+2011-10-03T07:17:01  *** beakerman has joined #selenium
+2011-10-03T07:17:23  <eranm> Ajay, thanks
+2011-10-03T07:18:01  <lord1234> to check if a checkbox is checked, do u use enabled or selected function?  i always get confused
+2011-10-03T07:22:52  <ace_me> heya
+2011-10-03T07:22:53  <__mike> selected
+2011-10-03T07:23:27  <ace_me> it looks I cannot use variables in //td[contains(text(),'custom0804')] so instead that 'custom0804' it does not work with //td[contains(text(),${form_custom})]
+2011-10-03T07:23:37  <ace_me> anyone know why ?
+2011-10-03T07:23:48  <ace_me> is it a bug ?
+2011-10-03T07:24:47  <ace_me> no one please ?
+2011-10-03T07:25:49  <ace_me> I cannot use variables in locators ?
+2011-10-03T07:26:45  <ace_me> I mean a constant
+2011-10-03T07:28:33  <ace_me> many times you are creating in a web app a new user based on a constant which after save is shown in a table list so at a search will be again shown in the list so it would be usefull to select the td which;s a hrtef contain that constant used in the user creation test
+2011-10-03T07:28:37  <ace_me> wouldn't it ?
+2011-10-03T07:30:24  *** QAGuy has joined #selenium
+2011-10-03T07:30:50  *** Ajay has quit IRC
+2011-10-03T07:31:12  *** barancev has quit IRC
+2011-10-03T07:31:34  *** __mike has quit IRC
+2011-10-03T07:35:44  *** barancev has joined #selenium
+2011-10-03T07:36:24  *** davehunt has joined #selenium
+2011-10-03T07:43:02  *** cieufhrxmpfakoih has joined #selenium
+2011-10-03T07:43:27  *** stockton has quit IRC
+2011-10-03T07:43:53  <RossPatterson> ace_me: Are you using Selenium IDE?
+2011-10-03T07:43:59  *** adupap has joined #selenium
+2011-10-03T07:45:33  *** ian_mac_ has quit IRC
+2011-10-03T07:50:26  *** emil_temp_nick has joined #selenium
+2011-10-03T07:51:23  <emil_temp_nick> I'm getting // ERROR: Caught exception [ERROR: Unsupported command [select]]", anybody has an idea why this error usually appears and how to fix it?
+2011-10-03T07:54:40  *** ThePeach has joined #selenium
+2011-10-03T07:54:45  *** ner0x has joined #selenium
+2011-10-03T07:57:57  *** andytinkham has joined #selenium
+2011-10-03T07:59:45  *** pnitin has joined #selenium
+2011-10-03T07:59:49  *** jrock20041 has joined #selenium
+2011-10-03T08:00:58  <emil_temp_nick> anybody knows why "SELECT" is not supported in C#?
+2011-10-03T08:01:01  *** ian_mac_ has joined #selenium
+2011-10-03T08:01:36  <AutomatedTester> emil_temp_nick: because it was deprecated
+2011-10-03T08:01:40  <AutomatedTester> use click
+2011-10-03T08:01:56  *** Elvanor_Thuramdr has joined #selenium
+2011-10-03T08:02:31  *** jrock20041 has quit IRC
+2011-10-03T08:02:39  <Elvanor_Thuramdr> I am having problems with WebDriver - Firefox - Linux - Native events. Sometimes my clicks / mouse events just do not seem to happen...
+2011-10-03T08:03:04  <emil_temp_nick> automated_test: but can select a value from a list with click?
+2011-10-03T08:05:48  <AutomatedTester> emil_temp_nick: yes
+2011-10-03T08:07:14  *** ian_mac_ has quit IRC
+2011-10-03T08:09:36  *** lord1234 has quit IRC
+2011-10-03T08:11:24  <emil_temp_nick> Automate: thx. Is there a way to get value of "selected item" in the list?
+2011-10-03T08:11:50  *** lord1234 has joined #selenium
+2011-10-03T08:13:42  *** kennethkoontz has joined #selenium
+2011-10-03T08:15:23  *** Ajay has joined #selenium
+2011-10-03T08:15:50  *** farlan has joined #selenium
+2011-10-03T08:15:56  *** GitHub30 has joined #selenium
+2011-10-03T08:15:56  <GitHub30> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/Dg7mYQ
+2011-10-03T08:15:56  <GitHub30> [selenium-ci/master] Fix dependencies. - Jari Bakken
+2011-10-03T08:15:56  *** GitHub30 has left #selenium
+2011-10-03T08:17:07  *** algard` has quit IRC
+2011-10-03T08:17:13  *** cieufhrxmpfakoih has quit IRC
+2011-10-03T08:17:37  *** lukeis has joined #selenium
+2011-10-03T08:17:55  <lord1234> how many frickin bots do we have in here?
+2011-10-03T08:18:57  <jarib> two. the github bots join and leave for each message.
+2011-10-03T08:19:36  *** ian_mac_ has joined #selenium
+2011-10-03T08:21:59  <andreastt> jarib: Did you ignore the tests, or shall I?
+2011-10-03T08:23:16  <jarib> andreastt: i didn't, please go ahead
+2011-10-03T08:23:32  <Elvanor_Thuramdr> Anyone else having "dropped events" on Firefox?
+2011-10-03T08:23:41  *** Ajay_ has joined #selenium
+2011-10-03T08:23:42  *** mcr_mfc has joined #selenium
+2011-10-03T08:23:47  *** Yxven has joined #selenium
+2011-10-03T08:24:09  <jarib> andreastt: it seems to have failed on a launch as well: http://xserve.openqa.org:8085/browse/SE2-JAVA-OPERA-23
+2011-10-03T08:24:13  <jarib> i got to run though, bbl
+2011-10-03T08:24:53  <andreastt> Okay, see you later.
+2011-10-03T08:24:59  <andreastt> jarib: Do you know which Opera is running on there?
+2011-10-03T08:25:15  <jarib> the one from apt
+2011-10-03T08:25:31  <jarib> https://github.com/jarib/selenium-ci/blob/master/puppet/modules/opera/manifests/init.pp
+2011-10-03T08:25:55  * jarib is gone
+2011-10-03T08:26:12  *** Ajay has quit IRC
+2011-10-03T08:26:27  *** mcr_mfc1 has quit IRC
+2011-10-03T08:31:30  *** mcr_mfc1 has joined #selenium
+2011-10-03T08:31:30  *** mcr_mfc has quit IRC
+2011-10-03T08:31:49  <Ajay_> andreastt: sent a pull request ,Please review
+2011-10-03T08:33:56  <selbot`> New news from builds: SE2-PYTHON-7 has FAILED : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-PYTHON-7>
+2011-10-03T08:34:00  <andreastt> Ajay_: Sure, will have a look at that tomorrow morning.
+2011-10-03T08:34:07  <andreastt> Now is home-time!
+2011-10-03T08:34:32  <Ajay_> andreastt: Guten Nacht
+2011-10-03T08:34:49  <andreastt> God natt. (-:
+2011-10-03T08:36:00  *** ajay1 has joined #selenium
+2011-10-03T08:38:40  *** rbalent has quit IRC
+2011-10-03T08:40:03  *** mashiara has joined #selenium
+2011-10-03T08:41:28  *** MattR__ has joined #selenium
+2011-10-03T08:41:29  *** mcr_mfc1 has quit IRC
+2011-10-03T08:44:02  <eranm> jimevans, what's the equivalent of 'nm' in Visual Studio? (I'd like to verify that some symbols are in a dll)
+2011-10-03T08:44:27  *** Spanktar has joined #selenium
+2011-10-03T08:45:52  *** k04n has joined #selenium
+2011-10-03T08:47:14  <jimevans> eranm: dumpbin.exe?
+2011-10-03T08:47:30  <eranm> jimevans, yup. Thanks!
+2011-10-03T08:48:34  <eranm> jimevans, any way to see the full signature of each symbol?
+2011-10-03T08:48:40  *** stackedsax has joined #selenium
+2011-10-03T08:48:50  <jimevans> that, i don't know.
+2011-10-03T08:51:16  *** mcr_mfc1 has joined #selenium
+2011-10-03T08:51:16  *** MattR__ has quit IRC
+2011-10-03T08:52:05  *** lord1234 has quit IRC
+2011-10-03T08:55:58  *** Yxven has quit IRC
+2011-10-03T08:57:01  *** mates has quit IRC
+2011-10-03T08:57:38  *** ajay1 has quit IRC
+2011-10-03T09:00:26  <Elvanor_Thuramdr> Is there a way to log something to the error console when using Firefox?
+2011-10-03T09:00:42  <Elvanor_Thuramdr> I am trying to debug something and it is hard to understand what is going on
+2011-10-03T09:01:16  *** lord1234 has joined #selenium
+2011-10-03T09:02:09  *** MattR__ has joined #selenium
+2011-10-03T09:02:10  *** mcr_mfc1 has quit IRC
+2011-10-03T09:02:28  *** MattR__ has quit IRC
+2011-10-03T09:03:01  *** mcr_mfc has joined #selenium
+2011-10-03T09:04:52  <Ajay_> Elvanor_Thurmamdr: wiki Developertips
+2011-10-03T09:05:06  <Ajay_> :wiki developertips
+2011-10-03T09:05:07  <selbot2> 1: DeveloperTips: Information on how to work on the WebDriver codebase. - http://code.google.com/p/selenium/wiki/DeveloperTips
+2011-10-03T09:05:20  <Elvanor_Thuramdr> Ajay_: thanks
+2011-10-03T09:05:51  <Ajay_> http://code.google.com/p/selenium/wiki/DeveloperTips#Debugging_the_Firefox_Driver
+2011-10-03T09:06:17  *** algard has joined #selenium
+2011-10-03T09:07:37  *** brettporter has quit IRC
+2011-10-03T09:07:42  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Updating classpath with new operadriver, protobuf. - http://code.google.com/p/selenium/source/detail?r=14002
+2011-10-03T09:08:09  <Elvanor_Thuramdr> Ajay_: hmm does not seem to work
+2011-10-03T09:08:21  <Elvanor_Thuramdr> Ajay_: I did driver.executeScript("Logger.dumpn('hello world')")
+2011-10-03T09:10:16  <Elvanor_Thuramdr> Is this Logger.dumpn available from my own tests?
+2011-10-03T09:10:22  <Elvanor_Thuramdr> (eg, not the extension...)
+2011-10-03T09:10:25  *** oiiii has quit IRC
+2011-10-03T09:11:04  <Ajay_> Try webdriver.log.file , i am not sure about the Logger.dumpn
+2011-10-03T09:11:43  *** pnitin has quit IRC
+2011-10-03T09:12:50  <Ajay_> eranm: r14002
+2011-10-03T09:12:53  <selbot2> eran.mes@gmail.com 6 minutes ago - EranMes: Updating classpath with new operadriver, protobuf. - http://code.google.com/p/selenium/source/detail?r=14002
+2011-10-03T09:13:47  <Elvanor_Thuramdr> Ajay_: well, how do I log to the log file ??
+2011-10-03T09:14:05  <eranm> Ajay_, what about it?
+2011-10-03T09:14:28  <Ajay_> eranm: i see a version was downgraded
+2011-10-03T09:14:55  <eranm> Ajay_, I see. I'll fix that.
+2011-10-03T09:15:04  <andreastt> Why are we downgrading to v0.7.2?
+2011-10-03T09:15:23  <Ajay_> eranm: Thanks
+2011-10-03T09:16:40  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Fixing an accidental version change in r14002. - http://code.google.com/p/selenium/source/detail?r=14003
+2011-10-03T09:17:17  *** Yxven has joined #selenium
+2011-10-03T09:17:22  <Ajay_> Elvanor_Thuramdr: Give a minute let me figure out , otherwise ping eranm: he is the FF Yoda
+2011-10-03T09:17:30  <Elvanor_Thuramdr> eranm: ping :)
+2011-10-03T09:17:37  <eranm> Err. Not intentionally, IntelliJ botched it up
+2011-10-03T09:17:46  *** ammar01 has quit IRC
+2011-10-03T09:17:53  <eranm> Elvanor_Thuramdr, the logger moved to fxdriver namespace
+2011-10-03T09:18:31  <Elvanor_Thuramdr> so what does that mean?
+2011-10-03T09:19:24  <Elvanor_Thuramdr> (All I want is a Java line of code to send something to the console)
+2011-10-03T09:19:38  <Elvanor_Thuramdr> So that I can try to understand why my clicks are not sent to the browsers
+2011-10-03T09:21:25  <Ajay_> Elvanor_Thuramdr: in the FF , Did you check the console
+2011-10-03T09:21:39  <Elvanor_Thuramdr> yes
+2011-10-03T09:23:29  *** lukeis has quit IRC
+2011-10-03T09:23:36  <Elvanor_Thuramdr> Ajay_: only some clicks are not sent. it is really strange
+2011-10-03T09:23:37  <eranm> Elvanor_Thuramdr, you'd have to call fxdriver.Logger.dumpn
+2011-10-03T09:23:39  *** lukeis has joined #selenium
+2011-10-03T09:23:47  <Elvanor_Thuramdr> eranm: in a JS script?
+2011-10-03T09:23:49  *** lukeis has quit IRC
+2011-10-03T09:23:52  <eranm> Elvanor_Thuramdr, yes
+2011-10-03T09:24:00  <Elvanor_Thuramdr> eg  driver.executeScript("fxdriver.Logger.dumpn('hello world')")
+2011-10-03T09:24:01  <Elvanor_Thuramdr> ?
+2011-10-03T09:24:03  <Elvanor_Thuramdr> let me try
+2011-10-03T09:24:10  <selbot2> eran.mes@gmail.com less than a minute ago - EranMes: Exctracting the modifiers release code into a separate function. This is needed to allow sending modifier keys to the Interactions API. - http://code.google.com/p/selenium/source/detail?r=14004
+2011-10-03T09:25:44  *** GitHub28 has joined #selenium
+2011-10-03T09:25:44  <GitHub28> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/QjZIWA
+2011-10-03T09:25:44  <GitHub28> [selenium-ci/master] More logging around the file lock to debug shutdown issues. - Jari Bakken
+2011-10-03T09:25:44  *** GitHub28 has left #selenium
+2011-10-03T09:26:14  <Elvanor_Thuramdr> eranm: no, this does not worl
+2011-10-03T09:26:15  <Elvanor_Thuramdr> work
+2011-10-03T09:26:35  <Elvanor_Thuramdr> I wrote driver.executeScript("fxdriver.Logger.dumpn('hello world');")
+2011-10-03T09:27:29  <eranm> I didn't think it would - the logger is supposed to work in the context of the Firefox extension
+2011-10-03T09:27:48  <eranm> The way our tests log from inside the page is to append text to an element
+2011-10-03T09:28:18  <Elvanor_Thuramdr> eranm: that wont help me a lot, as I am trying to understand the current log statements
+2011-10-03T09:28:33  <Elvanor_Thuramdr> and thus would like to mix them with my own so I can understand where is a problem
+2011-10-03T09:28:35  <eranm> Elvanor_Thuramdr, what exactly are you trying to do?
+2011-10-03T09:28:42  <Elvanor_Thuramdr> eranm: debug a nasty problem
+2011-10-03T09:28:58  *** k04n has quit IRC
+2011-10-03T09:29:03  <Elvanor_Thuramdr> I am sending a click to Firefox, and it does not happen
+2011-10-03T09:29:14  <Elvanor_Thuramdr> sometimes it does, sometimes it does not, to be more precise
+2011-10-03T09:29:27  <Elvanor_Thuramdr> In Chrome it always work without problem.
+2011-10-03T09:29:35  *** dave_miles_wfh has joined #selenium
+2011-10-03T09:29:41  <Elvanor_Thuramdr> Also the tests with native events are very, very slow. Not sure if this is normal
+2011-10-03T09:29:47  <eranm> that's different. That hints at a timing problem - if the element that's being clicked on is added dynamically, the test should wait until it's present and visible
+2011-10-03T09:29:49  <Elvanor_Thuramdr> but they are at least 3 times slower than with Chrome
+2011-10-03T09:30:01  *** davehunt is now known as davehunt|away
+2011-10-03T09:30:06  <Elvanor_Thuramdr> eranm: that's what I thought at first, but I am already waiting for the element
+2011-10-03T09:30:13  <Elvanor_Thuramdr> so I think everythin is OK
+2011-10-03T09:30:21  <Elvanor_Thuramdr> actually what I have now is a loop with 5 clicks on the element
+2011-10-03T09:30:31  <Elvanor_Thuramdr> the first one failes most of the time - all others go OK
+2011-10-03T09:30:41  <Elvanor_Thuramdr> so I dont think it is a timing problem.
+2011-10-03T09:30:58  <jarib> eranm: hmm, did we ever look into the native events perf regression someone reported on twitter, i wonder
+2011-10-03T09:31:10  <Elvanor_Thuramdr> (Although If I sleep for 1000ms before the click, it always work)
+2011-10-03T09:31:12  *** stackedsax has quit IRC
+2011-10-03T09:31:26  <Elvanor_Thuramdr> so it may be some sort of timing problem but I think the problem lies with WebDriver
+2011-10-03T09:31:33  <eranm> Elvanor_Thuramdr, so there's something with the set-up of the page: perhaps the event handler is not attached in time
+2011-10-03T09:31:48  <Elvanor_Thuramdr> eranm: maybe, but this is not the first click I do on the page
+2011-10-03T09:32:00  <Elvanor_Thuramdr> There is a login window first, then after login I click
+2011-10-03T09:32:07  <eranm> Elvanor_Thuramdr, we had a problem with similar symptoms in a complex GWT application.
+2011-10-03T09:32:30  <Elvanor_Thuramdr> eranm: my app is extremely complex. and a bit the same architecture as GWT
+2011-10-03T09:32:31  <eranm> Turned out they had hard-coded sleep of 200ms before doing anything, WebDriver always completed the native input before that time
+2011-10-03T09:32:39  <Elvanor_Thuramdr> It's just Qooxdoo and not GWT.
+2011-10-03T09:33:02  <Elvanor_Thuramdr> eranm: argh. nasty.
+2011-10-03T09:33:14  <Elvanor_Thuramdr> But I dont think this is the case here as it always work with Chrome
+2011-10-03T09:33:21  <Elvanor_Thuramdr> and Chrome process the events much faster
+2011-10-03T09:33:35  <eranm> Chrome also executes Javascript faster
+2011-10-03T09:33:52  <Elvanor_Thuramdr> yeah, so I dont think it's a problem coming from the JS library
+2011-10-03T09:34:01  <eranm> jarib, I haven't looked into performance issues with native events recently
+2011-10-03T09:34:08  <Elvanor_Thuramdr> it's slow on FF :)
+2011-10-03T09:34:14  <Elvanor_Thuramdr> however I dont really care
+2011-10-03T09:34:27  <Elvanor_Thuramdr> what's important for me is that it is currently very buggy :(
+2011-10-03T09:34:48  <eranm> Elvanor_Thuramdr, especially if native events are turned on, clicks will be sent - the only difference could be the coordinates
+2011-10-03T09:34:53  <Elvanor_Thuramdr> eranm: So I cannot log to the FF console
+2011-10-03T09:35:07  <eranm> What you could do is build WebDriver from trunk and add instrumentation to tell you to which coordinates click is being sent to
+2011-10-03T09:35:08  <jarib> eranm: i'll see if i can find the tweet with the numbers, though i guess you would've known if there was a serious regression by looking at internal builds
+2011-10-03T09:35:14  <Elvanor_Thuramdr> eranm: I checked the coordinates with: println logoutButton.getCoordinates().getLocationOnScreen().getX()
+2011-10-03T09:35:16  <Elvanor_Thuramdr> and they are OK
+2011-10-03T09:35:38  *** sfbrian has joined #selenium
+2011-10-03T09:35:46  <eranm> Elvanor_Thuramdr, see which coordinates *WebDriver* sends the click to, and if they match
+2011-10-03T09:36:05  <Elvanor_Thuramdr> I can add a global mouseClick on the body
+2011-10-03T09:36:08  <Elvanor_Thuramdr> on my app
+2011-10-03T09:36:16  <Elvanor_Thuramdr> this will be faster than building WD from trunk
+2011-10-03T09:36:20  <eranm> you could do that.
+2011-10-03T09:37:29  <Elvanor_Thuramdr> eranm: [INFO] nsCommandProcessor.js:233 Ignoring pending about:document-onload-blocker request
+2011-10-03T09:37:40  <Elvanor_Thuramdr> this is the only thing that seems suspicious in the current console log
+2011-10-03T09:37:40  *** QAGuy has quit IRC
+2011-10-03T09:37:54  <Elvanor_Thuramdr> It logs this on the first click (that does not happen), but not on the others
+2011-10-03T09:38:17  *** retornam has joined #selenium
+2011-10-03T09:38:29  <eranm> Elvanor_Thuramdr, probably because the page has just finished loading
+2011-10-03T09:38:31  <Elvanor_Thuramdr> eranm: are you familiar with this thing?
+2011-10-03T09:38:39  <Elvanor_Thuramdr> hmm
+2011-10-03T09:39:48  <eranm> Elvanor_Thuramdr, there's an explanation why we ignore this pending request in nsCommandProcessor.js.
+2011-10-03T09:40:58  *** stockton has joined #selenium
+2011-10-03T09:40:59  <selbot`> New news from builds: SE2-JS-7 was SUCCESSFUL (with 44 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/SE2-JS-7>
+2011-10-03T09:41:42  <Elvanor_Thuramdr> eranm: reading now but not sure I understand everything
+2011-10-03T09:42:01  <jarib> eranm: apparently happened between 2.5 and 2.6 https://gist.github.com/1220309
+2011-10-03T09:42:20  <jarib> oh wait
+2011-10-03T09:42:25  <jarib> wrong gist, that's with native events turned off
+2011-10-03T09:42:43  <jarib> there's the problem: https://gist.github.com/1218960
+2011-10-03T09:43:32  <eranm> Elvanor_Thuramdr, bottom line is, it's very unlikely that a click event is sent to the wrong window handle, it may be that it's sent to the wrong coordinates, but if you'll see that the click is sent to the right coordinates on executions where click doesn't register on your app, as well as executions where it does, then it's not the click implementation at fault.
+2011-10-03T09:44:08  <eranm> jarib, any idea which platform?
+2011-10-03T09:44:15  <Elvanor_Thuramdr> eranm: I am looking right now
+2011-10-03T09:44:17  <jarib> windows
+2011-10-03T09:44:41  <jarib> i think win7
+2011-10-03T09:44:46  <jarib> can find out
+2011-10-03T09:44:55  <eranm> jarib, I don't recall any changes in this area between 2.5 and 2.6 but I'll have to check further
+2011-10-03T09:45:00  *** amitev has quit IRC
+2011-10-03T09:45:54  <jarib> i could bisect it if you don't see anything obvious
+2011-10-03T09:46:36  *** klthom has joined #selenium
+2011-10-03T09:49:21  <eranm> jarib, that may be handy.
+2011-10-03T09:49:25  <eranm> I'm off - ttyl!
+2011-10-03T09:50:13  *** eranm has quit IRC
+2011-10-03T09:52:35  *** lfryc is now known as lfryc_afk
+2011-10-03T09:53:15  <jarib> AutomatedTester: are these expected? http://xserve.openqa.org:8085/browse/SE2-PYTHON-FX-7/log
+2011-10-03T09:53:38  <jarib> it didn't hang this time, but did see some failures
+2011-10-03T09:53:51  *** ThePeach has quit IRC
+2011-10-03T09:53:52  <Elvanor_Thuramdr> So there is no way at all to get something printed out to the FF console ? that's hard...
+2011-10-03T09:54:40  *** Binken_ has joined #selenium
+2011-10-03T09:54:41  <selbot`> New news from builds: SE2-JAVA-24 has FAILED : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-JAVA-24>
+2011-10-03T09:55:39  *** Nogem has joined #selenium
+2011-10-03T09:57:36  *** stephend has joined #selenium
+2011-10-03T10:04:05  *** Ajay_ has quit IRC
+2011-10-03T10:04:25  *** cerberos has quit IRC
+2011-10-03T10:05:32  *** jeichar_ has joined #selenium
+2011-10-03T10:05:46  *** naeg has joined #selenium
+2011-10-03T10:06:48  *** ian_mac_ has quit IRC
+2011-10-03T10:08:50  *** jeichar has quit IRC
+2011-10-03T10:09:16  *** pnitin has joined #selenium
+2011-10-03T10:12:40  <ace_me> I try to run my first test as shown at http://www.phpunit.de/manual/3.2/en/selenium.html with http://www.phpunit.de/manual/3.2/en/selenium.html
+2011-10-03T10:12:50  <ace_me> but I get include(PHPUnit_Framework_TestCase.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+2011-10-03T10:22:20  *** Binken_ has quit IRC
+2011-10-03T10:23:55  *** stephend has left #selenium
+2011-10-03T10:23:56  <selbot`> New news from builds: SE2-JAVA-25 has FAILED : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-JAVA-25>
+2011-10-03T10:24:51  <Nogem> ace_me: you tried to run the first test as shown at the first link with the same link?
+2011-10-03T10:29:54  *** Yxven has quit IRC
+2011-10-03T10:29:56  *** ian_mac_ has joined #selenium
+2011-10-03T10:31:02  *** naeg has quit IRC
+2011-10-03T10:32:42  *** vrockai_ has quit IRC
+2011-10-03T10:37:34  *** mweichert has joined #selenium
+2011-10-03T10:37:56  <mweichert> Hi, I'm using the web driver ruby bindings
+2011-10-03T10:38:13  <mweichert> I noticed that I can opt to use different http_client backends…
+2011-10-03T10:38:40  <mweichert> however I'm not sure how an http_client get's used - I thought the driver (firefox) is the client?
+2011-10-03T10:39:39  *** voodoofish1 has joined #selenium
+2011-10-03T10:41:07  *** ian_mac_ has quit IRC
+2011-10-03T10:41:45  *** ian_mac_ has joined #selenium
+2011-10-03T10:43:25  *** klthom has quit IRC
+2011-10-03T10:43:52  *** jeichar_ has quit IRC
+2011-10-03T10:44:39  *** SMaction has joined #selenium
+2011-10-03T10:44:59  *** naeg has joined #selenium
+2011-10-03T10:45:07  *** cheezy has joined #selenium
+2011-10-03T10:48:24  <cheezy> ping jimevans
+2011-10-03T10:48:48  <jimevans> pong
+2011-10-03T10:49:04  <cheezy> jimevans:  I seem to still be having problem with the modal dialog issue
+2011-10-03T10:49:29  <jimevans> ok. i'll not be able to look at it today, probably, but feel free to outline the issue for me.
+2011-10-03T10:49:30  *** ImthePC has joined #selenium
+2011-10-03T10:49:30  <cheezy> the problem is not consistent which leads me to believe it is somehow related to a timing issue
+2011-10-03T10:49:33  <jimevans> i'll be right back.
+2011-10-03T10:51:39  <jimevans> back now.
+2011-10-03T10:51:49  <jimevans> it's entirely possible that there's a timing issue.
+2011-10-03T10:52:51  <cheezy> what can I do to help with this?
+2011-10-03T10:53:18  *** GitHub199 has joined #selenium
+2011-10-03T10:53:18  <GitHub199> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/2lHbew
+2011-10-03T10:53:18  <GitHub199> [selenium-ci/master] Fix #locked return value. - Jari Bakken
+2011-10-03T10:53:18  *** GitHub199 has left #selenium
+2011-10-03T10:53:45  <jimevans> make sure you have Visual Studio 2010 Professional or higher, and get comfortable with debugging C++ code? no, i'm kidding here. i'm not entirely sure.
+2011-10-03T10:54:09  <cheezy> I do have VS10 and am very comfortable with c++
+2011-10-03T10:54:10  <selbot`> New news from builds: SE2-JAVA-8 has FAILED (3 tests failed) : Updated by Alexei Barantsev, simon.m.stewart <http://xserve.openqa.org:8085/browse/SE2-JAVA-8>
+2011-10-03T10:54:24  <cheezy> I'm just have never looked at the driver code
+2011-10-03T10:54:26  <jimevans> what language binding do you use?
+2011-10-03T10:54:32  <cheezy> ruby
+2011-10-03T10:54:47  <cheezy> charley baker has offered to help
+2011-10-03T10:54:56  <cheezy> at least he did a few weeks ago
+2011-10-03T10:55:53  *** barancev has quit IRC
+2011-10-03T10:56:04  <jimevans> the biggest thing to help would be a reproducible case.
+2011-10-03T10:56:20  <jimevans> but given that it's intermittent, that might be hard to come by.
+2011-10-03T10:56:21  *** Mayank1 has joined #selenium
+2011-10-03T10:56:33  <cheezy> I have a case that behaves different nearly each time i run it
+2011-10-03T10:56:42  <cheezy> 50% of the time it works
+2011-10-03T10:56:58  *** barancev has joined #selenium
+2011-10-03T10:57:31  *** Mayank has quit IRC
+2011-10-03T10:57:34  <jimevans> refresh my memory. you have nested popups, right? or am i misremembering?
+2011-10-03T10:58:09  *** freynaud has joined #selenium
+2011-10-03T10:58:30  <cheezy> yes - nested popups
+2011-10-03T10:58:41  <jimevans> and that's where it fails, with the second one?
+2011-10-03T10:58:54  <jimevans> sorry, memory not so good today.
+2011-10-03T10:59:09  <cheezy> often it fails after closing a modal - fails to find the window from which it was invoked
+2011-10-03T10:59:13  *** rbalent has joined #selenium
+2011-10-03T10:59:14  *** rbalent has joined #selenium
+2011-10-03T10:59:20  <cheezy> but also sometimes it fails to find the modal
+2011-10-03T10:59:31  <cheezy> doesn't even see the new handle for the modal
+2011-10-03T11:00:06  <jimevans> okay, the code where all that lives is in HtmlDialog::Wait() in HtmlDialog.cpp.
+2011-10-03T11:00:18  <jimevans> there may be logic errors there, but I can't see them.
+2011-10-03T11:04:54  *** stackedsax has joined #selenium
+2011-10-03T11:07:19  *** k-thom has joined #selenium
+2011-10-03T11:07:26  *** pnitin has quit IRC
+2011-10-03T11:08:45  *** lfryc_afk has quit IRC
+2011-10-03T11:09:38  *** jeichar has joined #selenium
+2011-10-03T11:09:46  *** cakehero has joined #selenium
+2011-10-03T11:10:48  <jimevans> anybody know anything about the java implementation of PageFactory
+2011-10-03T11:11:06  <jimevans> (says the non-Java guy)
+2011-10-03T11:13:44  *** jds_ has quit IRC
+2011-10-03T11:14:03  <lord1234> hey can anyone help me with a css selector?
+2011-10-03T11:14:23  <lord1234> i'm trying to identify how to find all instances of line 2 and 4 but not line 1 and 2 using find_element
+2011-10-03T11:14:23  <lord1234> https://gist.github.com/1259836
+2011-10-03T11:14:42  <freynaud> jimevans: it creates a page, with create = proxy all the WebElement variable from the @FindBy annotation
+2011-10-03T11:15:20  <jimevans> freynaud: yeah, but if I'm reading the code properly, your page object class has to have a constructor that takes a WebDriver instance. true or not?
+2011-10-03T11:15:29  <jimevans> if true, can that constructor be private?
+2011-10-03T11:16:06  <jimevans> (my source code is in a state where I can't quickly test the scenario)
+2011-10-03T11:16:36  <freynaud> jimevans: it doesn't do a lot of work, the key part is in the init element methods. You can use that directly wihout using the PageFactory directly
+2011-10-03T11:17:21  *** jeichar has quit IRC
+2011-10-03T11:17:24  <jimevans> ah. true. i didn't see that.
+2011-10-03T11:18:30  <freynaud> jimevans: I use it more as an example. For complex pages, I use pageSection rather than complete page to keep the size manageable
+2011-10-03T11:18:58  <freynaud> you'll probably need to change DefaultFieldDecorator at some point too.
+2011-10-03T11:19:12  <freynaud> jimevans: are you using java now ?
+2011-10-03T11:19:51  <jimevans> freynaud: yes. though using might be a strong word for describing it.
+2011-10-03T11:20:40  <lord1234> anyone have any good suggestions for my CSS issue?
+2011-10-03T11:21:35  *** Ajay has joined #selenium
+2011-10-03T11:26:32  *** Elvanor_Thuramdr has quit IRC
+2011-10-03T11:26:53  *** Elvanor has joined #selenium
+2011-10-03T11:29:05  <barancev> lord1234: get them all as the list, and skip unwanted
+2011-10-03T11:32:28  *** cheezy has quit IRC
+2011-10-03T11:32:29  <selbot`> New news from builds: SE2-JAVA-25 has FAILED (94 tests failed) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-JAVA-25>
+2011-10-03T11:34:49  <Ajay> TypeKit is trending on twitter
+2011-10-03T11:35:22  <stackedsax> I know those guys
+2011-10-03T11:36:16  <Ajay> Adobe acquired Typekit and Nitobi
+2011-10-03T11:36:20  <stackedsax> nice!
+2011-10-03T11:39:11  *** towski has joined #selenium
+2011-10-03T11:40:57  <Elvanor> Is there a way to wait in a test until all browser requests are fulfilled? In my case I need to wait for one image to load
+2011-10-03T11:42:12  *** naeg has quit IRC
+2011-10-03T11:42:49  *** lawcab has joined #selenium
+2011-10-03T11:43:02  <lawcab> hello
+2011-10-03T11:43:29  <lawcab> I have a dropdown box
+2011-10-03T11:43:55  <lawcab> i want to know how to get the value of what is currently sellected. How can I do this?
+2011-10-03T11:44:05  *** Ajay has quit IRC
+2011-10-03T11:46:44  <algard> lawcab, one way is to iterate through the <option> tags, and check elm.isSelected() for each
+2011-10-03T11:47:06  <lawcab> oh...that's gonna be expensive
+2011-10-03T11:47:38  *** zman9854 has joined #selenium
+2011-10-03T11:47:40  <Fyrespray^> use an xpath
+2011-10-03T11:47:56  <Fyrespray^> /select[@selected='selected']
+2011-10-03T11:48:14  <Fyrespray^> well to be more precise
+2011-10-03T11:48:15  <zman9854> Hello - is there a way to have the selenium server ignore requests to certain domains? I'd like to keep requests to adsense out of tests. Thank you!
+2011-10-03T11:48:33  <Fyrespray^> something like //select[@id='<id here>'][@selected='selected']
+2011-10-03T11:51:46  *** AutomatedTester has quit IRC
+2011-10-03T11:51:50  <lawcab> so the first one is the id to the actual dropdown
+2011-10-03T11:52:10  <ace_me> Nogem it looks I was not following all the text there
+2011-10-03T11:52:20  <ace_me> Now I look at 2.In your webserver's php.ini configuration file, configure PHPUnit/Extensions/SeleniumTestCase/prepend.php and PHPUnit/Extensions/SeleniumTestCase/append.php as the auto_prepend_file and auto_append_file, respectively.
+2011-10-03T11:52:30  <ace_me> and this I am not sure how to do it
+2011-10-03T11:52:47  <ace_me> configure PHPUnit/Extensions/SeleniumTestCase/prepend.php and PHPUnit/Extensions/SeleniumTestCase/append.php as the auto_prepend_file and auto_append_file\
+2011-10-03T11:53:21  *** freynaud has left #selenium
+2011-10-03T11:54:13  *** csanchez has quit IRC
+2011-10-03T11:54:21  <ace_me> means this Nogem auto_prepend_file = PHPUnit/Extensions/SeleniumTestCase/prepend.php;
+2011-10-03T11:55:20  <Nogem> ace_me: you have '.' in your classpath?
+2011-10-03T11:56:00  <ace_me> include_path = ".;\xampp\php\PEAR;"
+2011-10-03T11:56:06  <ace_me> I assume yes
+2011-10-03T11:56:28  <Nogem> first char, yeah - what errors are you running into now?
+2011-10-03T11:57:09  <ace_me> just added auto_prepend_file = PHPUnit/Extensions/SeleniumTestCase/prepend.php; and auto_append_file = PHPUnit/Extensions/SeleniumTestCase/append.php; at the end of php.ini
+2011-10-03T11:58:22  <ace_me> should I copy that coverage file ?
+2011-10-03T11:59:28  *** AutomatedTester has joined #selenium
+2011-10-03T12:02:33  <ace_me> I get now Parse error: syntax error, unexpected T_PROTECTED in D:\projects\yii\myapp\public\protected\modules\tester\views\default\test1.php on line 1 Nogem
+2011-10-03T12:03:35  <ace_me> require_once 'PHPUnit/Extensions/GroupTestSuite.php'; is outputting include(PHPUnit_Framework_TestSuite.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory
+2011-10-03T12:03:38  <ace_me> \quite the same
+2011-10-03T12:04:48  <jimevans> AutomatedTester: just checked twitter. what'd i miss?
+2011-10-03T12:05:35  <ace_me> jimevans fist time wih phpunit ?
+2011-10-03T12:05:36  <Nogem> ok, so is there a "./PHPUnit/Extensions/GroupTestSuite.php" or "/xampp/php/PEAR/PHPUnit/Extensions/GroupTestSuite.php"?
+2011-10-03T12:06:04  <Nogem> and note that the first include path is relative, the second is root relative
+2011-10-03T12:06:11  <ace_me> GroupTestSuite.php is there
+2011-10-03T12:06:16  <ace_me> D:\xampp\php\PEAR\PHPUnit\Extensions
+2011-10-03T12:06:33  *** funky_c has quit IRC
+2011-10-03T12:07:42  <ace_me> that means my web projectr should be able to access it relatively ? Nogem
+2011-10-03T12:07:52  <Nogem> are you executing from D:\xampp\php\PEAR or D:\?
+2011-10-03T12:08:08  *** seluser has joined #selenium
+2011-10-03T12:08:38  <jimevans> ace_me: never touched PHP, much less PHPUnit.
+2011-10-03T12:09:08  <ace_me> I have the proj in d:\proj\yii\proj01
+2011-10-03T12:09:25  <ace_me> and d:\xampp\php\pear is containing phpunit
+2011-10-03T12:10:53  <seluser> I have a question I was hoping somebody may be able to help answer.  I'm trying to run my test suite on IE 6/Windows XP with python and webdriver.  When webdriver starts I get the standard "This is the inital start page for the WebDriver server." but then there is a line below it that says "HTTP/1.1 200 OK..." and "This is the initial start page..." is repeated
+2011-10-03T12:10:56  <seluser> Anyone know why?
+2011-10-03T12:11:41  *** selbot2 has quit IRC
+2011-10-03T12:11:47  <seluser> My tests also hang with no exception or anything...IE stops responding
+2011-10-03T12:11:57  *** selbot2 has joined #selenium
+2011-10-03T12:12:37  *** ImthePC has left #selenium
+2011-10-03T12:12:54  <barancev> jimevans: look at #2590, isn
+2011-10-03T12:12:55  <selbot2>  open/new InternetExplorerDriver()  throws JavaScript Error 'overflow' is null or not an objecj - http://code.google.com/p/selenium/issues/detail?id=2590 [Type-Defect Priority-Medium]
+2011-10-03T12:13:02  <barancev> isn
+2011-10-03T12:13:08  *** cheezy has joined #selenium
+2011-10-03T12:13:08  *** ImthePC has joined #selenium
+2011-10-03T12:13:25  <barancev> is not it a duplicate of #2563?
+2011-10-03T12:13:25  <selbot2>  open/accepted InternetExplorer WebDriver Fails on finding element with javascript error - http://code.google.com/p/selenium/issues/detail?id=2563 [Type-Defect Priority-Medium]
+2011-10-03T12:14:12  *** selbot2 has quit IRC
+2011-10-03T12:14:27  *** selbot2 has joined #selenium
+2011-10-03T12:15:29  <jarib> :note eranm bisecting the perf regression leads to http://code.google.com/p/selenium/source/detail?r=13611 - so probably not an issue
+2011-10-03T12:15:30  <selbot2> ok!
+2011-10-03T12:19:12  *** seluser has quit IRC
+2011-10-03T12:28:12  *** RossPatterson has quit IRC
+2011-10-03T12:28:26  <ace_me> Nogem so mostly the test will be runned in console with phpunit test.php ?
+2011-10-03T12:28:43  <ace_me> I was trying until now to run it from inside a framework actin
+2011-10-03T12:29:00  <ace_me> that maybe should be called with execshell or so !
+2011-10-03T12:29:16  <jimevans> barancev: yeah, they're likely dupes.
+2011-10-03T12:29:53  <jimevans> i've marked it as such
+2011-10-03T12:32:21  <jimevans> i don't think i've ranted on how much i hate *sigh* nuget in awhile.
+2011-10-03T12:32:27  <jarib> could someone :note me?
+2011-10-03T12:32:28  *** zman9854 has quit IRC
+2011-10-03T12:32:39  <jimevans> :note jarib hi, jari
+2011-10-03T12:32:39  <selbot2> ok!
+2011-10-03T12:32:43  *** jarib has left #selenium
+2011-10-03T12:32:43  *** jarib has joined #selenium
+2011-10-03T12:32:43  <selbot2> jarib: note from jimevans less than 5 seconds ago: hi, jari
+2011-10-03T12:32:48  <jarib> thanks
+2011-10-03T12:32:54  <jimevans> np
+2011-10-03T12:33:01  *** pnitin has joined #selenium
+2011-10-03T12:33:17  <jimevans> that's pretty clever.
+2011-10-03T12:34:40  <jarib> yeah, nice feature. not my idea :)
+2011-10-03T12:39:34  *** ImthePC has quit IRC
+2011-10-03T12:43:19  *** Yxven has joined #selenium
+2011-10-03T12:43:45  *** ImthePC has joined #selenium
+2011-10-03T12:46:01  *** ace_me has quit IRC
+2011-10-03T12:49:19  *** freynaud has joined #selenium
+2011-10-03T12:50:41  *** jimevans has left #selenium
+2011-10-03T12:50:48  *** freynaud has left #selenium
+2011-10-03T12:54:55  <selbot`> New news from builds: SE2-JAVA-26 has FAILED (14 tests failed) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-JAVA-26>
+2011-10-03T12:56:09  *** ian_mac_ has quit IRC
+2011-10-03T12:56:13  *** ideaz has quit IRC
+2011-10-03T12:56:33  *** ideaz has joined #selenium
+2011-10-03T12:59:12  *** adamgoucher has quit IRC
+2011-10-03T13:00:30  *** ian_mac_ has joined #selenium
+2011-10-03T13:00:50  *** pnitin has quit IRC
+2011-10-03T13:04:09  *** andialbrecht_ is now known as andialbrecht
+2011-10-03T13:04:49  *** andialbrecht is now known as andialbrecht_
+2011-10-03T13:07:01  *** cburroughs has quit IRC
+2011-10-03T13:13:24  *** davehunt|away is now known as davehunt
+2011-10-03T13:18:27  *** Spanktar is now known as spanktar|afk
+2011-10-03T13:19:40  *** snax has joined #selenium
+2011-10-03T13:19:41  <snax> hi
+2011-10-03T13:20:01  <snax> How do I echo storedVars['options'].length  and not literally print storedVars['options'].length ?
+2011-10-03T13:20:17  *** jleyba has joined #selenium
+2011-10-03T13:25:41  *** ImthePC has quit IRC
+2011-10-03T13:25:53  *** farlan has quit IRC
+2011-10-03T13:32:26  *** xirkus has quit IRC
+2011-10-03T13:32:37  *** lord1234 has quit IRC
+2011-10-03T13:33:04  *** lord1234 has joined #selenium
+2011-10-03T13:34:32  *** xirkus has joined #selenium
+2011-10-03T13:38:35  *** sfbrian_ has joined #selenium
+2011-10-03T13:39:59  <AutomatedTester> jarib: ping
+2011-10-03T13:40:02  *** snax has quit IRC
+2011-10-03T13:40:12  *** xirkus has quit IRC
+2011-10-03T13:40:13  *** darius__w has joined #selenium
+2011-10-03T13:40:20  *** snax has joined #selenium
+2011-10-03T13:40:30  *** darius_w has quit IRC
+2011-10-03T13:40:57  *** Nogem has quit IRC
+2011-10-03T13:40:58  *** kennethkoontz has quit IRC
+2011-10-03T13:41:19  *** kennethkoontz has joined #selenium
+2011-10-03T13:41:26  *** rbalent has quit IRC
+2011-10-03T13:41:41  *** lord1234 has quit IRC
+2011-10-03T13:42:01  *** sfbrian has quit IRC
+2011-10-03T13:42:01  *** sfbrian_ is now known as sfbrian
+2011-10-03T13:43:14  *** ian_mac_ has quit IRC
+2011-10-03T13:45:39  <snax> How do I echo storedVars['options'].length  and not literally print storedVars['options'].length ?  It works when I use a javascript alert()
+2011-10-03T13:45:55  *** cheezy has quit IRC
+2011-10-03T13:46:23  *** xirkus has joined #selenium
+2011-10-03T13:47:38  <selbot2> james.h.evans.jr@gmail.com half a minute ago - JimEvans: Testing the parent element in IE native code to make sure it isn't the document. Fixes issue #2563. - http://code.google.com/p/selenium/source/detail?r=14005
+2011-10-03T13:50:42  *** xirkus has quit IRC
+2011-10-03T13:50:51  *** jfunk has quit IRC
+2011-10-03T13:51:41  *** xirkus has joined #selenium
+2011-10-03T13:52:06  <snax> It's javascript{storedVars['options'][2]}
+2011-10-03T13:53:38  *** lewlewlew has joined #selenium
+2011-10-03T13:55:07  *** selbot2 has quit IRC
+2011-10-03T13:55:07  *** ian_mac has quit IRC
+2011-10-03T13:55:07  *** evlew has quit IRC
+2011-10-03T13:55:07  *** ZinovaS has quit IRC
+2011-10-03T13:55:19  <jarib> AutomatedTester: pong
+2011-10-03T13:55:28  *** selbot2 has joined #selenium
+2011-10-03T13:55:37  <AutomatedTester> jarib: did you solve the python test issue?
+2011-10-03T13:55:41  *** spanktar|afk is now known as Spanktar
+2011-10-03T13:55:48  <jarib> AutomatedTester: nope
+2011-10-03T13:56:02  <AutomatedTester> jarib: its not loading native events for some reason
+2011-10-03T13:56:16  <jarib> ah
+2011-10-03T13:56:17  *** xirkus has quit IRC
+2011-10-03T13:56:26  <jarib> the python tests are running with firefox 7, that's why
+2011-10-03T13:56:32  <jarib> i'll bump it down to 3
+2011-10-03T13:56:56  <jarib> unless you can get me a URL for 4, 5 or 6
+2011-10-03T13:57:03  <esto_> with selenium ide i tried to export a test case to python and it says "suite export not implemented"
+2011-10-03T13:57:12  *** j0ls0n has joined #selenium
+2011-10-03T13:57:13  <esto_> but the suite is installed
+2011-10-03T13:57:27  <esto_> what could be the problem ?
+2011-10-03T13:58:00  *** xirkus has joined #selenium
+2011-10-03T13:58:02  <j0ls0n> In the Firefox Selenium UI is there a way to continue a test from the current point, ie. without running the entire test again?
+2011-10-03T13:58:41  <esto_> the second play button ( the one with only one green line )
+2011-10-03T13:59:08  *** ZinovaS has joined #selenium
+2011-10-03T13:59:26  <j0ls0n> @esto_ but that just starts restarts the current case?
+2011-10-03T13:59:51  <esto_> right click on one command
+2011-10-03T13:59:51  <j0ls0n> i'd like to just continue from the current step that's selected
+2011-10-03T13:59:54  <esto_> and set start point
+2011-10-03T14:00:14  <j0ls0n> @esto_ got it, thanks!
+2011-10-03T14:00:22  <esto_> welcome
+2011-10-03T14:02:15  *** ian_mac has joined #selenium
+2011-10-03T14:02:33  <k-thom> I am testing an application (in IE) using Selenium RC that, upon login, launches the application in a new browser window and closes the parent window.  I am not able to access the child window. After waiting for the child window to finish loading, an attempt to call get_all_window_ids/names/titles returns the following:  ERROR: Command execution failure. The error message is: The object invoked has disconnected from its clients. Does anyone know how to
+2011-10-03T14:02:33  <k-thom>  switch focus to this new window?
+2011-10-03T14:02:43  *** xirkus has quit IRC
+2011-10-03T14:09:32  *** xirkus has joined #selenium
+2011-10-03T14:10:23  <snax> http://wiki.openqa.org/pages/viewpageattachments.action?pageId=379&metadataLink=true
+2011-10-03T14:10:58  <snax> Where do I put the .js files ?  I want to install the addon for while loops.
+2011-10-03T14:13:40  <AutomatedTester> jarib: have you been trying to bring down the Mozilla FTP in an attempt to find the SDKs for other versions?
+2011-10-03T14:13:51  *** xirkus has quit IRC
+2011-10-03T14:16:00  *** xirkus has joined #selenium
+2011-10-03T14:18:47  <mweichert> I'm trying to use web driver over a PPP connection. Works great, except HTTPS sites always timeout. Any ideas why that may be? HTTP works fine. HTTPS works fine when not going over PPP
+2011-10-03T14:20:37  *** xirkus has quit IRC
+2011-10-03T14:23:17  <mweichert> Firefox outputs an error "The connection was interrupted"
+2011-10-03T14:23:40  *** adupap has quit IRC
+2011-10-03T14:31:01  *** csanchez has joined #selenium
+2011-10-03T14:40:46  *** lukeis has joined #selenium
+2011-10-03T14:56:04  *** towski has quit IRC
+2011-10-03T14:56:45  <jarib> AutomatedTester: i don't think so, haven't looked very hard :)
+2011-10-03T14:59:37  *** xirkus has joined #selenium
+2011-10-03T15:04:50  *** stockton has quit IRC
+2011-10-03T15:09:37  *** csanchez has quit IRC
+2011-10-03T15:11:31  *** emil_temp_nick has left #selenium
+2011-10-03T15:13:30  *** brettporter has joined #selenium
+2011-10-03T15:22:05  *** towski has joined #selenium
+2011-10-03T15:25:35  *** DustinFay has quit IRC
+2011-10-03T15:31:41  *** simonstewart has joined #selenium
+2011-10-03T15:32:04  <simonstewart> G'day all
+2011-10-03T15:32:31  <AutomatedTester> simonstewart: g'day mate, lets throw another chook on the barbie and have some tinnies
+2011-10-03T15:32:57  <simonstewart> Sounds good
+2011-10-03T15:33:05  <simonstewart> So, does anyone want the release bacon this time round?
+2011-10-03T15:33:22  <simonstewart> We've had 2.7 out for long enough
+2011-10-03T15:33:27  <simonstewart> Should be pushing 2.8 RSN
+2011-10-03T15:33:35  <simonstewart> But I'm not going to be able to do it
+2011-10-03T15:34:00  <AutomatedTester> RSN?
+2011-10-03T15:35:42  <AutomatedTester> btw simonstewart no one has really poo pooed my fennec design
+2011-10-03T15:35:48  *** stockton has joined #selenium
+2011-10-03T15:35:55  <AutomatedTester> well our design
+2011-10-03T15:36:09  <simonstewart> RSN == Real Soon Now
+2011-10-03T15:36:19  <simonstewart> And the fennec design isn't a bad one
+2011-10-03T15:36:44  <AutomatedTester> ahh bless your english-isms
+2011-10-03T15:38:01  *** towski has quit IRC
+2011-10-03T15:39:09  <simonstewart> So, bacon anyone?
+2011-10-03T15:39:39  <AutomatedTester> do you want it this week?
+2011-10-03T15:39:45  <simonstewart> Yup
+2011-10-03T15:40:03  <simonstewart> We've had 2.7 out for more than a week
+2011-10-03T15:40:08  <simonstewart> So the sooner, the better
+2011-10-03T15:40:15  <AutomatedTester> i am probably going to be up to my eye balls in admin :/
+2011-10-03T15:40:21  <simonstewart> k
+2011-10-03T15:40:37  <simonstewart> Are we ready for Firefox 8 and 9?
+2011-10-03T15:40:45  <AutomatedTester> havent checked
+2011-10-03T15:40:50  <AutomatedTester> I can help out with that
+2011-10-03T15:40:54  <AutomatedTester> 8 for Se1
+2011-10-03T15:41:35  <simonstewart> 8 and 9 for WebDriver is probably more pressing
+2011-10-03T15:41:51  <AutomatedTester> yea, I can have a look at that tomorrow
+2011-10-03T15:42:03  <AutomatedTester> I suspect 8 is broken :(
+2011-10-03T15:46:42  *** sfbrian has quit IRC
+2011-10-03T15:46:54  *** jleyba has left #selenium
+2011-10-03T15:47:05  <simonstewart> Gah!
+2011-10-03T15:47:14  <simonstewart> Heh. Jason was around
+2011-10-03T15:47:24  <simonstewart> Any idea what the breakage in 8 is?
+2011-10-03T15:47:27  <AutomatedTester> looking at https://bugzilla.mozilla.org/show_bug.cgi?id=650858
+2011-10-03T15:47:38  <AutomatedTester> its what was broken in 5, 6, 7
+2011-10-03T15:48:21  *** ian_mac has quit IRC
+2011-10-03T15:49:43  *** sfbrian has joined #selenium
+2011-10-03T15:50:40  <AutomatedTester> simonstewart: looks like I set the flag on this for FIrefox 8
+2011-10-03T15:50:49  * AutomatedTester will chase this up tomorrow
+2011-10-03T15:50:52  <simonstewart> Thanks
+2011-10-03T15:52:17  <AutomatedTester> simonstewart: are you back before you're off to MV or you going straight there?
+2011-10-03T15:54:29  *** cakehero has quit IRC
+2011-10-03T15:55:04  *** lukeis has quit IRC
+2011-10-03T15:57:07  <AutomatedTester> laters all
+2011-10-03T15:57:31  *** AutomatedTester has quit IRC
+2011-10-03T15:57:59  <selbot2> berrada@google.com less than 20 seconds ago - DouniaBerrada: Fixing broken Android build. - http://code.google.com/p/selenium/source/detail?r=14006
+2011-10-03T15:58:15  *** towski has joined #selenium
+2011-10-03T16:01:27  <simonstewart> TTFN
+2011-10-03T16:01:38  *** stockton has quit IRC
+2011-10-03T16:05:08  *** Yxven has quit IRC
+2011-10-03T16:06:10  *** andytinkham has quit IRC
+2011-10-03T16:16:09  *** SMaction has quit IRC
+2011-10-03T16:16:26  *** XRayCulver has quit IRC
+2011-10-03T16:16:26  *** lawcab has quit IRC
+2011-10-03T16:20:17  *** barancev has quit IRC
+2011-10-03T16:20:53  <simonstewart> Right. I'm going to bump junit to 4.10
+2011-10-03T16:23:25  *** Yxven has joined #selenium
+2011-10-03T16:23:57  *** cburroughs has joined #selenium
+2011-10-03T16:25:32  *** towski has quit IRC
+2011-10-03T16:25:50  <simonstewart> Gosh, there's an awful lot of issues being filed
+2011-10-03T16:28:41  *** towski has joined #selenium
+2011-10-03T16:34:23  *** retornam has quit IRC
+2011-10-03T16:36:03  *** Mayank1 has quit IRC
+2011-10-03T16:36:38  <jarib> no kidding
+2011-10-03T16:38:01  <jarib> :note AutomatedTester can we make the python build output xunit xml to build/test_logs?
+2011-10-03T16:38:02  <selbot2> ok!
+2011-10-03T16:40:15  * jarib sleeps
+2011-10-03T16:46:59  *** anjelica has quit IRC
+2011-10-03T16:53:02  *** j0ls0n has quit IRC
+2011-10-03T17:06:49  *** SpankyFromBRC has joined #selenium
+2011-10-03T17:11:27  *** Spanktar has quit IRC
+2011-10-03T17:15:54  <selbot`> New news from builds: SE2-JS-8 was SUCCESSFUL (with 82 tests) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/SE2-JS-8>
+2011-10-03T17:17:09  *** kennethkoontz has quit IRC
+2011-10-03T17:17:16  *** stackedsax has quit IRC
+2011-10-03T17:17:41  *** Cruel` has joined #selenium
+2011-10-03T17:18:58  <Cruel`> when saving a screenshot using webdriver of a page with flash, the flash box is left white
+2011-10-03T17:19:05  <Cruel`> must I do/install something additional?
+2011-10-03T17:19:58  <Cruel`> just firefox webdriver (yes, I have flash plugin)
+2011-10-03T17:25:06  *** cerberos has joined #selenium
+2011-10-03T17:28:53  *** cakehero has joined #selenium
+2011-10-03T17:36:35  *** cburroughs has quit IRC
+2011-10-03T17:38:00  *** mweichert has left #selenium
+2011-10-03T17:43:05  *** cburroughs has joined #selenium
+2011-10-03T17:51:49  *** ner0x has quit IRC
+2011-10-03T17:57:36  *** towski has quit IRC
+2011-10-03T17:57:36  *** ZinovaS has quit IRC
+2011-10-03T17:57:36  *** lewlewlew has quit IRC
+2011-10-03T17:57:36  *** snax has quit IRC
+2011-10-03T17:57:36  *** Epeli has quit IRC
+2011-10-03T17:57:36  *** mario-goulart has quit IRC
+2011-10-03T17:57:36  *** Mooose has quit IRC
+2011-10-03T17:57:36  *** ahfeel has quit IRC
+2011-10-03T17:57:36  *** Mox[NL] has quit IRC
+2011-10-03T17:57:36  *** zamolxes has quit IRC
+2011-10-03T17:57:36  *** jarib has quit IRC
+2011-10-03T17:57:37  *** Cruel` has quit IRC
+2011-10-03T17:57:37  *** dave_miles_wfh has quit IRC
+2011-10-03T17:57:37  *** beakerman has quit IRC
+2011-10-03T17:57:37  *** dmachi1 has quit IRC
+2011-10-03T17:57:37  *** nirvdrum has quit IRC
+2011-10-03T17:57:37  *** cgoldberg has quit IRC
+2011-10-03T17:57:37  *** chson has quit IRC
+2011-10-03T17:57:37  *** arnlaugsson has quit IRC
+2011-10-03T17:57:37  *** jmathes has quit IRC
+2011-10-03T17:57:37  *** silastic has quit IRC
+2011-10-03T17:57:37  *** moo-_- has quit IRC
+2011-10-03T17:57:37  *** wilhelm has quit IRC
+2011-10-03T17:57:37  *** eghm has quit IRC
+2011-10-03T17:57:37  *** a7p has quit IRC
+2011-10-03T17:57:37  *** brettporter has quit IRC
+2011-10-03T17:57:37  *** k-thom has quit IRC
+2011-10-03T17:57:37  *** algard has quit IRC
+2011-10-03T17:57:37  *** Dude-X has quit IRC
+2011-10-03T17:57:37  *** MadMerlin|work_ has quit IRC
+2011-10-03T17:57:37  *** selbot2 has quit IRC
+2011-10-03T17:57:37  *** davehunt has quit IRC
+2011-10-03T17:57:37  *** andreastt has quit IRC
+2011-10-03T17:57:37  *** Parabola has quit IRC
+2011-10-03T17:57:37  *** beowulf has quit IRC
+2011-10-03T17:57:37  *** Fyrespray^ has quit IRC
+2011-10-03T17:57:38  *** robinsmidsrod has quit IRC
+2011-10-03T17:57:38  *** cakehero has quit IRC
+2011-10-03T17:57:38  *** mrchrisadams has quit IRC
+2011-10-03T17:57:38  *** jyrkip has quit IRC
+2011-10-03T17:57:38  *** bracki has quit IRC
+2011-10-03T17:57:38  *** mick_laptop has quit IRC
+2011-10-03T17:59:26  *** cerberos has quit IRC
+2011-10-03T18:00:34  *** cakehero has joined #selenium
+2011-10-03T18:00:34  *** Cruel` has joined #selenium
+2011-10-03T18:00:34  *** towski has joined #selenium
+2011-10-03T18:00:34  *** brettporter has joined #selenium
+2011-10-03T18:00:34  *** ZinovaS has joined #selenium
+2011-10-03T18:00:34  *** selbot2 has joined #selenium
+2011-10-03T18:00:34  *** lewlewlew has joined #selenium
+2011-10-03T18:00:34  *** snax has joined #selenium
+2011-10-03T18:00:34  *** jarib has joined #selenium
+2011-10-03T18:00:34  *** k-thom has joined #selenium
+2011-10-03T18:00:34  *** dave_miles_wfh has joined #selenium
+2011-10-03T18:00:34  *** algard has joined #selenium
+2011-10-03T18:00:34  *** davehunt has joined #selenium
+2011-10-03T18:00:34  *** beakerman has joined #selenium
+2011-10-03T18:00:34  *** Dude-X has joined #selenium
+2011-10-03T18:00:34  *** dmachi1 has joined #selenium
+2011-10-03T18:00:34  *** nirvdrum has joined #selenium
+2011-10-03T18:00:34  *** cgoldberg has joined #selenium
+2011-10-03T18:00:34  *** Fyrespray^ has joined #selenium
+2011-10-03T18:00:34  *** chson has joined #selenium
+2011-10-03T18:00:34  *** Parabola has joined #selenium
+2011-10-03T18:00:34  *** beowulf has joined #selenium
+2011-10-03T18:00:34  *** MadMerlin|work_ has joined #selenium
+2011-10-03T18:00:34  *** andreastt has joined #selenium
+2011-10-03T18:00:34  *** silastic has joined #selenium
+2011-10-03T18:00:34  *** moo-_- has joined #selenium
+2011-10-03T18:00:34  *** wilhelm has joined #selenium
+2011-10-03T18:00:34  *** eghm has joined #selenium
+2011-10-03T18:00:34  *** a7p has joined #selenium
+2011-10-03T18:00:34  *** robinsmidsrod has joined #selenium
+2011-10-03T18:00:34  *** jmathes has joined #selenium
+2011-10-03T18:00:34  *** arnlaugsson has joined #selenium
+2011-10-03T18:00:34  *** Epeli has joined #selenium
+2011-10-03T18:00:34  *** mrchrisadams has joined #selenium
+2011-10-03T18:00:34  *** mario-goulart has joined #selenium
+2011-10-03T18:00:34  *** jyrkip has joined #selenium
+2011-10-03T18:00:34  *** Mooose has joined #selenium
+2011-10-03T18:00:34  *** bracki has joined #selenium
+2011-10-03T18:00:34  *** ahfeel has joined #selenium
+2011-10-03T18:00:34  *** Mox[NL] has joined #selenium
+2011-10-03T18:00:34  *** zamolxes has joined #selenium
+2011-10-03T18:00:34  *** mick_laptop has joined #selenium
+2011-10-03T18:00:45  *** beakerman has quit IRC
+2011-10-03T18:01:52  *** beakerman has joined #selenium
+2011-10-03T18:12:34  *** mick_laptop has quit IRC
+2011-10-03T18:13:15  *** mick_laptop has joined #selenium
+2011-10-03T18:14:19  *** cakehero has quit IRC
+2011-10-03T18:15:27  *** Spanktar has joined #selenium
+2011-10-03T18:40:31  *** dmachi has joined #selenium
+2011-10-03T18:40:31  *** dmachi1 has quit IRC
+2011-10-03T18:43:40  *** cerberos has joined #selenium
+2011-10-03T18:48:22  *** ner0x has joined #selenium
+2011-10-03T18:49:08  *** voodoofish1 has quit IRC
+2011-10-03T19:02:16  *** stephend has joined #selenium
+2011-10-03T19:06:36  *** towski has quit IRC
+2011-10-03T19:08:25  *** k-thom has quit IRC
+2011-10-03T19:12:13  *** Spanktar has quit IRC
+2011-10-03T19:12:20  *** sfbrian has quit IRC
+2011-10-03T19:18:48  *** dennis__ has joined #selenium
+2011-10-03T19:22:26  <dennis__> hi all. I am looking for pointers how to click an element in an iframe with position:absolute; (this is a popup menu in an iframe). works in FF, but ElementNotVisibleException in IE 8/9. Seems like the click position is calculated incorrectly. Any hints? (WD 2.7.0)
+2011-10-03T19:26:00  *** Spanktar has joined #selenium
+2011-10-03T19:26:51  *** cburroughs has quit IRC
+2011-10-03T19:52:20  *** nirvdrum has quit IRC
+2011-10-03T19:56:31  *** dennis__ has left #selenium
+2011-10-03T20:03:30  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Bumping junit to 4.10 - http://code.google.com/p/selenium/source/detail?r=14007
+2011-10-03T20:05:30  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Missed android - http://code.google.com/p/selenium/source/detail?r=14008
+2011-10-03T20:15:07  *** dennis__ has joined #selenium
+2011-10-03T20:15:32  *** ner0x has quit IRC
+2011-10-03T20:16:09  *** dennis__ is now known as delvis
+2011-10-03T20:16:20  *** chson has quit IRC
+2011-10-03T20:22:39  *** delvis has quit IRC
+2011-10-03T20:25:32  *** beakerman has quit IRC
+2011-10-03T20:28:34  *** pnitin has joined #selenium
+2011-10-03T20:30:35  *** Spanktar has quit IRC
+2011-10-03T20:43:07  *** pnitin has quit IRC
+2011-10-03T20:43:22  *** pnitin has joined #selenium
+2011-10-03T20:50:12  *** pnitin has quit IRC
+2011-10-03T20:52:26  *** pnitin has joined #selenium
+2011-10-03T21:02:43  *** cgoldberg has quit IRC
+2011-10-03T21:24:28  *** pnitin has quit IRC
+2011-10-03T21:37:44  *** Spanktar has joined #selenium
+2011-10-03T21:40:38  *** barancev has joined #selenium
+2011-10-03T21:49:52  *** csanchez has joined #selenium
+2011-10-03T21:52:19  *** Spanktar has quit IRC
+2011-10-03T21:54:21  *** pnitin has joined #selenium
+2011-10-03T21:55:32  *** krosenvold has quit IRC
+2011-10-03T22:03:29  <barancev> a question about #2557: should we check that an element to be submitted is a form, and give an error message if it is not?
+2011-10-03T22:03:30  <selbot2>  open/new "submit" command not working with IDE - http://code.google.com/p/selenium/issues/detail?id=2557 [Type-Defect Priority-Medium Component-IDE]
+2011-10-03T22:04:48  <barancev> in WebDriver it is allowed to call submit to an input element, in IDE it causes an error
+2011-10-03T22:06:56  *** andytinkham has joined #selenium
+2011-10-03T22:07:04  *** andytinkham has quit IRC
+2011-10-03T22:14:52  *** Cruel` has left #selenium
+2011-10-03T22:24:57  *** ace_me has joined #selenium
+2011-10-03T22:25:21  <ace_me> hi! I've started Selenium RC and I tried to run a test but I get PHPUnit_Framework_Exception: Could not connect to the Selenium RC server.
+2011-10-03T22:27:35  <darius__w> ace_me: well, looks like error says everything... test usual things, is server running, are host and port provided a correct and isnt it blocked by firewal and so on..
+2011-10-03T22:28:07  <ace_me> darius__w I agrree ! the server RC was stated in a cmd window so I see is running
+2011-10-03T22:29:24  <ace_me> was started on port 4444 and is local
+2011-10-03T22:29:42  <ace_me> so firewall will not allow connection from outside
+2011-10-03T22:29:45  <ace_me> on port 4444
+2011-10-03T22:30:04  <ace_me> is this testing needed connections from outsside on 4444 darius__w?
+2011-10-03T22:30:30  <darius__w> thats depends on what machine your test is running..
+2011-10-03T22:31:55  <ace_me> dropped firewall for a test and effect was the same
+2011-10-03T22:32:03  <ace_me> stopped* better saying
+2011-10-03T22:32:35  <darius__w> if its local, try 127.0.0.1 insted of localhost
+2011-10-03T22:32:37  <ace_me> test is running on my machine darius__w and i plan to test outside servers like www.google.com let's say
+2011-10-03T22:33:00  <ace_me> where to try 127.0.0.1 ?
+2011-10-03T22:33:07  <ace_me> instead of localhost
+2011-10-03T22:33:35  <darius__w> well your test script connects to RC server, so you need to provide it host and port to connect
+2011-10-03T22:33:50  <ace_me>       array(          'name'    => 'Firefox on Linux',          'browser' => '*firefox /usr/lib/firefox/firefox-bin',          'host'    => 'my.linux.box',          'port'    => 4445,          'timeout' => 30000,      ),
+2011-10-03T22:34:08  <darius__w> use ip for host
+2011-10-03T22:34:25  *** jeichar has joined #selenium
+2011-10-03T22:34:50  <darius__w> and i remember you say server listens on port 4444 and not 4445 as in your config
+2011-10-03T22:35:47  <ace_me> yes I was trying yesterday on 4445
+2011-10-03T22:35:55  <ace_me> as 4444 was reported as used
+2011-10-03T22:36:04  <ace_me> I will checkc back
+2011-10-03T22:36:18  <ace_me> now replaced host 127.0.0.1 and tooks longer
+2011-10-03T22:36:32  <ace_me> i only see an E in the cmd prompt
+2011-10-03T22:36:39  <ace_me> EE
+2011-10-03T22:36:53  <ace_me> I assume I will get better results
+2011-10-03T22:37:08  <ace_me> starting to understand what is happening and how to use it I think
+2011-10-03T22:37:15  <ace_me> just played with Selenium IDE for a week or so
+2011-10-03T22:37:44  <ace_me> thx ! I will visit kindergarden and came back shortly :)
+2011-10-03T22:37:52  <darius__w> :D
+2011-10-03T22:59:33  *** Spanktar has joined #selenium
+2011-10-03T23:04:41  *** Spanktar has quit IRC
+2011-10-03T23:04:56  *** Spanktar has joined #selenium
+2011-10-03T23:05:40  *** SpankyFromBRC has joined #selenium
+2011-10-03T23:06:15  *** Spanktar has quit IRC
+2011-10-03T23:06:15  *** SpankyFromBRC has quit IRC
+2011-10-03T23:06:31  *** Spanktar has joined #selenium
+2011-10-03T23:10:56  *** Spanktar has quit IRC
+2011-10-03T23:14:36  *** stackedsax has joined #selenium
+2011-10-03T23:16:17  <ace_me> back
+2011-10-03T23:16:44  <ace_me> BadMethodCallException: Method assertTitleEquals not defined.
+2011-10-03T23:17:33  *** mates has joined #selenium
+2011-10-03T23:19:30  *** mates has quit IRC
+2011-10-03T23:22:59  <ace_me> darius__w I get for iexplore couldn't get app window, is the pop-up blocker enabled ? is a script error
+2011-10-03T23:24:01  *** mates has joined #selenium
+2011-10-03T23:28:50  *** freynaud has joined #selenium
+2011-10-03T23:29:06  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Adding a test for a vexing problem where correctly configured proxies would cause problems - http://code.google.com/p/selenium/source/detail?r=14009
+2011-10-03T23:29:35  <selbot2> simon.m.stewart less than a minute ago - SimonStewart: Sometimes it's useful to debug a java binary - http://code.google.com/p/selenium/source/detail?r=14010
+2011-10-03T23:35:21  <selbot`> New news from builds: SE2-JAVA-12 has FAILED (32 tests failed) : Updated by 6 authors <http://xserve.openqa.org:8085/browse/SE2-JAVA-12>
+2011-10-03T23:37:22  <selbot`> New news from builds: SE2-JAVA-12 has FAILED (32 tests failed) : Updated by Alexei Barantsev <http://xserve.openqa.org:8085/browse/SE2-JAVA-12>
+2011-10-03T23:38:09  <barancev> another selbot?
+2011-10-03T23:39:16  *** simonstewart has quit IRC
+2011-10-03T23:53:38  *** nre_ has joined #selenium
+2011-10-03T23:54:44  *** lfryc has joined #selenium

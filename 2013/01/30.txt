@@ -1,0 +1,1086 @@
+[IRC logfile - Started Wed Jan 30 00:06:28 2013]
+[00:06:28] sayd: maybe missing a wait for page? I dunno.. almost out of idea
+[00:06:43] sayd: i see it load the page, but it never does anyhing after that
+[00:07:29] sayd: it seems to raelly not like the fact the dialog is present
+[00:07:53] sayd: i do the switch_to_alert after the click which causes it. thats ok right?
+[00:09:09] dude-x: you have to switch to alert and either dismiss or accept it
+[00:09:46] davehunt has joined #selenium
+[00:10:27] sayd: yeah i am accepting
+[00:10:45] sayd: basically find_element().click() # causes popup -- i never see the popup
+[00:10:56] llaskin: is it in the background?
+[00:10:57] dude-x: sayd, with python you can open the python interpreter
+[00:11:02] sayd: right after that in code : switch_to_alert().accept
+[00:11:02] llaskin: what if you manually run it with the interpreter?
+[00:11:09] dude-x: and just interact with the page live!
+[00:11:19] sayd: llaskin: dude-x i see it when i run locally
+[00:11:31] sayd: but just not when jenkins runs it on a remote machine
+[00:11:51] llaskin: are you vnc'd into the machine to make sure it appears or doesn't?
+[00:12:00] dude-x: yeah jenkins can be tricky sometimes
+[00:12:40] sayd: llaskin: uyeap
+[00:13:13] llaskin: hrm
+[00:13:16] llaskin: unsure
+[00:13:21] llaskin: perhaps you need an explicit wait?
+[00:13:25] llaskin: or an implicit one
+[00:15:54] sayd: lets see.. 
+[00:16:01] sayd: 40th time the charm?
+[00:22:22] sayd: nop.. timing didnt seem to help, i put a time.sleep.. the thing just seems to crap out
+[00:22:29] admc1 has joined #selenium
+[00:24:28] dude-x: you might need to wait for the alert to appear too
+[00:31:02] sayd: no dice
+[00:31:31] sayd: its like this thing knows how long ive worked on it and it just refuses to finish that last 0.9%
+[00:32:12] sayd: as soon as i manually click the button and i see the dialog, it disappears with the Modal error
+[00:34:01] phishy has joined #selenium
+[00:39:17] sayd: https://gist.github.com/8d3f63356634e802a53b that .click on line 3 is the one that should cause the modal
+[00:39:33] sayd: this is after i manually click it.. so i think that line may be taking longer than it should?
+[00:40:01] sayd: llaskin: would i just paste in the file to the interpeter to run this thing interactively?
+[00:41:49] llaskin: basically
+[00:48:06] llaskin: i don't know python
+[00:48:10] llaskin: so i assume that is how you do it.
+[00:52:27] DK2 has joined #selenium
+[00:53:19] KaibutsuX: has anyone looked into any memory leaks with webdriver's python bindings?
+[00:57:37] sayd: llaskin: just ran through it manually on that machine and it worked ok
+[IRC logfile - Started Wed Jan 30 01:04:00 2013]
+[01:04:00] mreedell has joined #selenium
+[01:11:30] smccarthy has joined #selenium
+[01:12:09] phishy has joined #selenium
+[01:12:44] sayd: idea. my implicit_wait at the top of hte page is less than the time i sleep in my script :?
+[01:13:09] sayd: maybe if i increase the implicit wait things will behave
+[01:14:47] sayd: although that still wouldnt explain why things run locally ok
+[01:24:20] megha has joined #selenium
+[01:24:28] milligan has joined #selenium
+[01:54:45] sayd: I might have to go back to "selanese"
+[01:55:04] sayd: if that can do like creating vars and using them in the test
+[IRC logfile - Started Wed Jan 30 02:03:02 2013]
+[02:03:02] DarkRift has joined #selenium
+[02:03:02] DarkRift has joined #selenium
+[02:23:51] sayd: is there somethign i can do before a click() to verify things are ok?
+[02:24:03] sayd: i am never seeing this click happen on a certain machine
+[02:25:10] Dude-X_: sayd, is this certain machine slower?
+[02:25:11] Dude-X_: faster?
+[02:26:09] sayd: Dude-X_: faster
+[02:26:51] sayd: i can show you the script if you want to see
+[02:26:58] Dude-X_: ok
+[02:27:59] sayd: Dude-X_: https://gist.github.com/127ee1f03bb919dd0d62 see line 66
+[02:29:22] sayd: 63 loads a new page, and i think anythign after that doesnt run
+[02:31:01] Dude-X_: 63 loads a new page?
+[02:31:16] Dude-X_: then 65 might need time to finish loading other elements
+[02:31:39] sayd: Dude-X_: yeah
+[02:31:53] Dude-X_: what browser do you run tests against?
+[02:32:02] sayd: i just put a print 64 will see if it gets there
+[02:32:09] sayd: Dude-X_: firefox
+[02:32:14] Dude-X_: okay great
+[02:32:19] Dude-X_: do you know how to use Firebug?
+[02:32:25] sayd: yup
+[02:33:54] jarray52 has joined #selenium
+[02:34:15] sayd: what do you want me to do with fb?
+[02:34:30] Dude-X_: there's a Firebug extension called "FireDiff"
+[02:34:44] Dude-X_: it shows up as a Changes on the tab
+[02:35:35] jarray52: I'm using the ruby bindings for selenium, and the rails server "loses" the csrf certificates and the session information. Any suggestions?
+[02:35:54] Dude-X_: sayd, firediff can show you all the dom changes
+[02:36:06] sayd: Dude-X_: ok
+[02:37:08] Dude-X_: so when you click that button, see what changes are being made to the DOM as the page loads
+[02:37:18] Dude-X_: then you wait for that element to appear first before you click the next button
+[02:37:23] sayd: Dude-X_: it seems like wd creates a new profile every time?
+[02:37:40] sayd: i just installed fb and when the test restarted it was gone
+[02:38:03] Dude-X_: oh yeah web driver starts a profile that is tailored for best use with webdriver
+[02:38:06] Dude-X_: it disables a lot of things
+[02:38:12] Dude-X_: do it separate from webdriver
+[02:38:30] sayd: it works fine if i manually click the button
+[02:38:48] sayd: but i will give it a shot
+[02:38:53] Dude-X_: web driver by default will click on buttons via javascript, not by using an OS event
+[02:38:55] sayd: see what firediff tells me
+[02:40:10] jarray52: Also, when I carry out the same sequence of events manually, rails does not "lose" the csrf certificate and session information.
+[02:40:57] Dude-X_: jarray52, why do you think it's a rails issue versus webdriver?
+[02:42:54] jarray52: Dude-X_: I don't know whether it is a rails issue or a webdriver issue. In fact, it is most likely a user error.
+[02:42:55] markalanevans has joined #selenium
+[02:44:03] sayd: Dude-X_: nothing showing up on changes
+[02:44:18] jarray52: Dude-X_: However, when I enter the same sequence of events manually, the csrf certificate and session information is not lost. Thus, I wonder if the problem is due to the way in which the information is entered by webdriver.
+[02:44:20] Dude-X_: jarray52, i don't have much experience with rails or Certs but it can be a pain when not using Firefox
+[02:44:41] jarray52: Dude-X_: I have the problem with both firefox and chrome.
+[02:44:55] Dude-X_: jarray52, web driver by default will use javascript to click on things, so it might bypass a few triggers
+[02:45:34] jarray52: Dude-X_: triggers?
+[02:45:43] Dude-X_: javascript triggers
+[02:45:45] Dude-X_: or CSS
+[02:46:52] jarray52: Dude-X_: Do you mean javascript/jquery bindings?
+[02:46:52] sayd: cool prog, but it didnt help
+[02:47:24] jarray52: Dude-X_: or triggering events?
+[02:47:57] Dude-X_: jarray52, javacsript, it doesn't matter the library
+[02:49:06] sayd: Dude-X_: this is the err when i manually do the click whil the test is running https://gist.github.com/127ee1f03bb919dd0d62#comment-760857
+[02:49:09] jarray52: Dude-X_: ahh... google says things like id, class, etc.
+[02:49:38] jarray52: Dude-X_: Yes. I'm using triggers to specify events.
+[02:50:10] Dude-X_: sayd, oh it's an alert dialog box that's not being properly closed!
+[02:50:55] sayd: opened, right? i never see it .. unless i click that button manually
+[02:51:13] fatguylaughing has joined #selenium
+[02:51:44] sayd: basically im scripting delete button, and its not popping up when i click() the element that triggers it via script. but just on this one machine
+[02:52:03] sayd: maybe the js isnt loaded yet but i tried putting in a time.sleep b4 the click
+[02:52:10] Dude-X_: probably there is a timing difference
+[02:52:18] sayd: and this is a faster machine i am running it on where it fails
+[02:52:39] Dude-X_: web driver has a expected conditions that has a wait for alert 
+[02:52:48] Dude-X_: it might be useful to use that function
+[02:53:19] jarray52: Dude-X_: I used wait events. In addition, I tried inserting long sleep statements between each step.
+[02:53:36] Dude-X_: and you still get issues?
+[02:53:46] sayd: Dude-X_: switch_to_alert?
+[02:53:54] jarray52: Dude-X_: Yes. I still have issues.
+[02:53:56] Dude-X_: :apidocs
+[02:53:56] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[02:54:31] Dude-X_: sayd, http://selenium.googlecode.com/git/docs/api/py/webdriver_support/selenium.webdriver.support.expected_conditions.html
+[02:55:45] Dude-X_: you import the module then you just use WebDriverWait(driver, timeout).until(alert_is_present)
+[02:56:32] sayd: ok Dude-X_ tryin :)
+[02:56:37] Dude-X_: you import the module then you just use WebDriverWait(driver, timeout).until(alert_is_present)
+[02:56:41] Dude-X_: oops
+[02:56:49] Dude-X_: ok afk
+[IRC logfile - Started Wed Jan 30 03:03:07 2013]
+[03:03:07] sayd: ugh i gotta speed up this test
+[03:03:57] sayd: it involves cron tho, which always seems to run earlier than my refresh()f
+[03:19:08] rananda has joined #selenium
+[03:19:57] phishy has joined #selenium
+[03:46:31] Nari119 has joined #selenium
+[03:50:12] Nari1110 has joined #selenium
+[IRC logfile - Started Wed Jan 30 04:02:26 2013]
+[04:02:26] xirkus has joined #selenium
+[04:17:09] stephend_ has joined #selenium
+[04:33:50] jleyba has joined #selenium
+[04:49:12] awilson820 has joined #selenium
+[IRC logfile - Started Wed Jan 30 05:00:22 2013]
+[05:00:22] girija_ has joined #selenium
+[05:01:29] amitev has joined #selenium
+[05:08:44] girija_ has joined #selenium
+[05:17:50] _kW has joined #selenium
+[05:22:11] kaawee has joined #selenium
+[05:34:19] plightbo_work has joined #selenium
+[05:38:45] stephend has joined #selenium
+[05:54:28] jeichar has joined #selenium
+[05:56:39] rananda has joined #selenium
+[IRC logfile - Started Wed Jan 30 06:00:05 2013]
+[06:00:05] phishy has joined #selenium
+[06:07:31] stephend has joined #selenium
+[06:25:44] zeljkof has joined #selenium
+[06:30:08] towski has joined #selenium
+[06:39:27] jeichar has joined #selenium
+[06:54:26] girija_ has joined #selenium
+[IRC logfile - Started Wed Jan 30 07:00:30 2013]
+[07:00:30] simonstewart has joined #selenium
+[07:03:27] sayd: anyone know what this is about? AttributeError: 'unicode' object has no attribute 'click'
+[07:07:33] barancev: sayd: please show the code that throws this error
+[07:14:47] sayd: barancev: im getting AttributeError: 'WebElement' object has no attribute 'is_clickable' now with this code: https://gist.github.com/20d78cc38a336aace512 line 65
+[07:16:26] barancev: 65?
+[07:17:06] barancev: must be 60
+[07:17:09] barancev: :apidoc
+[07:17:11] barancev: :apidocs
+[07:17:11] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[07:17:36] sayd: err. just updated the comment on that gist with latest traceback
+[07:18:19] sayd: I was follwing this http://seleniumhq.org/docs/04_webdriver_advanced.jsp
+[07:19:00] girija_ has joined #selenium
+[07:20:13] admc has joined #selenium
+[07:20:25] barancev: hm... yes, it's a doc bug, there is no is_clickable method
+[07:22:11] papegaaij has joined #selenium
+[07:22:16] barancev: is_clickable should be a combination of is_displayed AND is_enabled
+[07:22:58] sayd: wow ok 
+[07:23:19] sayd: im still having issues clicking that thing.. 
+[07:23:41] sayd: I am trying this now element = wait.until(lambda d: wd.find_element_by_id("edit-delete"))
+[07:24:36] kaawee has joined #selenium
+[07:28:01] sayd: timing is tricky 
+[07:28:14] sayd: and all this webdriverwait stuff is making it harder
+[07:32:51] barancev: sayd: use expected conditions: http://selenium.googlecode.com/git/docs/api/py/webdriver_support/selenium.webdriver.support.expected_conditions.html
+[07:35:36] stackedsax has joined #selenium
+[07:36:59] sayd: barancev: i tried 
+[07:38:16] sayd: if i had to do other stuff like refresh the page for that check.. would i use the condition in a function?
+[07:40:06] barancev: please rephrase the question. which condition in which function?
+[07:41:00] sayd: i think i would need to use a presence_of_element_located after a page refresh
+[07:42:02] barancev: in this case you need to implement your own condition to wait for
+[07:42:09] sayd: or maybe a element_located_to_be_selected and i would need to refresh the page until it was true
+[07:43:11] barancev: use element_to_be_clickable (or element_located_to_be_selected) as a draft and implement your own
+[07:43:52] sayd: what would that look like inside a webdriver wait?
+[07:46:17] barancev: sayd: btw, on the new site this bug is already fixed: http://docs.seleniumhq.org/docs/04_webdriver_advanced.jsp
+[07:46:37] barancev: element = wait.until(EC.element_to_be_clickable((By.Id,'someid')))
+[07:54:34] sayd: WebDriverWait(wd, 30).until(element_to_be_selected(By.Xpath("//div[@id='node-publish-status-add-more-wrapper']/select/option[7]")))
+[07:54:37] sayd: NameError: name 'element_to_be_selected' is not defined
+[07:54:51] sayd: before that: import selenium.webdriver.support.expected_conditions
+[07:59:17] kaawee_ has joined #selenium
+[IRC logfile - Started Wed Jan 30 08:01:19 2013]
+[08:01:19] barancev: are you doing python?
+[08:01:26] barancev: from selenium.webdriver.support.expected_conditions import ExpectedConditions
+[08:02:34] barancev: wait.until(ExpectedConditions.element_to_be_selected(...))
+[08:02:42] sayd: ok thanks. tired.. heading to bed
+[08:18:22] zeljkof has joined #selenium
+[08:23:05] Ardesco has joined #selenium
+[08:26:03] girija_ has left #selenium
+[08:26:19] girija_ has joined #selenium
+[08:36:26] Hronom has joined #selenium
+[08:37:18] rbalent has joined #selenium
+[08:39:14] testingb0t has joined #selenium
+[08:40:40] millenium has joined #selenium
+[08:40:50] millenium has left #selenium
+[08:42:39] rbalent has joined #selenium
+[08:43:10] kaawee_ has joined #selenium
+[08:44:26] Ardesco has joined #selenium
+[08:46:57] millenium has joined #selenium
+[08:47:15] millenium has left #selenium
+[08:51:24] stan has joined #selenium
+[IRC logfile - Started Wed Jan 30 09:00:56 2013]
+[09:00:56] kaawee_ has joined #selenium
+[09:01:12] barancev has joined #selenium
+[09:03:49] barancev|2 has joined #selenium
+[09:17:32] _kW has joined #selenium
+[09:22:34] zac_sel has joined #selenium
+[09:25:09] Steven_ has joined #selenium
+[09:33:03] Steven_: hello folks
+[09:33:20] Steven_: I've set up a selenium grid with about 100 nodes
+[09:33:26] Steven_: and I would like to use these in parallel
+[09:34:10] Steven_: afaik, each browser is controlled by a single test
+[09:34:20] Steven_: or rather
+[09:34:27] Steven_: each test runs in its own thread or process
+[09:34:35] Steven_: which means 100 processes or 100 threads
+[09:34:57] Steven_: under the hood, each test just opens a connection to the hub, and waits for a response
+[09:35:17] Steven_: is it possible to create an asynchronous sessions?
+[09:35:36] Steven_: that way I can have 1 process opening 100 connections to the hub
+[09:35:48] Steven_: instead of 100 processes each opening 1 connection to the hub
+[09:41:00] annette_ has joined #selenium
+[09:49:03] millenium has joined #selenium
+[09:51:59] jamesoram has joined #selenium
+[09:52:07] annette_ has left #selenium
+[09:52:20] _kW has joined #selenium
+[09:52:44] detronizator: GM
+[09:53:03] AutomatedTester: oh hai
+[IRC logfile - Started Wed Jan 30 10:02:47 2013]
+[10:02:47] jost has joined #selenium
+[10:06:14] millenium has left #selenium
+[10:06:16] millenium has joined #selenium
+[10:06:38] sburjan has joined #selenium
+[10:06:40] millenium has left #selenium
+[10:06:41] millenium has joined #selenium
+[10:06:58] millenium has left #selenium
+[10:06:58] millenium has joined #selenium
+[10:07:24] AutomatedTester: andreastt: yt?
+[10:11:20] davehunt has joined #selenium
+[10:15:36] alkemist has joined #selenium
+[10:18:06] AutomatedTester: :spec
+[10:18:07] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[10:23:07] AutomatedTester: simonstewart: yt?
+[10:23:37] jamesoram has joined #selenium
+[10:27:04] kaawee has joined #selenium
+[10:49:02] girija_ has joined #selenium
+[10:55:35] jibay has joined #selenium
+[10:56:57] matt has joined #selenium
+[IRC logfile - Started Wed Jan 30 11:00:48 2013]
+[11:00:48] kaawee_ has joined #selenium
+[11:01:30] caddoo has joined #selenium
+[11:06:41] samphippen has joined #selenium
+[11:08:18] freynaud has joined #selenium
+[11:09:53] rmartin has joined #selenium
+[11:11:39] girija_ has joined #selenium
+[11:17:59] rmartin has joined #selenium
+[11:25:59] rmartin has joined #selenium
+[11:26:31] annette has joined #selenium
+[11:27:28] annette has left #selenium
+[11:33:00] davehunt has joined #selenium
+[11:33:32] _kW has joined #selenium
+[11:34:04] rmartin has joined #selenium
+[11:34:12] andreastt: AutomatedTester: I am.
+[11:34:26] AutomatedTester: andreastt: jgraham helped me out :)
+[11:42:03] rmartin has joined #selenium
+[11:43:52] megha has joined #selenium
+[11:50:05] rmartin has joined #selenium
+[11:58:05] rmartin has joined #selenium
+[11:58:28] _kW has joined #selenium
+[IRC logfile - Started Wed Jan 30 12:06:10 2013]
+[12:06:10] rmartin has joined #selenium
+[12:07:00] kaawee has joined #selenium
+[12:14:11] rmartin has joined #selenium
+[12:14:13] rpereir__ has joined #selenium
+[12:33:33] rbalent_ has joined #selenium
+[12:45:40] jarib: :downloads
+[12:45:41] selbot2: http://seleniumhq.org/download/ and https://code.google.com/p/selenium/downloads/list
+[12:56:25] kaawee has joined #selenium
+[IRC logfile - Started Wed Jan 30 13:03:58 2013]
+[13:03:58] jamesoram has joined #selenium
+[13:05:52] nacho has joined #selenium
+[13:13:04] millenium has left #selenium
+[13:20:28] medwards has joined #selenium
+[13:20:59] medwards: Does WebDriverWait.until execute at least once no matter what? Even if I give it a wait_time of 0?
+[13:23:22] zac_sel: It would depend on the bindings I think
+[13:23:30] zac_sel: I use python and I've found it does
+[13:24:15] megha has joined #selenium
+[13:26:24] medwards: cool thats me too
+[13:29:59] girija_ has joined #selenium
+[13:30:00] aweiteka has joined #selenium
+[13:31:44] rpereir__ has joined #selenium
+[13:36:48] dawagner has joined #selenium
+[13:41:21] milligan has joined #selenium
+[13:45:46] knorrium_ has joined #selenium
+[13:50:58] rpereir__ has joined #selenium
+[13:52:51] llaskin has joined #selenium
+[13:57:59] barancev|2: freynaud: would you please review the patch in #4589
+[13:58:00] selbot2: 03 open/new Make IP where Selenium server binds configurable - https://code.google.com/p/selenium/issues/detail?id=4589 [Type-Defect Priority-Medium Status-Untriaged Component-Grid]
+[13:59:35] samphippen has joined #selenium
+[IRC logfile - Started Wed Jan 30 14:00:50 2013]
+[14:00:50] cgoldberg has joined #selenium
+[14:02:49] simonstewart has joined #selenium
+[14:04:06] nirvdrum has joined #selenium
+[14:06:52] ShishKabab has joined #selenium
+[14:13:02] kaawee has joined #selenium
+[14:13:15] davehunt has joined #selenium
+[14:19:09] RossPatterson has joined #selenium
+[14:19:09] ChanServ has altered RossPatterson's mode: +o
+[14:20:54] gdennis has joined #selenium
+[14:22:37] millenium has joined #selenium
+[14:22:55] millenium has left #selenium
+[14:36:55] freynaud: barancev: ok for me 
+[14:39:36] barancev: thanks!
+[14:39:37] barancev: :cla
+[14:39:38] selbot2: http://goo.gl/qC50R
+[14:39:41] simonstewart has joined #selenium
+[14:42:02] farlan has joined #selenium
+[14:46:11] kaawee_ has joined #selenium
+[14:50:45] nimeacuerdo has joined #selenium
+[IRC logfile - Started Wed Jan 30 15:01:20 2013]
+[15:01:20] adamgoucher has joined #selenium
+[15:03:59] fatguylaughing has joined #selenium
+[15:06:49] qaguy has joined #selenium
+[15:14:39] aweiteka has joined #selenium
+[15:17:19] zeljkof has joined #selenium
+[15:27:53] Guest70589 has left #selenium
+[15:41:56] jamesoram has joined #selenium
+[15:45:19] _kW has joined #selenium
+[15:50:01] stackedsax1 has joined #selenium
+[15:50:24] stackedsax1 has joined #selenium
+[15:54:35] girija_ has joined #selenium
+[15:54:38] AutomatedTester: where is jimevans...
+[15:54:41] AutomatedTester: he is late...
+[IRC logfile - Started Wed Jan 30 16:01:15 2013]
+[16:01:15] detronizator: what's worst than not having a Wiki Doc describing/introducing a project?
+[16:01:40] rpereir__ has joined #selenium
+[16:02:00] smccarthy has joined #selenium
+[16:02:41] AutomatedTester: detronizator: being forced to write Java?
+[16:03:34] stephend has joined #selenium
+[16:04:01] simonstewart: being forced to use git>
+[16:04:12] detronizator: AutomatedTester: no. having a Wiki that describes a project, how to get started, how to compile etc... but totally out of date and misleading.
+[16:04:24] AutomatedTester: simonstewart: ++
+[16:04:30] detronizator: simonstewart: FFS...
+[16:04:33] andreastt: Sounds like some other project I've worked on.
+[16:04:42] simonstewart: AutomatedTester: You couldn't handle an incremented simonstewart 
+[16:04:48] simonstewart: :)
+[16:04:58] AutomatedTester: simonstewart: I can handle worse...
+[16:05:12] andreastt: Don't overflow him…
+[16:05:14] simonstewart: Oh well. That's the thing that's been stopping me from levelling up
+[16:05:51] AutomatedTester: so... mobile... its a fad right?
+[16:06:11] simonstewart: It'll never catch on
+[16:06:59] RossPatterson: "My car gets 40 rods to the hogshead and that's the way I likes it."
+[16:07:21] simonstewart: RossPatterson: true story: I walk to work and don't own a car
+[16:07:27] bfife: "she'll go 300 hectares on a single tank of kerosene"
+[16:07:43] simonstewart: I <3 this channel
+[16:07:50] bfife: "put it in H!"
+[16:07:51] RossPatterson: :-)
+[16:09:00] detronizator: simonstewart: you walk to work because you live in Metropolis
+[16:09:11] simonstewart: Yes, yes I do
+[16:09:14] detronizator: simonstewart: only similar place is Gotham City
+[16:09:19] simonstewart: Ha!
+[16:09:45] RossPatterson: simonstewart: Nice.  I bicycle about 18 miles each way when the weather is warm enough.  Which it hasn't been for months :-(
+[16:09:56] simonstewart: I like cycling too
+[16:10:06] simonstewart: But nowhere to store my bike
+[16:10:25] *AutomatedTester walks to work too
+[16:10:32] RossPatterson: Having showers at work and a cycling-friendly employer helps.
+[16:10:48] AutomatedTester: RossPatterson: only if employees use showers
+[16:10:57] *AutomatedTester has worked with a number that don't :(
+[16:11:17] RossPatterson: Must.  Not.  Type.  What.  Comes.  Too.  Mind.
+[16:11:50] RossPatterson: AutomatedTester: You're also in the only real city on that tiny little island off the coast of France?
+[16:12:44] AutomatedTester: RossPatterson: by city you mean town and by town you mean small village right and by tiny island you mean near the Isle of Wight right?
+[16:13:17] RossPatterson: Yeah, right.  That's where Picadilly Circus and Marble Arch are, right?
+[16:13:30] AutomatedTester: no
+[16:13:39] AutomatedTester: I live ~100 miles away from that city
+[16:13:40] RossPatterson: Everything's bigger on this side of the pond :-)
+[16:13:40] dude-x has joined #selenium
+[16:14:03] RossPatterson: So "walk to work" means "across the hall to from the bedroom" then :-)
+[16:14:11] RossPatterson: s/to from/from/
+[16:14:29] AutomatedTester: no... down the stairs past the kitchen to the the room next to the front door
+[16:14:35] RossPatterson: LOL
+[16:14:38] AutomatedTester: sheesh, what do you take me for...
+[16:15:03] *AutomatedTester has WFH for 2+ years
+[16:15:30] AutomatedTester: and go to Laaaaahhhhddddhhaaaan for coffee and a catchup with simonstewart
+[16:15:37] AutomatedTester: and the occasional beer with him too
+[16:15:49] *AutomatedTester notes that he doesnt drink enough beer with simonstewart
+[16:16:26] simonstewart: Tuesdays are the day I normally have free
+[16:16:32] simonstewart: Tuesdays are good for beer AutomatedTester 
+[16:16:43] AutomatedTester: simonstewart: next Tuesday?
+[16:17:03] simonstewart: Next Tuesday is one of the few where I'm not going out
+[16:17:07] simonstewart: Are you in town?
+[16:17:13] AutomatedTester: I can be
+[16:17:58] AutomatedTester: d-day is 3 weeks 
+[16:18:07] AutomatedTester: so next week is probably my last chance...
+[16:19:19] RossPatterson: That's why I thought you were a mainlander - so many "meet you at the pub"s.
+[16:19:42] simonstewart: That's how British people say hello to each other
+[16:19:42] kaawee has joined #selenium
+[16:21:34] lukeis has joined #selenium
+[16:24:32] *detronizator thinks AutomatedTester and simonstewart should inform other Londoners of their joining whereabouts so those Londoners can crash it 
+[16:25:18] simonstewart: detronizator: I already tweet about my public expeditions
+[16:25:52] *detronizator thinks simonstewart is right
+[16:26:10] detronizator: in other news, some people are TOTALLY MENTAL (in a good way): http://www.edge-online.com/news/minecraft-players-recreate-game-of-thrones-kings-landing-in-extraordinary-detail/
+[16:27:40] jethro_ has joined #selenium
+[16:29:32] lukeis: people have way too much free time on their hands
+[16:29:52] *RossPatterson works for a living, and not in Mom's basement :-)
+[16:30:32] qaguy has joined #selenium
+[16:30:34] *lukeis works, has side work, has OSS, has wife, has kids, has house…. nope, can't find any spare time
+[16:30:52] bfife: has beer?
+[16:30:56] lukeis: yes :)
+[16:30:58] lukeis: and wine
+[16:31:02] llaskin: OSS?
+[16:31:03] lukeis: and scotch
+[16:31:08] lukeis: open source software
+[16:31:10] llaskin: favorite scotch luke?
+[16:31:20] lukeis: i haven't settled on a favorite
+[16:31:26] lukeis: i like peety ones
+[16:31:34] llaskin: peat.
+[16:31:36] llaskin: not peet
+[16:31:38] lukeis: Ardbeg comes to mind
+[16:31:46] lukeis: yeah, i can't spell :)
+[16:31:53] bfife: ever had the ardbeg uigeadail or corryvreckan?
+[16:32:23] llaskin: i have never heard of the latter
+[16:32:26] lukeis: right now i have a bottle of jura
+[16:32:27] intchanter-work has joined #selenium
+[16:32:38] bfife: tried some on robbie burns day. it was intense
+[16:32:41] *lukeis only has one bottle at a time
+[16:33:16] bfife: apparently $184 up here in the canadia though for a bottle :(
+[16:33:50] bfife: $86 in the us... go figure
+[16:35:08] llaskin: i like a good bourbon
+[16:35:26] bfife: i just picked up a bottle of buffalo trace bourbon. its alright
+[16:35:27] llaskin: any man who can find me a bottle of Rip Van Winkle will earn the honor of being my bestest buddy
+[16:35:30] llaskin: buffalo trace is great
+[16:35:33] llaskin: try eagle rare
+[16:35:38] bfife: that was last year :)
+[16:35:51] bfife: put some in a chili. added some zest
+[16:36:22] detronizator: llaskin: do yoy like burboun for the sweetness?
+[16:36:40] alkemist has joined #selenium
+[16:36:43] llaskin: detronizator:  yes sir
+[16:37:35] detronizator: llaskin: than buy somewhere Marsala
+[16:37:38] detronizator: and let me know
+[16:38:11] llaskin: marsala sauce?
+[16:38:38] llaskin: or something liek this: http://andrewswinecellar.com/products/edradour-ballechin-5-marsala-cask-matured-single-malt-scotch-whisky-750ml
+[16:38:40] bfife: llaskin: if you're in boston, apparently a few vendors carry it
+[16:38:49] bfife: but you probably have to backorder
+[16:39:13] bfife: i think my friend in NYC found it somewhere
+[16:39:26] llaskin: bfife: oh i have some good scotch shops around here
+[16:39:35] bfife: (rip van winkle)
+[16:40:34] llaskin: oh rip?
+[16:40:38] llaskin: yea its near impossibl to find
+[16:40:40] llaskin: and you can't really back order itg
+[16:40:43] llaskin: it
+[16:40:57] detronizator: llaskin: wow! finished in marsala cask!
+[16:40:58] detronizator: no
+[16:41:02] detronizator: I mean
+[16:41:03] *detronizator looks for link
+[16:41:38] detronizator: llaskin: http://en.wikipedia.org/wiki/Marsala_wine
+[16:41:56] llaskin: 1http://andrewswinecellar.com/products/edradour-ballechin-5-marsala-cask-matured-single-malt-scotch-whisky-750ml
+[16:42:02] llaskin: lol drink straight marsala wine?
+[16:42:03] llaskin: wtf
+[16:43:10] llaskin: btw bfife,  my friend says edradour is NASTY shit.  he used to work at a scotch shop
+[16:43:49] bfife: i own a bottle of the sassicaia finish
+[16:43:51] bfife: its ok
+[16:44:01] *bfife has somewhere around 30 bottles at home
+[16:46:38] *andreastt is wondering where open source work lead to reveal that half of the Selenium commiters has an obsession about good scotch
+[16:47:32] RossPatterson: It goes WAY back.  There used to be a tradition of Laphroaig gatherings at IETF meetings back when the IETF was still cool.
+[16:47:44] RossPatterson: aka "The Frog"
+[16:48:58] bluescreen10 has joined #selenium
+[16:55:06] noahsussman has joined #selenium
+[16:56:35] Ardesco: :yt frog song
+[16:56:36] selbot2: Rupert and the frog song FULL - http://www.youtube.com/watch?v=A4xeidmjy6s&feature=youtube_gdata
+[16:59:02] cmcgraw has joined #selenium
+[16:59:03] RossPatterson: Wow.  And I though Fantasia was trippy.
+[16:59:29] Ardesco: blah do others see chrome driver occasionally dropping a letter when it's doing a sendkyes?
+[16:59:57] rananda has joined #selenium
+[IRC logfile - Started Wed Jan 30 17:00:22 2013]
+[17:00:22] jethro_ has joined #selenium
+[17:01:14] dude-x: all the time!
+[17:01:18] dude-x: kidding
+[17:01:36] dude-x: i've seen firefox do that when the pc gets a cpu usage spike
+[17:01:48] Ardesco: only seen it on chromedriver so far
+[17:01:54] Ardesco: it's very rare
+[17:02:01] Ardesco: hurry up chromedriver 2
+[17:02:02] Ardesco: :)
+[17:02:21] bfife: hehe
+[17:02:37] Ardesco: whats funny about that ?
+[17:02:44] *Ardesco looks purplexed
+[17:02:58] bfife: impatiently waiting
+[17:03:14] Ardesco: getting there slowly!
+[17:03:34] Ardesco: http://code.google.com/p/chromedriver/downloads/detail?name=experimental_chromedriver2_win32_0.1.zip&can=2&q=
+[17:04:59] detronizator: General, farting-out-loud question: why is ChromeDriver separate from Chrome?
+[17:05:08] detronizator: I mean, just a design decision from google?
+[17:05:24] detronizator: would not be nice if the driver was part of the browser?
+[17:06:07] Ardesco: not an issue if you use this
+[17:06:08] Ardesco: https://github.com/Ardesco/selenium-standalone-server-plugin
+[17:06:09] Ardesco: ;)
+[17:06:35] detronizator: I love self-plugs :P
+[17:06:39] detronizator: Ardesco: ^
+[17:06:46] Ardesco: :D
+[17:06:51] medwards: AutomatedTester: you still doing visibility bugs?
+[17:06:54] bfife: who uses maven though.. ;)
+[17:07:06] AutomatedTester: medwards: sure...
+[17:07:15] Ardesco: https://github.com/Ardesco/Selenium-Maven-Template/
+[17:07:16] Ardesco: :)
+[17:07:17] AutomatedTester: amongst a million other things ;)
+[17:07:23] detronizator: Ardesco: anyway, I do think the driver should come inside the browser. Maybe even within the same exe
+[17:07:24] bfife: im seeing a pattern
+[17:07:37] Ardesco: It would make it easier to be fair
+[17:07:43] detronizator: AutomatedTester: you think it would be too much inside the same app?
+[17:08:05] medwards: AutomatedTester: if you'll be around in 30 I'll shoot you a bug.
+[17:08:19] AutomatedTester: medwards: I'll be having supper with the family 
+[17:08:22] bfife: AutomatedTester: maybe they should just build an api into all browsers. :P
+[17:08:26] AutomatedTester: medwards: but i'll be online
+[17:08:40] andreastt: detronizator: Security implications, device implications, and organizational implications are some of the things that come to mind.
+[17:08:41] AutomatedTester: detronizator: Marionette doesnt require a separate download
+[17:08:48] AutomatedTester: detronizator: there will be one but it wont be needed
+[17:08:57] Ardesco: bfife: you mean something that used the WebDriver API inside the browser
+[17:09:02] Ardesco: that would be cool
+[17:09:14] Ardesco: you could think of it as some sort of puppet driving a browser
+[17:09:20] AutomatedTester: detronizator: it will be behind a number of flags so it wont be easy to just turn it on
+[17:09:26] Ardesco: but since puppet is already a thing you would have to think of a different name
+[17:09:29] Ardesco: how about marionette
+[17:09:32] AutomatedTester: you will need to launch the browser telling it to work with marionette
+[17:09:34] andreastt: Ardesco: That's already technically possible.
+[17:09:35] Ardesco: give it a fresh feel
+[17:09:37] Ardesco: ;)
+[17:10:15] Ardesco: right off to try and find birthday presents
+[17:10:17] *Ardesco waves
+[17:10:33] annette has joined #selenium
+[17:10:40] detronizator: AutomatedTester: exactly how I'd expect
+[17:11:11] annette has left #selenium
+[17:11:13] AutomatedTester: detronizator: so if you have the flags, and the profile is in the correct shape it will start marionette listening
+[17:11:27] AutomatedTester: and then you speak straight to the browser
+[17:12:32] andreastt: AutomatedTester: With Marionette, how do you solve connecting to it on Android?
+[17:12:37] detronizator: AutomatedTester: so, exactly like PhantomJS does now :)
+[17:12:46] andreastt: AutomatedTester: Or devices in general.
+[17:12:51] *detronizator thinks Mozilla copied us :P
+[17:13:13] AutomatedTester: andreastt: we use the remote debugger
+[17:13:17] AutomatedTester: in Gecko
+[17:13:28] AutomatedTester: so we use adb to forward traffic to the port
+[17:14:01] andreastt: Yes, but Marionette will presumably open a port on the device.  The ADB doesn't allow you to forward and expose a port on the device to the outside world.
+[17:15:07] AutomatedTester: andreastt: by outside world do mean the device speaking to the local machine its attached?
+[17:15:28] andreastt: Yes, to the host.
+[17:15:35] AutomatedTester: andreastt: adb forward tcp:2828 tcp:2828 will forward all localhost:2828 traffic to the device
+[17:15:43] AutomatedTester: on the same port
+[17:15:47] andreastt: Last I checked ADB allows you to open ports _from_ the host to the device, but not the other way around?
+[17:16:35] AutomatedTester: we dont do it from device to host
+[17:16:39] AutomatedTester: we do from host to device
+[17:18:22] smoke_ has joined #selenium
+[17:18:25] AutomatedTester: andreastt: does that answer your question?
+[17:19:25] Spanktar has joined #selenium
+[17:19:40] dude-x has joined #selenium
+[17:20:12] andreastt: Right, yes.  Like the AndroidDriver, basically?
+[17:20:52] kaawee has joined #selenium
+[17:21:15] samphippen has joined #selenium
+[17:21:58] medwards: grr oh for ffs now I can't repro
+[17:22:07] AutomatedTester: andreastt: yup
+[17:23:44] plightbo_work has joined #selenium
+[17:24:13] andreastt: So presumably you hide this behind some runtime flag?
+[17:24:29] lukeis: and all things other things android… adb forward is an alias on my command line now
+[17:24:47] andreastt: Android is a monstrosity when it comes to debuging, is my experienc.e
+[17:24:52] lukeis: yes
+[17:24:54] andreastt: I obviously can't type.
+[17:25:36] lukeis: plightbo_work: congrats on the iOS release, did you guys do any automated testing for it? (if so, what did you end up using?)
+[17:25:48] andreastt: I had to implement a reverse proxy for OperaDriver to work on actual devices, since Opera requires the user to initiate the Scope connection.
+[17:26:01] plightbo_work: lukeis: no automated testing unfortunately :( but I've asked them to look in to it
+[17:26:09] regex: Anyone know if you call the .DLL file from the Selenium AES server in the settings.property file?
+[17:26:30] plightbo_work: lukeis: but, in related news, I'm an advisor to https://appthwack.com
+[17:26:32] lukeis: plightbo_work: sounds like most mobile apps then ;)  check out #appium :-D
+[17:26:46] lukeis: shameless plug...
+[17:26:46] plightbo_work: yeah appium looks cool, been keeping an eye on that
+[17:28:02] plightbo_work: didn't realize you worked on appium
+[17:28:18] lukeis: i haven't been much, but will be in the coming months
+[17:28:35] lukeis: one side project is ending, this will be my next one
+[17:29:06] lukeis: so, appthwack, i'm not seeing how they actually do the testing? I see many devices ;)
+[17:30:08] lukeis: random usage stress testing? looking for exceptions / errors?
+[17:30:08] plightbo_work: they just provide the platform
+[17:30:13] plightbo_work: you would use something like appium on it
+[17:30:19] lukeis: ahh
+[17:33:38] jleyba has joined #selenium
+[17:35:09] alkemist has joined #selenium
+[17:35:15] markalanevans has joined #selenium
+[17:35:35] llaskin1 has joined #selenium
+[17:37:40] jimevans has joined #selenium
+[17:37:58] simonstewart: plightbo_work: ios-driver is also great
+[17:40:04] jimevans: o hai everybody
+[17:40:40] RossPatterson: Bout time you showed up, slacker.  Things go well?
+[17:41:22] jimevans: yep. all set for tomorrow.
+[17:41:46] anix has joined #selenium
+[17:43:22] simonstewart: what's happening tomorrow?
+[17:44:31] jimevans: simonstewart: https://twitter.com/jimevansmusic/status/296667672379285504
+[17:44:51] simonstewart: Eep. Best wishes!
+[17:45:12] anix: Does htmlunit driver actually work??
+[17:45:21] jimevans: does the firefox driver know how to handle the wire protocol command for setting page load timeout?
+[17:45:24] simonstewart: Yes, but it starts without JS enabled
+[17:45:34] simonstewart: jimevans: should do
+[17:45:49] simonstewart: biab
+[17:46:27] softmanpetro has joined #selenium
+[17:46:55] anix: Java has a provision to send browser version as param in html unit constructor
+[17:47:12] anix: No such thing in c#
+[17:47:14] JackDandy has joined #selenium
+[17:47:56] jethro_ has joined #selenium
+[17:48:03] jimevans: anix: that's because the only way to get an HtmlUnitDriver instance in C# is to use RemoteWebDriver.
+[17:48:58] sfbrian has joined #selenium
+[17:49:18] *jimevans wishes we could just deprecate HtmlUnitDriver and be done with it.
+[17:50:25] anix: My code works perfectly fine on IE, but when i run the same using htmlunit it fails on recognition of 1st element 
+[17:50:40] lukeis: simonstewart: (freynaud can correct me if i'm wrong) the new appium is the merge of both (hugs/)appium  and ios-driver… re-written in Javascript ;) /cc plightbo_work
+[17:50:49] rpereir__ has joined #selenium
+[17:51:29] freynaud: lukeis: no.
+[17:51:37] lukeis: ok then I'm not correct :)
+[17:51:42] freynaud: :)
+[17:52:13] kaawee has joined #selenium
+[17:52:17] anix: Previous appium never worked for me...it just hangs :'( 
+[17:52:36] jimevans: anix: two things for .NET users. first, make sure you're using DesiredCapabilities.HtmlUnitWithJavaScript(). second, don't use HtmlUnit from .NET, use PhantomJSDriver instead.
+[17:53:02] lukeis: anix: i saw that if you are trying to run the device build app in the simulator or the simulator build app in the device ;)
+[17:53:49] anix: i am yet to explore phatomjsdriver Jim...will do it
+[17:54:51] sayd has joined #selenium
+[17:55:01] jimevans: anix: i assume you're trying to use HtmlUnit because you want so-called "headless" testing (however specious the argument that it's actually worth doing that). phantomjs is a much better fit with .net than htmlunit.
+[17:55:17] simonstewart: lukeis: no
+[17:55:26] lukeis: simonstewart: i'm getting that ;)
+[17:55:37] simonstewart: appium is separate from ios-driver
+[17:55:58] simonstewart: Personally, I favour ios-driver because it'll be easier to integrate into our tree
+[17:55:59] *lukeis nods… getting side story from françois...
+[17:56:09] simonstewart: k
+[17:56:11] simonstewart: Shutting up
+[17:56:44] jimevans: can someone give me the "50000-foot view" of appium vs. ios-driver, and what's the difference between the two?
+[17:56:52] jeichar_ has joined #selenium
+[17:59:42] anix: Actually m nt using htmlunit for testing but to fetch some required data from website so i prefer it tobe headless
+[IRC logfile - Started Wed Jan 30 18:00:16 2013]
+[18:00:16] anix: Wll try phantomjs
+[18:01:00] sayd: how would I get this condition to be checked repeatedly after refresh? https://gist.github.com/20d78cc38a336aace512
+[18:04:06] stackedsax has joined #selenium
+[18:04:20] sayd: I think I need to get that delayed_refresh to happen 
+[18:05:00] anix21 has joined #selenium
+[18:06:08] intchanter-work1 has joined #selenium
+[18:06:36] anix has joined #selenium
+[18:09:40] barancev|2 has joined #selenium
+[18:10:23] jamesoram has joined #selenium
+[18:10:35] awilson820 has joined #selenium
+[18:11:15] towski has joined #selenium
+[18:13:58] JackDandy has joined #selenium
+[18:16:10] ShishKabab has joined #selenium
+[18:16:25] sayd: anyone familiar with creating custom expected_conditions?
+[18:16:38] simonstewart: yes
+[18:16:48] simonstewart: In Java, but the ideas hold elsewhere
+[18:16:49] simonstewart: 'sup?
+[18:16:51] anix has joined #selenium
+[18:17:28] sayd: simonstewart: so im not sure if im approaching this correctly : https://gist.github.com/20d78cc38a336aace512
+[18:17:36] Swadq has joined #selenium
+[18:18:02] simonstewart: What error are you seeing?
+[18:18:11] simonstewart: Creating a lambda is the Right Thing for python (I think)
+[18:18:12] ShishKabab: I'm right now debugging a JavaScript problem that only occurs when testing with Selenium (from Python). Is there any way to use console.log() to print debug information to my Linux terminal?
+[18:18:15] simonstewart: AutomatedTester will know for sure
+[18:18:43] sayd: AutomatedTester: you got a sec to check that out?
+[18:19:27] simonstewart: sayd: what's happening when you use it? Any errors? Or nothing at all?
+[18:21:14] sayd: simonstewart: NameError: name 'element_to_be_clickable' is not defined
+[18:22:17] sayd: I think the problem is I need to send it a WebElement and not a locator
+[18:22:39] simonstewart: What object is "element_to_be_clickable" being called on?
+[18:23:23] sayd: (By.Id,'edit-delete')
+[18:24:33] barancev|2: sayd: where are your imports?
+[18:25:47] barancev|2: I've answered your question (exactly this one) today already
+[18:25:56] barancev|2: from selenium.webdriver.support.expected_conditions import ExpectedConditions
+[18:26:02] barancev|2: wait.until(ExpectedConditions.element_to_be_selected(...))
+[18:26:20] sayd: barancev|2: that ExpectedConditions doesnt exist I believe
+[18:26:35] barancev: :apidocs
+[18:26:36] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[18:27:00] sayd: barancev: yeah i know http://selenium.googlecode.com/git/docs/api/py/_modules/selenium/webdriver/support/expected_conditions.html
+[18:27:09] sayd: I dont see that object on that page
+[18:27:33] qaguy has joined #selenium
+[18:27:55] barancev: ok, then you should import something else from this module
+[18:28:08] sayd: i am importing the entire module
+[18:28:18] barancev: and lukeis: our python samples on the site are outofdate again?
+[18:28:29] lukeis: which samples?
+[18:28:37] lukeis: and on docs.seleniumhq.org ?
+[18:29:13] barancev: lukeis: http://docs.seleniumhq.org/docs/04_webdriver_advanced.jsp python samples in Expected Conditions section
+[18:30:28] barancev: sayd: then "from selenium.webdriver.support.expected_conditions import *" should import all classes from the module, right?
+[18:30:54] simonstewart: barancev: this is a question about how to add new expected conditions
+[18:30:59] simonstewart: (As I understand it)
+[18:31:10] phishy has joined #selenium
+[18:31:13] barancev: expected conditions in python are implemented as classes atm
+[18:31:15] lukeis: barancev: the sample works?
+[18:31:55] lukeis: to create ones own, they could look at the ExpectedConditions file for examples
+[18:32:15] lukeis: no need to extend or implement anything in python (unlike java)
+[18:32:19] barancev: lukeis: according to the apidocs there is no ExpectedConditions class in selenium.webdriver.support.expected_conditions module, each condition is a class, not a methid in ExpectedConditions class
+[18:32:42] lukeis: i don't see the problem...
+[18:33:50] lukeis: python works differently than java ;)
+[18:33:55] stephend_ has joined #selenium
+[18:35:32] barancev: lukeis: what "from selenium.webdriver.support.expected_conditions import ExpectedConditions as EC" should import?
+[18:35:54] dude-x: nothing. that would be wrong
+[18:35:59] lukeis: ah
+[18:36:06] dude-x: you'd import one of the names of the classes
+[18:36:27] lukeis: shoudl be "from selenium.webdriver.support import expected_conditions as EC" <- i will double check
+[18:37:11] lukeis: yeah, that's what i wanted
+[18:37:18] barancev: or from selenium.webdriver.support.expected_conditions import *
+[18:37:24] lukeis: could do that
+[18:37:38] lukeis: i personally hate * imports… but that's just my style
+[18:38:26] lukeis: i don't like automagical references that are hard to find when in vim ;)
+[18:39:01] ys has joined #selenium
+[18:40:35] ys: i'm using selenium-client with ruby.  is there a way to prevent selenium to print messages to stdout/stderr when an exception is raise ?
+[18:41:16] llaskin1: ys: yes
+[18:41:18] llaskin1: catch the exception
+[18:41:27] llaskin1: thats a ruby question, not selenium
+[18:41:47] lukeis: or redirect the output to a file…. `command to run ruby` > stdout.log 2> stderr.log
+[18:42:04] ys: i did it,  but still have message to stderr from inside selenium 
+[18:43:00] lukeis: are you running a standalone server too?
+[18:43:04] sayd: lukeis: dude-x it would just be import selenium.webdriver.support.expected_conditions
+[18:43:07] sayd: right?
+[18:43:23] lukeis: yeah, that's one way to do it...
+[18:43:27] ys: yes 
+[18:43:46] lukeis: sayd: python has a lot of different ways to import :)
+[18:44:04] samphippen has joined #selenium
+[18:44:05] ys: i'm using selenium-server-standalone-2.25.0.jar
+[18:44:13] dude-x: all i said is you can use some of the expected conditions, to avoid making your own similar ones
+[18:44:15] sayd: lukeis: I don't get why i"d get the NameError: name 'element_to_be_clickable' is not defined
+[18:44:41] lukeis: then you want "from selenium.webdriver.support.expected_conditions import *"
+[18:44:45] lukeis: sayd: ^
+[18:45:05] sayd: hmm wouldnt that be the same thing?
+[18:45:10] lukeis: nope
+[18:45:56] ys: even if i catch the exception and print the appropriate message in my log file, i have the following message on stderr : 2013-01-30 13:45:07 -0500 selenium-client received failure from selenium server: requested:         cmd=getTable         1=//div[@id="system_status"]//div[@id="system"]//table[@id="sortable-table-0"].6.0         sessionId=d4c3823a99aa408a84038f9dc7527f34 received:         "ERROR: Command execution failure. Please sear
+[18:46:49] ys: i know why i have the message, i just don't want to have it on stderr !
+[18:46:58] qaguy has joined #selenium
+[18:47:28] sayd: any issue with this? element = wait.until(lambda d: wd.find_element_by_id("edit-delete"))
+[18:47:31] sayd: wait.until(element_to_be_clickable(element))
+[18:47:46] sayd: its throwing TypeError: find_element() argument after * must be a sequence, not WebElement
+[18:48:36] lukeis: element = wait.until(element_to_be_clickable(*(By.ID, 'edit-delete'))
+[18:48:40] lukeis: just that
+[18:49:08] lukeis: you'll need "from selenium.webdriver.common.by import By"
+[18:49:24] sayd: lukeis: yep i got the By
+[18:50:28] sayd: whatsthat &
+[18:50:30] sayd: *
+[18:50:31] lukeis: um, without the *
+[18:50:51] lukeis: you do need the extra parenthesis though
+[18:51:08] sayd: ok the docs say that element_to_be_clickable should be passed a webelement
+[18:51:30] *lukeis goes to look
+[18:51:38] sayd: but it seemed to work :)
+[18:53:05] lukeis: sayd: the argument passed in says 'locator' 
+[18:53:07] sayd: lukeis: dude-x it seems that part of my test doesnt run, though
+[18:53:23] sayd: https://gist.github.com/20d78cc38a336aace512 line 66 seems to not happen but the click afterwards does
+[18:53:32] simonstewart: Right. Home time.
+[18:54:12] dude-x: 66 does nothing
+[18:54:14] dude-x: that's why
+[18:54:33] stackedsax has joined #selenium
+[18:55:27] sayd: dude-x: hmm maybe i need to get rid of the lamda? i wan that element_located_to_be_selected check to happen after a page refresh until the condition is true
+[18:55:51] lukeis: just get rid of the "lambda d:"
+[18:57:06] sayd: lukeis: that seems to have caused it to refresh after the delay, but then even though the condition isnt true yet, it calls the delete
+[18:57:11] dude-x: expected conditions class is written to avoid writing lambda d:
+[18:57:46] sayd: ok, maybe in my condition, since im checking another condition, i'd have to check its == true?
+[18:58:18] lukeis: it's returning an instance of element_located_to_be_selected
+[18:58:39] lukeis: you're using these helper classes a bit oddly ;)
+[18:59:07] sayd: lukeis: ok, yeah i wasn't sure how to do that
+[IRC logfile - Started Wed Jan 30 19:00:02 2013]
+[19:00:02] awilson820 has joined #selenium
+[19:00:27] lukeis: your return should be:  "element = locator.find_element(*self.locator); return element.is_displayed() and element.is_enabled()"
+[19:00:56] lukeis: if you change the variable name in the method __call__, you can change that first 'locator' to 'driver' ;)
+[19:01:52] sayd: i dont understand your latest comment
+[19:03:09] sayd: lukeis: something like this https://gist.github.com/20d78cc38a336aace512
+[19:03:19] farlan has left #selenium
+[19:04:49] sayd: lukeis: nah its still deleting before the refresh /post_is_scheduled test is true
+[19:05:31] jethro_ has joined #selenium
+[19:07:21] sayd: lukeis: i think it was another pesky *
+[19:10:43] qaguy: Hey guys. Can someone answer a selenium conference question for me?
+[19:11:00] jimevans: qaguy: maybe. go ahead and ask.
+[19:11:34] qaguy: I guys bought my early bird ticket. That covers Tuesday and Wednesday but not Monday. That correct?
+[19:11:37] qaguy: jusy*
+[19:11:40] qaguy: just*
+[19:11:53] moo-_- has joined #selenium
+[19:12:02] jimevans: i *believe* that's right, but i'm not an authority. awilson820?
+[19:12:34] awilson820: qaguy, yes that's correct. workshop tickets will go on sale in mid feb when we announce the full schedule 
+[19:13:00] qaguy: awilson820: Cool so I need a room for Monday and Tuesday night. 
+[19:13:11] qaguy: Thank you and thank you jimevans
+[19:13:16] jimevans: np
+[19:13:22] qaguy: Looking forward to finally meeting you in person
+[19:13:56] sayd: lukeis: does element.is_displayed() and element.is_enabled() cover being selected?
+[19:14:18] lukeis: that covers it being click-able
+[19:14:41] sayd: yeah i needed that line to check that it was selected
+[19:14:48] jimevans: qaguy: likewise.
+[19:14:55] qaguy: :)
+[19:15:33] *lukeis looks forward to being able to punch llaskin1 in person… oh, i mean, shake hands
+[19:17:04] admc has joined #selenium
+[19:18:09] dude-x: heh
+[19:26:01] cgoldberg has joined #selenium
+[19:36:53] barancev: google code throws 500th errors...
+[19:37:17] llaskin1: wow luke
+[19:37:25] llaskin1: way to highlight my name
+[19:37:33] lukeis: ;)
+[19:37:56] llaskin1: you punch...i shoot...we'll see how it ends:)
+[19:38:10] llaskin1: PS: I shoot from 1000 yds away, good luck punching:)
+[19:39:43] rpereir__ has joined #selenium
+[19:39:53] lukeis: i have the element of surprise on my hands… plus i'll wait for you at the conference, doubt you'll get a 1000yd line of sight
+[19:42:46] noahsussman has joined #selenium
+[19:50:38] sayd: lukeis: barancev dude-x im not sure whats up with this. it refreshes but never seems to pick up the is_selected() state: https://gist.github.com/20d78cc38a336aace512 line 65
+[19:52:46] regex: jimevans: Do you know anything about the AES?
+[19:52:49] adamgoucher has joined #selenium
+[19:53:05] jimevans: regex: that's a jenkins plug-in? if so, then no. sorry.
+[19:54:14] barancev: regex: what do you want to know about AES? I used to deal with it days ago
+[19:56:14] fatguylaughing has joined #selenium
+[19:56:55] regex: barancev: It's not being called correctly from Hudson.  I hit startup and put http://localhost:4444/wd/hub as the URL in hudson. 
+[19:57:26] regex: I changed one setting file to go to suiteDir=C:\Users\nptmsp1bxf\Desktop\seleniumplugin\source\  Should it call only the directly, the .DLL, or the CSPROJ file?
+[19:58:05] txs_ has joined #selenium
+[19:59:14] txs_: how to get number of row in html table ?   i'm using selenium::client::driver  with selenium-standalone ...
+[19:59:36] barancev: regex: AES is an RC tool, it knows nothing about webdriver and grid2
+[IRC logfile - Started Wed Jan 30 20:00:11 2013]
+[20:00:11] barancev: I think you should put AES address to the jenking plugin, that is something like http://localhost:4444/selenium-server/autoexec/
+[20:00:19] davehunt has joined #selenium
+[20:02:03] regex: barancev: Still nothing...I changed it to that within Hudson
+[20:02:22] barancev: regex: no idea, I used to run AES standalone
+[20:03:15] barancev: why do you need it at all? we're going to deprecate and cease RC :)
+[20:04:17] santiycr has joined #selenium
+[20:09:50] sfbrian_ has joined #selenium
+[20:09:56] barancev: #5099 is really cool
+[20:10:07] selbot2: ["503 Service Unavailable", "/apps/selbot2/vendor/bundle/ruby/1.9.1/gems/rest-client-1.6.1/lib/restclient/abstract_response.rb:48:in `return!'"]
+[20:10:24] barancev: aha, 500th errors also
+[20:11:17] andreastt: barancev: Speaking of nothing related, are you coming to SeConf this year?
+[20:11:42] barancev: andreastt: to Boston? no, too far...
+[20:12:01] AutomatedTester: #5099
+[20:12:06] barancev: may be next year, in Europe
+[20:12:09] selbot2: ["503 Service Unavailable", "/apps/selbot2/vendor/bundle/ruby/1.9.1/gems/rest-client-1.6.1/lib/restclient/abstract_response.rb:48:in `return!'"]
+[20:12:10] smccarthy has joined #selenium
+[20:12:14] andreastt: barancev: Next year is Asia I think.
+[20:12:15] barancev: 5099 is "Lets get Selenium IDE support for IE, Chrome, & Safari. (1)"
+[20:12:23] andreastt: But sad to hear that )-:
+[20:12:24] barancev: Asia is good too
+[20:12:47] andreastt: Where are you situated?
+[20:13:06] barancev: andreastt: Moscow, Russia
+[20:13:13] andreastt: Ah, I see.
+[20:14:00] andreastt: We have a few people visiting from Moscow soon I believe.
+[20:20:01] llaskin1: st. petersburg is where it's at (and where I'm from)
+[20:20:14] llaskin has joined #selenium
+[20:20:56] stepheneb has joined #selenium
+[20:24:08] Nari1110 has joined #selenium
+[20:24:19] AutomatedTester: llaskin: you're Russian?
+[20:29:14] andreastt: I've been in St. Petersburg once.  It was so cold I can't remember a thing.
+[20:29:27] jamesoram has joined #selenium
+[20:29:45] AutomatedTester: one of the senior QA managers at Yandex invited me out there
+[20:29:50] AutomatedTester: but it was bad timing
+[20:30:09] AutomatedTester: Mikalai ...
+[20:30:14] AutomatedTester: I forgot his surname
+[20:30:49] andreastt: I think I've talked to him.
+[20:30:56] andreastt: The name rings a bell.
+[20:31:15] andreastt: Very hard to hear through a crappy teleconf.
+[20:33:09] barancev: Mike/Michael is rather popular name in Russia as well as it the whole world :)
+[20:34:22] andreastt: True.
+[20:34:40] barancev: and you probably mean Michael Levin at Yandex
+[20:35:07] andreastt: We have this joke in the Oslo office that if you forget the name of one of the Polish developers, you'd be pretty good to guess either Lukazc, Wojtek, or Piotr. (-:
+[20:35:24] andreastt: More than not, you'd get it right.
+[20:38:20] cgoldberg has joined #selenium
+[20:38:55] llaskin: AutomatedTester: born, but not raised
+[20:39:26] llaskin: been in the states since age 5
+[20:39:31] llaskin: and yes, my brother is a Misha.
+[20:39:38] AutomatedTester: barancev: thats him
+[20:39:44] AutomatedTester: barancev: awesome chap
+[20:39:48] AutomatedTester: really nice guy
+[20:39:50] llaskin: barancev might laugh, he's a misha, not a mishka :-P
+[20:42:06] davehunt has joined #selenium
+[20:43:01] barancev: Mishka is a diminutive of Misha, the same name actually
+[20:43:30] dude-x: is Sasha a diminutive of Natasha?
+[20:44:01] barancev: Sasha is a short form of Alexander, 
+[20:44:14] jimevans: barancev beat me to it.
+[20:44:14] barancev: Natasha is a diminutive of Natalia
+[20:44:41] llaskin: barancev: but also I was saying more like "bear"
+[20:44:47] llaskin: mishka kosalapiy
+[20:44:49] llaskin: etc
+[20:45:04] llaskin: mmm chocolate candy
+[20:45:31] barancev: yes, Misha is a traditional tale name for a bear
+[20:45:59] llaskin: ...i was making a joke
+[20:46:01] llaskin: guess it didn't translate:(
+[20:46:10] barancev: and bears, you know, walking the streets in Russia :)
+[20:46:18] llaskin: and being drunk
+[20:46:25] llaskin: yes
+[20:46:26] llaskin: hah
+[20:46:33] llaskin: didn't Putin wrestle a bear?
+[20:46:44] llaskin: he's big strong russian communist(err I mean democratically elected) leader.
+[20:47:22] barancev: he was leading sterkhs, that's more interesting story :)
+[20:47:42] AutomatedTester: jimevans: so we ran into an interesting issue with batching up actions...
+[20:47:50] jimevans: oh? how so?
+[20:48:14] AutomatedTester: touch screens allow multiple independent actions to happen
+[20:48:48] AutomatedTester: e.g. on google maps press one finger, rotate with another...
+[20:49:17] jimevans: ok, i follow you so far.
+[20:49:55] AutomatedTester: so each finger will become its own action chain
+[20:50:33] AutomatedTester: so you need a action chain of action chains to build up things
+[20:50:38] AutomatedTester: then send them over
+[20:51:14] AutomatedTester: and then the remote end needs to see the different queues and try action them simultaneously
+[20:51:35] AutomatedTester: does that make any sense?
+[20:51:46] jimevans: or the touch implementation needs to be aware of being able to do "press" multiple times representing multiple fingers.
+[20:52:06] AutomatedTester: right but you can do more than just "press"
+[20:52:49] jimevans: right, i guess the touch events need a "finger index" piece that would indicate "this set of actions belongs to this finger"
+[20:53:33] AutomatedTester: yea
+[20:53:44] AutomatedTester: but thought you would be interested
+[20:53:50] jimevans: oh, i am.
+[20:54:05] jimevans: it's not something i'd gotten around to thinking about yet.
+[20:54:16] AutomatedTester: we are currently working on it now
+[20:55:01] AutomatedTester: we == our intern
+[20:55:17] jimevans: <3 interns
+[20:57:24] sayd: so how would one chain expected_conditions?
+[IRC logfile - Started Wed Jan 30 21:00:57 2013]
+[21:00:57] dude-x: that's something i would like to write a generic function for in python… i've seen somethng done for java but it's not in the main source tree
+[21:01:16] dude-x: sayd: nevertheless, it's not necessary
+[21:01:20] dude-x: just write a custom function
+[21:03:13] rpereir__ has joined #selenium
+[21:03:30] freynaud has joined #selenium
+[21:04:51] noahsussman has joined #selenium
+[21:09:50] intchanter-work has joined #selenium
+[21:10:40] sayd: dude-x: would it be something like def my_chained(): return element_to_be_clickable((By.ID, "foo")) && element_to_be_selected((By.ID, "bar"))
+[21:10:48] sayd: s/&&/and
+[21:11:03] dude-x: no
+[21:12:30] dude-x: def my_chained(): webdriverwait().until(…); webdriverwait().until(…);
+[21:12:35] dude-x: simple function
+[21:14:08] dude-x: alternatively you can write
+[21:14:39] sayd: i need to do a refresh between the webdriverwait calls
+[21:14:50] sayd: or within one i mean
+[21:15:50] alkemist has joined #selenium
+[21:16:49] dude-x: def my_chained_conditions(driver): element = driver.find_element(); if not element.is_displayed() return False; element.click(); driver.refresh(); driver.find_element()
+[21:17:04] dude-x: where you make sure to return an object or False
+[21:17:50] dude-x: you don't have to handle the case where a find element throws a no such element exception
+[21:18:03] dude-x: but maybe a stale element reference error
+[21:18:05] rpereir__ has joined #selenium
+[21:18:14] dude-x: but that's not an issue with you yet
+[21:18:38] admc has joined #selenium
+[21:21:10] sayd: dude-x: 57-69 on here is what im trying to do https://gist.github.com/20d78cc38a336aace512
+[21:21:49] sfbrian has joined #selenium
+[21:23:26] barancev: santiycr: what can/should we do on our side to avoid "Browser failed to start" failures like this: https://saucelabs.com/tests/5ac421750f314f3c9907ae391ef2cf63
+[21:24:34] sayd: incredibly frustrating this is taking so long to get working
+[21:25:28] sayd: i cant get it to detect that is_selected() thing (returned from scheduled_post_published)
+[21:25:29] smccarthy has joined #selenium
+[21:27:08] dude-x: 58 should take a driver object not object
+[21:27:12] dude-x: change object to 'driver'
+[21:28:12] sayd: dude-x: I ended up just renaming the driver inside that function to wd
+[21:28:18] intchanter-work has joined #selenium
+[21:28:20] sayd: but good to know that it takes a driver as the arg
+[21:28:34] dude-x: webdriver wait will always pass the driver object into the function you pass it to
+[21:29:02] dude-x: sometimes you don't need it, so i'd write "def function(ignored)
+[21:29:09] sayd: it still doesnt explain why that timeout exception is being thrown
+[21:29:17] dude-x: because it's never selected....
+[21:29:28] dude-x: or it's still not finding the element after 100 seconds
+[21:29:33] intchanter-work1 has joined #selenium
+[21:30:20] intchanter-work has joined #selenium
+[21:30:43] sayd: i put the webdriver wait inside that function after the page refresh
+[21:30:54] sayd: since the page might take a bit to laod
+[21:31:55] dude-x: looking at your code i bet it takes longer than 100 seconds
+[21:32:04] dude-x: probably closer to 150 seconds
+[21:32:18] sayd: if you refresh the gist you will see
+[21:33:16] dude-x: don't do that
+[21:33:24] dude-x: it will wait a superlong time
+[21:33:45] dude-x: leave it as element = driver.find_element_by_xpath('..')
+[21:33:51] sayd: basically i was reloading every 20 s
+[21:34:00] dude-x: i see that
+[21:34:19] dude-x: but i think it's taking longer than that because it will attempt about 5 times
+[21:34:32] dude-x: and each attempt is 10 seconds long
+[21:34:52] sayd: ok trying
+[21:35:01] dude-x: have you tried testing this in the python interpreter
+[21:35:08] sayd: gist updated
+[21:35:25] dude-x: you can open python; type "from selenium import webdriver; wd = webdriver.Firefox()
+[21:35:31] dude-x: then just naviage to the page
+[21:35:39] dude-x: and then click on stuff
+[21:35:56] dude-x: then type in commands in the python interpreter like "wd.find_element()"
+[21:36:32] AutomatedTester: sad panda...
+[21:36:39] *AutomatedTester needs a hot chocolate...
+[21:36:45] dude-x: there, there
+[21:37:28] samphippen has joined #selenium
+[21:37:40] sayd: yesss!
+[21:37:46] sayd: finally it is working
+[21:38:04] dude-x: with the last gist you used?
+[21:38:06] sayd: i didnt do the interpreter because i have a pretty long script and its
+[21:38:10] dude-x: or did oyu make some change?
+[21:38:21] dude-x: no, you just type the thing you're interested in
+[21:38:22] sayd: dude-x: i made a small change 
+[21:38:25] dude-x: you odn't have to type in all the commands
+[21:38:44] sayd: dude-x: updated the gist
+[21:38:47] awilson820 has joined #selenium
+[21:39:21] jcarr has joined #selenium
+[21:40:01] dude-x: i see no difference
+[21:40:25] dude-x: maybe it's slower than 2 minutes, and that it took 3 minutes?
+[21:40:31] dude-x: up to 3 minutes
+[21:41:11] sayd: i had to add the driver. in front of find_element_by_xpath
+[21:42:46] dude-x: told you to do that earlier
+[21:44:06] sayd: yeah it works much nicer :) but i forgot to call it on the driver
+[21:44:23] sayd: i just had find_element... instead of driver.find_element...
+[21:46:35] dude-x: did you get sytanx or attribute errors?
+[21:48:57] davehunt has joined #selenium
+[21:53:26] freynaud has left #selenium
+[21:53:53] sayd: i think it was syntax
+[21:54:13] sayd: NameError: global name 'find_element_by_xpath' is not defined
+[21:54:32] sayd: fixed, obviously
+[21:55:12] testingb0t has joined #selenium
+[21:55:18] AutomatedTester: andreastt: yt?
+[21:56:50] testingb0t1 has joined #selenium
+[21:59:34] *AutomatedTester might be going to China later this year
+[IRC logfile - Started Wed Jan 30 22:01:46 2013]
+[22:01:46] gabrielrotbart has joined #selenium
+[22:13:39] jamesoram has joined #selenium
+[22:14:49] AutomatedTester: another mass shooting...
+[22:16:24] dude-x: phoenix?
+[22:16:29] AutomatedTester: yea
+[22:17:18] lukeis: guns don't hurt/kill people, people with guns hurt/kill people ;)
+[22:17:39] dude-x: seems like there is a lot of frustration in the US in general
+[22:18:58] detroniz_ has joined #selenium
+[22:20:08] AutomatedTester: and then PhantomJS just crashed...
+[22:20:12] AutomatedTester: what a load of crap
+[22:20:31] AutomatedTester: good thing Ivan isnt here... 
+[22:21:48] lukeis: ;)
+[22:22:06] AutomatedTester: :D
+[22:22:22] jimevans: AutomatedTester: now, that's just *mean* :D
+[22:22:45] AutomatedTester: he didnt fall for it though :)
+[22:22:58] AutomatedTester: any DSLR pros in here
+[22:25:32] lukeis: AutomatedTester: at least for a change there's people in charge trying to actually tackle gun control… not that whatever they do will be enough, but baby steps i suppose?
+[22:25:46] AutomatedTester: lukeis: that is true
+[22:25:51] nimeacuerdo has joined #selenium
+[22:26:23] lukeis: btw, i own a dslr… but I typically set it to auto ;) so I'm no pro :-D
+[22:26:40] *AutomatedTester wants to get a macro lens
+[22:29:12] AutomatedTester: I am suffering from too much choice
+[22:32:28] gdennis has left #selenium
+[22:33:17] DarkRift has joined #selenium
+[22:33:52] KaibutsuX: i own a dslr but I mainly use it for astrophotography
+[22:34:11] icio has joined #selenium
+[22:35:17] AutomatedTester: KaibutsuX: do you have a telescopic photo lens for that 
+[22:35:22] AutomatedTester: or how do you do that?
+[22:35:26] AutomatedTester: KaibutsuX: I would love to do that 
+[22:36:04] KaibutsuX: i have a sigma 300mm that can be used but I also have a 10inch reflector
+[22:36:32] KaibutsuX: without any extra gear you can do startrails
+[22:36:46] KaibutsuX: http://www.astropix.com/HTML/BEGINNER/Beginner.htm
+[22:36:50] KaibutsuX: btw: not my site
+[22:38:06] AutomatedTester: thats awesome
+[22:38:54] KaibutsuX: yeah and the moon can always be an awesome shot
+[22:39:03] KaibutsuX: especially if you try to do some hdri with it
+[22:42:31] sayd: will se-builder ever be able to open python tests?
+[22:43:11] AutomatedTester: KaibutsuX: there are some astroids coming near earth ( <20k miles)  that will be awesome to take photos of
+[22:44:20] KaibutsuX: I don't think you can get much detail out of them even with good equipment, they just don't reflect enough light
+[22:45:12] KaibutsuX: but I have seen all kinds of cool things like wide shot time lapses
+[22:46:26] KaibutsuX: I wish it would start to warm up, i hate doing it in the cold
+[22:48:00] AutomatedTester: well the sun set at nearly 5pm this evening here
+[22:48:04] AutomatedTester: it was awesome
+[22:48:27] lukeis: any math geeks need to scratch out some equations on their smart phone?  'myscript calculator' is really cool
+[22:55:37] Selenium-Git has joined #selenium
+[22:55:37] Selenium-Git: [13selenium] 15cschooler opened pull request #9: Fixed a NullPointerException (06master...06master)  02http://git.io/k5mbUA
+[22:55:37] Selenium-Git has left #selenium
+[22:55:39] selbot2: 03 closed/fixed Move C# Selenium RC bindings into merged tree - https://code.google.com/p/selenium/issues/detail?id=9 [Type-Task Priority-Medium Lang-CSharp]
+[22:56:24] santiycr: :note barancev the job you pasted is a legit selenium failure to start the browser. Look at the log: https://saucelabs.com/jobs/5ac421750f314f3c9907ae391ef2cf63/selenium-server.log
+[22:56:24] selbot2: ok!
+[22:56:49] jimevans: hooray for cascading bot messages!
+[22:57:13] santiycr: :note barancev Sauce has a way to retry launching browsers when this happens, but it's disabled for selenium-ci as thei are issues that make selenium unreliable and need to be addressed from the selenium end
+[22:57:13] selbot2: ok!
+[IRC logfile - Started Wed Jan 30 23:02:44 2013]
+[23:02:44] plightbo_work has joined #selenium
+[23:02:57] simonstewart has joined #selenium
+[23:06:10] dude-x: cool: http://apod.nasa.gov/apod/astropix.html realt time moonrise
+[23:06:35] simonstewart has joined #selenium
+[23:09:30] lukeis: jimevans: we can have selbot ignore selenium-git… just need to add it to the list of ignored users ;)
+[23:10:12] jimevans: :)
+[23:11:15] gabrielrotbart has joined #selenium
+[23:11:58] llaskin has joined #selenium
+[23:13:09] Selenium-Git has joined #selenium
+[23:13:10] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/T824EQ
+[23:13:10] Selenium-Git: 13selenium/06master 148d136ef 15Corey Schooler: Resolved a NullPointerException which occurred when making a JsonWireProtocol call; masking the useful message intended for this situation, making it difficult to debug other issues....
+[23:13:10] Selenium-Git has left #selenium
+[23:14:14] simonstewart has joined #selenium
+[23:17:16] qaguy has joined #selenium
+[23:30:50] qaguy has joined #selenium
+[23:31:57] qaguy has left #selenium
+[23:37:36] dude-x: it's weird for me to fire up angry birds, and just "mess around" and find that i clear the level with 3 stars
+[23:43:44] jimevans: g'night everybody!
+[23:43:45] jimevans has left #selenium
+[23:47:26] dude-x: o/
+[23:51:59] sayd: think how much easier irc would be if there were no timezones
+[23:53:20] dude-x: you mean everyone had the same schedule?
+[23:53:29] dude-x: timezones are arbitrary as they are
+[23:53:51] dude-x: i kind of like that people are online at odd hours for me
+[23:54:02] dude-x: i can talk to my european cousins
+[23:54:10] dude-x: or asian ones
+[23:54:46] sayd: yeah if everyone had same schedule. seems to revolve around those arbirtrary time zones
+[23:55:41] dude-x: well its just a matter of fact that's sunny on one side of the world, while the other half sleeps (or should be sleeping)
+[23:56:57] dude-x: nevertheless, i can always chat with my friends in East Asia in the morning, and in the afternoon I can still chat with the Europeans 
+[23:59:51] stackedsax has joined #selenium

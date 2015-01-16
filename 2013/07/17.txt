@@ -1,0 +1,797 @@
+[2013-07-17 00:06:46] millenium, quitting. (Read error: Connection reset by peer)
+[2013-07-17 00:10:03] mbersoult_away, changing nick to mbersoult.
+[2013-07-17 00:15:20] ShawnM, quitting. (Remote host closed the connection)
+[2013-07-17 00:15:55] ShawnM, joining. (#selenium)
+[2013-07-17 00:17:06] Hronom, joining. (#selenium)
+[2013-07-17 00:21:05] ShawnM, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 00:25:58] testingb0t1, joining. (#selenium)
+[2013-07-17 00:26:03] Hronom, quitting. (Read error: Connection reset by peer)
+[2013-07-17 00:26:55] barancev, joining. (#selenium)
+[2013-07-17 00:29:13] barancev|2, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 00:30:52] Hronom, joining. (#selenium)
+[2013-07-17 00:33:56] freynaud, joining. (#selenium)
+[2013-07-17 00:36:07] stan, joining. (#selenium)
+[2013-07-17 00:37:46] bimmelino, joining. (#selenium)
+[2013-07-17 00:45:06] rbalent, joining. (#selenium)
+[2013-07-17 01:02:54] sorinello, joining. (#selenium)
+[2013-07-17 01:03:25] Ardesco, joining. (#selenium)
+[2013-07-17 01:20:17] dregin: Does HtmlUnitDriver have serious issues with JS?
+[2013-07-17 01:20:44] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 01:20:55] dregin: Using selenium = new WebDriverBackedSelenium(driver, baseUrl); where driver is HtmlUnitDriver
+[2013-07-17 01:21:24] dregin: then with the selenium object doing selenium.type("name=login_pwd", "password"); works
+[2013-07-17 01:21:40] dregin: but selenium.type("id=login-password", "password"); doesn't
+[2013-07-17 01:21:49] dregin: where name and id are attributes of the same element.
+[2013-07-17 01:33:52] davidlai, joining. (#selenium)
+[2013-07-17 01:39:39] sorinello, quitting. (Quit: Leaving)
+[2013-07-17 01:40:51] nhirata, joining. (#selenium)
+[2013-07-17 01:42:45] Ardesco: how did you start HTMLUnitDriver ?
+[2013-07-17 01:42:59] Ardesco: or rather, how did you instantiate it?
+[2013-07-17 01:43:55] stephend_, joining. (#selenium)
+[2013-07-17 01:46:48] stephend, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 01:48:31] sburjan, joining. (#selenium)
+[2013-07-17 01:48:42] stephend_, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 01:48:45] davehunt, joining. (#selenium)
+[2013-07-17 01:49:02] dregin: Ardesco: pastebin in one sec
+[2013-07-17 01:49:13] cgoldberg, quitting. (Ping timeout: 276 seconds)
+[2013-07-17 01:49:13] kurtsbees, quitting. (Ping timeout: 276 seconds)
+[2013-07-17 01:49:28] dregin: Well, actually
+[2013-07-17 01:49:33] dregin: it's just this: HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_17);
+[2013-07-17 01:49:51] dregin: and driver.setJavascriptEnabled(true);
+[2013-07-17 01:50:05] Ardesco: ok then JavaScript should work
+[2013-07-17 01:50:15] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 01:50:19] Ardesco: but bear in mind that the JavaScript engine in HTMLUnit is not used in any browsers
+[2013-07-17 01:50:25] dregin: the id selector doesn't, but the name one does >_<
+[2013-07-17 01:50:27] Ardesco: so it may not be compatible with your code
+[2013-07-17 01:50:44] Ardesco: You may have more luck with PhantomJS and Ghostdriver
+[2013-07-17 01:50:52] cgoldberg, joining. (#selenium)
+[2013-07-17 01:50:59] kurtsbees, joining. (#selenium)
+[2013-07-17 01:51:51] Ardesco: Also why are you using SeleniumBackedWebDriver
+[2013-07-17 01:51:55] Ardesco: bleh
+[2013-07-17 01:51:59] Ardesco: WebDriverBackedSelenium
+[2013-07-17 01:52:11] *Ardesco tries to get not the rich way round'
+[2013-07-17 01:52:16] Ardesco: not=it
+[2013-07-17 01:52:25] Ardesco: obviously need more coffee…..
+[2013-07-17 01:53:28] dregin: I exported a selenium test case to  JUnit then hacked it from blog post code
+[2013-07-17 01:53:42] dregin: I've not had my coffee yet ;_;
+[2013-07-17 01:53:50] dregin: Should I be using something else?
+[2013-07-17 02:06:00] jamesoram, joining. (#selenium)
+[2013-07-17 02:08:10] Quintasan, leaving. (#selenium)
+[2013-07-17 02:08:39] barancev: dregin: yes, HtmlUnit has issues with JavaScript, in general
+[2013-07-17 02:09:01] barancev: but it should not affect findElement method, imho
+[2013-07-17 02:09:09] dregin: I wouldn't have thought so
+[2013-07-17 02:09:13] barancev: there must be another cause for locator to fail
+[2013-07-17 02:09:27] dregin: I hit the JS errors after I started using name instead of id
+[2013-07-17 02:10:30] barancev: ah, WebDriverBackedSelenium!
+[2013-07-17 02:10:48] barancev: yes, *this* wrapper uses lot of JS code
+[2013-07-17 02:11:01] dregin: \o/
+[2013-07-17 02:11:08] barancev: I'd suggest to avoid it
+[2013-07-17 02:11:08] dregin: Can you suggest a different one?
+[2013-07-17 02:12:13] barancev: just don't mix WebDriverBackedSelenium and HtmlUnitDriver
+[2013-07-17 02:12:42] dregin: kk
+[2013-07-17 02:12:52] barancev: because WebDriverBackedSelenium emulates "old selenium behaviour" in pure JavaScript
+[2013-07-17 02:13:12] barancev: rather complex JS code, that can have issues with HtmlUnit
+[2013-07-17 02:13:46] jost, joining. (#selenium)
+[2013-07-17 02:14:00] barancev: other drivers ("real browsers") should be ok
+[2013-07-17 02:14:11] barancev: well, IE has some issues too...
+[2013-07-17 02:14:44] barancev: especially if you use fireEvent command in your scenarios
+[2013-07-17 02:15:28] sburjan, quitting. (Remote host closed the connection)
+[2013-07-17 02:16:44] sburjan, joining. (#selenium)
+[2013-07-17 02:16:52] raboof: so WebDriverBackedSelenium uses the classes like org.openqa.selenium.internal.seleniumemulation.* ?
+[2013-07-17 02:18:03] raboof: i noticed for example org.openqa.selenium.internal.seleniumemulation.Type will use either javascript or element.clear();element.sendKeys() to accomplish its task, and prefers the javascript route when available
+[2013-07-17 02:18:30] raboof: that seemed odd to me, as the js method sends like 50kb of javascript to the browser, so that doesn't seem ideal to me
+[2013-07-17 02:18:37] raboof: any clue about the rationale behind that?
+[2013-07-17 02:18:50] raboof: or shouldn't I be using org.openqa.selenium.internal.seleniumemulation.Type at all?
+[2013-07-17 02:19:11] Moo-_-, quitting. (Ping timeout: 252 seconds)
+[2013-07-17 02:21:14] moo-_-, joining. (#selenium)
+[2013-07-17 02:35:10] brettporter, quitting. (Quit: brettporter)
+[2013-07-17 02:37:29] jibay, joining. (#selenium)
+[2013-07-17 02:54:24] stephend, joining. (#selenium)
+[2013-07-17 02:58:46] stephend, quitting. (Ping timeout: 245 seconds)
+[2013-07-17 03:10:06] rananda, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 03:10:58] admc, quitting. (Quit: Leaving.)
+[2013-07-17 03:13:03] jost, quitting. (Quit: jost)
+[2013-07-17 03:24:53] Hronom, quitting. (Quit: Instantbird 1.4 -- http://www.instantbird.com)
+[2013-07-17 03:30:35] testingb0t1, quitting. (Quit: Leaving.)
+[2013-07-17 03:35:08] rananda, joining. (#selenium)
+[2013-07-17 03:36:54] rananda, quitting. (Client Quit)
+[2013-07-17 03:37:15] rananda, joining. (#selenium)
+[2013-07-17 03:54:11] qba73, joining. (#selenium)
+[2013-07-17 04:12:53] farlan, quitting. (Quit: Leaving.)
+[2013-07-17 04:15:58] AutomatedTester: hi
+[2013-07-17 04:15:58] selbot2: AutomatedTester: note from lukeis about 7 hours ago: look at the log when I pinged you with this and read the question above it :)
+[2013-07-17 04:16:48] AutomatedTester: :log
+[2013-07-17 04:16:48] selbot2: https://raw.github.com/SeleniumHQ/irc-logs/master/2013/07/17.txt
+[2013-07-17 04:18:36] AutomatedTester: :note lukeis I am happy for you to emulate a "pojo" style object but a dict is also good enough. The main thing is that we make something that can work through the logs programmatically
+[2013-07-17 04:18:36] selbot2: ok!
+[2013-07-17 04:20:12] testingb0t1, joining. (#selenium)
+[2013-07-17 04:20:21] kallisti, joining. (#selenium)
+[2013-07-17 04:25:21] sburjan, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 04:32:15] matthewrobbins, joining. (#selenium)
+[2013-07-17 04:34:10] matthewrobbins, changing nick to mcrmfc.
+[2013-07-17 04:39:00] barancev: raboof: the goal of WebDriverBackedSelenium is to be as close as possible to the "old behaviour"
+[2013-07-17 04:39:46] barancev: that's why it uses so much of JS instead of simple call to sendKeys
+[2013-07-17 04:40:10] Bebe_sel, joining. (#selenium)
+[2013-07-17 04:40:31] barancev: e.g. sendKeys can't enter text into an invisible field, but old 'type' command can
+[2013-07-17 04:40:44] barancev: etc
+[2013-07-17 04:45:35] barancev: jarib: jleyba: what OS did you run grid tests on?
+[2013-07-17 04:46:03] barancev: (I'm on Win7x64, and I want to get confirmation that Linux is ok too)
+[2013-07-17 04:53:16] pigmej, joining. (#selenium)
+[2013-07-17 04:53:25] pigmej: hello
+[2013-07-17 04:53:28] pigmej: I have problem
+[2013-07-17 04:53:38] pigmej: I wrote simple selenium script and it works "mostly"
+[2013-07-17 04:53:43] richdownie, joining. (#selenium)
+[2013-07-17 04:53:57] pigmej: except that the page that I'm using redirects after my action (Submit)
+[2013-07-17 04:54:05] pigmej: then I have exception that Element is not in DOM
+[2013-07-17 04:54:11] richdownie, quitting. (Client Quit)
+[2013-07-17 04:54:38] pigmej: and I'm using python webdriver
+[2013-07-17 04:55:08] pigmej: obviously the element is present on the page after reload
+[2013-07-17 04:55:10] richdownie, joining. (#selenium)
+[2013-07-17 04:55:18] pigmej: but I can't locate it via selenium because of that not found exception
+[2013-07-17 04:55:26] pigmej: so I need probably to refresh selenium DOM object or so
+[2013-07-17 04:55:44] pigmej: in java there is something like PageFactory.Init
+[2013-07-17 04:55:49] pigmej: and then everything is fine
+[2013-07-17 04:55:54] pigmej: the question is how to do it with python
+[2013-07-17 04:56:56] sburjan, joining. (#selenium)
+[2013-07-17 04:57:47] dhenry, joining. (#selenium)
+[2013-07-17 04:58:14] pigmej: the schema is like
+[2013-07-17 04:59:04] pigmej: URL1: fill the field, submit then it goes to other URL
+[2013-07-17 04:59:09] pigmej: and 'error'
+[2013-07-17 05:04:32] xinke2411, joining. (#selenium)
+[2013-07-17 05:06:37] Hronom, joining. (#selenium)
+[2013-07-17 05:07:18] pigmej: anyone?
+[2013-07-17 05:09:53] brettporter, joining. (#selenium)
+[2013-07-17 05:09:59] cheezy, joining. (#selenium)
+[2013-07-17 05:14:45] jamesoram, quitting. (Quit: Leaving)
+[2013-07-17 05:18:10] xinke2411, quitting. (Quit: Leaving.)
+[2013-07-17 05:18:29] xinke2411, joining. (#selenium)
+[2013-07-17 05:21:59] xinke2411, quitting. (Client Quit)
+[2013-07-17 05:29:10] aweiteka, joining. (#selenium)
+[2013-07-17 05:29:40] llaskin, joining. (#selenium)
+[2013-07-17 05:31:07] tourdedave, joining. (#selenium)
+[2013-07-17 05:31:29] AutomatedTester: tourdedave: I am fail
+[2013-07-17 05:31:40] tourdedave: :)
+[2013-07-17 05:31:56] AutomatedTester: doing thing now because I am fail
+[2013-07-17 05:32:05] tourdedave: Same
+[2013-07-17 05:32:11] AutomatedTester: *phew*
+[2013-07-17 05:32:19] tourdedave: Glad it's not just me
+[2013-07-17 05:32:29] AutomatedTester: real life got in the way
+[2013-07-17 05:32:32] AutomatedTester: pesky life
+[2013-07-17 05:32:56] tourdedave: As it is wont to do
+[2013-07-17 05:33:41] FullTiltProspect, joining. (#selenium)
+[2013-07-17 05:34:50] farlan, joining. (#selenium)
+[2013-07-17 05:40:10] raboof: barancev: hmm ok. so basically it's recommended not to use WebDriverBackedSelenium and instead use the webdriver methods directly myself?
+[2013-07-17 05:41:16] barancev: yes, WebDriverBackedSelenium was designed as a tool to support migration, not as a tool to be used on its own
+[2013-07-17 05:48:47] davehunt, quitting. (Remote host closed the connection)
+[2013-07-17 05:51:56] brettporter, quitting. (Quit: brettporter)
+[2013-07-17 05:52:33] pigmej, leaving. (#selenium)
+[2013-07-17 05:56:19] pigmej, joining. (#selenium)
+[2013-07-17 05:56:41] pigmej: I will repeat again my question...
+[2013-07-17 05:56:54] pigmej: python webdriver can't find element, but it exists
+[2013-07-17 05:57:12] pigmej: I think it's because old version of page is in cache, how to tell webdriver to reload it ?
+[2013-07-17 05:59:33] nimeacuerdo, joining. (#selenium)
+[2013-07-17 05:59:54] SamuraiJack, quitting. (Quit: Konversation terminated!)
+[2013-07-17 06:00:18] AutomatedTester: pigmej: we dont cache the DOM
+[2013-07-17 06:00:30] pigmej: AutomatedTester: so I wonder why it's not working for me...
+[2013-07-17 06:00:45] pigmej: I have page, I fill the login form, click the button, and then not a single element is found
+[2013-07-17 06:00:55] AutomatedTester: pigmej: is the page reloading?
+[2013-07-17 06:01:01] pigmej: changing URL
+[2013-07-17 06:01:07] ryanpetrello, joining. (#selenium)
+[2013-07-17 06:01:09] pigmej: from page/a
+[2013-07-17 06:01:10] pigmej: to page/b
+[2013-07-17 06:01:22] AutomatedTester: so its loading a new page
+[2013-07-17 06:01:24] pigmej: no idea what more happens behind
+[2013-07-17 06:01:27] pigmej: behind
+[2013-07-17 06:01:29] pigmej: yep
+[2013-07-17 06:01:44] AutomatedTester: then you need to add waits so you synchronise with whats on  the page
+[2013-07-17 06:01:51] pigmej: I did it
+[2013-07-17 06:01:59] pigmej: even sleep(60) doesn't help at all
+[2013-07-17 06:02:11] pigmej: browser.get("X")
+[2013-07-17 06:02:18] pigmej: I'm donig this
+[2013-07-17 06:02:20] pigmej: doing*
+[2013-07-17 06:02:28] AutomatedTester: get loads a page
+[2013-07-17 06:02:31] pigmej: yeah
+[2013-07-17 06:02:41] pigmej: then after click browser.find_element_by_id finds nothing after I previously clicked something
+[2013-07-17 06:03:18] selenium33, joining. (#selenium)
+[2013-07-17 06:03:33] selenium33, leaving. (#selenium)
+[2013-07-17 06:03:39] AutomatedTester: are there frames or iframes?
+[2013-07-17 06:03:48] pigmej: http://wklej.to/Nr5ZJ
+[2013-07-17 06:03:51] pigmej: pseudocode
+[2013-07-17 06:04:37] AutomatedTester: :apidocs
+[2013-07-17 06:04:37] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[2013-07-17 06:05:00] pigmej: AutomatedTester: yeah
+[2013-07-17 06:05:02] pigmej: there is frameset
+[2013-07-17 06:05:11] pigmej: shall I focus it somehow?
+[2013-07-17 06:05:14] AutomatedTester: yea
+[2013-07-17 06:05:30] pigmej: switch_to_frame...
+[2013-07-17 06:05:30] pigmej: ok
+[2013-07-17 06:05:31] AutomatedTester: we require explicit changes to each frame before interacting with it
+[2013-07-17 06:05:41] AutomatedTester: otherwise we never find the element
+[2013-07-17 06:05:47] pigmej: ok
+[2013-07-17 06:05:48] AutomatedTester: since its not in the frame webdriver is in
+[2013-07-17 06:06:08] pigmej: ok
+[2013-07-17 06:06:35] pigmej: can I focus any netsted frame ?
+[2013-07-17 06:06:40] pigmej: or ful path needed ?
+[2013-07-17 06:06:48] AutomatedTester: also use until/until_not (see http://selenium.googlecode.com/git/docs/api/py/webdriver_support/selenium.webdriver.support.wait.html) for your wait
+[2013-07-17 06:07:03] AutomatedTester: you can focus on  it by index
+[2013-07-17 06:07:05] AutomatedTester: or by name
+[2013-07-17 06:07:13] AutomatedTester: but you need to walk down the frameset
+[2013-07-17 06:08:19] pigmej: ok
+[2013-07-17 06:08:22] pigmej: so another question
+[2013-07-17 06:08:26] pigmej: wait = ui.WebDriverWait(browser, 10)
+[2013-07-17 06:08:31] pigmej: will it wait for frames also?
+[2013-07-17 06:08:34] AutomatedTester: driver.switch_to_frame(1); driver.switch_to_frame(2) will find the first frame, switch to it and then find the 2nd frame within the first frame
+[2013-07-17 06:08:44] AutomatedTester: no
+[2013-07-17 06:08:52] AutomatedTester: well yes
+[2013-07-17 06:08:56] pigmej: ;D
+[2013-07-17 06:09:08] AutomatedTester: you are using it incorrectly
+[2013-07-17 06:09:36] pigmej: probably, just find it out
+[2013-07-17 06:10:00] pigmej: I have to define condition probably ?
+[2013-07-17 06:10:09] AutomatedTester: you want wait.until(lambda driver: driver.find_element(By.TAG_NAME, "<your frame id>"))
+[2013-07-17 06:10:25] AutomatedTester: that will wait until it find the first level frame of what you want
+[2013-07-17 06:10:32] dhenry, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 06:11:56] pigmej: cool ;-)
+[2013-07-17 06:12:08] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 06:13:15] dhenry, joining. (#selenium)
+[2013-07-17 06:13:21] AutomatedTester: pigmej: By.TAG_NAME should be By.ID
+[2013-07-17 06:13:32] pigmej: Yeah I suppose :)
+[2013-07-17 06:13:51] pigmej: but frame name="main"
+[2013-07-17 06:13:55] pigmej: so name wasok this time ;-)
+[2013-07-17 06:14:02] pigmej: was ok*
+[2013-07-17 06:14:19] pigmej: http://wklej.to/VDgp8/text
+[2013-07-17 06:14:22] pigmej: correct ?
+[2013-07-17 06:14:41] AutomatedTester: pretty much
+[2013-07-17 06:14:54] AutomatedTester: you may need to do other tweaks
+[2013-07-17 06:15:08] pigmej: because it sill throws me 'not found' ;/
+[2013-07-17 06:15:09] AutomatedTester: e.g waiting for the submit button but other than that looks good
+[2013-07-17 06:15:15] pigmej: yeah
+[2013-07-17 06:16:21] pigmej: I hate frames :)
+[2013-07-17 06:16:29] AutomatedTester: pigmej: I dont blame you
+[2013-07-17 06:16:37] AutomatedTester: must feel like you are in the 90s
+[2013-07-17 06:17:11] pigmej: early 90s ;d
+[2013-07-17 06:17:20] cmcgraw, joining. (#selenium)
+[2013-07-17 06:19:53] qaguy, joining. (#selenium)
+[2013-07-17 06:22:50] pigmej: AutomatedTester: when browser goes then again to other URL
+[2013-07-17 06:22:56] pigmej: frame focus is cleared I suppose?
+[2013-07-17 06:23:01] AutomatedTester: yup
+[2013-07-17 06:23:04] pigmej: or shall I somehow focus top most frame again?
+[2013-07-17 06:23:07] AutomatedTester: we move back to window.top
+[2013-07-17 06:23:59] p_l: any suggestions on making WebDriver scroll to make an element visible on screen?
+[2013-07-17 06:24:20] AutomatedTester: p_l: interact with it?
+[2013-07-17 06:24:25] AutomatedTester: e.g click, send_keys
+[2013-07-17 06:24:37] AutomatedTester: we implicitly scroll
+[2013-07-17 06:24:41] p_l: AutomatedTester: the problem is that I already had cases where it wouldn't click because element wasn't visible
+[2013-07-17 06:24:51] p_l: that is, visible in viewport
+[2013-07-17 06:24:58] AutomatedTester: p_l: thats a bug if we arent scrolling
+[2013-07-17 06:25:09] AutomatedTester: we should implicitly scroll for you
+[2013-07-17 06:25:14] p_l: I guess I'll look into upgrading Selenium code just in case
+[2013-07-17 06:25:36] *p_l runs on 2.28'
+[2013-07-17 06:32:04] tedwards_, joining. (#selenium)
+[2013-07-17 06:32:49] cheezy, joining. (#selenium)
+[2013-07-17 06:38:26] riv_, joining. (#selenium)
+[2013-07-17 06:41:06] rickdarcy, quitting. (Ping timeout: 256 seconds)
+[2013-07-17 06:43:45] nirvdrum, joining. (#selenium)
+[2013-07-17 06:43:48] barancev: :log
+[2013-07-17 06:43:49] selbot2: https://raw.github.com/SeleniumHQ/irc-logs/master/2013/07/17.txt
+[2013-07-17 06:46:48] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 06:47:48] FullTiltProspect, leaving. (#selenium)
+[2013-07-17 06:52:30] bluescreen10, joining. (#selenium)
+[2013-07-17 06:53:52] mreedell, joining. (#selenium)
+[2013-07-17 06:55:39] pigmej: AutomatedTester: how to wait for elem visibility ?
+[2013-07-17 06:56:37] pigmej: isDisplayed?
+[2013-07-17 06:57:10] mreedell, quitting. (Client Quit)
+[2013-07-17 06:57:12] cgoldberg, quitting. (Quit: Ex-Chat)
+[2013-07-17 06:58:30] nirvdrum, quitting. (Remote host closed the connection)
+[2013-07-17 06:59:04] WelwynTester, joining. (#selenium)
+[2013-07-17 07:00:14] WelwynTester: anyone able to advise on commercial support for selenium ?
+[2013-07-17 07:00:15] simonstewart, joining. (#selenium)
+[2013-07-17 07:00:41] gagangowda10, joining. (#selenium)
+[2013-07-17 07:00:50] llaskin: WelwynTester: what language?
+[2013-07-17 07:01:06] WelwynTester: C#
+[2013-07-17 07:01:18] WelwynTester:  + Java
+[2013-07-17 07:02:53] WelwynTester: also looking for commercial support for Cucumber
+[2013-07-17 07:07:32] jimevans, joining. (#selenium)
+[2013-07-17 07:08:20] fatguylaughing, joining. (#selenium)
+[2013-07-17 07:10:00] jimevans: g'day everybody!
+[2013-07-17 07:10:35] barancev: WelwynTester: what kind of support do you need? implementing/maintaining your tests? resolving complex cases? urgent fixing selenium bugs that bother you?
+[2013-07-17 07:10:35] intchanter-work, joining. (#selenium)
+[2013-07-17 07:12:05] WelwynTester: firm are looking for confidence of support for yes either complex cases/features or critical fixes required when in production
+[2013-07-17 07:13:21] AutomatedTester: pigmej: yes
+[2013-07-17 07:13:50] AutomatedTester: hi Jim
+[2013-07-17 07:13:59] AutomatedTester: hi jimevans
+[2013-07-17 07:14:04] davehunt, joining. (#selenium)
+[2013-07-17 07:14:31] jimevans: :log
+[2013-07-17 07:14:31] selbot2: https://raw.github.com/SeleniumHQ/irc-logs/master/2013/07/17.txt
+[2013-07-17 07:14:50] jimevans: is selbot2 sleeping??? :)
+[2013-07-17 07:15:18] cgoldberg, joining. (#selenium)
+[2013-07-17 07:17:07] AutomatedTester: jimevans: is lukeis back today
+[2013-07-17 07:17:11] rebelagentm, joining. (#selenium)
+[2013-07-17 07:18:20] jimevans: huh. now that's damned odd. my irc client isn't behaving.
+[2013-07-17 07:18:30] jimevans: oh. there we go.
+[2013-07-17 07:19:05] jimevans: AutomatedTester: as far as i'm aware, yes. should be in the next couple of hours or so.
+[2013-07-17 07:19:20] AutomatedTester: jimevans: awesome, ta
+[2013-07-17 07:19:29] aweiteka, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 07:21:18] rebelagentm, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 07:21:48] qaguy, joining. (#selenium)
+[2013-07-17 07:24:37] barancev, changing nick to barancev|NotHere.
+[2013-07-17 07:29:16] jamesoram, joining. (#selenium)
+[2013-07-17 07:34:26] sburjan, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 07:36:03] rebelagentm, joining. (#selenium)
+[2013-07-17 07:41:23] Selenium-Git, joining. (#selenium)
+[2013-07-17 07:41:24] Selenium-Git, leaving. (#selenium)
+[2013-07-17 07:41:24] Selenium-Git: [13selenium] 15liulkg synchronize pull request #74: IEDriver desiredCapabilities.ensureCleanSession using WinInetUtilities (06master...06topic/cacheclear)  02http://git.io/m2xZnw
+[2013-07-17 07:45:11] dregin: Anyone ever used htmluinitdriver in a Junit test with JMeter?
+[2013-07-17 07:45:48] dregin: The internets tell me it should be a fabulous experience, but jmeter's failing repeatedly and doesn't seem to be trying to run the unit test at all
+[2013-07-17 07:48:17] qba73, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 07:53:45] aweiteka, joining. (#selenium)
+[2013-07-17 07:54:50] Dude-X, joining. (#selenium)
+[2013-07-17 07:55:37] llaskin: a coworker just says "starting a test case management should have started in the very beginning of product"...my response "said no startup company, EVER"
+[2013-07-17 07:58:27] dawagner, joining. (#selenium)
+[2013-07-17 07:58:43] kallisti, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 08:00:19] dawagner, quitting. (Client Quit)
+[2013-07-17 08:00:26] qba73, joining. (#selenium)
+[2013-07-17 08:07:35] dregin: llaskin: ^5
+[2013-07-17 08:11:17] WelwynTester, quitting. (Quit: Leaving)
+[2013-07-17 08:12:10] hirani, joining. (#selenium)
+[2013-07-17 08:12:50] Hronom, quitting. (Remote host closed the connection)
+[2013-07-17 08:13:37] phasze, joining. (#selenium)
+[2013-07-17 08:22:10] AutomatedTester: bbl
+[2013-07-17 08:23:53] smccarthy, joining. (#selenium)
+[2013-07-17 08:27:11] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 08:27:59] elopio, quitting. (Remote host closed the connection)
+[2013-07-17 08:30:56] testingb0t1, quitting. (Quit: Leaving.)
+[2013-07-17 08:32:43] elopio, joining. (#selenium)
+[2013-07-17 08:49:09] cheezy, joining. (#selenium)
+[2013-07-17 08:50:20] phasze: hello again everyone
+[2013-07-17 08:50:42] phasze: Is there any way of clicking the "leave this page" button or "stay on this page"?
+[2013-07-17 08:50:58] Dude-X: switch to alert, accept, dismiss
+[2013-07-17 08:51:09] jimevans: phasze: depends on the browser, but it should be handled as an alert.
+[2013-07-17 08:51:39] phasze: alright cool, for some reason I think last time I tried it it didn't work like that.  I'll try it again in all browsers
+[2013-07-17 08:53:54] foundatron, joining. (#selenium)
+[2013-07-17 08:53:57] foundatron, quitting. (Client Quit)
+[2013-07-17 08:57:48] lukeis, joining. (#selenium)
+[2013-07-17 08:57:48] selbot2: lukeis: note from AutomatedTester about 5 hours ago: I am happy for you to emulate a "pojo" style object but a dict is also good enough. The main thing is that we make something that can work through the logs programmatically
+[2013-07-17 08:57:48] nimeacuerdo, quitting. (Read error: Connection reset by peer)
+[2013-07-17 08:58:48] phasze: jimevans, Dude-X: ah, I can dismiss/accept it, just can't get the text.  I think that's the problem I ran into last time.  Is that just how it is?
+[2013-07-17 08:59:11] nimeacuerdo, joining. (#selenium)
+[2013-07-17 08:59:23] Dude-X: i don't you can get the text
+[2013-07-17 08:59:27] Dude-X: think you can get the text
+[2013-07-17 08:59:39] Dude-X: you can input text into an alert that accepts text input
+[2013-07-17 08:59:46] barancev|NotHere, changing nick to barancev.
+[2013-07-17 09:01:01] llaskin1, joining. (#selenium)
+[2013-07-17 09:01:05] llaskin, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 09:01:46] foundatron, joining. (#selenium)
+[2013-07-17 09:03:19] zac_sel, joining. (#selenium)
+[2013-07-17 09:04:18] stan, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 09:04:42] Ardesco, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 09:08:35] stephend, joining. (#selenium)
+[2013-07-17 09:08:36] tourdedave, quitting. (Quit: tourdedave)
+[2013-07-17 09:09:01] rananda, quitting. (Quit: Leaving)
+[2013-07-17 09:11:34] nirvdrum, joining. (#selenium)
+[2013-07-17 09:11:40] coreyg, joining. (#selenium)
+[2013-07-17 09:15:18] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-07-17 09:16:17] davidlai, joining. (#selenium)
+[2013-07-17 09:18:28] qba73, quitting. (Quit: Leaving)
+[2013-07-17 09:20:08] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 09:21:50] rebelagentm, leaving. (#selenium)
+[2013-07-17 09:25:55] SamuraiJack, joining. (#selenium)
+[2013-07-17 09:27:56] phasze, quitting. (Read error: Connection reset by peer)
+[2013-07-17 09:28:25] zac_sel_, joining. (#selenium)
+[2013-07-17 09:28:44] barancev: lukeis: yt?
+[2013-07-17 09:29:30] bimmelino, leaving. (#selenium)
+[2013-07-17 09:29:36] zac_sel, quitting. (Ping timeout: 245 seconds)
+[2013-07-17 09:32:51] Prometheian, joining. (#selenium)
+[2013-07-17 09:33:18] Prometheian: The ChromeDriver says it supports Chrome v27-30. Is that Chrome version 27 sub version 30, or 27 through 30?
+[2013-07-17 09:33:40] jimevans: Prometheian: major versions 27 through 30.
+[2013-07-17 09:34:32] Prometheian: Okay. I tried downgrading my Chrome to v27 to fix an issue, which didn't help, so I was wondering if my v27 was too high.
+[2013-07-17 09:34:41] Prometheian: But nope, not it. ^^
+[2013-07-17 09:35:30] Prometheian: Is there some general case where "chrome not reachable" is common?
+[2013-07-17 09:36:15] jimevans: Prometheian: i've no idea. i've never had an issue with it, but i'm not using grid either.
+[2013-07-17 09:36:20] barancev: Prometheian: which chromedriver flavour do you use?
+[2013-07-17 09:36:35] barancev: chromedriver or chromedriver2?
+[2013-07-17 09:36:45] Prometheian: I'm using the latest offa here: https://code.google.com/p/chromedriver/downloads/list
+[2013-07-17 09:36:51] Prometheian: 2.1 win
+[2013-07-17 09:37:34] barancev: oh! 2.1. I have to update too
+[2013-07-17 09:37:53] sburjan, joining. (#selenium)
+[2013-07-17 09:38:15] Prometheian: ?
+[2013-07-17 09:38:40] jimevans: Prometheian: barancev is probably still running with 2.0. :)
+[2013-07-17 09:38:44] Prometheian: Ah, lol
+[2013-07-17 09:38:49] barancev: yes, I'm on 2.0
+[2013-07-17 09:39:14] barancev: 2.1 released week ago
+[2013-07-17 09:39:21] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 09:39:27] Dude-X: you should probably use chrome 28
+[2013-07-17 09:39:28] barancev: I was extra busy last month
+[2013-07-17 09:39:36] Dude-X: that's what stable is anyway
+[2013-07-17 09:39:41] Dude-X: and it should work well with chromedriver 2
+[2013-07-17 09:40:10] Prometheian: I had been, but it was still giving me the error: chrome not reachable
+[2013-07-17 09:40:20] barancev: and now I'm back and going to implement Java binding for marionette
+[2013-07-17 09:40:45] jleyba: where are we on a 2.34 release/
+[2013-07-17 09:40:59] barancev: jimevans: why don't you include C# binding for marionette to the trunk?
+[2013-07-17 09:41:19] jimevans: barancev: because it's not in the release channel of firefox yet.
+[2013-07-17 09:41:48] jimevans: and i'm not convinced of the right way to do version-specific detection.
+[2013-07-17 09:41:53] jimevans: at least not yet.
+[2013-07-17 09:41:58] jimevans: i'm still thinking on it.
+[2013-07-17 09:42:02] barancev: jleyba: somebody should build native events lib for linux x64 (iirc lukeis created 32 bit version only)
+[2013-07-17 09:42:37] barancev: jimevans: MarionetteDriver can be a separate driver (temporarily)
+[2013-07-17 09:42:56] barancev: or do you want to make it a capability?
+[2013-07-17 09:42:57] jimevans: barancev: i'm not comfortable with that for the .net bindings.
+[2013-07-17 09:43:08] barancev: we don't need auto-detection
+[2013-07-17 09:43:14] barancev: we вщтже want it
+[2013-07-17 09:43:20] barancev: we don't want it
+[2013-07-17 09:43:41] barancev: we should allow the user to choose
+[2013-07-17 09:43:52] barancev: at least for several releases
+[2013-07-17 09:44:33] sfbrian, joining. (#selenium)
+[2013-07-17 09:44:54] jimevans: barancev: that's fine, as far as it goes. the .net firefox driver needs a little refactoring at this point though, because i hate copy-paste code. and i'm not done with that yet.
+[2013-07-17 09:45:17] barancev: fair
+[2013-07-17 09:45:23] jimevans: it's not going into 2.34. full stop.
+[2013-07-17 09:45:34] jimevans: not in .net, anyway.
+[2013-07-17 09:45:35] jimevans: :)
+[2013-07-17 09:45:52] barancev: sure I'm not going to include it in 2.34 for Java too
+[2013-07-17 09:46:31] jimevans: well, that would be one reason it's not in trunk. :) the .net bindings build process compiles a glob of all .cs files. :)
+[2013-07-17 09:46:53] Dude-X: firefox 24 ail have marionette in release build right?
+[2013-07-17 09:47:00] barancev: yes
+[2013-07-17 09:47:03] jimevans: Dude-X: should do
+[2013-07-17 09:47:09] Dude-X: cool
+[2013-07-17 09:47:15] jimevans: it's in aurora now.
+[2013-07-17 09:47:21] Prometheian: When I start a Node in the command line, can I tell it where Chrome.exe is?
+[2013-07-17 09:47:23] Dude-X: so septemberish?
+[2013-07-17 09:47:58] barancev: yes, the end of September
+[2013-07-17 09:48:38] jleyba: Prometheian what are you trying to do?
+[2013-07-17 09:49:02] Prometheian: I keep getting "chrome not reachable" errors in my JUnit test that I'm trying to run on Grid.
+[2013-07-17 09:49:39] jleyba: Oh.   I don't use grid so I can't help you there
+[2013-07-17 09:49:50] Prometheian: I've set the chromedriver path in my command line setup, I was wondering if I can set the chrome path as well.
+[2013-07-17 09:49:58] jleyba: Yes.
+[2013-07-17 09:50:01] jleyba: See ChromeOptions class
+[2013-07-17 09:50:17] jleyba: Well, you can't set it from the command line, but you can in DesiredCapabilities (see previous comment)
+[2013-07-17 09:50:41] gagangowda10: is there a way to tell the webdriver to wait untill an ajax call completes???
+[2013-07-17 09:50:58] Dude-X: gagangowda10: use a web driver wait with execute script
+[2013-07-17 09:51:46] jleyba: ew.  if you're not expecting any navigation, use executeAsyncScript
+[2013-07-17 09:51:58] Dude-X: python example: WebDriverWait(driver, 10).until(lambda d: d.execute_script("return jQuery.active === 0;")
+[2013-07-17 09:52:22] gagangowda10: Dude-X thats awesome!!! thank you!
+[2013-07-17 09:52:28] qaguy, joining. (#selenium)
+[2013-07-17 09:52:33] Prometheian: What's the capability name, chrome.path? I'm lookin through documentation but haven't found yet.
+[2013-07-17 09:52:34] jleyba: Still think executeAsyncScript would be better.  See example in javadoc: http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeAsyncScript(java.lang.String, java.lang.Object...)
+[2013-07-17 09:52:35] Dude-X: that's a simple acase
+[2013-07-17 09:53:05] Dude-X: jleyba: async script is cool if you know what to hook into
+[2013-07-17 09:53:22] jleyba: Prometheian: http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/chrome/ChromeOptions.html#setBinary(java.io.File)
+[2013-07-17 09:53:37] Prometheian: Ah, ty. ^^
+[2013-07-17 09:54:17] jleyba: Dude-X: you can check jQuery.active.  just use setTimeout to recheck if != 0
+[2013-07-17 09:55:13] Dude-X: i am a little unclear on how setTimeout works
+[2013-07-17 09:55:37] rebelagentm, joining. (#selenium)
+[2013-07-17 09:56:00] jleyba: :gist
+[2013-07-17 09:56:00] selbot2: Please paste >3 lines of text to https://gist.github.com
+[2013-07-17 09:56:17] Prometheian: I HAD BEEN SETTING THE BINARY TO THE CHROMEDRIVER. FUCK.
+[2013-07-17 09:56:21] Prometheian: God damnit two days
+[2013-07-17 09:56:23] Prometheian: of this shit
+[2013-07-17 09:56:57] mcrmfc, quitting. (Read error: Operation timed out)
+[2013-07-17 09:58:28] jleyba: Dude-X: https://gist.github.com/anonymous/6022392
+[2013-07-17 09:58:39] jamesoram, quitting. (Quit: Leaving)
+[2013-07-17 09:59:19] Dude-X: thanks for the example. much appreciated
+[2013-07-17 10:05:15] pigmej, quitting. (Remote host closed the connection)
+[2013-07-17 10:07:22] brettporter, joining. (#selenium)
+[2013-07-17 10:14:29] cheezy, joining. (#selenium)
+[2013-07-17 10:17:26] phasze, joining. (#selenium)
+[2013-07-17 10:19:36] phasze, quitting. (Client Quit)
+[2013-07-17 10:19:45] phasze, joining. (#selenium)
+[2013-07-17 10:19:54] SamuraiJack_, joining. (#selenium)
+[2013-07-17 10:20:44] phasze, quitting. (Client Quit)
+[2013-07-17 10:20:54] phasze, joining. (#selenium)
+[2013-07-17 10:21:39] SamuraiJack, quitting. (Ping timeout: 252 seconds)
+[2013-07-17 10:23:20] whhone, joining. (#selenium)
+[2013-07-17 10:26:11] ShawnM, joining. (#selenium)
+[2013-07-17 10:26:59] jrendell, joining. (#selenium)
+[2013-07-17 10:28:26] SamuraiJack_, quitting. (Ping timeout: 264 seconds)
+[2013-07-17 10:30:31] awilson820, joining. (#selenium)
+[2013-07-17 10:33:49] davehunt, quitting. (Remote host closed the connection)
+[2013-07-17 10:34:22] SamuraiJack_, joining. (#selenium)
+[2013-07-17 10:35:04] nimeacuerdo, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 10:35:58] Bebe_sel, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 10:36:16] whhone, leaving. ("Leaving...")
+[2013-07-17 10:37:20] Dude-X: 23 minutes to build boost on my mac. Sweet sassy molassy!
+[2013-07-17 10:48:22] rbalent, quitting. (Quit: May the Force be with you)
+[2013-07-17 10:53:29] mbersoult, changing nick to mbersoult_away.
+[2013-07-17 11:00:16] qaguy, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 11:04:38] stackedsax1, joining. (#selenium)
+[2013-07-17 11:07:46] qaguy, joining. (#selenium)
+[2013-07-17 11:10:37] nhirata, quitting. (Quit: nhirata)
+[2013-07-17 11:14:48] simonstewart, quitting. (Quit: simonstewart)
+[2013-07-17 11:16:14] foundatron, quitting. (Quit: Computer has gone to sleep.)
+[2013-07-17 11:17:38] tourdedave, joining. (#selenium)
+[2013-07-17 11:19:11] foundatron, joining. (#selenium)
+[2013-07-17 11:25:44] gagangowda10: jleyba thanks!!!
+[2013-07-17 11:29:43] admc, joining. (#selenium)
+[2013-07-17 11:34:22] Mkop1, joining. (#selenium)
+[2013-07-17 11:51:56] jibay, quitting. (Remote host closed the connection)
+[2013-07-17 11:53:43] santiycr, joining. (#selenium)
+[2013-07-17 11:55:42] jimevans: YoureReady&7
+[2013-07-17 11:55:48] jimevans: d'oh!
+[2013-07-17 11:55:54] AutomatedTester: jimevans: I AM READY
+[2013-07-17 11:55:57] AutomatedTester: lets do it
+[2013-07-17 11:57:06] llaskin1: who's our local java guy?
+[2013-07-17 11:57:09] bluescreen100, joining. (#selenium)
+[2013-07-17 11:57:29] JoonLee, quitting. (Remote host closed the connection)
+[2013-07-17 11:57:45] JoonLee, joining. (#selenium)
+[2013-07-17 11:57:48] AutomatedTester: llaskin1: a Googler or salesforce folk
+[2013-07-17 11:57:52] AutomatedTester: or barancev
+[2013-07-17 11:58:00] AutomatedTester: or the Opera folks
+[2013-07-17 11:58:38] llaskin1: just need help setting up babby's first selenium test in IntelliJ
+[2013-07-17 12:00:24] bluescreen10, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 12:03:41] AutomatedTester: llaskin1: I am sure you can google it
+[2013-07-17 12:15:49] sburjan, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 12:16:35] sburjan, joining. (#selenium)
+[2013-07-17 12:20:53] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 12:21:33] lukeis: jimevans: so, which system(s) should I try that pw out on ;)
+[2013-07-17 12:23:32] riv_, quitting. (Remote host closed the connection)
+[2013-07-17 12:23:53] jimevans: lukeis: any you care to. :)
+[2013-07-17 12:25:41] jimevans: afaik, it's not a password for anything i care about. :)
+[2013-07-17 12:26:22] jimevans: and by that i mean not a password i'm using. i can't speak for every user of every system in the world.
+[2013-07-17 12:26:47] qaguy, joining. (#selenium)
+[2013-07-17 12:28:54] llaskin1: luke, happy bday
+[2013-07-17 12:30:25] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 12:31:09] santiycr, quitting. (Quit: Leaving.)
+[2013-07-17 12:31:19] riv_, joining. (#selenium)
+[2013-07-17 12:32:39] lukeis: thanks leo
+[2013-07-17 12:34:11] foundatron, quitting. (Quit: Computer has gone to sleep.)
+[2013-07-17 12:36:06] stackedsax3, joining. (#selenium)
+[2013-07-17 12:36:10] stackedsax1, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 12:38:12] rickdarcy, joining. (#selenium)
+[2013-07-17 12:39:09] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 12:39:48] sburjan, quitting. (Ping timeout: 264 seconds)
+[2013-07-17 12:40:47] lukeis, leaving. (#selenium)
+[2013-07-17 12:41:29] foundatron, joining. (#selenium)
+[2013-07-17 12:42:05] AutomatedTester, quitting. (Ping timeout: 256 seconds)
+[2013-07-17 12:42:41] JoonLee, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 12:42:50] rickdarcy, quitting. (Ping timeout: 252 seconds)
+[2013-07-17 12:43:00] JoonLee, joining. (#selenium)
+[2013-07-17 12:46:53] AutomatedTester, joining. (#selenium)
+[2013-07-17 12:50:25] lukeis, joining. (#selenium)
+[2013-07-17 12:50:32] sburjan, joining. (#selenium)
+[2013-07-17 12:52:18] stackedsax3, quitting. (Ping timeout: 260 seconds)
+[2013-07-17 12:52:22] stackedsax1, joining. (#selenium)
+[2013-07-17 12:52:49] riv_, quitting. (Remote host closed the connection)
+[2013-07-17 12:56:50] awilson820, quitting. (Quit: Leaving.)
+[2013-07-17 12:57:14] qaguy, joining. (#selenium)
+[2013-07-17 12:57:20] Dude-X: lukeis: happy bday! (know it was yesterday)
+[2013-07-17 12:58:06] lukeis: thanks :)
+[2013-07-17 13:00:39] jillio, joining. (#selenium)
+[2013-07-17 13:00:56] cheezy, joining. (#selenium)
+[2013-07-17 13:02:59] llaskin1: ok so i am trying to run the java selenium example(yay look at this guy trying to learn java by learning using selenium), but I must be doing something wrong in my IntelliJ setup...can someone make a suggestion? http://imgur.com/R0308dR  error is java: package org.openqa.selenium does not exist
+[2013-07-17 13:03:26] freynaud, quitting. (Quit: freynaud)
+[2013-07-17 13:04:18] tourdedave, quitting. (Quit: tourdedave)
+[2013-07-17 13:04:33] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 13:04:34] Dude-X: use a different package header
+[2013-07-17 13:04:45] Dude-X: actually take out that line
+[2013-07-17 13:04:56] llaskin1: like what?
+[2013-07-17 13:05:02] Dude-X: the package line
+[2013-07-17 13:05:19] llaskin1: now i get: java: package org.openqa.selenium does not exist
+[2013-07-17 13:05:39] Dude-X: is selenium in your java classpath?
+[2013-07-17 13:06:10] llaskin1: the selenium jar is in the external libraries in a subfolder called packages
+[2013-07-17 13:07:06] Dude-X: it should probably be in your "project"
+[2013-07-17 13:07:40] Dude-X: honestly although i did web driver stuff in Java in the past, I am not too familiar with the fine details of setting up a proper java project
+[2013-07-17 13:08:15] llaskin1: its annoying honestly, that this si probably the thing in the past that has most deterred me from doing another language....
+[2013-07-17 13:08:19] llaskin1: cuz i can't setup a proper project
+[2013-07-17 13:08:56] sburjan, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 13:09:05] SamuraiJack_, quitting. (Quit: Konversation terminated!)
+[2013-07-17 13:09:39] santiycr, joining. (#selenium)
+[2013-07-17 13:09:39] Dude-X: you should be able to run a simple test with java -classpath=/path/to/seleniumj jar and the source code
+[2013-07-17 13:09:52] riv_, joining. (#selenium)
+[2013-07-17 13:10:17] santiycr1, joining. (#selenium)
+[2013-07-17 13:10:19] llaskin1: yes but i am trying to do it with IntelliJ
+[2013-07-17 13:10:21] llaskin1: not with command line
+[2013-07-17 13:13:58] santiycr, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 13:15:36] Dude-X: you will have to set the  project classpath
+[2013-07-17 13:16:08] rebelagentm, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 13:18:05] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 13:18:09] llaskin1: where do I do that?
+[2013-07-17 13:21:24] santiycr1, quitting. (Quit: Leaving.)
+[2013-07-17 13:22:14] lukeis: right click your project,  open module settings,  add it in the Dependencies area
+[2013-07-17 13:22:58] lukeis: or just use maven instead ;)
+[2013-07-17 13:23:09] rebelagentm1, joining. (#selenium)
+[2013-07-17 13:23:46] lukeis: IntelliJ already has maven wired in ;)  (much to the chagrin of simon)
+[2013-07-17 13:30:07] riv_, quitting. (Remote host closed the connection)
+[2013-07-17 13:31:29] santiycr, joining. (#selenium)
+[2013-07-17 13:35:01] sburjan, joining. (#selenium)
+[2013-07-17 13:36:44] llaskin1: lukeis: yea i added selenium using the pom.xml that was provided @ seleniumHQ
+[2013-07-17 13:37:05] awilson820, joining. (#selenium)
+[2013-07-17 13:37:08] awilson820, quitting. (Client Quit)
+[2013-07-17 13:38:53] awilson820, joining. (#selenium)
+[2013-07-17 13:39:34] llaskin1: huzzah got it
+[2013-07-17 13:39:35] llaskin1: ok
+[2013-07-17 13:40:52] brettporter, quitting. (Quit: brettporter)
+[2013-07-17 13:41:52] jimevans, quitting. (Quit: Leaving.)
+[2013-07-17 13:43:32] qaguy, joining. (#selenium)
+[2013-07-17 13:46:25] llaskin1: so given that you want to modularize etc, I currently have a global for my driver instance which gets passed around between multiple files.  How do the rest of you do it?  Do you just constantly pass the driver instance into each method you create?
+[2013-07-17 13:49:54] tedwards_, quitting. (Remote host closed the connection)
+[2013-07-17 13:54:10] nhirata, joining. (#selenium)
+[2013-07-17 13:55:53] santiycr, quitting. (Quit: Leaving.)
+[2013-07-17 13:58:46] farlan, leaving. (#selenium)
+[2013-07-17 14:00:26] Zac__, joining. (#selenium)
+[2013-07-17 14:01:32] lukeis: llaskin1: no… I follow the PageObject pattern, when a PageObject is constructed it takes a driver (then sets it as a private variable and is able to use it with subsequent method calls)
+[2013-07-17 14:03:21] zac_sel_, quitting. (Ping timeout: 245 seconds)
+[2013-07-17 14:03:36] zac_sel_, joining. (#selenium)
+[2013-07-17 14:04:41] Zac__, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 14:08:20] Prometheian, quitting. (Quit: ChatZilla 0.9.90.1 [Firefox 22.0/20130618035212])
+[2013-07-17 14:09:19] tourdedave, joining. (#selenium)
+[2013-07-17 14:10:43] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 14:11:18] davidlai, joining. (#selenium)
+[2013-07-17 14:14:16] tourdedave, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 14:18:42] llaskin1, quitting. (Quit: Leaving.)
+[2013-07-17 14:21:40] santiycr, joining. (#selenium)
+[2013-07-17 14:25:07] KaibutsuX_dopple, joining. (#selenium)
+[2013-07-17 14:26:53] zac_sel_, quitting. (Read error: Connection reset by peer)
+[2013-07-17 14:27:17] zac_sel_, joining. (#selenium)
+[2013-07-17 14:27:33] AutomatedTester: good night all
+[2013-07-17 14:27:45] lukeis: nighty night
+[2013-07-17 14:28:08] KaibutsuX, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 14:34:07] richdownie, quitting. (Quit: richdownie)
+[2013-07-17 14:35:15] admc, quitting. (Quit: Leaving.)
+[2013-07-17 14:36:07] Selenium-Git, joining. (#selenium)
+[2013-07-17 14:36:07] Selenium-Git, leaving. (#selenium)
+[2013-07-17 14:36:07] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/m4SLWA
+[2013-07-17 14:36:07] Selenium-Git: 13selenium/06master 1493acf07 15Jim Evans: Adding ability to set external GhostDriver implementation in .NET bindings...
+[2013-07-17 14:36:22] rebelagentm, joining. (#selenium)
+[2013-07-17 14:36:32] rebelagentm1, quitting. (Quit: Leaving.)
+[2013-07-17 14:39:32] richdownie, joining. (#selenium)
+[2013-07-17 14:43:47] nhirata, quitting. (Quit: nhirata)
+[2013-07-17 14:44:38] aweiteka, quitting. (Ping timeout: 264 seconds)
+[2013-07-17 14:47:41] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 14:53:54] qaguy, joining. (#selenium)
+[2013-07-17 14:54:35] rebelagentm1, joining. (#selenium)
+[2013-07-17 14:55:48] rebelagentm, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 14:59:21] testingb0t, quitting. (Quit: Leaving.)
+[2013-07-17 15:01:32] brettporter, joining. (#selenium)
+[2013-07-17 15:03:32] qaguy, quitting. (Quit: Leaving.)
+[2013-07-17 15:04:53] zac_sel_, quitting. (Read error: Connection reset by peer)
+[2013-07-17 15:05:18] zac_sel_, joining. (#selenium)
+[2013-07-17 15:06:17] cgoldberg, quitting. (Quit: Ex-Chat)
+[2013-07-17 15:19:43] jibay, joining. (#selenium)
+[2013-07-17 15:28:53] bluescreen100, quitting. (Remote host closed the connection)
+[2013-07-17 15:29:06] sburjan, quitting. (Ping timeout: 260 seconds)
+[2013-07-17 15:31:28] richdownie, quitting. (Quit: richdownie)
+[2013-07-17 15:33:49] sfbrian, quitting. (Read error: Connection reset by peer)
+[2013-07-17 15:36:40] richdownie, joining. (#selenium)
+[2013-07-17 15:36:49] intchanter-work, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:38:45] llaskin, joining. (#selenium)
+[2013-07-17 15:38:49] davehunt, joining. (#selenium)
+[2013-07-17 15:39:53] phasze: can't type "&" in a field with autocomplete :(
+[2013-07-17 15:41:20] ShawnM_, joining. (#selenium)
+[2013-07-17 15:41:36] KaibutsuX, joining. (#selenium)
+[2013-07-17 15:42:11] cmcgraw_, joining. (#selenium)
+[2013-07-17 15:42:21] jrendell_, joining. (#selenium)
+[2013-07-17 15:43:40] o3u_, joining. (#selenium)
+[2013-07-17 15:46:39] coreyg, quitting. (Quit: coreyg)
+[2013-07-17 15:47:33] cmcgraw, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:33] Silne30, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:34] o3u, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:34] KaibutsuX_dopple, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:34] jillio, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:34] ShawnM, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:35] jrendell, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 15:47:35] cmcgraw_, changing nick to cmcgraw.
+[2013-07-17 15:47:36] jrendell_, changing nick to jrendell.
+[2013-07-17 15:48:02] jillio, joining. (#selenium)
+[2013-07-17 15:48:08] llaskin, quitting. (Quit: Leaving.)
+[2013-07-17 15:49:01] stackedsax1, quitting. (Ping timeout: 276 seconds)
+[2013-07-17 15:53:45] richdownie, quitting. (Quit: richdownie)
+[2013-07-17 15:54:14] richdownie, joining. (#selenium)
+[2013-07-17 15:54:14] richdownie, quitting. (Client Quit)
+[2013-07-17 15:54:20] stackedsax1, joining. (#selenium)
+[2013-07-17 16:04:24] lukeis, quitting. (Quit: Leaving.)
+[2013-07-17 16:08:29] mbersoult_away, quitting. (Ping timeout: 252 seconds)
+[2013-07-17 16:13:54] Dude-X, quitting. (Quit: Dude-X)
+[2013-07-17 16:14:07] mbersoult, joining. (#selenium)
+[2013-07-17 16:21:05] ShawnM_, quitting. (Remote host closed the connection)
+[2013-07-17 16:25:22] JackDandy, quitting. (Read error: Connection reset by peer)
+[2013-07-17 16:25:40] smccarthy, quitting. (Remote host closed the connection)
+[2013-07-17 16:26:00] JackDandy, joining. (#selenium)
+[2013-07-17 16:32:01] jleyba, quitting. (Quit: Leaving)
+[2013-07-17 16:32:55] cheezy, joining. (#selenium)
+[2013-07-17 16:38:35] peret, joining. (#selenium)
+[2013-07-17 16:38:48] asavchuk, joining. (#selenium)
+[2013-07-17 16:44:47] coreyg, joining. (#selenium)
+[2013-07-17 16:45:08] coreyg, leaving. (#selenium)
+[2013-07-17 16:45:22] davehunt, quitting. (Remote host closed the connection)
+[2013-07-17 16:47:52] farlan, joining. (#selenium)
+[2013-07-17 16:48:03] hirani, leaving. (#selenium)
+[2013-07-17 16:53:46] ryanpetrello, quitting. (Remote host closed the connection)
+[2013-07-17 16:56:54] cheezy, quitting. (Remote host closed the connection)
+[2013-07-17 16:58:31] foundatron, quitting. (Quit: Later)
+[2013-07-17 17:02:33] cmcgraw, quitting. (Quit: cmcgraw)
+[2013-07-17 17:25:17] zac_sel_, quitting. (Read error: Connection reset by peer)
+[2013-07-17 17:31:39] ShawnM, joining. (#selenium)
+[2013-07-17 17:35:56] ShawnM, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 17:50:08] stackedsax1, quitting. (Quit: Leaving.)
+[2013-07-17 17:50:12] dhenry, quitting. (Remote host closed the connection)
+[2013-07-17 17:51:35] ShawnM, joining. (#selenium)
+[2013-07-17 17:52:32] santiycr1, joining. (#selenium)
+[2013-07-17 17:56:53] santiycr, quitting. (Ping timeout: 268 seconds)
+[2013-07-17 18:01:48] jackdaniella, joining. (#selenium)
+[2013-07-17 18:02:25] jackdaniella: Does anyone know the answer to this question
+[2013-07-17 18:02:26] jackdaniella: http://stackoverflow.com/questions/17710817/how-to-capture-traffic-in-python
+[2013-07-17 18:07:11] jackdaniella: I can send money to whomever can help answer the question above
+[2013-07-17 18:07:20] jackdaniella: Im in deep shit and need to figure this out
+[2013-07-17 18:09:41] jibay, quitting. (Remote host closed the connection)
+[2013-07-17 18:10:32] santiycr, joining. (#selenium)
+[2013-07-17 18:13:50] santiycr1, quitting. (Ping timeout: 260 seconds)
+[2013-07-17 18:14:24] stackedsax, joining. (#selenium)
+[2013-07-17 18:21:36] santiycr, quitting. (Quit: Leaving.)
+[2013-07-17 18:22:08] richdownie, joining. (#selenium)
+[2013-07-17 18:22:44] santiycr, joining. (#selenium)
+[2013-07-17 18:25:39] ryanpetrello, joining. (#selenium)
+[2013-07-17 18:36:04] ShawnM, quitting. (Remote host closed the connection)
+[2013-07-17 18:38:50] jackdaniella: Please :)
+[2013-07-17 18:40:29] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 18:45:06] shawnkni_, joining. (#selenium)
+[2013-07-17 18:45:51] shawnkni_, leaving. (#selenium)
+[2013-07-17 18:46:45] Dude-X_: jackdaniella: you can use something like the browser inspector (like Firebug or Chrome Inspector) to see all those details
+[2013-07-17 18:46:49] Dude-X_: without using something like webdriver
+[2013-07-17 18:47:54] llaskin, joining. (#selenium)
+[2013-07-17 18:47:55] shawnknight_, joining. (#selenium)
+[2013-07-17 18:52:29] shawnknight_, leaving. (#selenium)
+[2013-07-17 18:52:57] shawnknight_, joining. (#selenium)
+[2013-07-17 18:53:08] jrendell, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 18:53:55] ryanpetrello, quitting. (Remote host closed the connection)
+[2013-07-17 18:55:48] shawnknight_: hello
+[2013-07-17 18:56:34] llaskin1, joining. (#selenium)
+[2013-07-17 18:58:42] jackdaniella: @Dude-X: I need this to be scripted. Im using a python model to do this and I have millions of urls to check
+[2013-07-17 18:59:32] llaskin, quitting. (Ping timeout: 248 seconds)
+[2013-07-17 19:02:56] jackdaniella, quitting. (Ping timeout: 250 seconds)
+[2013-07-17 19:04:42] shawnknight_, quitting. (Remote host closed the connection)
+[2013-07-17 19:07:52] davidlai, joining. (#selenium)
+[2013-07-17 19:16:03] santiycr, quitting. (Quit: Leaving.)
+[2013-07-17 19:21:18] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 19:21:21] stackedsax, quitting. (Quit: Leaving.)
+[2013-07-17 19:23:54] santiycr, joining. (#selenium)
+[2013-07-17 19:32:11] lukeis, joining. (#selenium)
+[2013-07-17 19:35:20] davidlai, joining. (#selenium)
+[2013-07-17 19:36:06] Selenium-Git, joining. (#selenium)
+[2013-07-17 19:36:06] Selenium-Git, leaving. (#selenium)
+[2013-07-17 19:36:06] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/tdgf-A
+[2013-07-17 19:36:06] Selenium-Git: 13selenium/06master 14c7f4a96 15Alexandr Savchuk: Remove handling of create-forceprocess and ie-switches arguments....
+[2013-07-17 19:37:24] lukeis, quitting. (Read error: Connection reset by peer)
+[2013-07-17 19:37:47] lukeis, joining. (#selenium)
+[2013-07-17 19:39:01] ShawnM, joining. (#selenium)
+[2013-07-17 19:39:02] lukeis, quitting. (Read error: Connection reset by peer)
+[2013-07-17 19:39:33] lukeis, joining. (#selenium)
+[2013-07-17 19:39:33] smccarthy, joining. (#selenium)
+[2013-07-17 19:45:49] smccarthy, quitting. (Remote host closed the connection)
+[2013-07-17 19:50:46] davidlai, quitting. (Quit: Leaving.)
+[2013-07-17 19:54:14] seljenkinsbot: Project Chrome Linux Java Tests build #2738: FIXED in 7 min 46 sec: http://ci.seleniumhq.org:8080/job/Chrome%20Linux%20Java%20Tests/2738/
+[2013-07-17 19:58:41] santiycr, quitting. (Quit: Leaving.)
+[2013-07-17 19:59:17] santiycr, joining. (#selenium)
+[2013-07-17 20:00:13] santiycr, quitting. (Client Quit)
+[2013-07-17 20:02:53] awilson820, quitting. (Quit: Leaving.)
+[2013-07-17 20:06:23] richdownie, quitting. (Quit: richdownie)
+[2013-07-17 20:19:49] lukeis1, joining. (#selenium)
+[2013-07-17 20:19:49] lukeis, quitting. (Read error: Connection reset by peer)
+[2013-07-17 20:20:21] llaskin1, quitting. (Quit: Leaving.)
+[2013-07-17 20:33:48] whhone, joining. (#selenium)
+[2013-07-17 20:55:07] ShawnM, quitting. (Remote host closed the connection)
+[2013-07-17 21:01:13] asavchuk, quitting. (Quit: bye everyone)
+[2013-07-17 21:09:39] whhone, quitting. (Remote host closed the connection)
+[2013-07-17 21:12:07] stackedsax1, joining. (#selenium)
+[2013-07-17 21:15:52] whhone, joining. (#selenium)
+[2013-07-17 21:32:40] ShawnM, joining. (#selenium)
+[2013-07-17 21:48:48] stephend, quitting. (Remote host closed the connection)
+[2013-07-17 21:49:22] stephend, joining. (#selenium)
+[2013-07-17 21:53:01] seljenkinsbot: Project IE 9 Java Tests build #2704: FIXED in 10 min: http://ci.seleniumhq.org:8080/job/IE%209%20Java%20Tests/2704/
+[2013-07-17 21:53:14] davidlai, joining. (#selenium)
+[2013-07-17 21:53:19] stephend, quitting. (Ping timeout: 240 seconds)
+[2013-07-17 21:55:57] whhone, quitting. (Remote host closed the connection)
+[2013-07-17 22:25:20] stackedsax1, quitting. (Quit: Leaving.)
+[2013-07-17 22:35:09] SamuraiJack_, joining. (#selenium)
+[2013-07-17 22:36:13] lukeis1, quitting. (Quit: Leaving.)
+[2013-07-17 22:45:54] stephend, joining. (#selenium)
+[2013-07-17 22:48:01] rananda, joining. (#selenium)
+[2013-07-17 22:54:45] stephend, quitting. (Remote host closed the connection)
+[2013-07-17 22:55:11] stephend, joining. (#selenium)
+[2013-07-17 22:59:37] stephend, quitting. (Ping timeout: 245 seconds)
+[2013-07-17 23:06:39] sburjan, joining. (#selenium)
+[2013-07-17 23:25:41] stephend, joining. (#selenium)
+[2013-07-17 23:31:39] m3taflux, joining. (#selenium)
+[2013-07-17 23:32:12] m3taflux: hello guyz, i have a simple question, how to take screenshot on failure?
+[2013-07-17 23:33:47] stephend, quitting. (Ping timeout: 245 seconds)
+[2013-07-17 23:36:19] testingb0t, joining. (#selenium)
+[2013-07-17 23:39:11] testingb0t, quitting. (Client Quit)
+[2013-07-17 23:40:28] barancev, quitting. (Ping timeout: 246 seconds)
+[2013-07-17 23:42:09] m3taflux, quitting. (Quit: Page closed)
+[2013-07-17 23:54:13] barancev, joining. (#selenium)

@@ -1,0 +1,492 @@
+2011-04-26T00:00:56  *** amitev2 is now known as amitev
+2011-04-26T00:01:39  *** zmijunkie has joined #selenium
+2011-04-26T00:09:23  *** towski has joined #selenium
+2011-04-26T00:11:54  *** ovnimancer has joined #selenium
+2011-04-26T00:15:29  *** zmijunkie has quit IRC
+2011-04-26T00:21:00  *** towski has quit IRC
+2011-04-26T00:21:46  *** zmijunkie has joined #selenium
+2011-04-26T00:29:26  *** csanchez has joined #selenium
+2011-04-26T00:33:09  *** ammar01 has joined #selenium
+2011-04-26T00:42:34  *** udesh has quit IRC
+2011-04-26T01:02:30  *** HolyGoat has joined #selenium
+2011-04-26T01:06:17  *** zmijunkie has quit IRC
+2011-04-26T01:07:50  *** zmijunkie has joined #selenium
+2011-04-26T01:08:05  *** mashiara has joined #selenium
+2011-04-26T01:08:47  <HolyGoat> Something weird happening. Through Selenium RC I fire a click() followed by a wait_for_page_to_load(). The click executes fine, and I see the page opening. After that, it just keeps waiting and eventually results in a timeout.
+2011-04-26T01:09:18  *** dave_miles has joined #selenium
+2011-04-26T01:10:17  <HolyGoat> Anyone experienced this before? What could be the cause?
+2011-04-26T01:17:57  *** freynaud has joined #selenium
+2011-04-26T01:50:23  *** vrockai_ has joined #selenium
+2011-04-26T02:31:40  *** amitev has quit IRC
+2011-04-26T02:38:38  *** csanchez has quit IRC
+2011-04-26T02:41:55  *** nirvdrum has quit IRC
+2011-04-26T02:48:19  *** amitev has joined #selenium
+2011-04-26T03:09:27  *** miker2 has quit IRC
+2011-04-26T03:41:49  *** csanchez has joined #selenium
+2011-04-26T03:45:00  *** nirvdrum has joined #selenium
+2011-04-26T03:46:23  *** csanchez has quit IRC
+2011-04-26T03:48:42  *** csanchez has joined #selenium
+2011-04-26T04:01:27  *** sjmikem has quit IRC
+2011-04-26T04:02:25  *** skiphuffman_ has joined #selenium
+2011-04-26T04:09:26  *** kylls has joined #selenium
+2011-04-26T04:09:26  *** kylls has joined #selenium
+2011-04-26T04:43:37  *** toseter has joined #selenium
+2011-04-26T04:44:48  *** bebef_1987 has joined #selenium
+2011-04-26T04:51:09  *** miker2 has joined #selenium
+2011-04-26T04:51:45  *** ovnimancer has quit IRC
+2011-04-26T04:53:43  *** ovnimancer has joined #selenium
+2011-04-26T04:58:57  <HolyGoat> Hm. Am I understanding correctly that wait_for_page_to_load() is no longer necessary as of webdriver?
+2011-04-26T05:06:00  <jarib> HolyGoat: yes and no. there's no such method in the webdriver api, but that doesn't mean you never have to wait for things
+2011-04-26T05:06:21  <jarib> what language do you use?
+2011-04-26T05:07:02  <jarib> there are other mechanisms for waiting with webdriver
+2011-04-26T05:08:52  *** RossPatterson has joined #selenium
+2011-04-26T05:08:59  <ato> jarib: How do you trigger things like mouseMove() from watir-webdriver?
+2011-04-26T05:11:37  <bebef_1987> hy guys
+2011-04-26T05:12:21  <bebef_1987> i need to verify the favicon of a website with selenium
+2011-04-26T05:12:51  <jarib> ato: i don't, yet
+2011-04-26T05:13:00  <bebef_1987> dose anyone know how to do that?
+2011-04-26T05:13:01  <jarib> mostly because there's no implementation for firefox/chrome atm
+2011-04-26T05:13:29  <jarib> bebef_1987: i'd probably just skip selenium and use a HTTP lib to get /favicon.ico
+2011-04-26T05:13:46  <HolyGoat> jarib: I see. So letting the script sleep is the solution?
+2011-04-26T05:13:49  <HolyGoat> I use Python.
+2011-04-26T05:14:06  <jarib> HolyGoat: no, sleeping is always bad
+2011-04-26T05:14:09  <ato> jarib: Some time ago I changed our #fire_event implementation from using the advanced user interactions API to using JS injection of events because that's what you expect when you tell it to “fire an event”.
+2011-04-26T05:14:22  <ato> jarib: So I'm considering how we should expose the “native” stuff.
+2011-04-26T05:14:39  <HolyGoat> jarib: What would be a better solution?
+2011-04-26T05:15:18  <ato> Explicit waiting, maybe.
+2011-04-26T05:15:25  <jarib> HolyGoat: you can either configure implicit waits or wait explicitly
+2011-04-26T05:15:37  <jarib> i prefer the latter, and in ruby/java/c# we have helpers for that
+2011-04-26T05:15:49  <jarib> not sure what the situation is in python
+2011-04-26T05:16:31  <jarib> but basically you have some code that does   wait_until { some_element.is_visible() }
+2011-04-26T05:16:57  <jarib> and it polls the DOM for to be in the expected state, or times out
+2011-04-26T05:17:20  <HolyGoat> I'll see if I can find something like this for the webdriver api in python, thanks
+2011-04-26T05:17:38  <jarib> implicit waits means that it will always poll up until a specified timeout whenever you call driver.find_element()
+2011-04-26T05:18:02  <jarib> that can be configured from python i think
+2011-04-26T05:18:50  <jarib> though it shouldn't be hard to write a wait_until equivalent in python
+2011-04-26T05:20:23  <jarib> ato: right. i think Element#{hover,context_click,double_click} etc makes sense from a watir POV
+2011-04-26T05:21:52  <jarib> but for some of the more advanced stuff, not sure we can do any better than what is in webdriver
+2011-04-26T05:21:58  <RossPatterson> bebef_1987: In Selenium IDE and Selenium RC, you can't check the favicon.  Selenium 2's WebDriver API might be able to do this, but I don't know for sure.
+2011-04-26T05:22:46  <ato> jarib: And consequently Element#mouse_move, etc.?
+2011-04-26T05:23:02  <jarib> ato: most of the use cases for fire_event is obsoleted by native events, really
+2011-04-26T05:23:12  <jarib> ato: that would be #hover
+2011-04-26T05:23:33  <ato> Right, but we still want to keep #fire_event, I hope?
+2011-04-26T05:24:20  <jarib> ideally the native event stuff was so good cross-platform/browser that we could remove it
+2011-04-26T05:24:51  <ato> I think there's still a use case for being able to trigger synthetic events.
+2011-04-26T05:24:52  <jarib> so if there are use cases for fire_event that wouldn't be solved by proper native events, i'd love to hear them :)
+2011-04-26T05:24:56  <bebef_1987> RossPatterson:  I m using Selenium RC....
+2011-04-26T05:25:24  <ato> jarib: If you want to test ECMAscript events.
+2011-04-26T05:25:55  <ato> You have a button, you want to check that native mouseOver and synthetic mouseOver both triggers action.
+2011-04-26T05:26:13  *** mbeierl has joined #selenium
+2011-04-26T05:26:33  <jarib> ato: ahh
+2011-04-26T05:26:50  <ato> I mean, fire_event is just a helper; but a useful one.
+2011-04-26T05:26:55  *** cburroughs has joined #selenium
+2011-04-26T05:26:58  <jarib> i see how that would be useful to you guys
+2011-04-26T05:27:02  <ato> We could still do execute_script or something.
+2011-04-26T05:27:17  <ato> Yeah.
+2011-04-26T05:27:30  <jarib> yeah, since that's basically what fire_event is doing
+2011-04-26T05:27:33  <ato> It's very explicit for us that native and emulated events are not the same thing.
+2011-04-26T05:28:50  <jarib> yep
+2011-04-26T05:36:51  <RossPatterson> bebef_1987: Sorry, then, you'll have to do that outside Selenium, as jarib suggested.
+2011-04-26T05:37:41  <bebef_1987> Yep... I will try jarib 's way
+2011-04-26T05:38:52  <jarib> webdriver doesn't have anything to test favicons either.
+2011-04-26T05:39:40  <ato> I've heard a lot of people request that.
+2011-04-26T05:40:00  <ato> That's essentially a UI thing, though.
+2011-04-26T05:43:20  <RossPatterson> Agreed, it's kinda outside the Selenium baliwick, but given how deeply WebDriver is integrated into the browsers, I didn't know if it could handle it.  I wouldn't have been surprised if it could :-)
+2011-04-26T05:47:55  <ato> We will probably add support for doing this in OperaDesktopDriver, but that's an extension of WebDriver specifically for doing UI testing.
+2011-04-26T05:49:19  *** adamgoucher has quit IRC
+2011-04-26T05:59:40  *** nirvdrum has quit IRC
+2011-04-26T06:00:32  *** nirvdrum has joined #selenium
+2011-04-26T06:02:05  *** nirvdrum has joined #selenium
+2011-04-26T06:09:02  <HolyGoat> Now back to my Selenium 1 tests. Anyone have an idea why a wait_for_page_to_load() is causing a timeout after invoking a click()?
+2011-04-26T06:10:15  <RossPatterson> HolyGoat: Are you sure the page actually gets reloaded?  If the click() merely modifies the page (e.g., in some AJAXy fashion), that will happen.
+2011-04-26T06:10:48  *** adamgoucher has joined #selenium
+2011-04-26T06:10:49  <HolyGoat> RossPatterson: Hm.. this may be the case.
+2011-04-26T06:11:37  <HolyGoat> So it would be better to wait for an element to load?
+2011-04-26T06:12:07  <RossPatterson> If it's an AJAXy interaction, yes.
+2011-04-26T06:12:56  <HolyGoat> This site I'm testing is a complete Ajax mess. It also uses '#' in the URLs.
+2011-04-26T06:13:17  <RossPatterson> :-) Then that'll probably work.
+2011-04-26T06:14:48  *** aculich has quit IRC
+2011-04-26T06:16:28  *** aculich_ has joined #selenium
+2011-04-26T06:18:02  <HolyGoat> Yuk, that's going to require a bunch of custom javascript code.
+2011-04-26T06:18:20  *** dmachi1 has quit IRC
+2011-04-26T06:18:34  *** dmachi has joined #selenium
+2011-04-26T06:23:02  <RossPatterson> Not necessarily.  Waiting for an element to appear is easy.  We wrap our code up into a wrapper called WaitForElementPresent(locator, timeout), but it boils down to selenium.WaitForCondition("selenium.isElementPresent(\"" + locator.Replace("\"", "\\\"") + "\");", timeout);
+2011-04-26T06:23:41  <ato> Is the timeout required?
+2011-04-26T06:23:45  <ato> Or is there a default value?
+2011-04-26T06:23:47  <RossPatterson> The locator.Replace() is to make sure that any double-quotes in the locator get escaped before the JavaScript is created.
+2011-04-26T06:25:20  <RossPatterson> ato: Yes.
+2011-04-26T06:25:36  <RossPatterson> DOH!  "Yes, it is required."
+2011-04-26T06:25:47  <ato> Bad question (-;
+2011-04-26T06:30:34  *** jimevans has joined #selenium
+2011-04-26T06:30:56  <jimevans> jarib: ping
+2011-04-26T06:37:33  <jarib> jimevans: pong
+2011-04-26T06:37:53  <jimevans> got a sec to help me troubleshoot a ruby environment issue?
+2011-04-26T06:38:01  <jarib> sure
+2011-04-26T06:38:14  <jimevans> i've done a 'go //rb:ie'
+2011-04-26T06:38:21  <jarib> ok
+2011-04-26T06:38:40  <jimevans> then i cd into the build/rb/lib directory
+2011-04-26T06:39:20  <jarib> mhm
+2011-04-26T06:39:24  <HolyGoat> RossPatterson: Thanks! I'm doing this through RC though. This would require me to reference selenium.browserbot.getCurrentWindow(), correct?
+2011-04-26T06:39:25  <jimevans> if i go into irb at that point (Ruby 1.9.2p180), and try require 'selenium-webdriver', i receive "no such file to load"
+2011-04-26T06:39:56  <jarib> jimevans: ruby 1.9 doesn't append the current working dir to $LOAD_PATH
+2011-04-26T06:40:07  <jimevans> that'd explain it then.
+2011-04-26T06:40:19  <jarib> jimevans: what i usually do is stay in the top dir and include it on the load path with -I
+2011-04-26T06:40:29  <jarib> so `irb -I build\rb\lib -r selenium-webdriver`
+2011-04-26T06:40:29  <RossPatterson> HolyGoat: It would, if you were doing something in JavaScript that referenced "window".  In this case, we're calling a Selenium API function directly, so there's no need to do that.
+2011-04-26T06:40:33  <jarib> and you should be all set
+2011-04-26T06:40:52  <jimevans> gotcha. that should get me going. thatnks
+2011-04-26T06:40:59  <jimevans> s/thatnks/thanks
+2011-04-26T06:41:08  <jarib> s/include it/include the lib dir/
+2011-04-26T06:41:15  <jarib> np :)
+2011-04-26T06:45:24  <HolyGoat> RossPatterson: Ah, so to recap - you subclassed the driver, added your own WaitForElementPresent() which calls the waitForCondition() like that?
+2011-04-26T06:48:40  <RossPatterson> Essentially, yes.  In actual fact, we wrote a C# wrapper class, because we do a lot of error handling to get good diagnostic information when RC throws an exception.
+2011-04-26T06:49:52  *** ovnimancer has quit IRC
+2011-04-26T06:50:40  <HolyGoat> RossPatterson: It seems like we do some overlapping work :) What I do is subclassing the driver and wrap benchmarking code around methods that are relevant for benchmarking.
+2011-04-26T06:53:12  <RossPatterson> We chose a wrapper class because we were going to modify almost every method in some way or another.  Most importantly, we wrap every RC call in a try/catch that then captures screenshots on failure and looks for common errors our application can throw, because they're useful in diagnosing test failures.  As a result, we very rarely look at the execution log of a failed test - the exception and the diagnostic data is usually suffi
+2011-04-26T06:54:54  <HolyGoat> RossPatterson: So basically you wrap and rethrow exceptions that you get back from the driver?
+2011-04-26T07:00:58  <RossPatterson> Yup.  We wrap every RC client method with a call to TryWithScreenCapture(cmd), which is implemented as:
+2011-04-26T07:00:58  <RossPatterson> try
+2011-04-26T07:00:59  <RossPatterson> {
+2011-04-26T07:00:59  <RossPatterson> return cmd();
+2011-04-26T07:00:59  <RossPatterson> }
+2011-04-26T07:00:59  <RossPatterson> catch (Exception e)
+2011-04-26T07:00:59  <RossPatterson> {
+2011-04-26T07:01:00  <RossPatterson> CheckCommonProblems();
+2011-04-26T07:01:00  <RossPatterson> CaptureArtifacts();
+2011-04-26T07:01:01  <RossPatterson> throw;
+2011-04-26T07:01:01  <RossPatterson> }
+2011-04-26T07:03:12  <RossPatterson> CheckCommonProblems() looks for things like session timed out, unexpected JavaScript alert, our "A bad thing happened, please retry" message, and a few others, and turns them into specific expcetions of our own creation.
+2011-04-26T07:03:43  <HolyGoat> Very cool!
+2011-04-26T07:04:10  <RossPatterson> CaptureArtifacts() snaps screenshots of all the open windows, and collects the page's original HTML and current DOM.
+2011-04-26T07:04:13  <HolyGoat> Will this ever be part of Selenium?
+2011-04-26T07:04:48  <RossPatterson> I doubt it.  All of this is for the RC API, and the WebDriver API is the official way of the future.
+2011-04-26T07:06:16  <mashiara> I'm actually working on something similar with python and webdriver
+2011-04-26T07:06:51  <mashiara> basically on my test methods (using python unittest) I have decorators in style of @dump_source_on_failure @screenshot_on_failure
+2011-04-26T07:06:54  <HolyGoat> mashiara: That sounds interesting, particularly as Python is my weapon of choice too :)
+2011-04-26T07:07:42  <HolyGoat> mashiara: Do you also wrap exception messages and rethrow more specific exceptions?
+2011-04-26T07:07:53  <mashiara> right now all the code is in a private repo as I haven't had the time to refactor the client-specific stuff out but in a few weeks maybe.
+2011-04-26T07:08:05  <mashiara> not yet, but I could do it if I wanted
+2011-04-26T07:08:42  <RossPatterson> Our primary reason for doing this is that we run about 900 RC tests automatically on every commit.  Our test grid (based on JetBrains' TeamCity system) has to operate without human intervention or observation.
+2011-04-26T07:09:30  <HolyGoat> That would open up some possibilities, especially in regard to monitoring. Although maybe a bit fragile if it would depend on textual messages.
+2011-04-26T07:09:34  <HolyGoat> RossPatterson: whoa.
+2011-04-26T07:10:39  <RossPatterson> Yeah, it takes about 15 jobs and 30 minutes, but it's an awesome canary-in-the-coal-mine.
+2011-04-26T07:11:52  <HolyGoat> I can imagine. I'm trying to use Selenium for (fairly tight) integration with Nagios/Opsview
+2011-04-26T07:12:41  <HolyGoat> There is some stuff available, but the current solutions just run the test as one unit test. I want performance data over specific steps, readable test results in case of errors etc.
+2011-04-26T07:31:46  <HolyGoat> RossPatterson: Your solution worked like a charm, thanks!
+2011-04-26T07:33:31  <jimevans> jarib: sent you a reply about that watir issue.
+2011-04-26T07:35:00  <jimevans> i've an addendum to that reply though... i only checked IE9. :)
+2011-04-26T07:37:36  *** lfryc has quit IRC
+2011-04-26T07:37:52  <RossPatterson> HolyGoat: Glad to hear it.
+2011-04-26T07:40:05  *** lfryc has joined #selenium
+2011-04-26T07:40:54  <Archdude> good morning everyone
+2011-04-26T07:41:05  <RossPatterson> Good morning.
+2011-04-26T07:56:24  *** grzyweasel has joined #selenium
+2011-04-26T08:01:59  *** rbalent has quit IRC
+2011-04-26T08:06:06  *** vrockai_ has quit IRC
+2011-04-26T08:12:03  *** Archdude has quit IRC
+2011-04-26T08:20:21  *** jimevans has quit IRC
+2011-04-26T08:22:35  *** andytinkham has joined #selenium
+2011-04-26T08:24:27  *** sjmikem has joined #selenium
+2011-04-26T08:31:10  *** zmijunkie has quit IRC
+2011-04-26T08:31:53  *** Archdude has joined #selenium
+2011-04-26T08:45:19  *** bebef_1987 has quit IRC
+2011-04-26T08:51:33  <kylls> Archdude, robinsmidsrod morn
+2011-04-26T08:52:17  <robinsmidsrod> kylls: got something to say?
+2011-04-26T08:52:46  <kylls> robinsmidsrod, no
+2011-04-26T08:52:47  <kylls> thanks ;)
+2011-04-26T08:52:49  *** lfryc has quit IRC
+2011-04-26T08:53:42  <kylls> I say, only Good Morning!
+2011-04-26T08:54:49  *** toseter has quit IRC
+2011-04-26T08:55:10  *** lfryc has joined #selenium
+2011-04-26T08:55:35  *** toseter has joined #selenium
+2011-04-26T08:56:08  *** pnitin has quit IRC
+2011-04-26T08:56:15  <xirkus> anyone else seeing strange Grid behavior with the latest code; specifically having webdriver instances not being recognized by the grid?
+2011-04-26T08:59:39  <xirkus> never mind. I forgot to add the complete registration uri.
+2011-04-26T09:01:56  *** ahal has joined #selenium
+2011-04-26T09:04:11  *** amitev has quit IRC
+2011-04-26T09:04:26  *** brettporter has quit IRC
+2011-04-26T09:20:17  *** towski has joined #selenium
+2011-04-26T09:24:38  *** Spanktar has joined #selenium
+2011-04-26T09:29:27  *** towski has quit IRC
+2011-04-26T09:34:59  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: restoring support for external servlet on the hub. - http://code.google.com/p/selenium/source/detail?r=12072
+2011-04-26T09:40:57  *** sfbrian has joined #selenium
+2011-04-26T09:48:25  *** lfryc has quit IRC
+2011-04-26T10:07:50  *** udesh_ has joined #selenium
+2011-04-26T10:16:01  *** santiycr has joined #selenium
+2011-04-26T10:17:47  <melter> is there any work going in to improving the code generators in the ide?
+2011-04-26T10:26:11  *** esteele|away has quit IRC
+2011-04-26T10:28:55  *** pnitin has joined #selenium
+2011-04-26T10:31:32  <andytinkham> melter: I believe, though have no hard data to confirm, that the code generators are being changed to use the Selenium-webdriver interface. Not sure if that's what you're looking for for improvements though
+2011-04-26T10:34:31  *** pnitin has quit IRC
+2011-04-26T10:35:12  *** pnitin has joined #selenium
+2011-04-26T10:36:00  <adamgoucher> but those arent really 'improvements' in the traditional sense
+2011-04-26T10:37:34  *** esteele has joined #selenium
+2011-04-26T10:38:41  <andytinkham> True
+2011-04-26T10:39:30  <andytinkham> It does mean someone is looking at the code though, and so there's at least a possibility of further improvements
+2011-04-26T10:42:02  <selbot2> francois.reynaud 7 minutes ago - FrancoisReynaud: addign a test to debug timeout and re-registration of nodes. - http://code.google.com/p/selenium/source/detail?r=12073
+2011-04-26T10:44:24  *** cburroughs has quit IRC
+2011-04-26T10:44:41  *** cburroughs has joined #selenium
+2011-04-26T10:45:02  <freynaud> is google code down ?
+2011-04-26T10:45:45  <freynaud> I see the success message for a commit in this chat, but my success message is
+2011-04-26T10:45:46  <freynaud> svn: Commit failed (details follow):
+2011-04-26T10:45:46  <freynaud> svn: Commit failed unexpectedly --- please try again later (1)
+2011-04-26T10:45:46  <freynaud> svn: MERGE of '/svn/trunk/java/server/src/org/openqa/grid': 409 Conflict (https://selenium.googlecode.com)
+2011-04-26T10:45:50  <jarib> Project Hosting will be READ-ONLY Tuesday at 8:00am PST due to brief maintenance.
+2011-04-26T10:46:11  <freynaud> selbot2: francois.reynaud 7 minutes ago - FrancoisReynaud: addign a test to debug timeout and re-registration of nodes. - http://code.google.com/p/selenium/source/detail?r=12073
+2011-04-26T10:46:14  <jarib> right
+2011-04-26T10:46:18  <jarib> that's not good :P
+2011-04-26T10:46:22  <freynaud> did I write on a read only repo ? :)
+2011-04-26T10:46:29  <jarib> apparently
+2011-04-26T10:47:10  <jarib> and 8am PST was 3 hours ago
+2011-04-26T10:47:26  <freynaud> i cannot svn update either
+2011-04-26T10:49:29  <jarib> yeah, same here
+2011-04-26T10:59:49  *** udesh_ has quit IRC
+2011-04-26T11:01:20  <RossPatterson> melter: What don't you like about the current generated code?
+2011-04-26T11:17:23  *** ivog has joined #selenium
+2011-04-26T11:17:59  <ivog> It seems the selenium stackexchange site has been merged with software testing and QA
+2011-04-26T11:18:03  <ivog> :|
+2011-04-26T11:18:23  <sfbrian> :-/
+2011-04-26T11:19:00  <sfbrian> boo
+2011-04-26T11:21:15  *** plightbo_ has joined #selenium
+2011-04-26T11:23:29  <ivog> i wonder how that process went... some people from testing and qa propse a merge, some vote for it and it gets merged without consultation of the guy who proposed the selenium site in the first place... strange...
+2011-04-26T11:23:30  <jarib> ivog: what?
+2011-04-26T11:23:38  <jarib> link?
+2011-04-26T11:23:55  <ivog> http://area51.stackexchange.com/proposals/4693/selenium
+2011-04-26T11:24:32  <jarib> how did they merge it?
+2011-04-26T11:24:59  <ivog> i guess jeff attwood or some stackexchange moderator did the merge
+2011-04-26T11:26:08  <jarib> so everyone that committed to the Selenium stackexchange is now committed to the software testing and qa one?
+2011-04-26T11:26:21  <ivog> i guess so
+2011-04-26T11:27:01  <ivog> i wonder if there's some way things could be turned around probably not
+2011-04-26T11:27:03  <sfbrian> that seems wrong
+2011-04-26T11:27:13  <jleyba> jarib: do you know if the IE driver takes screenshots?
+2011-04-26T11:27:22  <andytinkham> Doesn't look like it quite -- I was already commited to both, but looking at the link, there's a side bar box that shows only 98.6% of people commited to the Selenium one are committed to the QA one (though maybe people have already started pulling their commitments to the QA one)
+2011-04-26T11:28:11  <jarib> jleyba: it does. though up until recently not the full page, and i haven't tried since
+2011-04-26T11:28:33  <melter> RossPatterson: bugs, lots of bugs
+2011-04-26T11:28:43  <jarib> jleyba: r12009
+2011-04-26T11:28:43  <melter> RossPatterson: often doesn't even compile
+2011-04-26T11:28:46  <selbot2> james.h.evans.jr 12 days ago - JimEvans: Implementing full-size screenshots in IE (up to 65536 x 65536 pixels) - http://code.google.com/p/selenium/source/detail?r=12009
+2011-04-26T11:29:19  <andytinkham> Though at that percentage, it looks like there's only 6 people who committed to the Se stackexchange that aren't committed to the QA one, so I'm guessing people might be pulling support after everyone was added.
+2011-04-26T11:29:53  <melter> RossPatterson: for java use of "number" instead of "Number", multiple declarations of the same variable name, use of variables ("${varname}") inside of "regex:", to name 3 off the top of my head
+2011-04-26T11:30:43  <melter> RossPatterson: and it's not just java, i looked at perl, ruby, python, they all have problems
+2011-04-26T11:30:59  <RossPatterson> melter: If the code doesn't compile, you should open up a bug report at http://code.google.com/p/selenium/issues/list.  That's not "improvement", that's "fix broken stuff".
+2011-04-26T11:31:20  *** XCulver has joined #selenium
+2011-04-26T11:32:00  <jarib> andytinkham: looks like i was automatically commited. i can uncommit from the ST/QA site now at least, and i didn't commit to it before
+2011-04-26T11:32:30  <andytinkham> jarib: Then I'd say that confirms everyone was ported over
+2011-04-26T11:33:07  <jarib> yep
+2011-04-26T11:33:44  <ivog> i'd probably be hard to reverse this...
+2011-04-26T11:34:36  <ivog> jeff attwood posted a message on the selenium site this would probaly be happening and asked to commit / uncommit accordingly, probably someone had to contact him directly in some way...
+2011-04-26T11:37:07  <jarib> so basically asking people to uncommit from the site they really want to see happen
+2011-04-26T11:37:28  <ivog> yea
+2011-04-26T11:38:01  <jarib> ah, at least they sent out an email about the merge
+2011-04-26T11:38:03  <ivog> i think he didn't realize that most of the people committed to the selenium proposal don't support this kind of merge
+2011-04-26T11:38:27  <ivog> heh, i did uncommit so i didn't receive anything :)
+2011-04-26T11:39:34  <ivog> ohwell google groups also has some new interface....
+2011-04-26T11:40:12  *** andytinkham has quit IRC
+2011-04-26T11:40:21  *** andytinkham has joined #selenium
+2011-04-26T11:42:37  <jarib> ivog: any idea how many people need to uncommit for it to go below 100%?
+2011-04-26T11:43:43  <jarib> or is that too late, maybe
+2011-04-26T11:44:04  <ivog> i guess it's too late, not sure how it all works though
+2011-04-26T11:46:21  *** barancev has joined #selenium
+2011-04-26T12:01:26  *** santiycr has quit IRC
+2011-04-26T12:02:12  <plightbo_> booo to merging stack exchange
+2011-04-26T12:02:19  <plightbo_> i uncommitted, but it's still at 100%
+2011-04-26T12:02:21  <plightbo_> boooo
+2011-04-26T12:05:20  <barancev> selenium proposal had 400+ votes, it's impossible to uncommit so much in short time
+2011-04-26T12:05:48  <barancev> there should be another way to undo this merge
+2011-04-26T12:08:11  <andytinkham> Could we make a new proposal around browser automation tools, highlighting the non-testing focuses more? Maybe include things like some of the web developer tools as well that aren't as widely used for testing?
+2011-04-26T12:10:28  <jarib> i like that idea
+2011-04-26T12:11:52  <ivog> I think it's best for someone to talk to jeff atwood, maybe he doesn't understand how most people committed to the selenium proposal feel about this merge. The selenium proposal is in state closed and it's probably best to reopen it if that somehow would be possible
+2011-04-26T12:23:31  <jleyba> Hmm..anyone know why getText() collapses &nbsp;?
+2011-04-26T12:26:29  *** sjmikem has quit IRC
+2011-04-26T12:33:59  *** RossPatterson has quit IRC
+2011-04-26T12:40:41  *** miker2 has quit IRC
+2011-04-26T12:42:25  <jarib> jleyba: looking at the tests, all space is collapsed, and &nbsp; is treated as a normal space
+2011-04-26T12:42:30  <jarib> testGetVisibleShouldCollapseMultipleWhitespacesIntoASingleSpace
+2011-04-26T12:42:42  <jarib> do you know the rationale for that?
+2011-04-26T12:42:49  <jleyba> Yeah, I realize it's codified in the tests, just not sure why
+2011-04-26T12:43:00  <jarib> i mean, nbsp isn't special
+2011-04-26T12:43:09  <jarib> all space is collapsed
+2011-04-26T12:43:22  <jarib> into a single space
+2011-04-26T12:43:53  <jleyba> ignoring nbsp for the moment, I believe that approach isn't correct
+2011-04-26T12:44:05  <jleyba> Should we collapse whitespace in a <pre> block?
+2011-04-26T12:44:10  <jarib> right
+2011-04-26T12:45:06  <jleyba> I'd like to change getText() to behave more like innerText
+2011-04-26T12:45:30  <jleyba> With the main differences being we have a stricter difference of which elements to ignore than just display:none, and
+2011-04-26T12:45:44  <jleyba> tabs would be normalized as spaces
+2011-04-26T12:47:52  <jarib> yeah. and if you do that and look at the failures in the java test suite, perhaps the rationale for collapsing becomes apparent
+2011-04-26T12:47:59  <jarib> (or not)
+2011-04-26T12:49:27  <jleyba> I suspect the original motivation may be due to handling inconsistencies b/w the browsers
+2011-04-26T12:49:51  <jleyba> Which is a moot point now with the atoms
+2011-04-26T12:55:00  <jarib> yep, that sounds plausible
+2011-04-26T12:56:34  <jleyba> I've got it narrowed down to a one-line change if we decide to change the behavior
+2011-04-26T12:57:49  <jarib> did you try the java tests with the change applied?
+2011-04-26T12:58:20  <jleyba> Yeah.  It only impacted tests enforcing the "&nbsp; is collapsed" behavior
+2011-04-26T12:59:46  *** skiphuffman_ has quit IRC
+2011-04-26T13:00:21  <jarib> jleyba: you changed it not to collapse for nbsp or for spaces in general?
+2011-04-26T13:02:55  <jleyba> jarib: http://codereview.appspot.com/4444065
+2011-04-26T13:03:11  *** barancev_ has joined #selenium
+2011-04-26T13:03:13  *** barancev has quit IRC
+2011-04-26T13:05:56  *** erwandf has quit IRC
+2011-04-26T13:07:24  *** barancev has joined #selenium
+2011-04-26T13:07:37  *** barancev_ has quit IRC
+2011-04-26T13:10:54  <jarib> jleyba: ah, you've already done all the work :) i'll apply it and run the watir specs real quick..
+2011-04-26T13:12:23  <jleyba> As is, the patch preserves the current &nbsp; behavior. To try with those spaces preserved, comment out line 669 in dom.js and uncomment 668
+2011-04-26T13:14:06  *** ivog has quit IRC
+2011-04-26T13:14:29  *** sjmikem has joined #selenium
+2011-04-26T13:14:47  <jarib> got it
+2011-04-26T13:18:54  *** toseter has quit IRC
+2011-04-26T13:19:30  <jarib> jleyba: doesn't apply cleanly on trunk
+2011-04-26T13:19:31  *** dhackner has joined #selenium
+2011-04-26T13:19:52  <jarib> but i'll roll back a few
+2011-04-26T13:22:34  <jleyba> Sorry, I wasn't sync'd to head. I'll upload an updated patch after I test with r12062 merged in
+2011-04-26T13:22:52  <selbot2> dawagner 3 days ago - DanielWagnerHall: Start with no elements, rather than an empty string element - http://code.google.com/p/selenium/source/detail?r=12062
+2011-04-26T13:23:18  <jarib> ok
+2011-04-26T13:25:22  <jarib> i applied tha patch to 12062, seeing some unexpected newlines in one of watir's table tests
+2011-04-26T13:25:31  <jarib> expected: [["Table 1, Row 1, Cell 1", "Table 1, Row 1, Cell 2"], ["Table 1, Row 2, Cell 1", "Table 1, Row 2, Cell 2 Table 2, Row 1, Cell 1 Table 2, Row 1, Cell 2"], ["Table 1, Row 3, Cell 1", "Table 1, Row 3, Cell 2"]],
+2011-04-26T13:25:36  <jarib>  got: [["Table 1, Row 1, Cell 1", "Table 1, Ro 1, Cell 2"], ["Table 1, Row 2, Cell 1", "Table 1, Row 2, Cell 2\n\nTable 2, Row 1, Cell 1  Table 2, Row 1, Cell 2"], ["Table 1, Row 3R, Cell 1", "Table 1, Row 3, Cell 2"]]
+2011-04-26T13:25:40  <jarib> meh
+2011-04-26T13:26:07  <jarib> https://gist.github.com/943064
+2011-04-26T13:26:12  *** adamgoucher has quit IRC
+2011-04-26T13:26:34  <jleyba> what's the HTML look like/
+2011-04-26T13:27:00  <jarib> one sec
+2011-04-26T13:27:28  <jleyba> need to run to a meeting.  be back in ~15 min
+2011-04-26T13:28:28  *** miker2 has joined #selenium
+2011-04-26T13:30:18  <jarib> jleyba: ok. refresh the gist to see the HTML. it's a nested table, we're fetching the text of each cell in the table with id=outer
+2011-04-26T13:31:44  *** dhackner has left #selenium
+2011-04-26T13:32:11  *** cburroughs has quit IRC
+2011-04-26T13:32:37  *** jimevans has joined #selenium
+2011-04-26T13:33:21  *** XCulver has quit IRC
+2011-04-26T13:37:39  *** mbeierl has quit IRC
+2011-04-26T13:39:08  <jleyba> jarib: I'd expect one of those newlines to there, but not both.  Looking into how to prevent the second now
+2011-04-26T13:42:32  <jarib> ok
+2011-04-26T13:46:34  <jarib> wow, when did the navigation/cross-reference stuff in google code search get this good
+2011-04-26T13:46:59  <jarib> (browsing the chromium source)
+2011-04-26T13:47:44  <jarib> and why doesn't every google code project get this :)
+2011-04-26T13:49:18  *** esteele is now known as esteele|away
+2011-04-26T13:50:10  *** kylls has quit IRC
+2011-04-26T13:55:59  *** miker2 has quit IRC
+2011-04-26T13:59:07  *** larrys has quit IRC
+2011-04-26T14:08:45  *** santiycr has joined #selenium
+2011-04-26T14:17:49  *** adamgoucher has joined #selenium
+2011-04-26T14:19:22  *** larrys has joined #selenium
+2011-04-26T14:30:29  <jarib> jimevans: someone's doing a capybara for .NET https://github.com/ITV/Coypu
+2011-04-26T14:31:18  <jimevans> ooooh, shiny.
+2011-04-26T14:34:57  *** jimevans has quit IRC
+2011-04-26T14:42:15  <jleyba> jarib: I've uploaded a new patch to http://codereview.appspot.com/4444065/
+2011-04-26T14:45:17  *** csanchez has quit IRC
+2011-04-26T14:51:59  *** freynaud has quit IRC
+2011-04-26T14:52:23  <jarib> jleyba: thanks, i'll try it out
+2011-04-26T14:54:50  *** plightbo_ has quit IRC
+2011-04-26T14:55:42  *** plightbo_ has joined #selenium
+2011-04-26T14:57:16  *** plightbo_ has quit IRC
+2011-04-26T15:01:57  *** Mayank has joined #selenium
+2011-04-26T15:04:07  <Mayank> Hello, is there a "work-around" for Selenium IDE to not to be limited to Firefox, but for IE too. that I could use?
+2011-04-26T15:07:39  <jleyba> Mayank: Selenium IDE is a Firefox add-on.  There may be some IE-specific tools out there, but nothing from the Se project
+2011-04-26T15:12:53  <Mayank> jleyba: any that you could name for IE? But it needs to be free - OSS
+2011-04-26T15:13:02  <jarib> jleyba: what's the target to start the js test server again?
+2011-04-26T15:13:30  <jleyba> jarib: ./go debug-server (starts on port 2310)
+2011-04-26T15:13:44  <jarib> thanks
+2011-04-26T15:14:01  <sfbrian> Mayank: I would suggest getting into Selenium RC if you want to do automation on IE
+2011-04-26T15:14:01  <jleyba> Mayank: Sorry, I don't know of any.  I actually never use SeIDE
+2011-04-26T15:15:11  <Mayank> sfbrian: But I need a tool to record these tests as well. The application runs on IE *only*.
+2011-04-26T15:15:23  <Mayank> jleyba: Thanks.
+2011-04-26T15:15:38  <eghm> i know that pain
+2011-04-26T15:16:09  <sfbrian> Mayank: unfortunately you would have to give up the ease of record/playback for the power of RC which is much much more powerful than IDE
+2011-04-26T15:16:29  <selbot2> jmleyba less than 20 seconds ago - JasonLeyba: More improvements to bot.dom.getVisibleText to properly - http://code.google.com/p/selenium/source/detail?r=12074
+2011-04-26T15:16:49  <sfbrian> Mayank: writing tests out manually isn't too hard once you get the hang of it.  There is tons of documentation on it
+2011-04-26T15:18:41  <Mayank> sfbrian: looks like so. a beginner!  Any other feature I would be missing?
+2011-04-26T15:19:28  <sfbrian> huh
+2011-04-26T15:19:54  <Mayank> hm?
+2011-04-26T15:21:26  <jarib> jleyba: i'm still seeing the \n\n, i think my markup may have some text nodes that are missing from your test maybe?
+2011-04-26T15:21:48  <jleyba> Very possible
+2011-04-26T15:22:19  <jarib> anyway, it's not a big deal
+2011-04-26T15:23:48  <jarib> i can dig into it tomorrow if i get bored :)
+2011-04-26T15:25:08  <jleyba> No worries, I can take a look now.  Pretty sure I just missed an edge case with my last pass at fixing it
+2011-04-26T15:30:08  *** santiycr has quit IRC
+2011-04-26T15:30:13  <barancev> do you know why http://localhost:2310/common/xhtmlTest.html contains links to css and js that are 404?
+2011-04-26T15:31:29  <barancev> they make lots of noise in test_logs
+2011-04-26T15:36:44  <barancev> Mayank: you may try TestMaker -- http://www.pushtotest.com/designer
+2011-04-26T15:37:35  *** brettporter has joined #selenium
+2011-04-26T15:41:29  <Mayank> barancev: Thanks, Ill have a look at it! :)
+2011-04-26T15:44:05  *** santiycr has joined #selenium
+2011-04-26T15:44:08  *** nirvdrum has quit IRC
+2011-04-26T15:48:33  <Mayank> barancev: Thanks again. This would probably work!
+2011-04-26T15:50:31  *** plightbo_ has joined #selenium
+2011-04-26T15:51:29  <jarib> barancev: i have a feeling those css/js references can be safely removed
+2011-04-26T15:51:44  <jarib> barancev: may be worth trying and see if any tests fail
+2011-04-26T15:51:59  <barancev> Mayank: I've never tried it myself, no warranties :) I don't like software that has installation package of size 0.5GB
+2011-04-26T15:53:29  *** brettporter has quit IRC
+2011-04-26T15:54:38  *** Mayank has quit IRC
+2011-04-26T15:54:54  <barancev> jarib: I've never ever managed to run tests to the end without errors yet :(
+2011-04-26T15:54:58  *** Mayank has joined #selenium
+2011-04-26T15:55:11  *** plightbo_ has quit IRC
+2011-04-26T15:55:56  <barancev> jarib: I'll try to remove these links and run tests, but I'd not expect to get rid of failed tests. At least they should not fail earlier :)
+2011-04-26T15:59:13  <jarib> jleyba: have you done any testing with a lot of sessions against a single chromedriver server?
+2011-04-26T16:01:07  <jleyba> jarib: Not really.  Are you seeing something weird?
+2011-04-26T16:01:47  <jarib> nope, just curious
+2011-04-26T16:02:26  <jarib> i did try 10 sessions, seemed to work ok
+2011-04-26T16:26:48  <barancev> jarib: testShouldBeAbleToFindChildrenOfANode failed if I remove links to JS
+2011-04-26T16:27:04  <barancev> jarib: assertThat(importedScripts.size(), equalTo(2));
+2011-04-26T16:28:09  <barancev> jarib: looks like this test should be rewritten to find some other elements
+2011-04-26T16:30:35  *** andytinkham has quit IRC
+2011-04-26T16:30:40  *** andytinkham has joined #selenium
+2011-04-26T16:34:59  *** andytinkham has quit IRC
+2011-04-26T16:40:02  *** plightbo_ has joined #selenium
+2011-04-26T16:40:58  <selbot2> jmleyba half a minute ago - JasonLeyba: Only start new lines for blocks if the current line has non-whitespace text - http://code.google.com/p/selenium/source/detail?r=12075
+2011-04-26T16:50:46  <barancev> when I've removed links to JS and CSS, and rewritten testShouldBeAbleToFindChildrenOfANode - tests failed as usual in testCanClickOnSuckerFishMenuItem
+2011-04-26T16:55:16  *** nirvdrum has joined #selenium
+2011-04-26T16:55:29  <selbot2> jmleyba less than 20 seconds ago - JasonLeyba: @Ignoring test that fails for all configs. - http://code.google.com/p/selenium/source/detail?r=12076
+2011-04-26T17:05:02  <jarib> barancev: could you attach the patch to an issue in the tracker?
+2011-04-26T17:05:06  <jarib> :newissue
+2011-04-26T17:05:06  <selbot2> http://code.google.com/p/selenium/issues/entry
+2011-04-26T17:05:17  <jarib> barancev: ^
+2011-04-26T17:06:35  *** jleyba has quit IRC
+2011-04-26T17:06:43  <barancev> jarib: ok, I'll do that [going to read rules how to make patches]
+2011-04-26T17:15:46  *** Spanktar has quit IRC
+2011-04-26T17:19:09  *** esteele|away has quit IRC
+2011-04-26T17:31:20  *** gronky has joined #selenium
+2011-04-26T17:31:55  *** frohoff has quit IRC
+2011-04-26T17:32:08  *** frohoff has joined #selenium
+2011-04-26T17:33:16  *** sfbrian has quit IRC
+2011-04-26T17:56:46  *** plightbo_ has quit IRC
+2011-04-26T17:57:42  *** ner0x has joined #selenium
+2011-04-26T17:59:43  *** sjmikem has quit IRC
+2011-04-26T18:14:57  *** ahal has quit IRC
+2011-04-26T18:32:58  *** gronky has quit IRC
+2011-04-26T18:34:16  *** santiycr has quit IRC
+2011-04-26T18:36:29  *** brettporter has joined #selenium
+2011-04-26T18:44:12  *** gronky has joined #selenium
+2011-04-26T18:45:17  *** Mayank has quit IRC
+2011-04-26T18:50:10  *** brettporter has quit IRC
+2011-04-26T18:55:40  *** brettporter has joined #selenium
+2011-04-26T19:10:51  *** Fyrespray has quit IRC
+2011-04-26T19:20:20  *** santiycr has joined #selenium
+2011-04-26T19:24:23  *** ahal has joined #selenium
+2011-04-26T19:57:55  *** adamgoucher has quit IRC
+2011-04-26T20:01:08  *** adamgoucher has joined #selenium
+2011-04-26T21:06:37  *** pnitin has quit IRC
+2011-04-26T21:25:52  *** gronky has quit IRC
+2011-04-26T21:44:53  *** nirvdrum has quit IRC
+2011-04-26T21:49:15  *** erwandf has joined #selenium
+2011-04-26T22:05:52  *** barancev has quit IRC
+2011-04-26T22:08:58  *** Rajan has quit IRC
+2011-04-26T22:11:13  *** Fyrespray has joined #selenium
+2011-04-26T22:14:14  *** mashiara has quit IRC
+2011-04-26T22:24:26  *** plightbo has quit IRC
+2011-04-26T22:31:36  *** ner0x has quit IRC
+2011-04-26T22:35:16  *** grzyweasel has quit IRC
+2011-04-26T22:47:44  *** pnitin has joined #selenium
+2011-04-26T23:07:13  *** santiycr has quit IRC
+2011-04-26T23:22:27  *** lfryc has joined #selenium
+2011-04-26T23:27:10  *** brettporter has quit IRC
+2011-04-26T23:27:55  *** csanchez has joined #selenium
+2011-04-26T23:44:10  *** shveta has joined #selenium
+2011-04-26T23:44:35  <shveta> hi , anyone there
+2011-04-26T23:45:10  <shveta> can someone please tell me how can i automate browser pop ups using selenium
+2011-04-26T23:46:08  <shveta> a7p, aculich_ adamgoucher ahal ahfeel_ ammar01  anatol___ andialbrecht Archdude ato cedrichurst_ charleyb ^
+2011-04-26T23:47:05  *** anatol___ has left #selenium
+2011-04-26T23:47:16  *** anatoli_ has joined #selenium
+2011-04-26T23:47:20  *** anatoli_ has left #selenium
+2011-04-26T23:49:35  *** ahal has quit IRC
+2011-04-26T23:49:55  *** amitev has joined #selenium
+2011-04-26T23:58:42  *** brettporter has joined #selenium

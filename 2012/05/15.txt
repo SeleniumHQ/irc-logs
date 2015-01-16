@@ -1,0 +1,795 @@
+[IRC logfile - Started Tue May 15 00:00:59 2012]
+[00:00:59] nirvdrum: jleyba: Should Safari work with RWD?
+[00:14:40] nirvdrum: jarib: Does 2.22.0.rc1 work with Safari?  Or do I need to build the gem?
+[00:15:05] Dude-X has joined #selenium
+[00:18:24] jarib: nirvdrum: let's see
+[00:18:37] jarib: r16738 fixes ruby for safari
+[00:18:39] selbot2: 03jmleyba@gmail.com 18 days ago - JasonLeyba: Fix SafariDriver break from r16735. | https://code.google.com/p/selenium/source/detail?r=16738 | http://seleniumhq.org/ci.jsp?r=16738
+[00:18:58] nirvdrum: Bah.  Okay, thanks.
+[00:19:00] kallisti has joined #selenium
+[00:19:11] kallisti has joined #selenium
+[00:19:20] nirvdrum: jarib: Any chance you'd be willing to push an rc2?
+[00:19:29] nirvdrum: If not, I can try to make this work with bundler.
+[00:19:30] kallisti has joined #selenium
+[00:19:30] kallisti has joined #selenium
+[00:19:49] jarib: r16754 is the released version
+[00:19:50] nirvdrum: Or I can just use the Java bindings.
+[00:19:51] selbot2: 03jari.bakken 13 days ago - JariBakken: Avoid conflict with ActiveSupport's Object#load. Fixes issue 3819. | https://code.google.com/p/selenium/source/detail?r=16754 | http://seleniumhq.org/ci.jsp?r=16754
+[00:20:15] jarib: (the pre-release gem)
+[00:20:33] jarib: so it should work with safari from trunk (unless jleyba introduced more breaking changes?)
+[00:20:44] nirvdrum: Okay.
+[00:20:54] nirvdrum: This is my first time trying and I'm trying on Windows.
+[00:21:03] jarib: what happens?
+[00:21:04] nirvdrum: The browser starts up, but the network seems to block.
+[00:21:17] jarib: oh, hold on
+[00:21:23] nirvdrum: That's if I run locally.
+[00:21:33] jarib: r16718
+[00:21:35] selbot2: 03jari.bakken 20 days ago - JariBakken: Fix the Ruby bindings for Safari changes in r16716. | https://code.google.com/p/selenium/source/detail?r=16718 | http://seleniumhq.org/ci.jsp?r=16718
+[00:21:36] nirvdrum: Remotely, I get an error about the checkState precondition being bad.
+[00:21:38] stockton_ has joined #selenium
+[00:21:57] jarib: ok, commits indicate the rc should work
+[00:22:26] jarib: let me try it here 
+[00:22:35] nirvdrum: So, both local and remote should work okay?
+[00:23:38] jarib: i don't think the 2.21 server will work with the trunk safari extension
+[00:23:48] nirvdrum: jarib: Locally, it looks like process_handshake is where things lock up.  Line 109.
+[00:24:09] nirvdrum: I'm running a server I built from trunk about 2 hours ago.
+[00:24:30] jarib: ok
+[00:24:33] jarib: jruby?
+[00:24:54] nirvdrum: Yeah.
+[00:25:08] nirvdrum: I can try MRI.  It was just a lot easier to install JRuby on this Windows EC2 machine.
+[00:25:48] jarib: jruby should work. 
+[00:27:19] nirvdrum: Remote just doesn't work for me.  "Exception: Executor has not been started yet"
+[00:27:30] nirvdrum: Local blocks, so seems like it's an issue with the Ruby bindings there.
+[00:29:42] jarib: nirvdrum: ok, the extension from trunk appears to work with the RC gem on both MRI 1.9.3 and JRuby 1.6.7 for me
+[00:29:49] jarib: just tried it
+[00:29:54] jarib: i'm on OS X though.
+[00:30:46] nirvdrum: Hmm . . . doesn't work with Java bindings locally either.
+[00:30:59] nirvdrum: I guess it's an issue with the driver on Windows.  Fun.
+[00:31:17] nirvdrum: The browser starts up, but the socket doesn't really seem to work right.
+[00:31:24] nirvdrum: Thanks for checking.
+[00:31:36] jarib: XP?
+[00:31:54] nirvdrum: Win2008.  Closer to Win 7 than anything else.
+[00:35:10] nirvdrum: It's possible I somehow screwed up the extension installation too I suppose.
+[00:36:12] jarib: if it fails everywhere, that seems likely
+[00:36:52] nirvdrum: Do you need to change any permissions when installing it?  I just followed what was in the wiki.
+[00:37:03] jarib: RC gem with MRI 1.9.2 on Win 7 works for me with the trunk extension as well
+[00:37:15] jarib: not that i can recall
+[00:37:23] jarib: i just followed the wiki as well
+[00:37:29] nirvdrum: Damn.
+[00:37:50] nirvdrum: Well, thanks for checking it out for me.
+[00:37:56] nirvdrum: Figure out that grid problem, by the way?
+[00:39:25] jarib: i think it may have been a firewall issue
+[00:39:58] jarib: i had two nodes connected, one of them wasn't reachable from the hub
+[00:40:12] nirvdrum: Interesting.
+[00:40:39] jarib: i'm just guessing though, didn't have time to actually prove it
+[00:41:35] jarib: btw, the beta console takes a while to load in that scenario
+[00:41:52] jarib: since it tries to ask the non-reachable node about how it's configured
+[00:42:16] jarib: not really a big deal though.. just have to wait for the admins to get that port opened :P
+[00:42:24] jarib: firewalls </3
+[00:42:29] nirvdrum: That's annoying.
+[00:42:37] nirvdrum: It should timeout.
+[00:42:58] jarib: it does, just takes a while
+[00:43:29] jarib: the more interesting problem in my case is how to deal with ports and displays
+[00:44:37] jarib: since i'm running so many browsers on a single node
+[00:44:55] jarib: so far, i've just subclassed FirefoxDriver
+[00:45:41] jarib: and it calls out to a service to fetch a port + X display to start on
+[00:45:54] jarib: (the service maintains a pool of both)
+[00:46:17] nirvdrum: You shouldn't need a different X display for each browser.
+[00:46:20] jarib: then it releases both in FirefoxDriver.quit()
+[00:46:36] nirvdrum: That's really only if you need to capture the framebuffer to a screenshot.
+[00:46:56] jarib: firefox has issues with focus
+[00:47:36] jarib: i know from hard earned experience that a separate display per browser is a lot more reliable :)
+[00:47:43] nirvdrum: Heh.  Okay.
+[00:47:52] nirvdrum: I'm still new to the WD side of things.
+[00:48:05] nirvdrum: I hope it doesn't have focus problems on Windows.  Otherwise, I'm going to have issues.
+[00:49:19] jarib: #3127
+[00:49:19] selbot2: 03simon.m.stewart open/accepted Tracking issue for focus issues in Firefox - https://code.google.com/p/selenium/issues/detail?id=3127 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox]
+[00:50:57] tessarakt has joined #selenium
+[00:51:04] tessarakt: hi
+[00:51:15] tessarakt: I have problems with WebDriver :-(
+[00:51:38] nirvdrum: jarib: Looks like these only affect interacting with the page.  So, I should be okay.
+[00:51:48] nirvdrum: tessarakt: You're really going to have to be a lot more specific than that.
+[00:51:50] jarib: yeah, it's mostly for focus/blur events
+[00:51:57] jarib: AFAIK
+[00:52:01] tessarakt: umm, yeah, just had to try again
+[00:52:34] jarib: nirvdrum: anyway, my concern is orphaned browsers (where quit() won't be called at all), not sure how common that is
+[00:52:55] tessarakt: I have this webdriver code: http://nopaste.linux-dev.org/?46302
+[00:52:57] jarib: if that happens, the display won't be returned to the pool
+[00:53:39] tessarakt: and the last test does not run through
+[00:54:42] jarib: i could have some timeout in the display pool service, but it seems like this should be coordinates with grid's timeouts
+[00:55:01] jarib: i should probably learn more about how to extend grid
+[00:55:10] tessarakt: those are QUnit tests, inside WebDriver they don't run through until the last one, so the number of completed tests does not display
+[00:55:25] tessarakt: when I open the HTML page in a browser, it displays in less than a second
+[00:55:26] jarib: tessarakt: any exceptions?
+[00:55:48] nirvdrum: jarib: As I understand it, the hub does much better at tracking WD sessions now and can clean them up, much like it's been able to do with RC.
+[00:56:05] tessarakt: well, yeah - the element is not found
+[00:56:32] nirvdrum: jarib: And now I feel like an asshole.  Apparently my extension build was old or bad.  Cleaning my workspace and building again gave me a good extension.
+[00:56:38] tessarakt: but sometimes it DOES run through ...
+[00:56:46] tessarakt: not really reproducible ...
+[00:56:46] jarib: nirvdrum: no worries :)
+[00:57:02] nirvdrum: I should stick to my mantra of always doing "./go clean"
+[00:57:10] nirvdrum: I've seen too many weird things happen with the build.
+[00:57:20] jarib: yeah :(
+[00:57:34] tessarakt: "Wait<WebDriver> wait = new WebDriverWait(driver, 10);" is a 10-seconds wait?
+[00:57:51] Dude-X: yes
+[00:58:01] Dude-X: well up to 10 seconds
+[00:58:05] tessarakt: umm
+[00:58:15] tessarakt: ok, then I am using it wrong, I guess
+[00:58:29] Dude-X: what do you want to wait for? to get an element?
+[00:59:01] tessarakt: yeah
+[00:59:08] tessarakt: I should just set an implicit wait?
+[00:59:21] Dude-X: that would be WebElement element = new WebDriverWait(driver, 10).until(ExpectedCondtiions.presenceOfElementLocatedBy(by))
+[00:59:28] Dude-X: that's another alternative
+[00:59:40] jarib: nirvdrum: yeah, the logic should probably live in the hub, but that assumes i can know what node, display and port the orphaned session was running on..
+[00:59:44] Dude-X: i don't use implicit waits; i only have wrapped calls that do webdriver waits
+[00:59:48] tessarakt: driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS); WebElement qunitTestResultsElement = driver.findElement(By.id("qunit-testresult")); should also do?
+[IRC logfile - Started Tue May 15 01:00:05 2012]
+[01:00:05] Dude-X: that can work too
+[01:00:09] jarib: anyway, i'm anticipating problems i don't have yet. i'll just bite the bullet and read the code at that point :)
+[01:00:21] Dude-X: sets the whole session to wait up to 10 seconds
+[01:00:32] nirvdrum: jarib: I'll get that workshop code up in a throwaway repo for you.  I was waiting to find a permanent home for it, but Simon wanted to wait until Kristian was done with his git stuff.
+[01:01:10] jarib: cool, that'll help
+[01:01:16] tessarakt: I guess sometimes it's fast enough for 0
+[01:01:29] tessarakt: when thread interleaving is working nicely or something like that
+[01:01:40] tessarakt: and that's why it did not always fail
+[01:01:47] Dude-X: webdriver isn't threadsafe though
+[01:02:02] Dude-X: unless you spawn different JVMs/processes
+[01:02:12] tessarakt: and also that was the reason why the screenshot was not complete
+[01:02:54] Dude-X: goin home
+[01:03:31] tessarakt: ok, thanks for enlightening me and resolving my misunderstanding
+[01:03:33] tessarakt: works fine now
+[01:22:49] mreedell has joined #selenium
+[01:35:06] Binken_ has joined #selenium
+[01:36:04] sfbrian_ has joined #selenium
+[01:46:22] stephend: krosenvold: you're not still around are you?
+[IRC logfile - Started Tue May 15 02:06:28 2012]
+[02:06:28] Siph0n| has joined #selenium
+[02:23:33] stockton has joined #selenium
+[02:29:00] kallisti: aside from Cache, OfflineCache, and lock
+[02:29:06] kallisti: are there any other Firefox profile files I should be ignoring?
+[02:29:34] kallisti: files/directories
+[02:53:31] Ardesco has joined #selenium
+[IRC logfile - Started Tue May 15 03:08:45 2012]
+[03:08:45] mdgreenfield has joined #selenium
+[03:08:48] mdgreenfield has left #selenium
+[03:10:25] DarkRift has joined #selenium
+[03:10:25] DarkRift has joined #selenium
+[03:15:24] mreedell has joined #selenium
+[03:32:24] friskd has joined #selenium
+[03:41:24] kallisti: it takes a pretty long time to zip an entire Firefox profile
+[03:46:04] brettporter has joined #selenium
+[03:47:31] opapo has joined #selenium
+[03:51:11] mdgreenfield has joined #selenium
+[IRC logfile - Started Tue May 15 04:05:27 2012]
+[04:05:27] ian_mac has joined #selenium
+[04:08:51] Odd_Bloke has joined #selenium
+[04:27:06] opapo has joined #selenium
+[04:42:48] santiycr has joined #selenium
+[04:56:25] barancev has joined #selenium
+[04:58:51] pnitin has joined #selenium
+[IRC logfile - Started Tue May 15 05:22:12 2012]
+[05:22:12] Dude-X_ has joined #selenium
+[05:27:26] Bebe_home has joined #selenium
+[05:29:31] Bebe_home: hey all
+[05:29:48] Bebe_home: I have a fix for a bug
+[05:29:54] Bebe_home: how can I submit it?
+[05:30:45] Dude-X_: post it in the issue
+[05:32:21] Bebe_home: Dude-X can't I make a patch or something?
+[05:33:38] opapo has joined #selenium
+[05:44:19] lukeis has joined #selenium
+[05:47:30] lukeis: Bebe_home: svn diff is the preferred format
+[05:48:58] Bebe_home: lukeis is it ok if I use the online edit dialog from google code? 
+[05:49:31] lukeis: umm, i think so, although I don't know what that ends up doing :)
+[05:50:00] lukeis: point me to the issue and/or diff if you have something ready
+[05:50:12] lukeis: (also we really like it if the tests are updated accordingly)
+[05:50:28] Bebe_home: I don't have the diff 
+[05:50:45] Bebe_home: http://code.google.com/p/selenium/issues/detail?id=3906
+[05:50:51] Bebe_home: here is the issue 
+[05:51:13] Bebe_home: I can't brake anything right?
+[05:51:44] Bebe_home: if I try with the web interface :d
+[05:53:13] lukeis: nope... you don't have commit rights ;)
+[05:55:27] Bebe_home: Yippie
+[05:55:29] Bebe_home: :D
+[05:58:03] lukeis: you should see a button that says 'Suggest Patch' .. i don't know where that ends up going to, hopefully it gives you a link (if so let me know...)
+[05:58:48] lukeis: google code becoming more like github... very very slowly ;)
+[IRC logfile - Started Tue May 15 06:02:09 2012]
+[06:02:09] Bebe_home: lukeis it created a new issue 
+[06:02:15] arnlaugsson has joined #selenium
+[06:02:16] Bebe_home: can you merge the 2 
+[06:02:21] lukeis: ah, yes
+[06:02:34] Bebe_home: http://code.google.com/p/selenium/issues/detail?id=3909
+[06:02:51] Bebe_home: http://code.google.com/p/selenium/issues/detail?id=3906
+[06:07:47] lukeis: Bebe_home: have you signed the :cla?
+[06:07:47] selbot2: http://goo.gl/qC50R
+[06:08:12] Bebe_home: nope
+[06:08:59] lukeis: can you please :) and let me know how you may want to be referred to in a commit message (i'll commit that patch)
+[06:12:06] Bebe_home: Bebe
+[06:12:27] Bebe_home: but I think AutomatedTester might want to see it....
+[06:12:38] pnitin has joined #selenium
+[06:13:05] lukeis: that looks ok by me (David can harass me if he doesn't like it) ;)
+[06:13:33] Bebe_home: ok  if you say so :D 
+[06:14:02] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS on behalf of Bebe: python file upload should work on windows too. Fixes Issue 3906 | https://code.google.com/p/selenium/source/detail?r=16922 | http://seleniumhq.org/ci.jsp?r=16922
+[06:14:03] lukeis: there ya go ^  thanks for the patch!
+[06:14:41] Bebe_home: thanks for the help 
+[06:15:45] lukeis: :note AutomatedTester if we don't release 2.22 soon you may want to release 2.21.4 (see #3906)
+[06:15:45] selbot2: ok!
+[06:15:48] selbot2: 03 closed/fixed Can't upload a file using selenium and python in Windows - https://code.google.com/p/selenium/issues/detail?id=3906 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Lang-Python]
+[06:17:21] opapo_ has joined #selenium
+[06:19:30] elopio has joined #selenium
+[06:30:17] Alex0011 has joined #selenium
+[06:33:10] testingb0t has joined #selenium
+[06:33:43] testingb0t1 has joined #selenium
+[06:38:58] _md has joined #selenium
+[06:47:07] brettporter has joined #selenium
+[IRC logfile - Started Tue May 15 07:01:27 2012]
+[07:01:27] ElxRoman has joined #selenium
+[07:01:36] ElxRoman: :help
+[07:07:16] teodosia has joined #selenium
+[07:19:52] papegaaij has joined #selenium
+[07:20:52] Ajay_ has joined #selenium
+[07:20:58] Ajay_: :log
+[07:20:58] selbot2: http://illicitonion.com/selogs/selenium/2012/05/15.txt
+[07:26:18] Ajay_: :seen krosenvold
+[07:26:19] selbot2: krosenvold was last seen about 13 hours ago, saying 'jimevans: I think selenium-server is affected'.
+[07:26:28] Ajay_: :help
+[07:26:59] lfryc has joined #selenium
+[07:28:24] JakeSays has joined #selenium
+[07:32:18] kyconquers has joined #selenium
+[07:35:40] tessarakt has joined #selenium
+[07:39:30] Bebe has joined #selenium
+[07:59:54] amitev has joined #selenium
+[IRC logfile - Started Tue May 15 08:00:48 2012]
+[08:00:48] santiycr has joined #selenium
+[08:03:06] brettporter has joined #selenium
+[08:09:17] rbalent has joined #selenium
+[08:31:10] Roacer has joined #selenium
+[08:31:16] Roacer: good morning
+[08:36:36] Bebe has joined #selenium
+[08:36:42] testingb0t has joined #selenium
+[08:39:23] Roacer: How would you guys handle the base url for your unit tests? Have 1 base test class that sets it?
+[08:49:02] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Throwing NoSuchWindowException if a window was closed (not sure about ff 3.6, though) | https://code.google.com/p/selenium/source/detail?r=16923 | http://seleniumhq.org/ci.jsp?r=16923
+[08:49:34] jeichar has joined #selenium
+[08:50:00] jeppe has joined #selenium
+[IRC logfile - Started Tue May 15 09:14:12 2012]
+[09:14:12] joar has joined #selenium
+[09:20:29] stackedsax has joined #selenium
+[09:21:03] zac_sel has joined #selenium
+[09:22:21] benadderson has joined #selenium
+[09:22:46] robbim02 has joined #selenium
+[09:29:15] amitev has joined #selenium
+[09:30:37] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Ensure cleanup after failing tests. And ignore failing tests, too | https://code.google.com/p/selenium/source/detail?r=16924 | http://seleniumhq.org/ci.jsp?r=16924
+[09:36:41] davehunt has joined #selenium
+[09:40:22] jarib has joined #selenium
+[09:43:26] amitev has joined #selenium
+[09:53:40] sburjan has joined #selenium
+[09:58:17] AutomatedTester has joined #selenium
+[09:58:18] selbot2: AutomatedTester: note from lukeis about 4 hours ago: if we don't release 2.22 soon you may want to release 2.21.4 (see #3906) 
+[09:59:08] Ammar01 has joined #selenium
+[IRC logfile - Started Tue May 15 10:06:15 2012]
+[10:06:15] DanTester has joined #selenium
+[10:10:51] DanTester: Hi Everyone - need some help with a test I wish to run for IE. I have exported the test in jUnit (WebDriver), but when I try to run it in Eclipse IDE, there are errors. These stop me from running the test, for IE. If I could just get it to run for IE this will help me greatly, indeed!
+[10:11:00] leev: does anyone have an opinion/fact on which php webdriver implementation is the best?
+[10:17:42] barancev: leev: facebook's one
+[10:17:55] barancev: DanTester: what errors, exactly? :gist
+[10:17:55] selbot2: Please paste >3 lines of text to https://gist.github.com
+[10:19:08] leev: thanks barancev 
+[10:21:05] DanTester:  barancev: the first one is caused by java.lang.ClassNotFoundException: com.google.common.base.Function
+[10:21:54] barancev: DanTester: add selenium-server-standalone-2.2.1.0.jar to the project build path, this jar file contains *all* the required libraries
+[10:22:04] barancev: 2.21.0, even
+[10:22:18] DanTester: ok I will try that now -brb!
+[10:24:23] amitev2 has joined #selenium
+[10:29:55] Andrei_Khveras has joined #selenium
+[10:31:41] Andrei_Khveras: Hi, All. Can anyone suppose why InterruptedException may occur in WebDriver while executing Element.getText() and Element.getAttribute methods in IE8?
+[10:36:09] DanTester: <barancev> Wow, thank you, very much!
+[10:36:57] jibay has joined #selenium
+[10:43:54] jarib has joined #selenium
+[10:57:48] andreastt has joined #selenium
+[IRC logfile - Started Tue May 15 11:17:31 2012]
+[11:17:31] NReijmersdal: Any grid specialists around? I set maxInstances=1 on the nodes, but if a browser crashes (this doesnt close the browser) it happyly starts a new session on this node, making it run out of memory and more crashing browsers.
+[11:17:53] NReijmersdal: the new BROWSER_TIMEOUT does cleanup eventualy
+[11:18:06] NReijmersdal: but often to late before the whole machine is overloaded
+[11:18:36] NReijmersdal: Shouldnt it hold new sessions on this node until the BROWSER_TIMEOUT is reached?
+[11:19:20] NReijmersdal: This leads to another question, why does the hub always starts new sessions on the same machine, it doesn't cycle the nodes.
+[11:25:25] corecode has left #selenium
+[11:26:30] Madau has joined #selenium
+[11:27:42] Madau: Please, is there a whole documentation of Selenium Classes and methods somewhere ? I haved search it, without success.
+[11:28:09] ElxRoman: :apidocs
+[11:28:10] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[11:28:19] Madau: IThank you !
+[11:28:32] ElxRoman: np
+[11:32:33] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Oh, what a difference a return statement makes. Fixing finding firefox on the PATH. | https://code.google.com/p/selenium/source/detail?r=16925 | http://seleniumhq.org/ci.jsp?r=16925
+[11:33:38] dawagner has joined #selenium
+[11:33:43] simonstewart has joined #selenium
+[11:34:11] simonstewart: Ave!
+[11:43:11] jarib: salve!
+[11:43:20] jarib: quid agis?
+[11:44:30] simonstewart: ecce romani!
+[11:45:22] nsussman has joined #selenium
+[11:45:22] jarib: quod est bonum.
+[11:45:35] hxmws has joined #selenium
+[11:46:25] hxmws: Hi All, Quick question, with webdriver is there any way to get a summary of each page? i.e number of 404's number of 301's etc?
+[11:46:30] simonstewart: Est omnes bonum
+[11:46:50] simonstewart: hxmws: you want a proxy to gather that data
+[11:47:00] simonstewart: take a look at http://proxy.browsermob.com
+[11:48:23] hxmws: member:simonstewart, thanks. I'll take a look. Was looking at using saucelabs but not sure if this is something the offer
+[11:48:34] simonstewart: I'm not sure. 
+[11:48:45] simonstewart: santi would be the person to ask
+[11:48:48] simonstewart: But he's asleep right now
+[11:50:06] AutomatedTester: hxmws: I dont think they offer that
+[11:50:30] AutomatedTester: or you would still need to do the same things locally
+[11:51:06] hxmws: AutomatedTester; would be awesome if they did :-)
+[11:51:36] AutomatedTester: hxmws: if you say so :)
+[11:52:04] hxmws: member:AutomatedTester, just out of curiosity what language are you writing you tests in?
+[11:52:10] AutomatedTester: python
+[11:52:49] hxmws: cool, and you are using your own machines for webdriver?
+[11:53:48] AutomatedTester: hxmws: yea
+[11:54:25] AutomatedTester: last time we checked it wasnt cost effective to use sauce
+[11:54:31] AutomatedTester: well last I heard about it
+[IRC logfile - Started Tue May 15 12:06:40 2012]
+[12:06:40] simonstewart: Right, everyone. Time to get the build green
+[12:08:02] simonstewart: Nuts. Forgot that Firefox 10 was an ESR release
+[12:09:44] Ajay_ has joined #selenium
+[12:23:05] jeppe has joined #selenium
+[12:23:56] nirvdrum has joined #selenium
+[12:23:58] flra has joined #selenium
+[12:27:17] bsilverberg has joined #selenium
+[12:37:39] barancev: ElxRoman: I'm ready to apply your patch, have you signed :cla? and, please, tell us how do you want to be referred in the commit mesage?
+[12:37:40] selbot2: http://goo.gl/qC50R
+[12:37:57] barancev: simonstewart: do you mean local tests, or CI-server?
+[12:38:54] ElxRoman: barancev: yep, I've signed, what type of refer you can do?
+[12:39:34] barancev: ElxRoman: e.g. like this: r16917
+[12:39:36] selbot2: 03james.h.evans.jr@gmail.com about 19 hours ago - JimEvans (on behalf of KSummerlin): Adding ByChained support to .NET support classes. Also additions to the .NET PageFactory to allow decorating members with multiple instances of FindsByAttribute, including ordering of the attributes. Fixes issue #3870. | https://code.google.com/p/selenium/source/detail?r=16917 | http://seleniumhq.org/ci.jsp?r=16917
+[12:39:49] barancev: ElxRoman: on behalf of
+[12:40:33] ElxRoman: barancev: I think you can use my nickname
+[12:40:41] barancev: ok
+[12:40:54] ElxRoman: barancev: Thanks
+[12:44:46] hxmws_ has joined #selenium
+[12:47:19] Roacer: selecting a radio button or checkbox, is just element.click()?
+[12:49:12] hxmws has joined #selenium
+[12:54:24] jarib has joined #selenium
+[12:57:30] bsilwal has joined #selenium
+[12:58:44] simonstewart: barancev: either. both.
+[IRC logfile - Started Tue May 15 13:00:34 2012]
+[13:00:34] barancev: nice! CI gone crazy since the beginning of May
+[13:01:39] simonstewart: Well, this is suboptimal: http://selenium-ci.jaribakken.com/#/revision/16925/list
+[13:02:35] barancev: it's infrastructral issue, not the tests so much broken
+[13:03:07] simonstewart: So it seems
+[13:03:17] simonstewart: But I'd still like things to be cleaned up
+[13:04:02] barancev: sure, it is hard to do changes without a safety net
+[13:20:55] papegaaij has joined #selenium
+[13:21:26] RossPatterson has joined #selenium
+[13:31:30] cgoldberg has joined #selenium
+[13:36:35] cmcgraw has joined #selenium
+[13:41:01] jimevans has joined #selenium
+[13:43:22] dawagner: How likely is it that upgrading to Lion is going to brick my laptop?
+[13:43:33] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Reenabling native events on firefox 10 on linux. It's an ESR release, and so should continue to be supported. | https://code.google.com/p/selenium/source/detail?r=16926 | http://seleniumhq.org/ci.jsp?r=16926
+[13:44:13] Roacer: dawagner: if you laptop is a mac, I don't think so, I am running on lion
+[13:44:18] andreastt: dawagner: Well, I dare say it's going to be less of a problem than upgrading Ubuntu.
+[13:44:37] andreastt: Never upgraded to Lion myself though.  This machine came installed with it.
+[13:44:50] mltolun has joined #selenium
+[13:44:58] Roacer: I upgraded, went smooth, and quite fast
+[13:46:55] simonstewart: dawagner: I did the upgrade a while ago
+[13:46:58] simonstewart: It'll be fin
+[13:47:00] simonstewart: e
+[13:48:25] leev: is there away around IE9 certificate errors?  
+[13:48:39] simonstewart: Other than properly signing SSL certs?
+[13:48:45] leev: i have tried acceptSslCerts and ignoreProtectedModeSettings
+[13:48:48] leev: other than that, yes :)
+[13:50:10] jimevans: leev: the ie driver doesn't handle unsigned/self-signed certificates. sorry. feel free to implement support and submit a patch.
+[13:50:43] leev: thanks
+[13:50:43] mltolun has left #selenium
+[13:51:30] sumxyz has joined #selenium
+[13:52:18] jimevans: simonstewart: working on another issue with the keyboard atoms. bot.action.type doesn't work for non-printable keys for IE9, though i haven't debugged further to see if it's a document-mode thing.
+[13:52:42] simonstewart: When you say "non printable" characters, what are you expecting?
+[13:52:52] simonstewart: I think we just make sure that printable characters and the arrow keys work
+[13:53:03] mreedell has joined #selenium
+[13:56:26] jimevans: by non-printable, i mean arrows.
+[13:56:31] simonstewart: Bah!
+[13:57:17] eranm has joined #selenium
+[13:57:27] jimevans: i need to play with it a bit more.
+[IRC logfile - Started Tue May 15 14:00:13 2012]
+[14:00:13] hxmws_ has joined #selenium
+[14:00:38] jimevans: i'm using webdriver.atoms.element.type and i'm starting to wonder if there's not a mistranslation from json wire protocol key code to actual javascript key code.
+[14:01:24] simonstewart: There shouldn't be
+[14:03:04] mltolun has joined #selenium
+[14:03:46] dawagner: bsilverberg: I'm just writing you a response to those emails, sorry for the *huge* delay
+[14:03:58] jimevans: well i agree there *shouldn't* be. :)
+[14:05:01] bsilverberg: dawagner: :-) np I am just now preparing a new patch for the color issue which better conforms to Google js standards
+[14:08:24] Jackneill has joined #selenium
+[14:08:39] Jackneill has joined #selenium
+[14:13:29] farlan has joined #selenium
+[14:14:13] farlan: good morning everyone!  Can someone recommend a proxy service to spoof geo-location by ip?
+[14:15:43] Roacer: farlan: I don't know any free services, but I know there are a couple commercial one's around
+[14:18:30] farlan: roacer: which ones?
+[14:19:38] Roacer: farlan: https://wonderproxy.com/
+[14:23:08] farlan: thanks roacer
+[14:27:09] bsilwal has joined #selenium
+[14:28:08] xtian_ has joined #selenium
+[14:28:20] mdgreenfield has joined #selenium
+[14:28:23] mdgreenfield has left #selenium
+[14:36:53] ElxRoman has joined #selenium
+[14:38:00] ElxRoman: :log
+[14:38:01] selbot2: http://illicitonion.com/selogs/selenium/2012/05/15.txt
+[14:42:44] bsilwal_ has joined #selenium
+[14:45:36] iamchrisf has joined #selenium
+[14:46:13] hxmws_ has joined #selenium
+[14:46:19] llaskin has joined #selenium
+[14:50:56] DanTester has joined #selenium
+[14:51:43] dawagner: Ok, anyone know why Chrome is downloading, rather than opening, some of the logs in http://illicitonion.com/selogs/selenium/2012/05/ even though they are served with the same headers?
+[14:52:46] dawagner: Same charset, same encoding
+[14:53:33] simonstewart: "Fun and games"?
+[14:53:46] stockton has joined #selenium
+[14:54:01] DanTester: Hi - need some help with installing Bromine in the Xampp. At moment I have Xampp installed and have downloaded Bromine. Now do I copy Bromine to the c:\xampp\htdocs directory?
+[14:58:00] jibay_ has joined #selenium
+[14:58:08] jarib: argh, DefaultDriverSessions.registerDriver seriously needs to do some logging 
+[14:58:31] jarib: as mentioned by the comment "// TODO(simon): Log this!" :P
+[IRC logfile - Started Tue May 15 15:00:02 2012]
+[15:00:02] hxmws has joined #selenium
+[15:01:16] hxmws has joined #selenium
+[15:03:58] nhirata has joined #selenium
+[15:08:21] hxmws has joined #selenium
+[15:08:39] simonstewart: :yt damien rice when doves cry
+[15:08:40] selbot2: Damien Rice - When Doves Cry (Prince Cover) - http://www.youtube.com/watch?v=uJKpcXvvg90&feature=youtube_gdata
+[15:08:56] sumxyz1 has joined #selenium
+[15:11:19] brokenthumbs has joined #selenium
+[15:12:50] sumxyz has joined #selenium
+[15:16:06] llaskin: simonstewart:  wow old school
+[15:16:11] llaskin: :yt romeo juliet when doves cry
+[15:16:12] selbot2: Tarver -- When Doves Cry - I Want To Go Out Sessions - http://www.youtube.com/watch?v=vThnbxO39dI&feature=youtube_gdata
+[15:16:18] llaskin: listen to that version, i always liked it...
+[15:20:53] DanTester has joined #selenium
+[15:21:26] DanTester: Hi There - Does anyone know how to install Bromine for Xmapp, please?
+[15:21:34] DanTester: *Xampp
+[15:27:36] jleyba_ has joined #selenium
+[15:29:03] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Re-enable native events on Firefox 10 on Windows. | https://code.google.com/p/selenium/source/detail?r=16927 | http://seleniumhq.org/ci.jsp?r=16927
+[15:29:14] llaskin: DanTester: no clue haven't used it
+[15:33:54] opapo has joined #selenium
+[15:40:58] zac_sel has joined #selenium
+[15:43:01] stockton has joined #selenium
+[15:46:25] AutomatedTester has joined #selenium
+[15:50:53] opapo: I need pointers on running 100+ concurrent webdriver instances
+[15:51:51] opapo: I get a webdriverexception saying it can't load the firefox profile, but it works if I lower the number of concurrent instances.
+[15:52:27] simonstewart: On one machine?
+[15:52:29] Dude-X: on a decent machine at best you can get 50 browser instances
+[15:53:40] opapo: do you start your instances one at a time or in a pooled environment in python?
+[15:53:52] Dude-X: i use the multiprocessing module
+[15:54:16] Dude-X: chrome lets you use up to 50 on a dual core 8gb 3ghz intel machine
+[15:54:18] Dude-X: in linux
+[15:54:19] skiphuffman has joined #selenium
+[15:54:21] opapo: my initial hope was to simulate 1000 machines
+[15:54:39] simonstewart: opapo: take a look at using the selenium grid
+[15:54:42] opapo: I guess I can't do that on a single machine
+[15:54:45] Dude-X: the other week we did a load test getting everyone in the team running a script
+[15:55:00] Dude-X: we had it open 20 instances of chrome
+[15:55:14] opapo: simonstewart: I will look into selenium grid
+[15:55:26] simonstewart: One day Moore's Law says that what you want to do will be possible
+[15:56:02] opapo: Why can't that day be now?
+[15:56:09] Dude-X: opapo if you use grid, you will need a test framework that can dispatch mulitple tests at once
+[15:56:18] simonstewart: opapo: ask intel
+[15:56:22] simonstewart: :)
+[15:56:30] Dude-X: opapo: it's easy to invent fast things at a small scale, but it's hard to mass manufacture it
+[15:56:33] Dude-X: that's where the time is spent
+[15:57:07] opapo: I am only one person.  Surely they can do it for me. :)
+[15:57:37] jfunk has joined #selenium
+[15:57:39] opapo: Is the issue processing power on the selenium box?
+[15:57:57] Dude-X: not quite
+[15:58:08] Dude-X: webdriver is very network intensive
+[15:59:11] joar has joined #selenium
+[IRC logfile - Started Tue May 15 16:00:10 2012]
+[16:00:10] opapo: Thanks guys
+[16:03:00] Dude-X: if you really want a nice load test environment, get a network that has a gigabit ethernet network
+[16:03:25] pnitin has joined #selenium
+[16:03:47] Dude-X: but if you're just one person, you can pay for load testing, or just hammer the webservices with other tools like err the python equivalent of grinder (whose name escapes me)
+[16:08:00] kenck has joined #selenium
+[16:09:01] drnikki has joined #selenium
+[16:11:04] adamgoucher: sooooo. i can set timeouts, but can i get them to see what their values are currently?
+[16:11:59] jleyba_: no
+[16:12:42] dawagner: Jesus, it's been a while since I svn up'd
+[16:14:11] skiphuffman: Got a grid question.  With the new Selenium 2 grid hub is there a way to change the name of the nodes from "DefaultRemoteProxy" to something more informative?
+[16:14:52] skiphuffman: Well, not exactly "new"
+[16:15:02] skiphuffman: just the current Selenium 2
+[16:15:25] dawagner: :seen andreastt
+[16:15:25] selbot2: andreastt was last seen about 2 hours ago, quitting.
+[16:15:36] simonstewart: dawagner: I just changed every java file yesterday
+[16:16:11] dawagner: I noticed.
+[16:18:24] nirvdrum: jleyba: Is there an upperbound on the response payload from the safari driver that might explain #3795 ?  I'm wondering if it's just an extension API limitation somehow.
+[16:18:25] selbot2: 03 open/new Screenshot from Safari Driver are sent but never received by Webdriver - https://code.google.com/p/selenium/issues/detail?id=3795 [Type-Defect Priority-Medium Component-WebDriver Browser-Safari]
+[16:21:08] jimevans: jleyba_: got a second?
+[16:21:14] jleyba_: Sure
+[16:21:34] jimevans: i'm still looking at the keyboard thing from yesterday.
+[16:21:42] jimevans: i've gotten a little further along.
+[16:22:47] jimevans: right now, webdriver.atoms.element.type passes the raw wire protocol values along to bot.action.type if we're using a control key (arrows, page up/down, etc.). is this the expected behavior?
+[16:23:31] jimevans: i think you want an else clause at line 221.
+[16:23:35] jimevans: s/you/we
+[16:25:09] jleyba_: do you have local changes? 221 is the middle of a switch statement for me
+[16:25:25] jimevans: oh! maybe i do. hang on.
+[16:26:15] jimevans: sorry. meant line 216.
+[16:26:31] jimevans: yes, i have local changes, but just for writing to console.log
+[16:27:18] jleyba_: yeah, that should be an else blcok
+[16:27:32] jimevans: ok, i'm not crazy then. 
+[16:27:40] jimevans: alright. next problem.
+[16:28:15] jimevans: if i add the else block, it looks like bot.action.type doesn't process the webdriver keys.
+[16:29:33] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Introduce a MessageTarget class to simplify working with Messages. Good bye, ugly switch statements! | https://code.google.com/p/selenium/source/detail?r=16928 | http://seleniumhq.org/ci.jsp?r=16928
+[16:30:24] jleyba_: Let me take a look
+[16:30:27] teodosia has left #selenium
+[16:30:54] llaskin: given that browser is a driver instance, why do I get array's returned for any of the items in this statement: $browser.find_element(:css, ".n-hoverbox .body").text.split("\n"), credential, "Is credentials hoverbox is #{$browser.find_element(:css, ".n-hoverbox .body").text}"
+[16:31:01] llaskin: any one have an idea/thought wtf i might be doin wrong?
+[16:31:33] Dude-X: that looks complex
+[16:31:42] Dude-X: is that ruby?
+[16:33:35] selbot2: 03jmleyba@gmail.com less than 20 seconds ago - JasonLeyba: Properly use an else-block or we'll attempt to type a non-printable character. | https://code.google.com/p/selenium/source/detail?r=16929 | http://seleniumhq.org/ci.jsp?r=16929
+[16:33:56] jleyba_: jimevans: Works for me with ^^
+[16:35:27] simonstewart: ttfn
+[16:39:00] nirvdrum: llaskin: split returns an array.
+[16:40:06] iamchrisf__ has joined #selenium
+[16:41:30] hxmws_ has joined #selenium
+[16:42:01] selbot2 has joined #selenium
+[16:43:37] zac_sel_ has joined #selenium
+[16:43:40] bsilwal has joined #selenium
+[16:43:49] tessarakt has joined #selenium
+[16:44:58] skiphuffman: Got a grid question.  With the new Selenium 2 grid hub is there a way to change the name of the nodes from "DefaultRemoteProxy" to something more informative?  Well, not exactly "new", just the current Selenium 2
+[16:45:22] dawagner: org.openqa.selenium.WebDriverException: java.util.concurrent.ExecutionException: org.openqa.selenium.WebDriverException: Unable to convert << Hurrah for wrapping exceptions
+[16:45:47] llaskin: nirvdrum: but i am not doing a find element of the split...
+[16:46:24] llaskin: $browser.find_element.text.split returns an array, which I compare against credential(an array)  and then print out some text based on the 3rd argument
+[16:46:44] nirvdrum: I guess I don't understand what the problem is then.
+[16:47:17] nirvdrum: skiphuffman: That's not the name of the node, that's the name of the proxy class used to interact with that node.  You can set the node ID.  By default it's that URL you see there.
+[16:49:03] llaskin: i'm trying to get to 2.21 to see if it helps
+[16:49:04] llaskin: but doubt it
+[16:49:06] llaskin: we'll see
+[16:49:54] skiphuffman: so if I set "nodeID" in the JSON configuration it will show that on the grid instead of the IP address that I currently see?
+[16:50:10] nirvdrum: skiphuffman: It should, yes.
+[16:50:18] nirvdrum: Keep in mind those are supposed to be unique.
+[16:51:00] skiphuffman: Of course
+[16:51:06] skiphuffman: But thanks for the reminder
+[16:52:02] skiphuffman: I just find it annoying trying to remember which node is 123.45.67.8/5555 is
+[16:52:29] nirvdrum: Makes sense.
+[16:52:52] bsilwal has joined #selenium
+[16:53:03] nirvdrum: Before nodeID was there I wrote a custom proxy to resolve the local hostname for the machine.  Setting the node ID is a much more straightforward process.
+[16:54:21] noahsussman has joined #selenium
+[16:56:00] llaskin: cgoldberg:  u in da city today?
+[16:56:02] skiphuffman: Ok, I may have done that wrong.  I added "nodeID":"Browser Lab 1 XP and IE 8", to the configuration section of the JSON that I start a node with and restarted it.
+[16:56:15] skiphuffman: But I still see my IP address
+[16:58:45] adamgoucher: can i set multple timeouts at once, or is it one timeout per call and if i want to set n timeouts i need to make n calls?
+[16:59:56] skiphuffman: @nirvdrum?
+[IRC logfile - Started Tue May 15 17:01:34 2012]
+[17:01:34] sumxyz has joined #selenium
+[17:02:16] jleyba has joined #selenium
+[17:04:07] nirvdrum: skiphuffman: Try the beta console at /grid/beta/console
+[17:04:25] jleyba: jimevans: get it working?
+[17:04:26] barancev| has joined #selenium
+[17:04:41] jimevans: not yet. i'm not seeing any cursor movement at all in IE.
+[17:04:56] barancev|: :log
+[17:04:57] selbot2: http://illicitonion.com/selogs/selenium/2012/05/15.txt
+[17:05:06] jimevans: i'm working on ginning up a browser-only test case.
+[17:06:47] jimevans: there's something in the translation between webdriver.atoms.element.type and bot.action.type where something's not getting translated properly.
+[17:08:38] bsilwal has joined #selenium
+[17:09:42] stephend has joined #selenium
+[17:13:12] skiphuffman has joined #selenium
+[17:13:12] brettporter has joined #selenium
+[17:13:12] kyconquers has joined #selenium
+[17:14:43] skiphuffman: @nirvdrum  Ok, got it figured out.  The parameter is "id" not "nodeID" or "ID"
+[17:16:24] nirvdrum: Bah.  I thought it was ID, but when you said "nodeID" I assumed you had looked it up :-P
+[17:17:59] barancev|: simonstewart:  what's your verdict on compound css selectors? 
+[17:20:07] skiphuffman: I think I just made it up.  The id of the node is nodeID of course.  At least in my brain.  But I learned about the beta console and that makes me happy.
+[17:20:09] nirvdrum: jarib: Minor victory, but I got Phillipe to point his project at your gem: https://github.com/ph7/selenium-client
+[17:20:44] nirvdrum: skiphuffman: The beta console still has some rough edges, like that round corner way out of place, but the plan is to make that the default console soon.
+[17:25:54] jarib has joined #selenium
+[17:26:24] barancev|: regarding #903 - is it correct to work with a profile this way?  shouldn't layoutOnDisk be called after setting all custom preferences? 
+[17:26:25] selbot2: 03 open/new FirefoxProfile appears to lose preferences when initialized from a directory - https://code.google.com/p/selenium/issues/detail?id=903 [Type-Defect Priority-Medium Browser-Firefox Component-WebDriver GettingInvolved]
+[17:27:18] bsilwal has joined #selenium
+[17:27:19] jimevans: jleyba: yeah, can't get the damned thing to behave. so i'm inside webdriver.atoms.element.type, and by adding console.log write lines in the else if block that starts at line 210.
+[17:27:38] jimevans: i can see that we're evaluating webdriverKey to be the correct object.
+[17:27:48] nirvdrum: skiphuffman: So, everything's working well for you now?
+[17:27:53] jimevans: e.g., bot.Keyboard.Keys.LEFT
+[17:28:07] ner0x has joined #selenium
+[17:28:31] jleyba: jimevans: I cut some corners by not writing unit tests and that may be biting us in the arse
+[17:28:52] jimevans: hang on. i think i may see the problem.
+[17:28:52] jleyba: I'll try to find some time to cover our bases here
+[17:30:09] jimevans: no, i'm wrong.
+[17:30:14] jimevans: i don't see the problem
+[17:30:57] jimevans: anyway, we're pushing the correct key object into the array, but when it gets to bot.action.type, it doesn't seem to respond to it.
+[17:31:01] skiphuffman: @nirvdrum  Yup, all is much better now.
+[17:31:18] skiphuffman: need to update all my node configuration files, but that is fine.
+[17:31:26] skiphuffman: but first.   lunch.
+[17:32:07] dawagner: heh junit has an "invokeExplosively" method
+[17:32:39] Dude-X: that's what happened to me in the bathroom the other day :/
+[17:40:10] lukeis has joined #selenium
+[17:43:45] stockton has joined #selenium
+[17:44:31] jeichar has joined #selenium
+[17:45:32] sumxyz has joined #selenium
+[17:48:26] stackedsax has joined #selenium
+[17:48:56] Ammar01 has joined #selenium
+[17:54:15] sfbrian has joined #selenium
+[17:59:44] sassda has joined #selenium
+[IRC logfile - Started Tue May 15 18:01:48 2012]
+[18:01:48] Bebe has joined #selenium
+[18:05:27] noahsussman has joined #selenium
+[18:08:08] noahsuss_ has joined #selenium
+[18:12:02] jimevans: jleyba: okay, now i'm logging right before the call to bot.action.type, and i know we're passing the right objects as part of the array of the key sequence. if i call bot.action.type directly from, say, an atoms test case page, it works. from webdriver.atoms.element.type, it doesn't!
+[18:14:28] jleyba: jimevans: Ok, that's on my list for things to investigate today :)
+[18:15:20] hxmws has joined #selenium
+[18:21:07] noahsussman has joined #selenium
+[18:21:50] jimevans: aha! it's not all keys!
+[18:25:12] lukeis: jimevans: so... i know why it's not dragging in IE9, but I don't know how to fix it from our side (i had to hack jquery-ui a bit to see it work)
+[18:25:42] jimevans: hrm. what's the story there?
+[18:25:59] lukeis: the event object that is getting created and fired is not setting event.pageX and event.pageY  ~ which jQuery depends on to determine where the mouse is located
+[18:26:10] lukeis: it's always 0
+[18:26:13] simonstewart: Right. Home time
+[18:26:17] simonstewart: G'ngiht!
+[18:26:19] simonstewart has left #selenium
+[18:26:37] lukeis: if i hack jquery to use event.clientX / clientY  it works ;)
+[18:27:23] lukeis: i tried to explicitly set it in the event object... but IE9 would always reset it to 0
+[18:29:53] lukeis: so i guess the key is to figure out how to make sure pageX and pageY are set on the fired event object... I'm a bit at a loss there though. I tried a number of things and got nothing
+[18:29:54] adamgoucher: umm, wtf does svn: OPTIONS of 'https://selenium.googlecode.com/svn/trunk': SSL handshake failed: SSL disabled due to library version mismatch (https://selenium.googlecode.com) mean?
+[18:30:38] lukeis: it means screw you adamgoucher you are not allowed to do svn today
+[18:30:39] lukeis: :-D
+[18:30:50] adamgoucher: i could just paste my diff in here :P
+[18:31:19] lukeis: i'll check in something for you if you want
+[18:31:42] adamgoucher: ive gots to check it first, and my tree is /old/
+[18:32:32] Siph0n has joined #selenium
+[18:32:41] adamgoucher: http://pastebin.mozilla.org/1640531
+[18:35:19] adamgoucher: why of course! svn is misbehaving so lets download the world then upgrade! thank you ports.
+[18:35:33] stackedsax has joined #selenium
+[18:37:03] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS on behalf of AdamGoucher: toString of timeout can be more than just implicit. | https://code.google.com/p/selenium/source/detail?r=16930 | http://seleniumhq.org/ci.jsp?r=16930
+[18:38:06] nacho has joined #selenium
+[18:38:12] adamgoucher: thanks. now to see if it works. and if not, at least i'm not the one jumping the gun per the commit logs :D
+[18:38:55] lukeis: heh ;)
+[18:39:23] testingb0t has joined #selenium
+[18:39:30] adamgoucher: svn: E155016: This working copy is corrupt and cannot be upgraded. Please check out a new working copy. fun!
+[18:39:44] lukeis: no reason it should not work... well, unless it happens to be null
+[18:42:42] adamgoucher: i think the magic jsonification takes care of that. at least in php.
+[18:42:53] adamgoucher: 'Exception: Unknown wait type: null' nicely displayed for me
+[18:43:27] lukeis: ah yeah, java will convert null to a string without complaining
+[18:46:19] lukeis: jimevans: hmm, this seems relevant http://bugs.jqueryui.com/ticket/7324  will have to figure out exactly what they did and replicate it on our side
+[18:47:26] stackedsax has joined #selenium
+[18:56:16] hxmws has joined #selenium
+[18:56:25] lukeis: jimevans: ah-ha... we need this stuff: https://github.com/jquery/jquery-ui/commit/0b7155f92781c59b0eb0ac8e008715d8a56671fb
+[18:57:44] lukeis: i am humbled at the javascript prowess of the jquery guys... cause that is something I would have never of thought of :)
+[IRC logfile - Started Tue May 15 19:00:34 2012]
+[19:00:34] stackedsax has joined #selenium
+[19:03:04] skiphuffman: @nirvdrum, are you still on here?
+[19:03:39] nirvdrum: What's up?
+[19:03:52] skiphuffman: That id variable is fantastic, but is there any way that I can get it back to the test?  IOW can I access that from the selenium webdriver object?
+[19:04:25] skiphuffman: I would love to record what node ran a test.
+[19:05:00] nirvdrum: Not out of the box.  You'd have to write a servlet that provides some sort of API for you to query against based on the session ID.
+[19:05:38] skiphuffman: Ok, just thought I would ask.  
+[19:06:29] eanxgeek_ has joined #selenium
+[19:08:24] ignacio_ has joined #selenium
+[19:08:52] ignacio_ has joined #selenium
+[19:19:17] rubyruy has joined #selenium
+[19:25:07] rubyruy has joined #selenium
+[19:30:34] selbot2: 03luke.semerau@gmail.com half a minute ago - LukeIS: fixing drag/drop in IE9 synthetic events by adding a function as a property to the event.pageX and event.pageY | https://code.google.com/p/selenium/source/detail?r=16931 | http://seleniumhq.org/ci.jsp?r=16931
+[19:30:37] lukeis: jimevans: ^ :)
+[19:30:50] jimevans: ooooh. shiny.
+[19:35:19] lukeis: i must say, thanks jimevans, that was a welcome distraction and fun problem to solve :)  (and I learned something new in JS ~ i haven't seen that way to override a property with a function)
+[19:40:18] Dude-X: kudos lukeis
+[19:40:45] Bebe_home has joined #selenium
+[19:45:04] jimevans: lukeis: rock on! i owe you a beer next time i'm in town.
+[19:45:20] lukeis: mmm beer
+[19:46:04] lukeis: adamgoucher: i see you're going to be in my neck of the woods giving a talk at the SJ meetup in july. I'm so there ;) would be nice to actually meet ya in person
+[19:48:14] nirvdrum: skiphuffman: But, there's no way of relaying that back to the client per se.  It would be an external resource.
+[19:48:44] nirvdrum: Your tests intentionally aren't supposed to know what machine they're on.
+[19:50:03] tessarakt: gnaaa ...
+[19:50:16] Dude-X: adamgoucher: i feel that my project can get a bit of attention now. can you give me a shoutout on the selenium blog about my python3 port and python23 port at http://github.com/Dude-X/Selenium2
+[19:50:18] tessarakt: my WebDriver tests work on one Linux machine, but fail on another ...
+[19:50:46] tessarakt: apparently the QUnit JavaScript do not run through on that other machine
+[19:50:51] tessarakt: and I have no idea why
+[19:51:01] llaskin: tessarakt: thats interesting
+[19:51:03] llaskin: identical machines?
+[19:51:14] tessarakt: no, unfortunately not
+[19:51:24] tessarakt: not even same Firefox
+[19:51:38] tessarakt: but it's not that I am doing something totally weird ...
+[19:51:55] tessarakt: just some very basic JS+DOM
+[19:53:21] tessarakt: and unfortunately I don't have access to the machine where it fails from home
+[19:56:47] llaskin: can't reallly help u then
+[19:56:52] llaskin: what versions of FF?
+[19:58:44] mreedell_ has joined #selenium
+[19:59:24] skiphuffman: @nirvdrum  Thanks.  I thought there might be something I could grab, like that ID, but I don't need it.
+[19:59:56] nirvdrum: Well, if you ever want to look into it, the hub keeps track of session IDs to nodes.
+[IRC logfile - Started Tue May 15 20:00:08 2012]
+[20:00:08] nirvdrum: That's how it knows where to route subsequent requests.
+[20:02:04] noahsussman has joined #selenium
+[20:02:12] tessarakt: sorry, dunno
+[20:02:41] tessarakt: of course I am always the first and only one to have such problems
+[20:02:45] tessarakt: that's annoying
+[20:02:50] skiphuffman: Yeah, once I get a few more things kicked to the curb.
+[20:03:14] skiphuffman: I really would like to contribute, but need to get out from under a sisyphean stone.
+[20:16:45] skiphuffman: Sigh, anyone seen this little beauty:  WebDriverException: Message: 'Session [1337106972438] not available and is not among the last 1000 terminated sessions.\nActive sessions are[]' ; Stacktrace: Method getExistingSession threw an error in ActiveTestSessions.java 
+[20:25:57] jimevans: :note jleyba here's a standalone test case for what's failing with keyboard stuff https://gist.github.com/2704367
+[20:25:57] selbot2: ok!
+[20:26:13] farlan has left #selenium
+[20:34:25] jarib has joined #selenium
+[20:53:33] mreedell_ has joined #selenium
+[20:55:39] gmonnerat has joined #selenium
+[IRC logfile - Started Tue May 15 21:00:24 2012]
+[21:00:24] skiphuffman: @nirvdrum?  Using an "id" in my node config json files broke my tests all over the place.  
+[21:00:56] skiphuffman: Tests wouldn't start, or would open a browser window but never send a url.  
+[21:01:23] skiphuffman: nodes would connect, but even if the node java job was stopped, they would still show on the grid.
+[21:02:05] skiphuffman: Just chewed up half my day dealing with it.
+[21:04:56] algard has joined #selenium
+[21:05:54] noahsussman has joined #selenium
+[21:06:06] noahsussman has joined #selenium
+[21:08:53] jcarr has joined #selenium
+[21:09:27] jcarr: Hey all - is there a corporate CLA for selenium? I haven't been able to find one, only the individual CLA.
+[21:10:27] lukeis: individual's contribute... not coporations, although as an individual you should get your company to be ok with it... :cla
+[21:10:27] selbot2: http://goo.gl/qC50R
+[21:10:55] jcarr: lukeis: so there's no way to have a company sign the CLA one behalf of all it's employees?
+[21:11:10] lukeis: umm, you'd have to ask simonstewart about that
+[21:11:36] jcarr: alright, thanks.
+[21:12:27] lukeis: i would say though that if there's a main contact that will be submitting patches to selenium, only they will really need to sign the cla
+[21:13:41] lukeis: plus as it is right now, everyone has to ask simon or take the user's word for it if they've signed it... since he keeps it private (since it has personal info on it)
+[21:14:16] jcarr: I've seen some posts about that
+[21:14:27] jcarr: Alright, I'll see what I can make happen, thanks lukeis
+[21:16:39] jcarr has left #selenium
+[21:18:57] stephend has joined #selenium
+[21:24:16] joar has joined #selenium
+[21:27:33] santiycr has joined #selenium
+[21:30:03] jcarr has joined #selenium
+[21:32:23] sfbrian_ has joined #selenium
+[21:35:26] sassda has left #selenium
+[21:44:48] claus has joined #selenium
+[21:45:54] testingb0t1 has joined #selenium
+[21:46:27] claus: Hi, I'm trying to write a WebDriver test with Selenium version 2.21.0 and encountered an issue with Actions.moveToElement
+[21:47:49] claus: I'm testing a jQuery bubble popup and I can sucessfully move the mouse over the hot spot and make the popup appear
+[21:48:13] claus: but I can't move the mouse away from the hot spot to make the popup disappear.
+[21:48:33] jibay__ has joined #selenium
+[21:48:49] nirvdrum has joined #selenium
+[21:49:05] claus: If I use the Actions.moveToElement a second time to move the mouse over a different hotspot I end up with two popups.
+[21:49:59] claus: Any clue why that happens or what else I can try?
+[21:57:30] amitev has joined #selenium
+[21:58:37] lukeis: claus: sounds like the mouseout event isn't being triggered... and potentially a bug. maybe trying moveToElement(element).moveToElement(element, -5, -5).perform  to attempt to trigger the mouse up?
+[IRC logfile - Started Tue May 15 22:01:24 2012]
+[22:01:24] claus: lukeis: for my second moveToElement, right?
+[22:01:44] lukeis: yeah, maybe :)
+[22:03:18] lukeis: gotta go
+[22:10:17] claus: lukeis suggestion didn't work either ... still the same result
+[22:14:23] jleyba has joined #selenium
+[22:14:24] selbot2: jleyba: note from jimevans about 2 hours ago: here's a standalone test case for what's failing with keyboard stuff https://gist.github.com/2704367 
+[22:21:11] santiycr has joined #selenium
+[22:39:03] sfbrian has joined #selenium
+[22:48:09] kallisti: hm looks like there's a heap space error when I attempt to load my typical firefox profile
+[22:48:16] kallisti: which is pretty huge
+[22:49:36] opapo has joined #selenium
+[22:50:24] AutomatedTester: kallisti: whats in the profile?
+[22:50:29] AutomatedTester: kitchensink?
+[22:50:47] stackedsax: man, I hate myself for forgetting -DPOOL_MAX=1024
+[22:51:07] stackedsax: I mean, I wrote the damn bug in the first place… 
+[22:51:18] kallisti: yes, literally every privacy extension imaginable, a proxy extension, ad blocker, HTTPS everywhere, ...
+[22:51:24] stackedsax: totally forgot when I upgraded to 2.21 just now
+[22:51:24] kallisti: also pretty sure my cache is still in it.
+[22:54:36] ian_mac has joined #selenium
+[22:59:07] jarib: stackedsax: for grid?
+[IRC logfile - Started Tue May 15 23:00:07 2012]
+[23:00:07] stackedsax: yarrr
+[23:00:39] jarib: stackedsax: do you set that on both the hub and the nodes? what's your max session setting?
+[23:00:48] stackedsax: just the hub
+[23:01:04] stackedsax: it's #3432
+[23:01:05] selbot2: 03 closed/fixed raise jetty's POOL_MAX setting to get some more available threads on the hub - https://code.google.com/p/selenium/issues/detail?id=3432 [Type-Defect Priority-Medium Component-Grid]
+[23:01:05] AutomatedTester has joined #selenium
+[23:01:25] stackedsax: I submitted a patch, I just hadn't realized the patch was made into a configurable parameter
+[23:01:43] jarib: gotcha
+[23:02:12] stackedsax: I had thought it was just rolled in… so my grid started falling over and I started blaming everyone but me :)
+[23:05:58] barancev: do we have native events support for FF11 in trunk?
+[23:07:50] barancev: webdriver-firefox-previous.dll should be compiled for FF11
+[23:08:56] barancev: but I got 'can't load native events' error on windows7 + ff11
+[23:08:59] Automate_ has joined #selenium
+[23:14:06] jimevans has joined #selenium
+[23:14:29] jimevans: jleyba: ping
+[23:14:42] AutomatedTester has joined #selenium
+[23:17:03] santiycr: :seen andrestt
+[23:17:03] selbot2: I haven't seen andrestt.
+[23:17:13] santiycr: :seen andreastt
+[23:17:13] selbot2: andreastt was last seen about 9 hours ago, quitting.
+[23:17:36] santiycr: :note andreastt hey, here's the opera failure in our windows boxes: https://sso.dev.saucelabs.com/jobs/8a26e671b2044c029a63526300eaf08e/selenium-server.log
+[23:17:36] selbot2: ok!
+[23:18:01] santiycr: :note andreastt I'm working on a way to let you capture these for the linux failures you reported as well
+[23:18:01] selbot2: ok!
+[23:19:34] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: When a selected frame loads a new page, the SafariDriver will now | https://code.google.com/p/selenium/source/detail?r=16932 | http://seleniumhq.org/ci.jsp?r=16932
+[23:20:12] jleyba: jimevans: pong
+[23:20:27] jimevans: did you happen t see my earlier note?
+[23:21:00] jleyba: yup.  just now getting to it though
+[23:21:14] jimevans: oh, no worries. i just wanted to make sure you saw it.
+[23:24:17] jleyba: bah, our internal copy of the atoms has drifted from head again
+[23:26:01] nhirata has joined #selenium
+[23:26:47] jimevans: jleyba: lukeis made a change to get synthetic drag-drop working for jquery in ie9
+[23:28:19] nsussman has joined #selenium
+[23:29:54] nsussman has joined #selenium

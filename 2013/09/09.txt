@@ -1,0 +1,823 @@
+[2013-09-09 08:32:14] selloggingbot, joining. (#selenium)
+[2013-09-09 08:32:43] rbalent, quitting. (Quit: May the Force be with you)
+[2013-09-09 08:33:02] vila, quitting. (Remote host closed the connection)
+[2013-09-09 08:33:12] barancev: AutomatedTester: do you have an updated chimp?
+[2013-09-09 08:33:35] barancev: I'm not qualified enough to read the code of firefix easily
+[2013-09-09 08:33:59] barancev: jimevans: or may be you have already collected the list of the changes?
+[2013-09-09 08:34:18] Prometheian, joining. (#selenium)
+[2013-09-09 08:37:43] barancev: how should we pass parameters to the new marionette?
+[2013-09-09 08:38:33] Prometheian: My test opens a window where there's a table. If you click on any part of one of the rows, it counts that as a choice and closes itself and sends the choice to the main window. However, for some reason, my test keeps failing even though it's clicking where it needs to. Line 87. http://www.hastebin.com/qevijawali.avrasm Anyone mind taking a peek to see why it might be doing so?
+[2013-09-09 08:38:54] jimevans: barancev: parameters should be passed as the value of the "parameters" property in the json object sent across the wire.
+[2013-09-09 08:39:05] dimacus: anyone know of a firefox plugin that will take console log and dump it into file?
+[2013-09-09 08:39:12] dimacus: error log etc..
+[2013-09-09 08:39:16] dimacus: info
+[2013-09-09 08:39:25] barancev: jimevans: got it, thanks
+[2013-09-09 08:40:45] asavchuk: dimacus: fxdriver? :)
+[2013-09-09 08:41:36] dimacus: yeah… basically there seems to be a bug with the console log command line arg
+[2013-09-09 08:41:41] dimacus: that it does not actually save to file
+[2013-09-09 08:42:08] dimacus: asavchuk:  webdriver.log.file this flag is broken, so i'm looking for an alternative
+[2013-09-09 08:42:20] dimacus: like an FF add on that just dumps things to file
+[2013-09-09 08:42:22] asavchuk: dimacus: oh! it's broken of course
+[2013-09-09 08:42:31] dimacus: of course?
+[2013-09-09 08:42:34] asavchuk: dimacus: use webdriver.log.driver.file
+[2013-09-09 08:42:40] asavchuk: :)
+[2013-09-09 08:43:06] asavchuk: webdriver.log.(driver|browser|?).(file|level)
+[2013-09-09 08:43:22] dimacus: asavchuk:  so will that be log from the driver or from JS console log?
+[2013-09-09 08:43:55] asavchuk: driver log contains messages from driver. browser log - from browser
+[2013-09-09 08:44:00] asavchuk: as i know.
+[2013-09-09 08:44:09] dimacus: https://code.google.com/p/selenium/wiki/FirefoxDriver
+[2013-09-09 08:44:19] dimacus: the documentation got outdated me thinks
+[2013-09-09 08:44:30] seljenkinsbot: Project Firefox 10 Linux Synthesized Java Tests build #2269: UNSTABLE in 35 min: http://ci.seleniumhq.org:8080/job/Firefox%2010%20Linux%20Synthesized%20Java%20Tests/2269/
+[2013-09-09 08:44:40] dimacus: let me try that, and if that answers it, i will update the wiki
+[2013-09-09 08:44:54] asavchuk: https://code.google.com/p/selenium/issues/detail?id=5355
+[2013-09-09 08:45:22] asavchuk: ther is an example of setting up logs
+[2013-09-09 08:45:51] asavchuk: but be note that setting level for log does not work - always INFO is used.
+[2013-09-09 08:45:53] dimacus: thank you sir… this should help me to chase down a JS bug in FF driver core, and hopefully fix it
+[2013-09-09 08:46:11] dimacus: asavchuk:  ah ok i'll use error then
+[2013-09-09 08:46:25] seljenkinsbot: Project Firefox 23 Linux Synthesized Java Tests build #466: UNSTABLE in 28 min: http://ci.seleniumhq.org:8080/job/Firefox%2023%20Linux%20Synthesized%20Java%20Tests/466/
+[2013-09-09 08:46:26] seljenkinsbot: Project Firefox 22 Linux Synthesized Java Tests build #1089: UNSTABLE in 36 min: http://ci.seleniumhq.org:8080/job/Firefox%2022%20Linux%20Synthesized%20Java%20Tests/1089/
+[2013-09-09 08:46:35] jlipps, joining. (#selenium)
+[2013-09-09 08:46:51] barancev: AutomatedTester: https://gist.github.com/barancev/6497489
+[2013-09-09 08:47:09] seljenkinsbot: Project Firefox 23 Linux Native Java Tests build #466: UNSTABLE in 31 min: http://ci.seleniumhq.org:8080/job/Firefox%2023%20Linux%20Native%20Java%20Tests/466/
+[2013-09-09 08:47:38] barancev: line 1159 is curWindow.location = msg.json.value;
+[2013-09-09 08:47:46] hackerpreneur, joining. (#selenium)
+[2013-09-09 08:47:54] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 08:48:14] barancev: should I pass both value and parameters? or it is a bug?
+[2013-09-09 08:50:08] jimevans: in AutomatedTester's nightly build, the "session" parameter has been changed to "sessionId" to match the webdriver wire protocol too.
+[2013-09-09 08:50:54] dimacus: asavchuk: i'm looking at the code example, in the link and it seems that in the py file the log is set both in capabilities and profile… is that redundency on purpose?
+[2013-09-09 08:51:33] hackerpreneur, joining. (#selenium)
+[2013-09-09 08:51:39] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 08:51:43] asavchuk: dimacus: please use only settings in profile - this code was just example for issue
+[2013-09-09 08:52:12] dimacus: great, that makes it simpler than dealing with capabilities
+[2013-09-09 08:52:18] hackerpreneur, joining. (#selenium)
+[2013-09-09 08:52:24] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 08:53:02] hackerpreneur, joining. (#selenium)
+[2013-09-09 08:53:08] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 08:54:20] barancev: jimevans: I tried both, with the same result
+[2013-09-09 08:54:48] jimevans: barancev: don't know what to tell you. i'm running fine with david's private drop.
+[2013-09-09 08:55:04] mansi, quitting. (Read error: Connection reset by peer)
+[2013-09-09 08:55:27] barancev: jimevans: do you have a modified .net binding?
+[2013-09-09 08:55:29] mansi, joining. (#selenium)
+[2013-09-09 08:55:58] jimevans: yes, but it's not committed anywhere yet. i'm still playing with it.
+[2013-09-09 08:57:00] barancev: jimevans: can you dump a sample session log (full text of messages and responses)?
+[2013-09-09 08:57:02] mansi, quitting. (Read error: Connection reset by peer)
+[2013-09-09 08:57:30] mansi, joining. (#selenium)
+[2013-09-09 08:57:37] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 08:58:11] eutheria: it is a bad idea to try and use testng threads to run tests on a grid?
+[2013-09-09 08:58:48] jimevans: barancev: if you can live with me having stripped out the length fields
+[2013-09-09 08:59:10] barancev: sure
+[2013-09-09 08:59:22] barancev: I want to check the structure of the messages
+[2013-09-09 09:02:52] rebelagentm, joining. (#selenium)
+[2013-09-09 09:02:52] jimevans: barancev: https://gist.github.com/anonymous/6497760
+[2013-09-09 09:02:52] Prometheian: My test opens a window where there's a table. If you click on any part of one of the rows, it counts that as a choice and closes itself and sends the choice to the main window. However, for some reason, my test keeps failing even though it's clicking where it needs to. Line 87. http://www.hastebin.com/qevijawali.avrasm Anyone mind taking a peek to see why it might be doing so?
+[2013-09-09 09:03:31] zeljkof, joining. (#selenium)
+[2013-09-09 09:03:38] barancev: jimevans: {"to":"0","name":"goUrl","sessionId":"13","parameters":{"value":"http://localhost:2310/common/click_tests/html5_submit_buttons.html"}} -- value! not url as I expected
+[2013-09-09 09:03:56] barancev: so, parameter names are still the same, non-conformant?
+[2013-09-09 09:03:59] jimevans: Prometheian: without access to the html in question, it'll be nearly impossible to help with that, unfortunately.
+[2013-09-09 09:04:10] jimevans: barancev: yes, parameter names are still nonconformant.
+[2013-09-09 09:04:19] barancev: ok, I see, thanks!
+[2013-09-09 09:05:12] Prometheian: Are you talking site access? Or source code?
+[2013-09-09 09:05:33] jimevans: Prometheian: either. or if you have a simple page that demonstrates the problem, even better.
+[2013-09-09 09:05:45] jimevans: :kittens
+[2013-09-09 09:05:45] selbot2: Before you say you cannot provide html, think of the kittens! http://jimevansmusic.blogspot.ca/2012/12/not-providing-html-page-is-bogus.html
+[2013-09-09 09:05:50] Prometheian: I don't believe I do. I'm building new tests for an old site.
+[2013-09-09 09:06:26] Prometheian: Don't have source code access to the site either.
+[2013-09-09 09:07:29] Prometheian: warning: very ugly page
+[2013-09-09 09:08:07] jimevans: Prometheian: i'm not sure i'm going to be able to devote any time to looking at it now. i'm in the middle of several things, including "paid-for" work.
+[2013-09-09 09:09:15] Prometheian: Understandable.
+[2013-09-09 09:09:26] Prometheian: Once the dev's get back from lunch I'm going to pester them.
+[2013-09-09 09:09:34] admc, quitting. (Quit: Leaving.)
+[2013-09-09 09:10:23] gittish_, joining. (#selenium)
+[2013-09-09 09:12:46] davidlai, joining. (#selenium)
+[2013-09-09 09:13:03] seljenkinsbot: Project IE 9 Java Tests build #2847: UNSTABLE in 11 min: http://ci.seleniumhq.org:8080/job/IE%209%20Java%20Tests/2847/
+[2013-09-09 09:13:21] rebelagentm, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 09:15:00] md--, joining. (#selenium)
+[2013-09-09 09:18:27] md--_, quitting. (Ping timeout: 276 seconds)
+[2013-09-09 09:21:46] lukeis, quitting. (Quit: Leaving.)
+[2013-09-09 09:22:12] jimevans: lunch!
+[2013-09-09 09:23:07] lukeis, joining. (#selenium)
+[2013-09-09 09:23:44] tourdedave, quitting. (Quit: My MacBook has gone to sleep. ZZZzzz…)
+[2013-09-09 09:24:36] seljenkinsbot: Project IE 8 Java Tests build #2848: UNSTABLE in 11 min: http://ci.seleniumhq.org:8080/job/IE%208%20Java%20Tests/2848/
+[2013-09-09 09:26:55] mansi, quitting. (Remote host closed the connection)
+[2013-09-09 09:27:30] mansi, joining. (#selenium)
+[2013-09-09 09:27:52] rebelagentm, joining. (#selenium)
+[2013-09-09 09:27:56] seljenkinsbot: Project Firefox 10 XP Native Java Tests build #2249: UNSTABLE in 11 min: http://ci.seleniumhq.org:8080/job/Firefox%2010%20XP%20Native%20Java%20Tests/2249/
+[2013-09-09 09:28:34] mansi, quitting. (Read error: Connection reset by peer)
+[2013-09-09 09:28:43] mansi, joining. (#selenium)
+[2013-09-09 09:28:47] mansi, quitting. (Remote host closed the connection)
+[2013-09-09 09:30:46] mansi, joining. (#selenium)
+[2013-09-09 09:32:50] seljenkinsbot: Project Firefox 10 Linux Javascript Tests build #2253: FIXED in 4 min 54 sec: http://ci.seleniumhq.org:8080/job/Firefox%2010%20Linux%20Javascript%20Tests/2253/
+[2013-09-09 09:32:52] admc, joining. (#selenium)
+[2013-09-09 09:33:46] jimevans: bah! i think marionette doesn't handle unicode characters yet.
+[2013-09-09 09:34:15] awilson820, joining. (#selenium)
+[2013-09-09 09:34:18] gittish_, quitting. (Quit: gittish_)
+[2013-09-09 09:34:23] jleyba: http://corner.squareup.com/2013/09/kochiku.html
+[2013-09-09 09:34:30] tobie_, quitting. (Write error: Broken pipe)
+[2013-09-09 09:34:44] seljenkinsbot: Project IE 7 Java Tests build #2847: UNSTABLE in 12 min: http://ci.seleniumhq.org:8080/job/IE%207%20Java%20Tests/2847/
+[2013-09-09 09:38:11] seljenkinsbot: Project Firefox 17 Linux Javascript Tests build #986: FIXED in 5 min 37 sec: http://ci.seleniumhq.org:8080/job/Firefox%2017%20Linux%20Javascript%20Tests/986/
+[2013-09-09 09:38:29] seljenkinsbot: Project Firefox 10 Linux Synthesized Java Tests build #2270: FIXED in 9 min 47 sec: http://ci.seleniumhq.org:8080/job/Firefox%2010%20Linux%20Synthesized%20Java%20Tests/2270/
+[2013-09-09 09:39:24] awilson820, quitting. (Quit: Leaving.)
+[2013-09-09 09:44:01] seljenkinsbot: Project Firefox 22 Linux Synthesized Java Tests build #1090: FIXED in 11 min: http://ci.seleniumhq.org:8080/job/Firefox%2022%20Linux%20Synthesized%20Java%20Tests/1090/
+[2013-09-09 09:44:11] brokenthumbs, joining. (#selenium)
+[2013-09-09 09:48:51] sfbrian, joining. (#selenium)
+[2013-09-09 09:50:00] seljenkinsbot: Project Firefox 23 Linux Synthesized Java Tests build #467: FIXED in 11 min: http://ci.seleniumhq.org:8080/job/Firefox%2023%20Linux%20Synthesized%20Java%20Tests/467/
+[2013-09-09 09:52:38] DirtyMoney, joining. (#selenium)
+[2013-09-09 09:53:53] DirtyMoney: hey guys
+[2013-09-09 09:54:06] DirtyMoney: anyone online that is handling the documentation?
+[2013-09-09 09:56:51] rsimpson_, joining. (#selenium)
+[2013-09-09 09:56:52] jimevans: DirtyMoney: i don't generally deal with docs, but what's going on?
+[2013-09-09 09:57:24] DirtyMoney: I want to help and improve the documentation
+[2013-09-09 09:57:53] DirtyMoney: so I want to talk to the doc people to talk about a general way of handling this
+[2013-09-09 09:58:39] rsimpson_: Would someone be able to help me here using selenium with cucumber and cheezy/page-object?
+[2013-09-09 09:59:35] Ardesco, quitting. (Quit: Ardesco)
+[2013-09-09 10:00:57] smccarthy, joining. (#selenium)
+[2013-09-09 10:01:24] admc, quitting. (Quit: Leaving.)
+[2013-09-09 10:03:30] admc, joining. (#selenium)
+[2013-09-09 10:04:28] awilson820, joining. (#selenium)
+[2013-09-09 10:07:19] Dude-X, joining. (#selenium)
+[2013-09-09 10:07:24] tilgovi, joining. (#selenium)
+[2013-09-09 10:10:46] santiycr, joining. (#selenium)
+[2013-09-09 10:11:34] Prometheian: My test clicks a link a spot on a table and then errors out. It says: org.openqa.selenium.WebDriverException: disconnected: unable to receive message from renderer
+[2013-09-09 10:11:44] Prometheian: The window with the table closes once it's clicked.
+[2013-09-09 10:20:02] Selenium-Git, joining. (#selenium)
+[2013-09-09 10:20:02] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/wu7GrA
+[2013-09-09 10:20:02] Selenium-Git: 13selenium/06master 14f8e0b54 15Samit Badle: special keys shortened in Selenium IDE
+[2013-09-09 10:20:02] Selenium-Git, leaving. (#selenium)
+[2013-09-09 10:21:46] stephend, joining. (#selenium)
+[2013-09-09 10:23:09] zeljkof, quitting. (Quit: zeljkof)
+[2013-09-09 10:30:41] admc, quitting. (Quit: Leaving.)
+[2013-09-09 10:31:05] smccarthy2, joining. (#selenium)
+[2013-09-09 10:31:51] aweiteka, quitting. (Ping timeout: 260 seconds)
+[2013-09-09 10:34:30] smccarthy, quitting. (Ping timeout: 276 seconds)
+[2013-09-09 10:38:47] jamesoram, quitting. (Quit: This computer has gone to sleep)
+[2013-09-09 10:41:03] jimpurbrick1, joining. (#selenium)
+[2013-09-09 10:43:18] Prometheian: How do I switch between windows when a new one pops up? Because it seems like my current method is causing crap to break.
+[2013-09-09 10:43:33] gittish, joining. (#selenium)
+[2013-09-09 10:44:11] jimpurbrick, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 10:44:48] asavchuk_, joining. (#selenium)
+[2013-09-09 10:45:26] jimpurbrick1, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 10:47:05] Selenium-Git, joining. (#selenium)
+[2013-09-09 10:47:05] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/DQn7Pg
+[2013-09-09 10:47:05] Selenium-Git, leaving. (#selenium)
+[2013-09-09 10:47:05] Selenium-Git: 13selenium/06master 144d5b02d 15Samit Badle: Clear stored history for Base URLs, test cases and test suites. Fixes issue #6135
+[2013-09-09 10:47:59] aweiteka, joining. (#selenium)
+[2013-09-09 10:48:52] oliveiraev, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 10:51:06] ArSn, quitting. (Remote host closed the connection)
+[2013-09-09 10:52:36] DirtyMoney: Prometheian: use driver.switchTo().windowHandle
+[2013-09-09 10:52:57] Prometheian: Which is how I'm doing it right now, but I iterate through open windows.
+[2013-09-09 10:53:26] jimevans: Prometheian: that should be driver.switchTo().window(windowHandle). but remember that the handles returned by driver.getWindowHandles() are not guaranteed to be in any order whatsoever.
+[2013-09-09 10:53:28] DirtyMoney: what's the exact problem?
+[2013-09-09 10:53:49] stephend, quitting. (Read error: Connection reset by peer)
+[2013-09-09 10:54:02] stephend, joining. (#selenium)
+[2013-09-09 10:54:08] Prometheian: Randomly it seems, the tests will just break cause it won't switch windows.
+[2013-09-09 10:54:16] Prometheian: It's working now but no idea what I did to fix it.
+[2013-09-09 10:54:31] DirtyMoney: so there's no problem anymore :)
+[2013-09-09 10:54:40] DirtyMoney: be sure to switch back to the default window
+[2013-09-09 10:55:03] Prometheian: Yeah. I changed getPageSource to getPageTitle when trying to find which page to switch to.
+[2013-09-09 10:55:24] DirtyMoney: brb
+[2013-09-09 10:58:06] Prometheian: Oh yay, breaking again.
+[2013-09-09 10:58:08] Prometheian: The fuck.
+[2013-09-09 10:58:36] davehunt, quitting. (Remote host closed the connection)
+[2013-09-09 11:00:02] jimevans: Prometheian: sounds like you're not making sure the window exists before trying to switch to it.
+[2013-09-09 11:00:03] davehunt, joining. (#selenium)
+[2013-09-09 11:00:29] Prometheian: Yes
+[2013-09-09 11:00:33] Prometheian: I am
+[2013-09-09 11:00:35] Prometheian: Silly me
+[2013-09-09 11:00:45] Prometheian: wait, no
+[2013-09-09 11:01:24] Prometheian: 	    for (String window : driver.getWindowHandles())
+[2013-09-09 11:01:28] jimevans: what does your window switching method look like?
+[2013-09-09 11:01:32] Prometheian: driver.switchTo().window(window);
+[2013-09-09 11:01:33] jimevans: (use a pastebin)
+[2013-09-09 11:01:40] Prometheian: its 4 lines
+[2013-09-09 11:01:42] Prometheian: but okay
+[2013-09-09 11:01:55] oliveiraev, joining. (#selenium)
+[2013-09-09 11:02:33] Prometheian: http://www.hastebin.com/loteseleka.vbs
+[2013-09-09 11:02:53] jimevans: Prometheian: it may be only 4 lines, but it's easier to parse in one place rather than line by line.
+[2013-09-09 11:02:59] Prometheian: true
+[2013-09-09 11:03:50] hackerpreneur, joining. (#selenium)
+[2013-09-09 11:03:54] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 11:04:03] rsimpson_, leaving. (#selenium)
+[2013-09-09 11:04:23] jimevans: alright, let's think through this socratically. what do you expect would happen if, at the moment you called driver.getWindowHandles(), the target browser hadn't had time to open/fully populate the newly opened window?
+[2013-09-09 11:04:31] hackerpreneur, joining. (#selenium)
+[2013-09-09 11:04:35] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 11:04:42] Prometheian: Wouldn't show up.
+[2013-09-09 11:04:59] jimevans: right, and would never be found by your found window loop.
+[2013-09-09 11:05:12] hackerpreneur, joining. (#selenium)
+[2013-09-09 11:05:16] hackerpreneur, quitting. (Max SendQ exceeded)
+[2013-09-09 11:05:20] jimevans: since the problem is intermittent, that strongly suggests a timing issue to me.
+[2013-09-09 11:05:48] helperguy, joining. (#selenium)
+[2013-09-09 11:05:50] jimevans: so something like using a webdriverwait to wait for the number of window handles returned to be > 1 would seem to be in order.
+[2013-09-09 11:05:53] helperguy, quitting. (Max SendQ exceeded)
+[2013-09-09 11:06:24] vila, joining. (#selenium)
+[2013-09-09 11:06:26] helperguy, joining. (#selenium)
+[2013-09-09 11:06:26] smccarthy2, quitting. (Remote host closed the connection)
+[2013-09-09 11:06:29] helperguy, quitting. (Max SendQ exceeded)
+[2013-09-09 11:06:32] Prometheian: I also think it was ignoring the if statement at some point and would just set the active window to the last in the list which would RNG complete some of the time due to correct window picking.
+[2013-09-09 11:06:43] oliveiraev, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 11:07:00] smccarthy, joining. (#selenium)
+[2013-09-09 11:07:09] jimevans: yep. you can't count on the last one in the list being the last one opened.
+[2013-09-09 11:07:11] Prometheian: It doesn't like my if statement if(driver.getTitle().contains("Corporate Initiative"))
+[2013-09-09 11:07:27] Prometheian: going back to getPageSource
+[2013-09-09 11:07:38] helperguy, joining. (#selenium)
+[2013-09-09 11:07:42] helperguy, quitting. (Max SendQ exceeded)
+[2013-09-09 11:08:18] helperguy, joining. (#selenium)
+[2013-09-09 11:08:23] helperguy, quitting. (Max SendQ exceeded)
+[2013-09-09 11:11:48] timbo1, joining. (#selenium)
+[2013-09-09 11:13:30] Prometheian: Yeah, this doesn't seem to be working.
+[2013-09-09 11:20:30] oliveiraev, joining. (#selenium)
+[2013-09-09 11:23:15] YaNakilon, quitting. (Ping timeout: 276 seconds)
+[2013-09-09 11:23:34] ddary, joining. (#selenium)
+[2013-09-09 11:26:53] YaNakilon, joining. (#selenium)
+[2013-09-09 11:27:32] davehunt, quitting. (Remote host closed the connection)
+[2013-09-09 11:28:31] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 11:29:35] Prometheian: What defines a window's name? It's title?
+[2013-09-09 11:31:29] lukeis: window.open(url, name)   <- the arbitrary string 'name' passed in by javascript ;)   use WebDriver and the window handles api… much nicer
+[2013-09-09 11:31:30] jimevans: Prometheian: the name property added when window.open() is called.
+[2013-09-09 11:31:52] Prometheian: What if the new window is generated by the webpage?
+[2013-09-09 11:32:01] jimevans: then use window handles.
+[2013-09-09 11:32:18] Prometheian: Window name is a no-go in that scenario?
+[2013-09-09 11:32:44] jleyba: if you know it, use it
+[2013-09-09 11:32:45] jimevans: not necessarily. you'd need to know what window was supplied (if any) by the webpage when it calls window.open()
+[2013-09-09 11:34:09] gdennis, leaving. (#selenium)
+[2013-09-09 11:34:30] Prometheian: I don't know the name, and it probably isn't given one. Any code changes I'd have to put in a ticket for and who knows when it'd get developed over actual consumer functionality.
+[2013-09-09 11:34:58] jimevans: Prometheian: again i say, then use window handles.
+[2013-09-09 11:35:10] Prometheian: I am! They don't seem to work correctly.
+[2013-09-09 11:35:52] jimevans: Prometheian: i dispute that assertion.
+[2013-09-09 11:36:36] Prometheian: Yeah... :s
+[2013-09-09 11:39:31] Oscar_Rieken, quitting. (Ping timeout: 260 seconds)
+[2013-09-09 11:39:37] phasze: have you actually checked the window title Prometheian?
+[2013-09-09 11:39:43] Prometheian: Yes
+[2013-09-09 11:40:57] Oscar, joining. (#selenium)
+[2013-09-09 11:41:08] jimevans: Prometheian: have you checked that the size of the list returned by driver.getWindowHandles() is > 1?
+[2013-09-09 11:41:52] Prometheian: http://i41.tinypic.com/s2ec1v.jpg
+[2013-09-09 11:42:07] Prometheian: I am not
+[2013-09-09 11:42:58] jimevans: Prometheian: can you?
+[2013-09-09 11:43:02] jimevans: please?
+[2013-09-09 11:43:06] Prometheian: Yeah, implementing now.
+[2013-09-09 11:44:53] woodybrood, quitting. (Read error: Connection reset by peer)
+[2013-09-09 11:45:05] woodybrood, joining. (#selenium)
+[2013-09-09 11:46:07] Dude-X, quitting. (Quit: Dude-X)
+[2013-09-09 11:48:15] tourdedave, joining. (#selenium)
+[2013-09-09 11:49:49] Prometheian: Car leaks oil, stopped putting oil in. No more leaks!
+[2013-09-09 11:50:05] Prometheian: List isn't empty.
+[2013-09-09 11:50:11] Prometheian: It just isn't switching at all.
+[2013-09-09 11:50:30] jimevans: it shouldn't be empty, but how many entries does it have. you need to know the number.
+[2013-09-09 11:51:28] Prometheian: kk
+[2013-09-09 11:51:43] phasze: maybe get the title of each window while you're at it ;)
+[2013-09-09 11:52:19] jimevans: phasze: i'd discourage that for the moment.
+[2013-09-09 11:52:30] jimevans: let's just make sure there's more than one window handle in the list.
+[2013-09-09 11:52:33] Prometheian: 2
+[2013-09-09 11:52:37] phasze: figured it would just be a simple extra line to put in
+[2013-09-09 11:52:50] Prometheian: I'm running the for like: for (String window : driver.getWindowHandles())
+[2013-09-09 11:53:35] jimevans: okay, so you've verified the list count by something like system.out.println(driver.getWindowHandles().getSize()), right?
+[2013-09-09 11:53:41] Prometheian: yes
+[2013-09-09 11:53:47] jimevans: okay, great.
+[2013-09-09 11:54:10] jimevans: now, inside your loop, see if you can get the title of each driver.
+[2013-09-09 11:54:20] Prometheian: I'm unsure how to get a window's title from it's handle.
+[2013-09-09 11:54:48] jimevans: driver.switchTo().window(windowHandle); system.out.println(driver.getTitle());
+[2013-09-09 11:55:21] Prometheian: kk
+[2013-09-09 11:55:23] Prometheian: sec
+[2013-09-09 11:55:44] brockfredin: jimevans Hope you had a nice weekend
+[2013-09-09 11:56:22] jimevans: brockfredin: meh. had some sad tasks this weekend.
+[2013-09-09 11:56:39] brockfredin: jimevans Sorry about that.
+[2013-09-09 11:56:40] Prometheian: 2
+[2013-09-09 11:56:42] Prometheian: My Information > Goal Assignments
+[2013-09-09 11:56:43] patarr, joining. (#selenium)
+[2013-09-09 11:56:44] Prometheian: Corporate Initiative
+[2013-09-09 11:57:25] Prometheian: There be yer page titles.
+[2013-09-09 11:57:31] Mkop, joining. (#selenium)
+[2013-09-09 11:57:32] Prometheian: And yes, they're correct.
+[2013-09-09 11:57:40] phasze: now make sure they're spelled the same in your code and on the page ;)
+[2013-09-09 11:57:51] pairup, joining. (#selenium)
+[2013-09-09 11:57:55] patarr: Hi guys, I've been trying to solve a bug for a couple hours now and I can't wrap my head around it. It's just a simple web entry of some text into two form fields and hitting submit. But what occurs is the first field is always correctly populated, but only one or two characters get submitted into the next field and then submit fails because the input is malformed. Anyone have any ideas?
+[2013-09-09 11:58:25] phasze: in all browsers patarr?
+[2013-09-09 11:58:35] patarr: phasze, I have no tried any others.
+[2013-09-09 11:59:05] phasze: Try another patarr, and which are you seeing this failure on now?
+[2013-09-09 11:59:13] SamuraiJack, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 12:00:19] patarr: phasze: Firefox.
+[2013-09-09 12:01:02] Prometheian: 		    for (String window : driver.getWindowHandles())
+[2013-09-09 12:01:04] Prometheian: 		    	{
+[2013-09-09 12:01:05] Prometheian: 		    		if(driver.getTitle().equalsIgnoreCase("Corporate Initiative"))
+[2013-09-09 12:01:07] Prometheian: 		    			driver.switchTo().window(window);
+[2013-09-09 12:01:09] Prometheian: 		    	}
+[2013-09-09 12:01:10] Prometheian: 	    	}
+[2013-09-09 12:01:12] Prometheian: oh god sorry
+[2013-09-09 12:01:15] Prometheian: http://www.hastebin.com/heviyolare.coffee
+[2013-09-09 12:01:55] Prometheian: For whatever reason, that isn't working,.
+[2013-09-09 12:02:46] jimevans: i wouldn't expect that to work. you need to switch to the window before looking for its title.
+[2013-09-09 12:02:46] phasze: print them both out Prometheian, driver.getTitle() and your string, something isn't matching
+[2013-09-09 12:02:53] phasze: that to
+[2013-09-09 12:02:54] phasze: lol
+[2013-09-09 12:03:03] Prometheian: Ah
+[2013-09-09 12:03:19] Prometheian: hurr hurr hurr
+[2013-09-09 12:04:14] jimevans: Prometheian: http://www.hastebin.com/wucuhesola.avrasm
+[2013-09-09 12:05:04] Prometheian: I like that current handle thing. For whatever reason, didn't think I could do that.
+[2013-09-09 12:05:07] Prometheian: Being sick sucks.
+[2013-09-09 12:06:38] Prometheian: Ahaha! It clicked. What the fuck.
+[2013-09-09 12:06:54] jimevans: slightly better version: http://www.hastebin.com/cohayixubi.avrasm
+[2013-09-09 12:07:15] patarr: WOW Chrome flies through this code!! Thanks phasze
+[2013-09-09 12:07:26] phasze: patarr: that doesn't solve the firefox issue though
+[2013-09-09 12:07:35] phasze: that should still be looked at :P
+[2013-09-09 12:07:58] eutheria, quitting. (Remote host closed the connection)
+[2013-09-09 12:08:10] patarr: phasze: it seems that the exception output from Chrome is also terrible though. Pretty vague. "No such Element can be found" Thanks so much! Now which element would that be :)
+[2013-09-09 12:08:19] patarr: phasze: not sure how to even begin looking at it.
+[2013-09-09 12:08:35] phasze: does it give you a line number?
+[2013-09-09 12:08:37] phasze: are you debugging?
+[2013-09-09 12:08:48] patarr: phasze: looking at traceback. No line #
+[2013-09-09 12:09:07] phasze: can you put breakpoints and step through at that point?
+[2013-09-09 12:09:53] patarr: eeh im not well versed at debugging python yet. and it seems the exception is coming from within the webdriver itself.
+[2013-09-09 12:10:45] phasze: yeah, that will come from webdriver because it's trying to do something with an element it can't find.
+[2013-09-09 12:11:27] phasze: so maybe you're trying to sendkeys or click on something you think it there but isn't.  Like maybe your page isn't loaded yet.
+[2013-09-09 12:12:16] santiycr, quitting. (Quit: Leaving.)
+[2013-09-09 12:12:25] patarr: I'll work on it. I'm just really pissed that this driver doesn't submit as detailed exceptions as the FF one. Is there a selenium method I can use to check if the page is fully loaded?
+[2013-09-09 12:13:46] dimacus, joining. (#selenium)
+[2013-09-09 12:14:18] santiycr, joining. (#selenium)
+[2013-09-09 12:14:50] phasze: alas there is not patarr, I actually execute some javascript to verify my pages are loaded.  I have it check for jquery.active and if >0 then I make it wait a bit more.
+[2013-09-09 12:18:07] Prometheian: so
+[2013-09-09 12:18:15] Prometheian: the title for one of the pages
+[2013-09-09 12:18:17] Prometheian: is the url
+[2013-09-09 12:18:19] Prometheian: to that page
+[2013-09-09 12:18:29] Prometheian: Why
+[2013-09-09 12:18:46] timbo1, quitting. (Quit: Leaving.)
+[2013-09-09 12:23:46] Prometheian: Okay, now I'm fucking confused as hell.
+[2013-09-09 12:24:47] jimevans: Prometheian: one thing you have to remember is that the title of a given page isn't automatically set as soon as the page navigates. it may take some time for the browser to update the title property of the web page.
+[2013-09-09 12:25:09] Prometheian: This window is given no title.
+[2013-09-09 12:25:16] Prometheian: This site is so terribly designed for automated testing.
+[2013-09-09 12:25:26] aweiteka, quitting. (Ping timeout: 240 seconds)
+[2013-09-09 12:26:09] Prometheian: A quarter of the time I run these tests, they pass.
+[2013-09-09 12:26:13] Prometheian: The rest, they fail.
+[2013-09-09 12:26:26] Prometheian: It'll run a line successfully.
+[2013-09-09 12:26:30] Prometheian: And then say it fails.
+[2013-09-09 12:27:03] davidlai, quitting. (Quit: Leaving.)
+[2013-09-09 12:27:07] Prometheian: I'm using chromedriver 2.2
+[2013-09-09 12:27:11] phasze: We used to have that problem quite a bit Prometheian, the solution was the add many waits
+[2013-09-09 12:27:31] Prometheian: I'm already seeding in some waits, but only 1024l
+[2013-09-09 12:27:40] Prometheian: I'll bring up to 5000
+[2013-09-09 12:27:49] phasze: over 9000!
+[2013-09-09 12:27:57] Prometheian: :D
+[2013-09-09 12:28:07] jimevans: Prometheian: so what, exactly, is failing? that it's not switching to the popup window? that it's not performing something correctly after switching? what?
+[2013-09-09 12:28:31] Prometheian: See, that's the thing. It's working correctly and just failing. Giving me a disconnect error on the stack trace.
+[2013-09-09 12:28:34] Prometheian: It clicks what it needs to
+[2013-09-09 12:28:38] Prometheian: the window closes
+[2013-09-09 12:28:42] Prometheian: and it's supposed to switch to the main window
+[2013-09-09 12:28:49] Prometheian: But instead it just fails.
+[2013-09-09 12:29:02] jimevans: wait. how is it supposed to switch to the main window?
+[2013-09-09 12:29:09] phasze: it give you a renderer error?
+[2013-09-09 12:29:11] Prometheian: 	    driver.switchTo().window(curHandle);
+[2013-09-09 12:29:35] Prometheian: org.openqa.selenium.WebDriverException: disconnected: unable to receive message from renderer
+[2013-09-09 12:29:45] phasze: yup renderer
+[2013-09-09 12:29:49] jimevans: okay good.
+[2013-09-09 12:29:54] tourdedave, quitting. (Quit: My MacBook has gone to sleep. ZZZzzz…)
+[2013-09-09 12:30:18] Prometheian: org.openqa.selenium.WebDriverException: disconnected: DevTools client closed during closing UI debuggers
+[2013-09-09 12:30:21] Prometheian: 2 errors, that's second
+[2013-09-09 12:30:31] phasze: https://code.google.com/p/chromedriver/issues/detail?id=263
+[2013-09-09 12:30:34] phasze: https://code.google.com/p/chromedriver/issues/detail?id=402&q=renderer&colspec=ID%20Status%20Pri%20Owner%20Summary
+[2013-09-09 12:31:32] dimacus:   // NO. This cannot be changed to a local variable, Simon.
+[2013-09-09 12:31:32] dimacus:   // See documentation on msITimer.
+[2013-09-09 12:31:32] dimacus: pure gold in the comments :)
+[2013-09-09 12:31:54] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 12:32:16] Prometheian: No solution in those threads phasze?
+[2013-09-09 12:32:59] phasze: nope Prometheian: I've had them starred for some time and am waiting on the fix.  Until then we also get random chrome failures when the test deals with popups.
+[2013-09-09 12:33:08] Prometheian: Okay, well.
+[2013-09-09 12:33:20] Prometheian: At least I know what I spent the last 5 1/2 hours working on isn't my issue.
+[2013-09-09 12:33:28] Prometheian: And has just results in improved code.
+[2013-09-09 12:36:04] phasze: also this one, probably more related to yours Prometheian: https://code.google.com/p/chromedriver/issues/detail?id=401
+[2013-09-09 12:37:10] Prometheian: Oh man, I'm giving up for now.
+[2013-09-09 12:37:31] Prometheian: Once a new driver pops up that I can install that has this fixed I'll work on it. But for now, on to other things!
+[2013-09-09 12:37:35] stephend, quitting. (Read error: Connection reset by peer)
+[2013-09-09 12:37:53] stephend, joining. (#selenium)
+[2013-09-09 12:37:54] AutomatedTester: jimevans: so how is that build?
+[2013-09-09 12:38:00] aweiteka, joining. (#selenium)
+[2013-09-09 12:38:03] jimevans: AutomatedTester: works!
+[2013-09-09 12:38:17] AutomatedTester: issues?
+[2013-09-09 12:38:23] AutomatedTester: I bet there are some
+[2013-09-09 12:38:25] jimevans: I'm able to remove the parameters hack at least
+[2013-09-09 12:39:03] jimevans: yeah, there are a few issues, but i think most of them are already captured in the bug list.
+[2013-09-09 12:39:08] jimevans: like submit doesn't work
+[2013-09-09 12:39:49] jimevans: scrolling elements into view doesn't work very well. :)
+[2013-09-09 12:40:07] jimevans: but again, this stuff isn't directly related to your change.
+[2013-09-09 12:40:18] OS-10583, joining. (#selenium)
+[2013-09-09 12:40:19] asavchuk_, quitting. (Quit: bye everyone)
+[2013-09-09 12:40:20] AutomatedTester: jimevans: yay more bugs :)
+[2013-09-09 12:40:29] OS-10583: anybody around ?
+[2013-09-09 12:40:36] jimevans: yeah. one funny one is returning a list of elements from javascript.
+[2013-09-09 12:41:04] jimevans: marionette returns an object, rather than an array.
+[2013-09-09 12:41:08] OS-10583: got a bit of "curious" issues related to selenium on web application with .NET
+[2013-09-09 12:41:14] AutomatedTester: jimevans: which one?
+[2013-09-09 12:41:25] jimevans: AutomatedTester: give me a second.
+[2013-09-09 12:41:33] jimevans: OS-10583: :ask
+[2013-09-09 12:41:33] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[2013-09-09 12:41:34] AutomatedTester: thanks chap!
+[2013-09-09 12:41:50] OS-10583: thanks selbot2
+[2013-09-09 12:41:53] santiycr, quitting. (Quit: Leaving.)
+[2013-09-09 12:42:29] OS-10583: why does selenium record duplicate username and password fields when i try to record the login
+[2013-09-09 12:42:57] patarr: phasze: my script completely executes correctly but I still get a not found element message. Is that some sort of weird quirk?
+[2013-09-09 12:42:58] jimevans: OS-10583: by "record", are you using Selenium IDE (the firefox plugin)?
+[2013-09-09 12:43:09] OS-10583: also, it seems it's omitting the username/password fields from sending them in other hidden fields
+[2013-09-09 12:43:23] OS-10583: yes, selenium IDE 2.3.0 on firefox on ubuntu 12.04
+[2013-09-09 12:43:26] phasze: patarr: nope, sounds like something didn't execute correcly.
+[2013-09-09 12:43:41] tilgovi, quitting. (Remote host closed the connection)
+[2013-09-09 12:43:50] phasze: patarr: if you think it all ran good it may have even been the last command.
+[2013-09-09 12:44:01] patarr: but it worked well! lol
+[2013-09-09 12:44:07] jimevans: OS-10583: well, i'm going to be singularly unable to help with that. my (strongly negative) feelings about selenium ide are on record.
+[2013-09-09 12:44:20] OS-10583: i can handover the url of the site just to try out
+[2013-09-09 12:44:33] OS-10583: no wait, i don't think that's wise (this is being recorded)
+[2013-09-09 12:45:27] OS-10583: jimevans: you know if selenium has been tested with a .net web application?  those things could be really annoying
+[2013-09-09 12:45:38] tourdedave, joining. (#selenium)
+[2013-09-09 12:46:12] OS-10583: i compare payloads between what selenium sends
+[2013-09-09 12:46:20] OS-10583: and what the browser sends
+[2013-09-09 12:46:23] OS-10583: here's one sample
+[2013-09-09 12:46:34] OS-10583: $txtPassword=1234&ctl00_ContentPlaceHolder1_txtPassword_ClientState={"enabled":true,"emptyMessage":"Password","validationText":"","valueAsString":""}
+[2013-09-09 12:46:52] OS-10583: $txtPassword=1234&ctl00_ContentPlaceHolder1_txtPassword_ClientState={"enabled":true,"emptyMessage":"Password","validationText":"1234","valueAsString":"1234"}
+[2013-09-09 12:47:08] OS-10583: first is with selenium, second is with firefox alone
+[2013-09-09 12:47:16] OS-10583: notice the "1234" in the field
+[2013-09-09 12:47:32] nirvdrum_, joining. (#selenium)
+[2013-09-09 12:48:05] jimevans: OS-10583: i've heard of people using selenium with .NET web applications. but using selenium ide or selenium rc, i'm not going to be able to diagnose any problems you may see.
+[2013-09-09 12:49:25] jimevans: AutomatedTester: https://gist.github.com/jimevans/6500573
+[2013-09-09 12:49:39] jimevans: there's a transcript of the traffic to/from marionette.
+[2013-09-09 12:50:00] stephend, quitting. (Read error: Connection reset by peer)
+[2013-09-09 12:50:19] stephend, joining. (#selenium)
+[2013-09-09 12:50:23] jimevans: you'll notice the response to executeScript returns an interesting return value.
+[2013-09-09 12:50:34] OS-10583: i see
+[2013-09-09 12:51:12] OS-10583: wait a minute
+[2013-09-09 12:51:36] OS-10583: i missed the part where you said you didn't like the ide
+[2013-09-09 12:51:51] jimevans: OS-10583: i just abhor the RC api, and keep myself deliberately ignorant of it. similarly i believe record/playback to be a flawed paradigm for long-term success of automation efforts, so i remain ignorant of that too.
+[2013-09-09 12:51:54] OS-10583: what would be the alternative to write a nice selenium script
+[2013-09-09 12:53:10] jimevans: visual studio using the webdriver .net bindings? eclipse/intellij using the webdriver java bindings? any text editor using the webdriver ruby or python bindings? any of those i'd use. :)
+[2013-09-09 12:53:13] OS-10583: jimevans: i'll have to agree, i do stress testing and recording never helped me out by itself
+[2013-09-09 12:53:45] barancev: AutomatedTester: is something fixed from this list? https://docs.google.com/document/d/1bcQKwXD8pTEggsdPVM3LA23eVdQdHDtkm7GHFMUeWN4/edit?usp=sharing
+[2013-09-09 12:54:14] OS-10583: jimavans: thanks, so i can use python to generate a selenium script ?
+[2013-09-09 12:54:50] jimevans: "generate" is a hazy word for me, but you can write a webdriver script using python, yes.
+[2013-09-09 12:54:56] stephend_, joining. (#selenium)
+[2013-09-09 12:54:59] stephend, quitting. (Read error: Connection reset by peer)
+[2013-09-09 12:56:04] jimevans: AutomatedTester, barancev: yep, those issues still look to be in place.
+[2013-09-09 12:56:23] OS-10583: ok, i'm just wondering if a "script" in selenium is universal, 'cause this third-party service which requires automated login, has the selenium option
+[2013-09-09 12:57:51] barancev: AutomatedTester: and, btw, firefox dies on quit
+[2013-09-09 12:58:00] brokenthumbs, joining. (#selenium)
+[2013-09-09 12:59:30] barancev: https://gist.github.com/barancev/6500693
+[2013-09-09 13:00:02] jimevans: barancev: that definitely doesn't happen for me.
+[2013-09-09 13:00:16] ddary, quitting. (Quit: ddary)
+[2013-09-09 13:00:58] barancev: jimevans: did you run a single test or the whole suite?
+[2013-09-09 13:01:08] jimevans: the whole suite for the .net bindings
+[2013-09-09 13:02:32] barancev: there is no crash when I run a sinple test method, but when I run a class the firefox crashes on quit
+[2013-09-09 13:04:22] Oscar, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 13:04:42] barancev: but from Java point of view tests are ok
+[2013-09-09 13:05:06] barancev: firefox dies after the response from marionette is received
+[2013-09-09 13:05:17] Archdude: anyone here from the NYC area interested in a test engineer opportunity?
+[2013-09-09 13:06:47] nirvdrum_, quitting. (Ping timeout: 260 seconds)
+[2013-09-09 13:07:06] AutomatedTester: barancev: thanks
+[2013-09-09 13:07:09] fatguylaughing, joining. (#selenium)
+[2013-09-09 13:07:17] Oscar, joining. (#selenium)
+[2013-09-09 13:07:24] AutomatedTester: barancev: dies on response from marionette?
+[2013-09-09 13:11:56] barancev: AutomatedTester: after it
+[2013-09-09 13:12:04] santiycr, joining. (#selenium)
+[2013-09-09 13:12:09] barancev: Java gets the response, all is ok
+[2013-09-09 13:12:24] barancev: may be I should close the reader?
+[2013-09-09 13:12:34] barancev: can it be the reason?
+[2013-09-09 13:12:40] AutomatedTester: ?
+[2013-09-09 13:12:53] barancev: the reader that reads data from the socket
+[2013-09-09 13:13:00] barancev: connection to marionette
+[2013-09-09 13:14:09] AutomatedTester: so you read the response and then it dies?
+[2013-09-09 13:14:46] barancev: yes
+[2013-09-09 13:14:51] AutomatedTester: weird
+[2013-09-09 13:14:59] AutomatedTester: that should be rock solid code
+[2013-09-09 13:15:06] AutomatedTester: jimevans: are you seeing that too?
+[2013-09-09 13:15:06] barancev: from the Java perspective the iest is dome
+[2013-09-09 13:15:10] jleyba: :whobrokeit
+[2013-09-09 13:15:11] selbot2: simonstewart
+[2013-09-09 13:15:15] barancev: test is done :)
+[2013-09-09 13:15:15] jleyba: There's your answer
+[2013-09-09 13:15:58] OS-10583: what is the difference between sendkeys and type ?
+[2013-09-09 13:16:10] jimevans: AutomatedTester: no, i'm good. i'm not seeing any crashes at all. although i did add some robustness code in my .NET implementation to handle subsequent calls to quit().
+[2013-09-09 13:16:12] AutomatedTester: OS-10583: different APIs
+[2013-09-09 13:16:23] santiycr, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 13:16:34] jleyba: OS-10583: one of the reasons you should migrate to the webdriver API
+[2013-09-09 13:16:38] OS-10583: would it make a difference in form login ?
+[2013-09-09 13:16:44] jleyba: depends
+[2013-09-09 13:17:21] OS-10583: k,
+[2013-09-09 13:17:59] OS-10583: 1.10 seems to record my input as "type"
+[2013-09-09 13:18:10] OS-10583: 2.3.0 puts "sendkeys" instead
+[2013-09-09 13:20:51] tilgovi, joining. (#selenium)
+[2013-09-09 13:21:02] jimevans: the vast bulk of the complexity of the .net marionette driver could be eliminated if moz#819050 were fixed and if the command names and parameter names matched the webdriver wire protocol.
+[2013-09-09 13:21:04] selbot2: 03David Burns :automatedtester NEW/ Marionette response containing element has raw ID instead of JSON object - https://bugzilla.mozilla.org/show_bug.cgi?id=819050
+[2013-09-09 13:21:25] davidlai, joining. (#selenium)
+[2013-09-09 13:22:19] AutomatedTester: jimevans: ok cool, that will be my next bug
+[2013-09-09 13:22:42] AutomatedTester: jimevans: my original patch breaks stuff in FxOS so need to work through that
+[2013-09-09 13:22:43] jimevans: i can't seem to find the bug about command and parameter names though. i know one exists.
+[2013-09-09 13:23:34] AutomatedTester: https://bugzilla.mozilla.org/show_bug.cgi?id=807282
+[2013-09-09 13:23:37] jimevans: and mind, that's only about reducing the client implementation's complexity. doesn't say anything about functionality. :)
+[2013-09-09 13:23:51] AutomatedTester: interop ftw
+[2013-09-09 13:24:05] jimevans: oh, so the parameters fix was part 1?
+[2013-09-09 13:24:11] AutomatedTester: yea
+[2013-09-09 13:24:16] jimevans: gotcha
+[2013-09-09 13:24:22] jimevans: well struck, that.
+[2013-09-09 13:24:29] AutomatedTester: each bug needs to land "separate"
+[2013-09-09 13:24:42] jimevans: the json request structure fix looks good.
+[2013-09-09 13:25:08] AutomatedTester: except it broke stuff in FxOS
+[2013-09-09 13:25:16] jimevans: (moving parameters to its own property, instead of flattening it out, i mean)
+[2013-09-09 13:25:18] jimevans: oh.
+[2013-09-09 13:25:21] jimevans: well that sucks.
+[2013-09-09 13:25:35] cmcgraw, joining. (#selenium)
+[2013-09-09 13:25:42] jimevans: time for more whack-a-mole!
+[2013-09-09 13:25:45] OS-10583: heheh, this scanner says "sendKeys" is not recognized
+[2013-09-09 13:25:57] AutomatedTester: jimevans: I had whack-a-mole with this bug
+[2013-09-09 13:26:41] jimevans: yeah, that's why it's time for MOAR!!!
+[2013-09-09 13:27:07] jimevans: i don't envy y'all, by the way.
+[2013-09-09 13:27:19] jimevans: you're doing yeoman's work there, you and your team.
+[2013-09-09 13:27:32] AutomatedTester: :)
+[2013-09-09 13:27:40] lytrogeek, changing nick to eanxgeek|log.
+[2013-09-09 13:27:43] AutomatedTester: thats why we are hiring...
+[2013-09-09 13:27:47] *jimevans <3 marionette and the people making it happen'
+[2013-09-09 13:27:49] AutomatedTester: were hiring even
+[2013-09-09 13:29:15] rebelagentm1, joining. (#selenium)
+[2013-09-09 13:29:28] jimevans: AutomatedTester: where's the canonical marionette client repository, or a clone thereof i can see? your fork on github good?
+[2013-09-09 13:29:51] AutomatedTester: mozilla-central
+[2013-09-09 13:30:07] AutomatedTester: http://hg.mozilla.org/mozilla-central/
+[2013-09-09 13:30:20] santiycr, joining. (#selenium)
+[2013-09-09 13:30:48] AutomatedTester: http://hg.mozilla.org/mozilla-central/file/tip/testing/marionette
+[2013-09-09 13:31:41] retornam, quitting. (Ping timeout: 264 seconds)
+[2013-09-09 13:31:58] rebelagentm, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 13:32:31] retornam, joining. (#selenium)
+[2013-09-09 13:33:32] emil_tester, quitting. (Quit: Page closed)
+[2013-09-09 13:34:05] dimacus: when i am launching a grid node, and i get an error "connection refused" i honestly feel a little hurt and dispointed… someone hurt my node's feelings :(
+[2013-09-09 13:34:08] jimevans: AutomatedTester: is getElementLocationOnceScrolledIntoView (or some more reasonably named equivalent) defined in the spec, and implemented in marionette?
+[2013-09-09 13:34:25] jimevans: (i'm guessing not0
+[2013-09-09 13:34:26] jimevans: )
+[2013-09-09 13:39:58] jimevans: protip for marionette client writers: the prefix on the command is the number of *bytes* not the number of *characters* in the json command.
+[2013-09-09 13:40:38] barancev: ooou
+[2013-09-09 13:40:55] barancev: in what encoding?
+[2013-09-09 13:41:02] jimevans: utf-8
+[2013-09-09 13:41:06] barancev: ok
+[2013-09-09 13:41:24] jimevans: getting those mixed up can lead to all kinds of fun.
+[2013-09-09 13:42:41] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 13:43:23] timbo1, joining. (#selenium)
+[2013-09-09 13:47:39] AutomatedTester: jimevans: I dont think its documented
+[2013-09-09 13:47:55] AutomatedTester: jimevans: we have about an element being in view before interacting
+[2013-09-09 13:49:15] barancev: :spec
+[2013-09-09 13:49:16] selbot2: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[2013-09-09 13:51:38] Prometheian, quitting. (Quit: ChatZilla 0.9.90.1 [Firefox 23.0.1/20130814063812])
+[2013-09-09 13:52:30] imphasing: does switching windows reset what frame is currently active?
+[2013-09-09 13:53:32] jimevans: imphasing: that might depend on the browser implementation. in the IE driver it does.
+[2013-09-09 13:57:32] imphasing: I'll just tias with chrome
+[2013-09-09 13:57:45] awilson820, quitting. (Quit: Leaving.)
+[2013-09-09 13:58:58] farlan, quitting. (Quit: Leaving.)
+[2013-09-09 13:59:47] dhenry, quitting. (Remote host closed the connection)
+[2013-09-09 14:00:01] mreedell-work, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 14:03:41] cmcgraw, quitting. (Quit: cmcgraw)
+[2013-09-09 14:03:43] bluescreen100, quitting. (Ping timeout: 260 seconds)
+[2013-09-09 14:06:13] awilson820, joining. (#selenium)
+[2013-09-09 14:07:23] barancev: not every test crashes firefox
+[2013-09-09 14:09:53] AutomatedTester: barancev: oh
+[2013-09-09 14:10:36] AutomatedTester: barancev: which call?
+[2013-09-09 14:10:37] intchanter-work, quitting. (Quit: Leaving.)
+[2013-09-09 14:10:44] intchanter-work, joining. (#selenium)
+[2013-09-09 14:10:52] barancev: investigating
+[2013-09-09 14:13:57] AutomatedTester: barancev: thanks!
+[2013-09-09 14:17:49] intchanter-work, quitting. (Quit: Leaving.)
+[2013-09-09 14:18:02] aweiteka, quitting. (Read error: Operation timed out)
+[2013-09-09 14:18:18] intchanter-work, joining. (#selenium)
+[2013-09-09 14:22:22] jleyba, quitting. (Quit: Leaving)
+[2013-09-09 14:28:25] AutomatedTester: jimevans: looking at moz#819050 it should be a trivial fix
+[2013-09-09 14:28:27] selbot2: 03David Burns :automatedtester NEW/ Marionette response containing element has raw ID instead of JSON object - https://bugzilla.mozilla.org/show_bug.cgi?id=819050
+[2013-09-09 14:28:44] AutomatedTester: :wiki jsonwireprotocol
+[2013-09-09 14:28:45] selbot2: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[2013-09-09 14:28:51] woodybrood, leaving. (#selenium)
+[2013-09-09 14:29:02] jimevans: that'd be sweet.
+[2013-09-09 14:29:17] AutomatedTester: jimevans: the code has the object it tries to send
+[2013-09-09 14:29:26] AutomatedTester: so its just updating the object accordingly
+[2013-09-09 14:29:37] zeljkof, joining. (#selenium)
+[2013-09-09 14:30:23] zeljkof, quitting. (Client Quit)
+[2013-09-09 14:30:25] davehunt, joining. (#selenium)
+[2013-09-09 14:31:16] AutomatedTester: e.g. http://mxr.mozilla.org/mozilla-central/source/testing/marionette/marionette-listener.js#1220
+[2013-09-09 14:31:54] jimevans: right.
+[2013-09-09 14:31:59] jimevans: should be pretty easy.
+[2013-09-09 14:32:10] AutomatedTester: yup
+[2013-09-09 14:32:30] tourdedave, quitting. (Quit: My MacBook has gone to sleep. ZZZzzz…)
+[2013-09-09 14:34:37] pairup, quitting. (Read error: Connection reset by peer)
+[2013-09-09 14:36:59] jimevans: well that was an annoying client-side bug.
+[2013-09-09 14:37:16] jimevans: wasn't calculating my socket buffer length correctly.
+[2013-09-09 14:43:01] OS-10583, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 14:44:40] barancev: AutomatedTester: I think {"to":"0","sessionId":"13","name":"switchToFrame","parameters":{"id":null}} causes a subsequent crash
+[2013-09-09 14:44:54] AutomatedTester: interesting
+[2013-09-09 14:46:26] barancev: well, no :)
+[2013-09-09 14:46:40] barancev: there are other tests with the same command that are ok
+[2013-09-09 14:46:43] barancev: :(
+[2013-09-09 14:46:55] AutomatedTester: hmmm
+[2013-09-09 14:52:54] jimevans: so about 1/3 of the .NET bindings tests fail for marionette (ignoring alerts tests)
+[2013-09-09 14:53:10] AutomatedTester: thats an improvement
+[2013-09-09 14:53:46] jimevans: and i'm not getting any random disconnections or unable-to-connects either.
+[2013-09-09 14:54:08] AutomatedTester: yay
+[2013-09-09 14:55:41] Oscar, leaving. (#selenium)
+[2013-09-09 14:59:58] md--, quitting. (Remote host closed the connection)
+[2013-09-09 15:01:56] gittish, quitting. (Quit: gittish)
+[2013-09-09 15:03:39] auto_user, joining. (#selenium)
+[2013-09-09 15:04:27] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-09-09 15:05:01] pairup, joining. (#selenium)
+[2013-09-09 15:05:33] rebelagentm1, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 15:08:10] intchanter-work, quitting. (Quit: Leaving.)
+[2013-09-09 15:08:23] mansi, quitting. (Remote host closed the connection)
+[2013-09-09 15:08:29] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 15:08:48] vila, quitting. (Ping timeout: 276 seconds)
+[2013-09-09 15:08:55] mansi, joining. (#selenium)
+[2013-09-09 15:09:31] tilgovi, quitting. (Ping timeout: 260 seconds)
+[2013-09-09 15:11:11] tilgovi, joining. (#selenium)
+[2013-09-09 15:13:03] mansi, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 15:18:05] patarr: could selenium be fooled by dynamically loaded content on a site? Let's say you load the page, and you're looking for a checkbox. Selenium can not find it, so I assume it's being loaded by some kind of JS after the page is loaded and selenium can't find it?
+[2013-09-09 15:18:47] patarr: Yup. implicitly waiting did the trick
+[2013-09-09 15:19:30] rebelagentm, joining. (#selenium)
+[2013-09-09 15:20:41] barancev: AutomatedTester: found what causes crashes
+[2013-09-09 15:20:59] barancev: it is writer.close()
+[2013-09-09 15:21:32] barancev: where writer = new PrintWriter(socket.getOutputStream(), true)
+[2013-09-09 15:27:32] DarkRift, joining. (#selenium)
+[2013-09-09 15:33:00] Selenium-Git, joining. (#selenium)
+[2013-09-09 15:33:00] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/zSXiGg
+[2013-09-09 15:33:00] Selenium-Git: 13selenium/06master 149bc36a1 15Samit Badle: getting ready for Selenium IDE 2.4.0 release
+[2013-09-09 15:33:00] Selenium-Git, leaving. (#selenium)
+[2013-09-09 15:33:13] patarr, leaving. (#selenium)
+[2013-09-09 15:35:45] fatguylaughing, joining. (#selenium)
+[2013-09-09 15:39:56] nirvdrum, quitting. (Remote host closed the connection)
+[2013-09-09 15:40:15] smccarthy: anyone seen this error when running IE9 on the grid : exec return code 1: ERROR: The system was unable to find the specified registry key or value.
+[2013-09-09 15:40:20] smccarthy: or maybe seen that error some other way
+[2013-09-09 15:41:04] tilgovi, quitting. (Remote host closed the connection)
+[2013-09-09 15:41:20] nirvdrum, joining. (#selenium)
+[2013-09-09 15:41:39] smccarthy: 4520
+[2013-09-09 15:42:46] nirvdrum_, joining. (#selenium)
+[2013-09-09 15:47:26] nirvdrum_, quitting. (Ping timeout: 240 seconds)
+[2013-09-09 15:49:15] seljenkinsbot: Project SeleniumHQ build #135: SUCCESS in 1 min 24 sec: http://ci.seleniumhq.org:8080/job/SeleniumHQ/135/
+[2013-09-09 15:49:16] seljenkinsbot: Samit Badle: Selenium IDE v2.4.0 available for testing
+[2013-09-09 15:54:24] chrismcmahon, joining. (#selenium)
+[2013-09-09 16:00:17] smccarthy, quitting. (Remote host closed the connection)
+[2013-09-09 16:02:14] gittish, joining. (#selenium)
+[2013-09-09 16:03:34] lukeis, quitting. (Quit: Leaving.)
+[2013-09-09 16:07:52] jleyba, joining. (#selenium)
+[2013-09-09 16:08:37] jleyba: :ci
+[2013-09-09 16:08:37] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[2013-09-09 16:09:20] admc, joining. (#selenium)
+[2013-09-09 16:09:46] jimevans1, joining. (#selenium)
+[2013-09-09 16:10:00] jimevans, quitting. (Read error: Connection reset by peer)
+[2013-09-09 16:11:09] brokenthumbs, joining. (#selenium)
+[2013-09-09 16:13:40] admc, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 16:13:42] jleyba, quitting. (Quit: Leaving)
+[2013-09-09 16:15:42] jimevans1, quitting. (Quit: Leaving.)
+[2013-09-09 16:22:14] pairup, quitting. (Quit: I'm asleep.)
+[2013-09-09 16:23:47] auto_user, quitting. (Ping timeout: 250 seconds)
+[2013-09-09 16:27:40] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 16:32:15] oliveiraev, quitting. (Quit: Leaving)
+[2013-09-09 16:42:01] tilgovi, joining. (#selenium)
+[2013-09-09 16:49:21] davehunt, quitting. (Remote host closed the connection)
+[2013-09-09 16:55:44] rebelagentm, leaving. (#selenium)
+[2013-09-09 17:01:46] vila, joining. (#selenium)
+[2013-09-09 17:09:35] farlan, joining. (#selenium)
+[2013-09-09 17:13:24] awilson820, quitting. (Quit: Leaving.)
+[2013-09-09 17:14:35] awilson820, joining. (#selenium)
+[2013-09-09 17:17:06] sfbrian, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 17:19:41] mansi, joining. (#selenium)
+[2013-09-09 17:20:56] chrismcmahon, quitting. (Quit: Leaving.)
+[2013-09-09 17:25:09] mansi, quitting. (Ping timeout: 248 seconds)
+[2013-09-09 17:25:58] dimacus, joining. (#selenium)
+[2013-09-09 17:33:10] brokenthumbs, joining. (#selenium)
+[2013-09-09 17:36:46] mreedell-work, joining. (#selenium)
+[2013-09-09 17:38:52] timbo1, quitting. (Quit: Leaving.)
+[2013-09-09 17:44:21] jlipps, quitting. (Quit: Leaving.)
+[2013-09-09 17:44:55] dimacus1, joining. (#selenium)
+[2013-09-09 17:47:10] dimacus, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 17:47:27] jlipps, joining. (#selenium)
+[2013-09-09 17:50:50] pairup, joining. (#selenium)
+[2013-09-09 17:56:22] dimacus1, quitting. (Quit: Leaving.)
+[2013-09-09 18:00:35] tom_irc, joining. (#selenium)
+[2013-09-09 18:00:53] tom_irc: is this the right channel for webdriver related questions now too?
+[2013-09-09 18:00:59] tom_irc, changing nick to eftm.
+[2013-09-09 18:02:08] phdjsep, joining. (#selenium)
+[2013-09-09 18:04:06] tourdedave, joining. (#selenium)
+[2013-09-09 18:04:32] phdjsep: I have a strange issue. If I look at the timezone of my browser when I start it up by hand, it's correct. When selenium is running, the timezone is 0. Is there a firefox profile setting for timezone? I couldn't find any
+[2013-09-09 18:04:53] dimacus, joining. (#selenium)
+[2013-09-09 18:05:27] eftm: and is there any way to set a profile for ssl certs and stuff when using it with chrome?
+[2013-09-09 18:07:21] davidlai, quitting. (Quit: Leaving.)
+[2013-09-09 18:11:01] tourdedave, quitting. (Ping timeout: 248 seconds)
+[2013-09-09 18:12:26] gittish, quitting. (Quit: gittish)
+[2013-09-09 18:12:44] phdjsep, quitting. (Quit: phdjsep)
+[2013-09-09 18:18:14] eftm, quitting. (Ping timeout: 264 seconds)
+[2013-09-09 18:19:56] mansi, joining. (#selenium)
+[2013-09-09 18:20:39] jlipps, quitting. (Quit: Leaving.)
+[2013-09-09 18:21:12] nycjv321, joining. (#selenium)
+[2013-09-09 18:21:41] nycjv321: Are there any examples for programmatically driving Selenium Grid in Java?
+[2013-09-09 18:24:18] p0deje, quitting. (Quit: p0deje)
+[2013-09-09 18:24:43] p0deje, joining. (#selenium)
+[2013-09-09 18:24:45] awilson820, quitting. (Quit: Leaving.)
+[2013-09-09 18:25:12] santiycr, quitting. (Quit: Leaving.)
+[2013-09-09 18:25:16] mansi, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 18:28:09] DirtyMoney, quitting. (Ping timeout: 250 seconds)
+[2013-09-09 18:28:43] p0deje, quitting. (Client Quit)
+[2013-09-09 18:31:09] mansi, joining. (#selenium)
+[2013-09-09 18:35:17] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 18:53:01] mansi, quitting. (Remote host closed the connection)
+[2013-09-09 18:53:35] mansi, joining. (#selenium)
+[2013-09-09 18:56:03] dimacus, joining. (#selenium)
+[2013-09-09 18:56:56] santiycr, joining. (#selenium)
+[2013-09-09 18:57:38] mansi, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 18:59:04] nycjv321: Hello?
+[2013-09-09 19:03:06] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 19:03:47] eftm, joining. (#selenium)
+[2013-09-09 19:05:15] jlipps, joining. (#selenium)
+[2013-09-09 19:05:35] eftm, quitting. (Client Quit)
+[2013-09-09 19:06:44] schweens, quitting. (Quit: schweens)
+[2013-09-09 19:09:31] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 19:15:09] dimacus, joining. (#selenium)
+[2013-09-09 19:15:44] mreedell-work, quitting. (Quit: Computer has gone to sleep.)
+[2013-09-09 19:17:18] davidlai, joining. (#selenium)
+[2013-09-09 19:18:38] vila, quitting. (Ping timeout: 240 seconds)
+[2013-09-09 19:20:45] davidlai, quitting. (Client Quit)
+[2013-09-09 19:22:05] santiycr, quitting. (Quit: Leaving.)
+[2013-09-09 19:22:06] mansi, joining. (#selenium)
+[2013-09-09 19:22:18] jlipps, quitting. (Quit: Leaving.)
+[2013-09-09 19:25:31] jlipps, joining. (#selenium)
+[2013-09-09 19:27:23] pairup, quitting. (Quit: I'm asleep.)
+[2013-09-09 19:27:28] mansi, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 19:30:23] davidlai, joining. (#selenium)
+[2013-09-09 19:33:07] jlipps, quitting. (Quit: Leaving.)
+[2013-09-09 19:34:45] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 19:35:54] dimacus, joining. (#selenium)
+[2013-09-09 19:36:04] mansi, joining. (#selenium)
+[2013-09-09 19:36:29] brokenthumbs, joining. (#selenium)
+[2013-09-09 19:37:42] tourdedave, joining. (#selenium)
+[2013-09-09 19:44:32] jlipps, joining. (#selenium)
+[2013-09-09 19:52:32] jlipps, quitting. (Quit: Leaving.)
+[2013-09-09 20:01:23] p0deje, joining. (#selenium)
+[2013-09-09 20:02:34] tilgovi, quitting. (Remote host closed the connection)
+[2013-09-09 20:03:17] mansi, quitting. (Remote host closed the connection)
+[2013-09-09 20:03:54] mansi, joining. (#selenium)
+[2013-09-09 20:08:16] mansi, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 20:14:20] Dude-X, joining. (#selenium)
+[2013-09-09 20:16:35] brokenthumbs, quitting. (Quit: Leaving.)
+[2013-09-09 20:19:07] Dude-X, quitting. (Client Quit)
+[2013-09-09 20:19:19] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-09-09 20:22:59] schweens, joining. (#selenium)
+[2013-09-09 20:40:27] davidlai, quitting. (Quit: Leaving.)
+[2013-09-09 21:05:55] dimacus, quitting. (Quit: Leaving.)
+[2013-09-09 21:10:56] nirvdrum, quitting. (Remote host closed the connection)
+[2013-09-09 21:15:39] jlipps, joining. (#selenium)
+[2013-09-09 21:17:41] DarkRift, quitting. (Ping timeout: 248 seconds)
+[2013-09-09 21:33:12] Nakilon, joining. (#selenium)
+[2013-09-09 21:36:40] YaNakilon, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 21:38:02] p0deje, quitting. (Quit: p0deje)
+[2013-09-09 22:04:54] OS-10583, joining. (#selenium)
+[2013-09-09 22:10:13] stephend_, quitting. (Remote host closed the connection)
+[2013-09-09 22:10:47] stephend, joining. (#selenium)
+[2013-09-09 22:11:28] nirvdrum, joining. (#selenium)
+[2013-09-09 22:14:34] mansi, joining. (#selenium)
+[2013-09-09 22:15:02] stephend, quitting. (Ping timeout: 240 seconds)
+[2013-09-09 22:18:10] girija, joining. (#selenium)
+[2013-09-09 22:18:43] nirvdrum, quitting. (Ping timeout: 246 seconds)
+[2013-09-09 22:20:42] gittish, joining. (#selenium)
+[2013-09-09 22:20:58] mansi, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 22:25:42] davidlai, joining. (#selenium)
+[2013-09-09 22:37:45] OS-10583: anybody know anything about clientstate and asp.net?
+[2013-09-09 22:41:46] SamuraiJack, joining. (#selenium)
+[2013-09-09 22:57:37] stephend, joining. (#selenium)
+[2013-09-09 22:58:53] softmanpetro, joining. (#selenium)
+[2013-09-09 22:59:04] Archdude_, joining. (#selenium)
+[2013-09-09 23:01:17] Archdude, quitting. (Ping timeout: 268 seconds)
+[2013-09-09 23:01:17] Archdude_, changing nick to Archdude.
+[2013-09-09 23:03:36] schweens, quitting. (Quit: schweens)
+[2013-09-09 23:04:14] nycjv321, quitting. (Quit: leaving)
+[2013-09-09 23:05:24] ddary, joining. (#selenium)
+[2013-09-09 23:05:25] julienphalip, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:05:25] jab416171, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:05:41] moo-_-, quitting. (Quit: No Ping reply in 180 seconds.)
+[2013-09-09 23:06:01] moo-_-, joining. (#selenium)
+[2013-09-09 23:06:15] Garrick, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:06:40] ebi, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:06:50] AutomatedTester, quitting. (Ping timeout: 264 seconds)
+[2013-09-09 23:07:31] AutomatedTester, joining. (#selenium)
+[2013-09-09 23:08:42] gittish, quitting. (Quit: gittish)
+[2013-09-09 23:09:14] DocD2, quitting. (Ping timeout: 264 seconds)
+[2013-09-09 23:10:25] eghm, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:11:25] eghm, joining. (#selenium)
+[2013-09-09 23:11:29] Brando753, quitting. (Remote host closed the connection)
+[2013-09-09 23:11:47] Brando753, joining. (#selenium)
+[2013-09-09 23:11:52] sayd, quitting. (Quit: Goodbye)
+[2013-09-09 23:12:17] sayd_, joining. (#selenium)
+[2013-09-09 23:13:12] milligan, quitting. (Quit: Server does not respond.)
+[2013-09-09 23:15:13] mansi, joining. (#selenium)
+[2013-09-09 23:15:30] papegaaij, joining. (#selenium)
+[2013-09-09 23:19:05] davidlai, quitting. (Quit: Leaving.)
+[2013-09-09 23:19:43] mansi, quitting. (Ping timeout: 245 seconds)
+[2013-09-09 23:21:17] milligan, joining. (#selenium)
+[2013-09-09 23:22:07] drharmony, quitting. (Read error: Connection timed out)
+[2013-09-09 23:22:41] drharmony, joining. (#selenium)
+[2013-09-09 23:24:35] milligan, quitting. (Max SendQ exceeded)
+[2013-09-09 23:26:02] OS-10583, quitting. (Ping timeout: 256 seconds)
+[2013-09-09 23:31:06] santiycr, joining. (#selenium)
+[2013-09-09 23:31:07] milligan, joining. (#selenium)
+[2013-09-09 23:32:58] p0deje, joining. (#selenium)
+[2013-09-09 23:33:09] girija_, joining. (#selenium)
+[2013-09-09 23:33:26] p0deje, quitting. (Client Quit)
+[2013-09-09 23:35:43] girija, quitting. (Read error: Connection reset by peer)
+[2013-09-09 23:43:59] ddary_, joining. (#selenium)
+[2013-09-09 23:44:04] ddary_, quitting. (Client Quit)
+[2013-09-09 23:44:39] santiycr, quitting. (Quit: Leaving.)
+[2013-09-09 23:44:51] p0deje, joining. (#selenium)
+[2013-09-09 23:53:02] davidlai, joining. (#selenium)
+[2013-09-09 23:55:43] ArSn, joining. (#selenium)
+[2013-09-09 23:59:12] girija_, quitting. (Ping timeout: 240 seconds)
+[2013-09-09 23:59:49] davidlai, quitting. (Quit: Leaving.)

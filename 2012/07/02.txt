@@ -1,0 +1,358 @@
+[IRC logfile - Started Mon Jul  2 15:22:58 2012]
+[15:23:09] selloggingbot has joined #selenium
+[15:24:24] brokenthumbs has joined #selenium
+[15:24:28] toabctl has joined #selenium
+[15:26:38] softmanpetro: are you sure it should work from within php too ? ((JavascriptExecutor) driver).executeScript("arguments[0].style.visibility = 'visible', $myelement); 
+[15:27:25] softmanpetro: surely not :(
+[15:28:05] opapo has joined #selenium
+[15:28:13] rpereir__ has joined #selenium
+[15:28:44] Zack has joined #selenium
+[15:30:23] jimevans: softmanpetro: you'd have to use whatever the equivalent of "casting to JavascriptExecutor" is in whatever php bindings you're using. unfortunately, you'll have to refer to the bindings themselves for that information, as the project doesn't provide any built-in php bindings.
+[15:30:44] softmanpetro: ok... I am already close :)
+[15:31:58] dawagner: Ugh.  Password change means muscle memory retraining :(
+[15:33:38] llaskin has joined #selenium
+[15:33:57] santius has joined #selenium
+[15:36:02] dawagner: simonstewart: Is there a good reason the firefoxdriver is still multiple components, and not one big compiled blob?
+[15:37:07] jarib has joined #selenium
+[15:39:34] simonstewart: Because it needs to be
+[15:39:44] simonstewart: The prompt service overrides the prompt service
+[15:39:53] simonstewart: The driver itself is separate
+[15:40:02] simonstewart: (roles and responsibilities and all that guff)
+[15:40:15] simonstewart: I _am_ trying to modularize things and move to a closure-style for the whole thing.
+[15:40:57] dawagner: Ok, cool :)
+[15:43:40] nacho has joined #selenium
+[15:44:54] Dude-X: it bothers me that i confuse closure with clojure
+[15:46:52] simonstewart: It's worse that they're homophones
+[15:47:25] Dude-X: i prononuce the j in clojure as the j in just
+[15:47:45] simonstewart: I believe that they're both pronounced "closure"
+[15:47:55] simonstewart: I've been wrong on many, many occasions before.
+[15:48:06] llaskin: i pronounce it similar to a "zh" sound clozhure
+[15:48:18] *dawagner pronounces clojure with the j, know it's wrong, but to aid clarity
+[15:48:34] simonstewart: I say "closure with a j" if I'm talking about clojure
+[15:48:50] dawagner: It helps that I rarely talk about clojure
+[15:50:54] *dawagner is doing that debugging thing where he throws exceptions inside conditionals to work out which line of code is failing
+[15:51:09] dawagner: "if this is the 14th call to getCurrentUrl, throw an exception so I can get a line number"
+[15:51:18] simonstewart: Ugh
+[15:51:27] simonstewart: I tend to sink that stuff into the httpcommandexecute
+[15:51:30] simonstewart: or
+[15:51:42] simonstewart: and then have it report when a command takes longer than a threshold value
+[15:51:53] simonstewart: I am, of course, insane by definition
+[15:52:04] dawagner: We work with browsers, we're all insane
+[15:52:18] dawagner: That's a nice hook point, though :)
+[15:54:46] softmanpetro: http://pastebin.com/HaimNTFD
+[15:55:00] ian_mac has joined #selenium
+[15:55:22] softmanpetro: it loosk I output befroe and after executescript the isDisplayed and the element remaisn the same
+[15:55:57] samuelgiles has joined #selenium
+[15:58:33] rdarcy has joined #selenium
+[IRC logfile - Started Mon Jul  2 16:02:29 2012]
+[16:02:29] barancev: I need help with the function Utils.wrapResult
+[16:03:39] barancev: I was trying to investigate #2521 (and some other where we get WebDriverException: null)
+[16:03:41] selbot2: 03 open/new org.openqa.selenium.WebDriverException: null, when executing javascript for the netscape.security.PrivilegeManager - https://code.google.com/p/selenium/issues/detail?id=2521 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox]
+[16:04:22] barancev: the parameter 'result' is an error message that cannot be wrapped, that's why we get null
+[16:04:47] softmanpetro: will $webdriver->executeScript("arguments[0].style.display = 'block';", array($elements)); apply the visibility to $elements ? it looks no . . .
+[16:04:58] tekin has joined #selenium
+[16:05:25] barancev: result instanceof Error returns false, but is *is* an error, how can it be so?
+[16:09:17] simonstewart: softmanpetro: no
+[16:09:27] softmanpetro: :)
+[16:09:31] simonstewart: But you'll get an array of elements in your JS in arguments[0]
+[16:09:36] simonstewart: so you can just iterate over it in a for loop
+[16:18:24] jeichar has joined #selenium
+[16:19:47] Gungy: hi simon
+[16:21:35] Gungy: how do i get around an issue i have in webdriver where i click an option in the left menu tree and in the right pane loads a table using ajax - but webdriver is not finding a particular button on that table - ive doubled checked its id and its correct....
+[16:23:01] Dude-X: gungy, click, then either wait for some javascript activity to completed (maybe like jQuery.active == 0 is true) or wait for some other element that is the last element in the dom to be visible
+[16:23:17] Dude-X: (it is true when isDisplayed() is called)
+[16:23:20] softmanpetro: simonstewart http://pastebin.com/iHRjgiKR
+[16:23:30] Dude-X: then you can look up the id and then click or get text
+[16:24:48] simonstewart:  softmanpetro: that looks about right
+[16:25:04] softmanpetro: ok... I will correct it ...
+[16:25:30] Swadq has joined #selenium
+[16:29:22] jimevans: :seen eramn
+[16:29:22] selbot2: I haven't seen eramn.
+[16:29:26] jimevans: :seen eranm
+[16:29:27] selbot2: eranm was last seen 2 days ago, quitting.
+[16:30:07] simonstewart: jimevans: I can poke eranm if you want me to
+[16:30:12] simonstewart: He's not at his desk right now
+[16:30:21] simonstewart: But if I blow up his desktop machine he should come running]
+[16:30:30] jimevans: simonstewart: i just want to know if there would be any problems with using logging.h in the common interactions code?
+[16:30:31] amitev: (rofl)
+[16:31:01] *jimevans is looking at #4176
+[16:31:03] selbot2: 03 open/new More logging in IEDriver - https://code.google.com/p/selenium/issues/detail?id=4176 [Type-Defect Priority-Medium Status-Untriaged]
+[16:31:13] simonstewart: jimevans: that should be fine
+[16:31:33] jimevans: alright. i'll trust your judgement (dangerous as that usually is) :)
+[16:31:51] diego_el_mestre has joined #selenium
+[16:33:27] Dude-X has joined #selenium
+[16:33:37] simonstewart: Writing to a file in the firefox driver might be hairy
+[16:33:48] simonstewart: But sysout should be fine.
+[16:34:10] jimevans: simonstewart: well, it writes to stdout if no file is specified, which is usually the case unless you specifically set it otherwise.
+[16:34:25] santius has joined #selenium
+[16:34:39] simonstewart: Should be good, then
+[16:34:39] awilson820 has joined #selenium
+[16:41:07] barancev: :gist
+[16:41:08] selbot2: Please paste >3 lines of text to https://gist.github.com
+[16:42:19] barancev: I've tried to add debug logging, and what I've found: https://gist.github.com/3033858
+[16:42:57] barancev: only Object.getPrototypeOf(result) == 'Error' is true for this error object
+[16:43:37] barancev: is it allowed to add such a condition to Utils.wrapResult?
+[16:44:04] softmanpetro: this code http://pastebin.com/kd6qGXnr is showing 1-1 for the first tab which is visible and - - - for the others 3 simonstewart
+[16:46:00] softmanpetro: so it looks is not changing the attribute needed to isDisplayed be true
+[16:46:36] simonstewart: Are thr elements actually displayed in the browser?
+[16:48:01] softmanpetro: no.. only the one contained in the tab1 , in the source I can see them
+[16:48:15] softmanpetro: in the page source
+[16:48:21] simonstewart: Then webdriver is working, but the JS isn't quite right :)
+[16:48:30] softmanpetro: ok
+[16:52:00] softmanpetro: if this line is fine ... there is nothing else which could fail simonstewart $webdriver->executeScript("arguments[0].style.display = 'block';", array($el));
+[16:53:05] simonstewart: You need to loop in the JS: "var els = arguments[0]; for (var i = 0; i < els.length; i++) { els[i].style.display = 'block'; }"
+[16:53:24] simonstewart: An array doesn't have a "style" property 
+[16:54:22] teodosia has left #selenium
+[16:54:26] softmanpetro: I was calling it in the last try inside foreach of the panels with argument as beeing a panel not the array of panels
+[16:55:17] simonstewart: Does the JS work as expected inside the web inspector (or firebug)?
+[16:57:20] jimevans: adamgoucher: https://tbe.taleo.net/NA11/ats/careers/requisition.jsp?org=MLB&cws=1&rid=543
+[IRC logfile - Started Mon Jul  2 17:03:48 2012]
+[17:03:48] nhirata_ has joined #selenium
+[17:18:53] jibay has joined #selenium
+[17:29:55] adamgoucher: jimevans: nice; @jbrains did something like that for the jays i think
+[17:31:23] kskkoontz has joined #selenium
+[17:32:04] lukeis has joined #selenium
+[17:36:55] Swadq has joined #selenium
+[17:40:01] softmanpetro: how can I pause after an alert inside $webdriver->executeScript("... ?
+[17:43:07] llaskin: inside of execute script?
+[17:43:12] llaskin: i don't think you can
+[17:54:36] klrmn has joined #selenium
+[17:54:54] lukeis: llaskin: you can... you just have to use executeAsyncScript and do some tricky JS... the person left, so... oh well :)
+[17:55:06] llaskin: ewwww
+[17:55:08] llaskin: yea i can see that
+[17:55:08] llaskin: still
+[17:55:09] llaskin: ewww
+[17:55:28] lukeis: not that bad... i would just use a setTimeout
+[IRC logfile - Started Mon Jul  2 18:00:07 2012]
+[18:00:07] *dawagner is learning go
+[18:00:54] dawagner: Shit.  Javascript scoping has ruined me.
+[18:04:28] stephend has joined #selenium
+[18:04:57] awilson820 has joined #selenium
+[18:06:46] santiycr has joined #selenium
+[18:09:20] NeptuNooo has joined #selenium
+[18:11:30] simonstewart: G'night
+[18:11:34] simonstewart has left #selenium
+[18:20:00] Spanktar has joined #selenium
+[18:27:46] llaskin1 has joined #selenium
+[18:28:57] Swadq has joined #selenium
+[18:36:16] testingb0t has joined #selenium
+[18:43:25] brokenthumbs_ has joined #selenium
+[18:47:00] sawoy has joined #selenium
+[IRC logfile - Started Mon Jul  2 19:21:02 2012]
+[19:21:02] erratic has joined #selenium
+[19:21:25] erratic: anybody know of a way to work around the issue with going from http to https in selenium 
+[19:21:37] erratic: there's a permission denied problem that keeps coming up?
+[19:21:38] NeptuNooo has left #selenium
+[19:23:57] Dude-X: do you have the certificate installed?
+[19:24:24] erratic: its like ebay's little ouath verify window
+[19:24:35] erratic: so the certificate is one that validates
+[19:24:39] erratic: does that matter
+[19:25:34] Dude-X: i don't know, only speculating
+[19:25:50] Dude-X: but it's an issue i've seen with https in general from other projects (that i have not worked on)
+[19:28:03] erratic: http://sejq.blogspot.com/2009/01/remember-certificate-exception.html
+[19:28:12] erratic: maybe that if it is an issue with self signed 
+[19:28:22] erratic: but its ebay's certificate so I dont think... 
+[19:34:30] jfunk has joined #selenium
+[19:37:53] erratic: http://www.seleniumwebdriver.com/selenium-rc-selenium-1-0/permission-denied-for-lthttpdev-example-comgt-to-get-property-location-href/?PHPSESSID=9087c1ae17c5ce65e90546c9b9caca13
+[19:37:58] AutomatedTester has joined #selenium
+[19:38:03] erratic: thats wacky Im not sure how I feel about that
+[19:39:57] jibay has joined #selenium
+[19:41:25] stackedsax has joined #selenium
+[19:45:17] llaskin has joined #selenium
+[19:45:23] llaskin has joined #selenium
+[19:56:14] erratic: who here would seriously change code in selenium core 
+[19:57:16] Dude-X: you'd have to if it's not webdriver
+[19:57:37] erratic: ...just seems like a bad idea
+[19:57:39] erratic: but ok
+[19:58:36] erratic: spanktar... 
+[19:58:46] erratic: ooooooooooook
+[19:58:49] erratic: well then
+[19:59:00] erratic: I just pasted that to my coworker 
+[19:59:07] erratic: fanx guy who ever you were
+[IRC logfile - Started Mon Jul  2 20:00:15 2012]
+[20:00:15] AutomatedTester: :log
+[20:00:15] selbot2: http://illicitonion.com/selogs/selenium/2012/07/02.txt
+[20:01:00] erratic: fancy pants
+[20:10:49] Spanktar has joined #selenium
+[20:13:52] alexglow has joined #selenium
+[20:23:26] selbot2: 03james.h.evans.jr@gmail.com 4 minutes ago - JimEvans: Further enhancing IE driver server logging. | https://code.google.com/p/selenium/source/detail?r=17307 | http://seleniumhq.org/ci.jsp?r=17307
+[20:24:14] AutomatedTester: jimevans: hey
+[20:24:30] jimevans: AutomatedTester: s'up?
+[20:24:46] AutomatedTester: jimevans: there is a patch on #4177
+[20:24:48] selbot2: 03 open/new Python code patch - IEDriver logging, minor fixes - https://code.google.com/p/selenium/issues/detail?id=4177 [Type-Defect Priority-Medium Status-Untriaged]
+[20:24:56] jimevans: yep.
+[20:25:05] AutomatedTester: what is the "host" for logging?
+[20:25:25] jimevans: it's the IP address of the host adapter to bind the mongoose server to.
+[20:26:08] AutomatedTester: ok, that makes more sense than the other documenation items I found
+[20:26:18] AutomatedTester: it just say "sets the value of the host"
+[20:26:18] jimevans: :)
+[20:26:35] AutomatedTester: at which point I screamed going "WTF IS THE HOST"
+[20:27:02] jimevans: well, that's what i'm here for. 
+[20:27:57] AutomatedTester: thanks, will get the guy to update his patch because there is a spelling mistake that makes me see red
+[20:28:24] adamgoucher: why does the json wire protocol not have double click for elements?
+[20:28:28] jimevans: AutomatedTester: no problem. bear in mind english isn't his first language. :)
+[20:28:45] AutomatedTester: jimevans: I am never nasty in bugs
+[20:28:50] AutomatedTester: firm but not nasty
+[20:28:59] jimevans: adamgoucher: the it's in the interactions api.
+[20:29:26] adamgoucher: should session have it then?
+[20:29:32] sawoy: <AutomatedTester> what is a problem ? i'm that guy :)
+[20:29:39] jimevans: it should, yes.
+[20:29:48] AutomatedTester: sawoy: my bad its not your fault
+[20:29:55] *AutomatedTester goes to find blame and mock them
+[20:30:01] adamgoucher: ah. yes, i see why it is on the session
+[20:30:06] sawoy: np
+[20:30:07] AutomatedTester: bets its either me, lukeis or dawagner
+[20:31:23] AutomatedTester: <- idiot
+[20:34:46] Swadq has joined #selenium
+[20:44:08] lukeis: AutomatedTester: is that the one I already posted a code review comment on? ;)
+[20:44:21] AutomatedTester: no
+[20:44:25] lukeis: different one
+[20:44:27] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Instead of recording the entire application task history, record only the recently executed tasks. Each task will be recorded using its description along with a stack trace for where it was scheduled. This should make it a lot easier to locate failing commands. | https://code.google.com/p/selenium/source/detail?r=17308 | http://seleniumhq.org/ci.jsp?r=17308
+[20:44:27] AutomatedTester: yea
+[20:44:41] AutomatedTester: I cant spell capability by the looks
+[20:45:40] lukeis: i can't spell... i have gotten in the habit of re-reading every diff I make (for spelling errors especially)...
+[20:46:07] lukeis: and someone entrusted the docs to me... heh
+[20:46:15] AutomatedTester: I only spotted it because someone sent in a patch for something and the code next to it has my awful spelling mistake
+[20:54:45] Swadq_ has joined #selenium
+[20:57:50] jleyba has joined #selenium
+[IRC logfile - Started Mon Jul  2 21:07:55 2012]
+[21:07:55] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Removing some unused code. | https://code.google.com/p/selenium/source/detail?r=17309 | http://seleniumhq.org/ci.jsp?r=17309
+[21:18:26] Spanktar has joined #selenium
+[21:20:54] Dude-X: when will ff13 be added to the build?
+[21:29:16] ian_mac has joined #selenium
+[21:44:11] Dome_ has joined #selenium
+[21:45:09] lukeis: Dude-X: that's up to daniel and santiycr :) (although I think santi's part of adding it to sauce is done... maybe)
+[21:45:35] Dude-X: nice
+[21:55:01] testingb0t1 has joined #selenium
+[21:57:45] NeptuNooo has joined #selenium
+[IRC logfile - Started Mon Jul  2 22:00:14 2012]
+[22:00:14] klrmn has joined #selenium
+[22:05:27] hellome has joined #selenium
+[22:06:01] hellome: Hello guys.. so i wanted to know.. if any of you have any experience with image compare with Selenium? 
+[22:06:07] hellome: Selenium 2 i.e.
+[22:07:11] Dude-X: comparing images?
+[22:07:24] Dude-X: you cant do so directly
+[22:08:59] crome: few days ago there was someone who did that
+[22:11:18] hellome: Dude-X @do so directly? 
+[22:11:21] adamgoucher: hellome: nirvdrum does it for a living. sorta.
+[22:11:23] hellome: not sure what you mean
+[22:12:32] lukeis: he's referring to mogotest.com
+[22:12:34] jarib has joined #selenium
+[22:13:31] Dude-X: well image compare like the whole browser window or a specifc image
+[22:13:39] Dude-X: selenium can do screenshots of the browser window
+[22:13:49] hellome: specific images 
+[22:14:02] Dude-X: (or rather it seems of the entire page loaded in the browser)
+[22:14:08] lukeis: you'll need to use another tool to do image comparison
+[22:14:27] Dude-X: how would you grab those images using webdriver? execute_script?
+[22:14:30] hellome: so its a part of the web-browser.. 
+[22:14:35] hellome: what i need to test is that
+[22:14:46] hellome: when i rotate this image.. it indeed does rotate
+[22:15:30] lukeis: if you hash the file's output, everytime you run this rotation does the hash change? or can you compare the hashes?
+[22:16:01] lukeis: (hash == md5 or other equivalent)
+[22:16:17] hellome: but that is not true UI test is it.. i mean when i rotate the image.. 
+[22:16:27] hellome: the image holder elements height and width change 
+[22:16:42] AutomatedTester: hellome: does it reload the image?
+[22:16:42] lukeis: is it a new image file rendered?
+[22:16:55] hellome: i can use that for verification too.. but then again.. its the holder i am verifying not the image itself
+[22:17:16] lukeis: then you can just look at the height and width attributes of the holder
+[22:17:23] hellome: its a browser panel that displays a scaned image .. 
+[22:17:47] hellome: yes i thought of that .. but that is not a true image test is there
+[22:18:11] AutomatedTester: hellome: is the image reloaded on rotation?
+[22:18:52] lukeis: if the image is "new" then you can/ should do both, checking the height/width and the hash of the new file
+[22:19:03] hellome: AuotomatedTester@ let me find that out
+[22:19:30] hellome: i am still not certain what you mean by checking the hash of the file
+[22:19:51] ignacio__ has joined #selenium
+[22:20:04] lukeis: download the image file displayed, run an md5 hash against it... it generates a unique hex value
+[22:20:35] lukeis: compare that hex value with a known good value
+[22:20:55] Dude-X: how would you download it, curl, or some url-lib like library?
+[22:21:06] lukeis: too many options there to count ;)
+[22:21:18] lukeis: i would use whatever native language you are in though
+[22:21:22] Dude-X: does that include the webdriver api?
+[22:21:28] lukeis: nope
+[22:21:33] Dude-X: whew
+[22:21:43] lukeis: well... only to get the url...
+[22:21:57] Dude-X: yeah that's fine
+[22:21:57] lukeis: findElement("img").getAttribute("src")
+[22:22:55] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Wrapping error objects. "WebDriverException: null" error messages should go off. Not an ideal solution, I know, but it works. If you have an idea of a better implementation please drop a comment. | https://code.google.com/p/selenium/source/detail?r=17310 | http://seleniumhq.org/ci.jsp?r=17310
+[22:28:13] ajt has left #selenium
+[22:29:55] hellome: lukeis@ is that how you suggest i capture the image? 
+[22:30:22] lukeis: that's one way... but really depends on your page and how the image is rendered
+[22:30:41] hellome: could you elaborate.. 
+[22:31:02] lukeis: the image could be a background of div for example, rather than <img src="...."
+[22:31:58] lukeis: there's quite a few ways to render the same exact thing in html :)
+[22:32:04] hellome: it is in an div.. i do not see an img source in the element informatino
+[22:32:41] hellome: it renders through a canvas
+[22:32:56] hellome: html 45
+[22:32:58] hellome: 5*
+[22:33:17] lukeis: :-/  selenium has a bit of trouble with html5 elements
+[22:33:28] hellome: thats an understatement
+[22:33:38] hellome: i have had SOOO MANY issues with html5 elements
+[22:33:52] hellome: multi-select.. etc etx
+[22:34:15] jimevans: oh, boy. html5. hooray for cross-browser fail.
+[22:34:43] hellome: ? @ jimevans
+[22:34:47] lukeis: jimevans: how 'bout you work on making all those html5 gizmos work in ie6 ;)
+[22:34:57] hellome: hahahaha RT!!
+[22:35:01] jimevans: :-P
+[22:35:45] jimevans: until IE8 has reached the end of its life cycle, i can't really say that html5 is viable.
+[22:35:57] hellome: but guys seriously.. any help would be great with this DANG image comparison 
+[22:36:07] hellome: here is the test scenario.. 
+[22:36:09] AutomatedTester: hellome: do histogram comparisons
+[22:36:24] hellome: histogram comparison? 
+[22:36:48] hellome: so i login to a test website
+[22:37:04] AutomatedTester: http://stackoverflow.com/questions/843972/image-comparison-fast-algorithm
+[22:37:07] hellome: it has a image viewer panel, part of the browser split using division panels
+[22:37:17] hellome: and then this image can be rotated left/right/180
+[22:37:25] hellome: now my tests needs to verify that it is doing so
+[22:38:49] jimevans has left #selenium
+[22:46:33] hellome: so there is a way for me to save the image to a file path
+[22:46:40] erratic: ohai to paige
+[22:47:42] AutomatedTester: looks like we are moving to FPWD 
+[22:47:49] AutomatedTester: very very excited
+[22:48:16] Dude-X: is that related to the tweet?
+[22:48:31] Dude-X: the happy news
+[22:48:40] AutomatedTester: yea
+[22:48:50] Dude-X: what's FPWD again
+[22:49:03] Dude-X: it reminds me of an opcode
+[22:49:11] AutomatedTester: First Public Working Draft
+[22:49:22] Dude-X: the webdriver spec?
+[22:49:41] AutomatedTester: yes
+[22:50:04] Dude-X: is apple, microsoft interested in such a thing?
+[22:50:12] AutomatedTester: Microsoft is
+[22:50:22] AutomatedTester: but only once FPWD is out
+[22:50:32] Dude-X: that is good news indeed
+[22:53:00] stephend_ has joined #selenium
+[22:57:22] Dude-X: ars technica says that firefox is holding on to number #2 browser in world market share
+[22:57:24] Dude-X: not bad
+[22:57:26] selbot2: 03dawagner@gmail.com closed/fixed DOCS: Typo in PageFactory documentation - https://code.google.com/p/selenium/issues/detail?id=2 [Type-Defect]
+[22:57:31] Dude-X: i think ff12 has a lot of good fixes
+[22:57:48] AutomatedTester: had a funny discussion with people in my team
+[22:58:05] AutomatedTester: we never know what has been released and what hasnt because we all mainly run nightly
+[22:58:32] AutomatedTester: people get excited about a feature and we go "oh that, has it been released now"
+[22:58:36] Dude-X: i meant to say ff13
+[22:58:52] Dude-X: ff13 fixed a lot of memory leaks
+[22:59:03] AutomatedTester: ff13 fixed THE memory leak
+[22:59:07] AutomatedTester: i believe
+[IRC logfile - Started Mon Jul  2 23:00:11 2012]
+[23:00:11] Dude-X: i thought ff15 will be the one that fixes the issues with extensions
+[23:00:23] AutomatedTester: maybe
+[23:00:27] AutomatedTester: see I dont know
+[23:00:54] Dude-X: so most mozillans run the nightly?
+[23:02:27] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Fix a build. | https://code.google.com/p/selenium/source/detail?r=17311 | http://seleniumhq.org/ci.jsp?r=17311
+[23:02:39] barancev: r17308 broken Firefox 3.6 Linux Javascript Tests
+[23:02:43] selbot2: 03jmleyba@gmail.com about 2 hours ago - JasonLeyba: Instead of recording the entire application task history, record only the recently executed tasks. Each task will be recorded using its description along with a stack trace for where it was scheduled. This should make it a lot easier to locate failing commands. | https://code.google.com/p/selenium/source/detail?r=17308 | http://seleniumhq.org/ci.jsp?r=17308
+[23:03:20] barancev: jleyba was faster :)
+[23:04:37] barancev: hmm... no, javascript tests should fail, only java was fixed by the last commit
+[23:07:40] brettporter has joined #selenium
+[23:09:01] MadMerlin|work_ has joined #selenium
+[23:09:10] jibay has joined #selenium
+[23:12:56] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Deprecating browser specific WebElement classes, they are replaced with RemoteWebElement. It's a first step, in the next release all uses of these classes will be cleaned out of the Selenium code and the classes will be completely removed. | https://code.google.com/p/selenium/source/detail?r=17312 | http://seleniumhq.org/ci.jsp?r=17312
+[23:16:14] Zack has left #selenium
+[23:21:21] barancev: and I've broken firefox 3.6 java tests
+[23:50:20] santiycr: Dude-X:  firefox 13 is already on Sauce, although it's a bit unstalbe
+[23:50:44] santiycr: seems like both FF12 and FF13 don't interact will with the HTTP proxy built in Selenium
+[23:50:55] santiycr: s/will/well
+[23:51:20] Dude-X: what kind of issues
+[23:51:32] AutomatedTester: santiycr: issue #?
+[23:56:42] santiycr: I don't think I got to log it
+[23:56:53] santiycr: I'm instead working on getting sauce's browsers off of the selenium proxy
+[23:57:27] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Fixing error wrapping to work in ff 3.6 | https://code.google.com/p/selenium/source/detail?r=17313 | http://seleniumhq.org/ci.jsp?r=17313

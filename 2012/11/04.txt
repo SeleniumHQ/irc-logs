@@ -1,0 +1,475 @@
+[IRC logfile - Started Sun Nov  4 01:21:55 2012]
+[01:21:55] detronizator: :note jimevans I might have found the source of many issues. The issue is in Qt. I have found a nice workaround and reported the issue also on the PhantomJS issue tracker and CCed you.
+[01:21:55] selbot2: ok!
+[01:50:43] sreeks has joined #selenium
+[IRC logfile - Started Sun Nov  4 04:34:19 2012]
+[04:34:19] Nari7 has joined #selenium
+[04:50:03] Nari8 has joined #selenium
+[04:58:14] o3u has joined #selenium
+[IRC logfile - Started Sun Nov  4 05:08:54 2012]
+[05:08:54] Nari9 has joined #selenium
+[05:14:04] Nari9 has joined #selenium
+[05:18:47] Nari9 has joined #selenium
+[05:28:20] stackedsax has joined #selenium
+[05:40:13] Nari10 has joined #selenium
+[IRC logfile - Started Sun Nov  4 06:36:26 2012]
+[06:36:26] Nari10 has joined #selenium
+[06:42:37] Nari10 has joined #selenium
+[IRC logfile - Started Sun Nov  4 07:11:32 2012]
+[07:11:32] Nari10 has joined #selenium
+[07:24:09] Nari11 has joined #selenium
+[07:43:32] Nari12 has joined #selenium
+[07:56:27] Nari13 has joined #selenium
+[IRC logfile - Started Sun Nov  4 08:02:35 2012]
+[08:02:35] SamuraiJack has joined #selenium
+[08:20:12] alexglow has joined #selenium
+[IRC logfile - Started Sun Nov  4 09:29:19 2012]
+[09:29:19] testingb0t has joined #selenium
+[09:30:09] testingb0t1 has joined #selenium
+[09:35:46] testingb0t has joined #selenium
+[09:40:08] jarib has joined #selenium
+[09:46:07] testingb0t1 has joined #selenium
+[09:57:59] zac_sel has joined #selenium
+[IRC logfile - Started Sun Nov  4 10:00:18 2012]
+[10:00:18] detronizator has joined #selenium
+[10:22:10] jarib has joined #selenium
+[10:22:39] detronizator: :note jimevans Crashes are mostly gone. In QtWebKit, "qobject.signal.disconnect()" is evil and doesn't work. Now we are not affected by it anymore. I'll do a clean commit after I'm back from airport.
+[10:22:40] selbot2: ok!
+[10:53:01] jibay has joined #selenium
+[IRC logfile - Started Sun Nov  4 11:12:28 2012]
+[11:12:28] haakjes has joined #selenium
+[11:13:46] haakjes: hi all, since a week i've been having a problem with selenium (never had it before): sometimes send_keys (python bindings) does not work: either no data is entered, or only partial data. we do continious testing using firefox
+[11:13:57] haakjes: anyone familiar with this problem?
+[11:16:43] haakjes: (sometimes = 1 in 8 times on average)
+[11:23:25] Eleccy has joined #selenium
+[11:42:13] Eleccy has joined #selenium
+[IRC logfile - Started Sun Nov  4 12:12:58 2012]
+[12:12:58] Ardesco_H: haakjes, have you updated to Firefox 16 recently?
+[12:13:26] Ardesco_H: may be a native events issue with the latest version of selenium, try 2.26.0 which supports FF15 and FF16 native events
+[12:16:17] haakjes: yes
+[12:16:27] haakjes: i updated both firefox nd selenium
+[12:16:36] haakjes: would enabling native events help?
+[12:30:50] dekroning has joined #selenium
+[IRC logfile - Started Sun Nov  4 13:14:15 2012]
+[13:14:15] Nari13 has joined #selenium
+[13:18:59] Nari13 has joined #selenium
+[13:45:05] mdgreenfield has joined #selenium
+[IRC logfile - Started Sun Nov  4 14:33:13 2012]
+[14:33:13] mreedell has joined #selenium
+[14:51:39] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: Adding forgotten files | https://code.google.com/p/selenium/source/detail?r=18062 | http://seleniumhq.org/ci.jsp?r=18062
+[IRC logfile - Started Sun Nov  4 15:48:42 2012]
+[15:48:42] o3u has joined #selenium
+[IRC logfile - Started Sun Nov  4 16:43:43 2012]
+[16:43:43] detronizator has joined #selenium
+[16:52:53] HolyGoat has joined #selenium
+[16:59:24] sreeks has joined #selenium
+[IRC logfile - Started Sun Nov  4 17:03:06 2012]
+[17:03:06] simonstewart has joined #selenium
+[17:03:16] simonstewart: Greetings all
+[17:04:11] alexglow has joined #selenium
+[17:05:42] Dude-X_: o/
+[17:11:38] mdgreenfield has joined #selenium
+[17:17:33] mdgreenfield1 has joined #selenium
+[17:37:52] rbalent has joined #selenium
+[17:49:09] mdgreenfield has joined #selenium
+[17:56:39] selbot2: 03simon.m.stewart@gmail.com less than 20 seconds ago - SimonStewart: Delete unused class. | https://code.google.com/p/selenium/source/detail?r=18063 | http://seleniumhq.org/ci.jsp?r=18063
+[IRC logfile - Started Sun Nov  4 18:03:58 2012]
+[18:03:58] simonstewart: krosenvold: yt?
+[18:14:28] ner0x has joined #selenium
+[18:15:18] smccarthy has joined #selenium
+[18:22:41] mdgreenfield has joined #selenium
+[18:46:15] detronizator has joined #selenium
+[18:55:09] stackedsax has joined #selenium
+[18:58:43] mdgreenfield has joined #selenium
+[IRC logfile - Started Sun Nov  4 19:06:04 2012]
+[19:06:04] rp2: I still have the question how s.findElement(By.xpath(".[contains(text(),'377')]")).getText() can be empty. sleeping on it hasn't helped.
+[19:08:30] simonstewart: rp2: we delegate down to the browser's xpath engine for xpath, so the xpath engine finds the text. However, when we do "getText" we use our own mechanism to determine what the visible text is
+[19:08:44] simonstewart: The two may not agree on what's actually present
+[19:09:01] simonstewart: Notably, the xpath engine will probably be matching text nodes without regard to user visibility
+[19:11:08] rp2: aaah, so perhaps it's not visible?
+[19:11:17] rp2: thanks
+[19:11:20] simonstewart: NP
+[19:11:37] rp2: a lot!
+[19:11:55] rp2: now I still need to retrieve that text somehow ...
+[19:12:57] rp2: is there a '... and pretend it's visible' switch?
+[19:13:12] simonstewart: javascriptExecutor("return arguments[0].innerText || arguments[0].textContent", element)
+[19:13:17] rp2: hmm
+[19:13:24] simonstewart: rp2: no need for one :)
+[19:13:33] rp2: I suppose that will work
+[19:13:45] rp2: thanks a lot for your help
+[19:14:08] simonstewart: Pleasure
+[19:18:31] simonstewart: detronizator: how's phantom js going?
+[19:18:50] detronizator: I'm almost done committing the patch of the patches :)
+[19:19:06] detronizator: fixes many things: there is an issue in Qt that was biting us really hard
+[19:19:14] detronizator: I worked around it for now
+[19:19:16] simonstewart: Ugh. Sounds nasty
+[19:19:24] simonstewart: But glad to hear you have it sorted out
+[19:19:26] detronizator: after this, it's just missing 2 things:
+[19:19:32] detronizator: - merging the java binding
+[19:19:40] detronizator: - packing ghostdriver 1.0 inside Phantomjs
+[19:19:50] simonstewart: So, I see you've an open issue about merging. How would that look to you?
+[19:20:08] simonstewart: (I know there's a patch, but a high level description would be The Daddy)
+[19:20:21] detronizator: isn't the description in the issue?
+[19:20:35] detronizator: After the code review I got by a couple of Selenium-ers
+[19:20:43] detronizator: I corrected what they asked (all in the issue)
+[19:20:44] simonstewart: I'm having a pleasant glass of wine and hacking on blog posts and other code :)
+[19:20:51] detronizator: :)
+[19:20:53] simonstewart: I better read this issue then
+[19:20:59] simonstewart: What's the number?
+[19:21:00] detronizator: I'm having an espresso and doing similar things
+[19:21:06] detronizator: 1 sec
+[19:21:20] detronizator: https://code.google.com/p/selenium/issues/detail?id=4644
+[19:21:50] simonstewart: Right. Let's read this patch
+[19:22:31] simonstewart: OK. So you're planning on pushing the ghostdrver client side code into selenium?
+[19:22:45] simonstewart: Dumb question: why not go the same route as the operadriver?
+[19:23:02] simonstewart: Where we pull in the meat of the implementation through a third party library?
+[19:23:22] detronizator: simonstewart: not sure I know how Opera driver does it
+[19:23:48] simonstewart: They run their project separately (on github!) and then check in the "operadriver.jar" into third_party/java/operadriver
+[19:23:52] detronizator: my plan, after having had many conv with Jim, is that I have a tiny Java Binding in Selenium
+[19:24:17] simonstewart: Hmmm...
+[19:24:20] detronizator: and then you link it inside the selenium packagE?
+[19:24:25] simonstewart: yeah
+[19:24:32] simonstewart: we just treat it as a third party dependency
+[19:24:38] simonstewart: That way you don't need to touch svn :)
+[19:24:47] detronizator: I can do that too, but you guys need to make 1 mind about this stuff
+[19:24:56] simonstewart: Heh :)
+[19:25:08] simonstewart: this is what happens when I go away for two months
+[19:25:13] detronizator: 1 guy was saying "keep it outside", another "keep it inside", now you say "do it outside but give us a jar"
+[19:25:18] detronizator: just agree on a strategy
+[19:25:27] simonstewart: That's why we're talking now :)
+[19:25:35] simonstewart: Who's "1 guy"?
+[19:25:46] simonstewart: jim is saying "pull it in", I think?
+[19:25:52] detronizator: You ask me to rememeber names (nicknames) of people that I never met?
+[19:25:55] detronizator: impossible!
+[19:26:00] detronizator: yes
+[19:26:01] simonstewart: handles are fine!
+[19:26:03] simonstewart: k
+[19:26:07] detronizator: jim is the "pull in"
+[19:26:22] dawagner has joined #selenium
+[19:26:28] simonstewart: guessing, dawagner or jleyba are the "keep out" chaps?
+[19:26:34] detronizator: and indeed it would be awkward: C# binding lives inside Selenium, while the Java one is outside... but you say "it's an internalized jar", that is true...
+[19:26:43] dawagner: :log
+[19:26:43] selbot2: http://illicitonion.com/selogs/selenium/2012/11/04.txt | http://illicitonion.com/selogs/search
+[19:26:44] detronizator: I think jleyba yes.
+[19:26:48] simonstewart: OK
+[19:26:56] simonstewart: so, here's the long term vision for the project:
+[19:27:03] detronizator: shoot!
+[19:27:11] simonstewart: "Browser vendors are responsible for the browser drivers"
+[19:27:19] dawagner: Ooh! I happen to be reviewing the change I assume you're talking about! /me listens
+[19:27:31] simonstewart: The way that Opera work is the model that most closely follows that
+[19:27:49] simonstewart: Though they only provide Java bindings, and everyone else gets it through the remote server.
+[19:28:08] simonstewart: In the end, I'd like our tree to be a tiny bit of glue and a whole lot of tests
+[19:28:17] simonstewart: With some support libraries for people who like that sort of thing
+[19:28:29] simonstewart: dawagner: hi!
+[19:28:44] detronizator: dawagner: hello!
+[19:29:01] simonstewart: It gets easier now that the APIs are as stable as they are (don't implement the .logging. stuff just yet)
+[19:29:12] simonstewart: (or anything marked @Beta)
+[19:29:24] simonstewart: We very, very seldom add new methods to existing interfaces
+[19:29:26] detronizator: simonstewart: if you say you want just a jar, I can do just a jar. But I hope that is the FINAL solution. That issue has been there for ages now (think of me with my patronizing face on)
+[19:29:42] simonstewart: Hey! I've been offline for months!
+[19:30:03] simonstewart: Indeed, that issue was posted after I'd been away for half a month already :)
+[19:30:16] dude-x has joined #selenium
+[19:30:30] simonstewart: I'll add a note to the bug report
+[19:30:30] detronizator: simonstewart: ok. you are forgiven.
+[19:30:45] simonstewart: Thank you. I'll buy you a make up beer next time we're in the same pub together
+[19:30:59] simonstewart: Or we could always attempt to revive the "steak as big as your head" thing
+[19:31:22] detronizator: ok - put in there what you want exactly from me and I'll prepare it.
+[19:31:46] simonstewart: You're a star
+[19:31:53] simonstewart: Thanks for being patient with us
+[19:31:58] detronizator: simonstewart: dawagner: we could definitely do that
+[19:32:23] detronizator: simonstewart: what you guys have built is crucial to so many people in this industry, you deserve the best Ivan behaviour
+[19:32:40] detronizator: even when I think you (simon) are slacking :P
+[19:32:42] simonstewart: I could see that the moment you touched svn :P
+[19:32:46] simonstewart: Ha!
+[19:32:56] detronizator: simonstewart: :)
+[19:33:03] detronizator: simonstewart: started at FB?
+[19:33:04] simonstewart: Slowly getting back on the case. I'll be back properly after I've started at Facebook
+[19:33:04] detronizator: or not yet?
+[19:33:08] simonstewart: 19th November
+[19:33:24] detronizator: nice! you got a nice month off. very good idea - I should have done that before Amazon
+[19:33:28] simonstewart: Eurostar this week, then a short break gathering my strength, then leaping over the atlantic
+[19:33:28] dawagner: In that case, I will just watch :) But the patch looks good to me
+[19:33:41] simonstewart: dawagner: ta
+[19:34:03] detronizator: dawagner: it's great! At least it makes it easy for me to pack the jar, knowing everything else is fine.
+[19:34:27] detronizator: Ah, question for simonstewart and dawagner: can I stick with the current package?
+[19:34:35] mdgreenfield has joined #selenium
+[19:34:38] detronizator: I have putted stuff into org.selenium.stuff.phantomjs
+[19:34:49] detronizator: should I make my own or can I "enrich" your?
+[19:35:39] simonstewart: Normally, I'd use the package name to figure out where to download the latest version of the project, but I'm fine with you leaving it in org.openqa.selenium.phantomjs if you're feeling lazy
+[19:35:55] simonstewart: I can always do a pull request to change things :)
+[19:36:03] simonstewart: dawagner: you're opinion?
+[19:36:19] dawagner: No opinion either way :)
+[19:36:26] simonstewart: detronizator: up to you, then
+[19:36:51] detronizator: simonstewart: I'll make it "simonstewart.loves.screwing.with.me.phantomjs"
+[19:36:53] detronizator: mmm
+[19:37:00] detronizator: maybe that came out wrong
+[19:37:02] detronizator: :)
+[19:37:32] simonstewart: See: this is exactly why I like to meet people in person
+[19:37:41] simonstewart: Cos I know that's a joke, because I've met you :)
+[19:38:07] detronizator: simonstewart: in what universe you would get offended by that, come on? :_)
+[19:38:09] detronizator: :)
+[19:38:15] simonstewart: Ha!
+[19:38:33] simonstewart: Should have seen how annoyed I used to get as a newbie OSS chap
+[19:38:42] detronizator: 1 thing is sure: if this community was made of "sensitive people", I would have not started hanging around
+[19:39:36] simonstewart: Where's antlong when you need him?
+[19:39:37] detronizator: simonstewart: we all (I think at least 70%) have been target of jokes since we were kids - we have always been the "outcasts", right? (or is that a stereotype for you?)
+[19:39:57] detronizator: hence, an healthy understanding of joking as a conversation instrument it's key
+[19:40:26] detronizator: that said, if you mention mums and sisters, I still get upset like a high-schoolers :P
+[19:40:44] simonstewart: Damn it. 
+[19:40:53] simonstewart: Your Mum jokes are some of my favourite
+[19:41:21] detronizator: if a guy is looking for a punch in the nuts, that's just what he has to do. :)
+[19:41:36] simonstewart: ok
+[19:41:43] detronizator: I was expelled once for harming a class-mate because of a bad joke
+[19:41:48] *simonstewart steps away and updates issue #4644
+[19:41:49] selbot2: 03 open/accepted Provide a PhantomJS Driver - https://code.google.com/p/selenium/issues/detail?id=4644 [Type-Enhancement Priority-Medium]
+[19:42:13] simonstewart: Done!
+[19:42:22] detronizator: simonstewart: kool mate
+[19:42:29] detronizator: will act upon it soon
+[19:42:33] simonstewart: Thank you.
+[19:42:39] detronizator: thank you!
+[19:42:49] simonstewart: If you shout when I'm online, I can do the patching and pulling of the jar
+[19:43:15] detronizator: here is a question: how do I pass you a patch with a binary file?
+[19:43:26] dawagner: simonstewart: What do you want to drop junit3 support from?
+[19:43:36] simonstewart: Our tree :)
+[19:43:47] dawagner: Can we drop TestNG first?
+[19:44:00] simonstewart: The two operations are mutually exclusive
+[19:44:09] simonstewart: s/are/are not/
+[19:44:55] simonstewart: My wife's old laptop appears to be having a hard time getting the grid tests to run
+[19:45:05] simonstewart: Which isn't helping make sure that my purge of code is working
+[19:45:20] simonstewart: I'd check it in without a care in the world, but I think I'd break something
+[19:46:02] dawagner: *shrug* what's the worst that can happen?
+[19:46:17] simonstewart: Well, the grid build will break
+[19:46:21] dawagner: That reminds me, I had the grid tests 90% running on our CI, when I was in Amsterdam with freynaud, I should finish that...
+[19:46:37] simonstewart: What was the 10% missing?
+[19:47:10] dawagner: IIRC They work when run through a shell on the build slaves, but not when triggered from CI itself, and I hadn't tracked down the different in environments yet
+[19:47:30] simonstewart: Ugh
+[19:47:31] dawagner: s/different/difference/
+[19:47:56] dawagner: Or possibly they hang when run through CI, probably through leaking a couple of processes
+[19:48:01] dawagner: I'll try to take a look soon :)
+[19:49:03] simonstewart: Oh good. I can't run testWebDriverTimesOut in an IDE
+[19:49:40] Swadq has joined #selenium
+[19:51:30] detronizator: simonstewart: Question - how do I bring you guys the binary "jar" with an svn patch? I'm an ignorant at SVN, and I recall having troubles with binary stuff and trying to make a patch out of it.
+[19:52:07] dawagner: You can attach a jar to an issue
+[19:52:25] detronizator: than it will be something like a patch + a jar
+[19:52:27] simonstewart: Or tell us the git hash to build from, if building is easy
+[19:52:37] detronizator: as I still have to "decor" the Default??? classes
+[19:52:55] simonstewart: I can do those easily enough without a new patch
+[19:53:02] simonstewart: All we need is the bulk of the driver
+[19:53:17] detronizator: k
+[19:53:48] simonstewart: Is the java code in the https://github.com/detro/ghostdriver repo?
+[19:55:34] simonstewart: Looks like it's here: https://github.com/detro/ghostdriver/tree/master/test/java/src/main/java/org/openqa/selenium/phantomjs
+[19:55:38] simonstewart: That the right place?
+[19:56:50] *simonstewart pokes the ghostdriver build
+[19:57:13] simonstewart: This poor machine
+[19:57:34] detronizator: simonstewart: yes - right place
+[19:57:42] detronizator: for now those java classes have served to run the tests
+[19:57:46] simonstewart: ./gradlew jar?
+[19:57:59] detronizator: maybe - never generated a jar with gradle :)
+[19:58:09] simonstewart: How do you generate the jar?
+[19:58:24] simonstewart: (I notice it just downloaded 2.25)
+[19:58:24] detronizator: I have to look at the gradle manual: it's surely very easy
+[19:58:40] detronizator: yeah, I might have to add something to the build instructions
+[19:58:46] detronizator: but now that 2.26 is out
+[19:58:49] simonstewart: I see what you did there :)
+[19:59:06] detronizator: I have also to update those classes
+[19:59:30] detronizator: the proxy in Selenium now supports Socks5 and PhantomJS does to: I couldn't build those with 2.25.
+[19:59:44] detronizator: give me 1 or 2 days and I'll have an easy way to make a jar ;)
+[19:59:52] detronizator: simonstewart: what "I did there"?
+[IRC logfile - Started Sun Nov  4 20:00:03 2012]
+[20:00:03] simonstewart: "It's surely very easy"
+[20:00:08] simonstewart: Normally means the exact opposite
+[20:00:21] simonstewart: I can check in what's there already, if you want?
+[20:00:31] detronizator: no no
+[20:00:45] detronizator: need to test against 2.26 fully
+[20:00:45] simonstewart: ok. Fine by me
+[20:00:49] simonstewart: Groovy shoes
+[20:01:07] simonstewart: Anytime up until Thursday I can do the integration on request
+[20:01:11] detronizator: ah - question: do you have issues with the CrazyFunBuild going OOM?
+[20:01:14] simonstewart: After that, The Wife and The Boy are here
+[20:01:21] simonstewart: I used to. 
+[20:01:26] simonstewart: And then I gave it more memory
+[20:01:48] detronizator: I did that too: what about updating the ./go script so I don't have to do it manually ;)
+[20:02:02] simonstewart: Sure
+[20:02:09] simonstewart: :gist your current settings
+[20:02:09] selbot2: Please paste >3 lines of text to https://gist.github.com
+[20:02:12] detronizator: simonstewart: unless is already there
+[20:02:28] simonstewart: -Xmx900m -XX:MaxPermSize=384m -XX:ReservedCodeCacheSize=128m
+[20:02:32] simonstewart: That's what we use right now
+[20:02:57] detronizator: I pushed the MaxPermSize to 1024m: I'm nuts I know
+[20:03:08] *simonstewart shrugs. I can do that too
+[20:03:19] simonstewart: Xmx?
+[20:03:21] detronizator: that did it for me (the OOM error helped indicating what to change)
+[20:04:01] detronizator: simonstewart: didn't change that, but I'd push that to 1024m too - now days Memory is a comodity
+[20:04:13] simonstewart: Not on this laptop
+[20:04:15] *simonstewart sighs
+[20:04:43] detronizator: and it's a Max parameter: the JVM should keep it in its pants if it doesn't need all that memory, right?
+[20:05:02] simonstewart: Presumably
+[20:05:58] simonstewart: Done
+[20:06:10] selbot2: 03simon.m.stewart@gmail.com half a minute ago - SimonStewart: We appear to use an awful lot of memory during a build. | https://code.google.com/p/selenium/source/detail?r=18064 | http://seleniumhq.org/ci.jsp?r=18064
+[20:07:01] detronizator: lol - you went all in there
+[20:07:01] detronizator: :)
+[20:07:25] simonstewart: Now, when doing a build where we expect scanning of build files to take "a while", is it better to just start streaming build information to the build server as we read it, and then do a topo sort once everything has been read, or wait until everything has been read before streaming the build information over?
+[20:07:52] simonstewart: In for a penny, in for a pound
+[20:08:25] detronizator: simonstewart: you ta'king to me?
+[20:08:37] simonstewart: The world at large
+[20:09:00] detronizator: ah - imagine yourself saying something like that out loud while in the middle of... Piccadilly Circus
+[20:09:12] detronizator: how funny would it be when the police comes and brings you away?
+[20:09:28] detronizator: (aka - I got no clue what you are talking about there)
+[20:10:13] mdgreenfield has joined #selenium
+[20:10:27] simonstewart: Yeah. There's a lot of context in my head
+[20:10:40] Swadq has joined #selenium
+[20:11:12] dawagner: simonstewart: I've been tempted a few times to pick up the crazyfun-in-java rewrite, are you doing anything there these days?
+[20:11:32] simonstewart: Was thinking of doing some this weke
+[20:11:36] dawagner: (In particular, I'm wanting a good concept of the expected output files of a rule)
+[20:11:37] simonstewart: but I've thought that for a while
+[20:11:48] simonstewart: I can run you through what's in my head
+[20:11:55] dawagner: Please do!
+[20:11:58] simonstewart: ok
+[20:12:04] *simonstewart gets a refill for the wine
+[20:12:08] dawagner: heh
+[20:12:29] andreastt: Is the idea to rewrite it in Java?
+[20:12:34] andreastt: Isn't that a bit overkill?
+[20:12:49] simonstewart: Rewrite in java
+[20:12:56] simonstewart: Let's take the build from the beginning to end
+[20:13:09] simonstewart: Key concept to have in mind: not everything needs to be in the same process
+[20:13:19] simonstewart: So, we start the build and two things happen
+[20:13:39] simonstewart: 1) We start a server process of some sort (this could be in-memory and in-process to start with, but concpetually a server process)
+[20:13:58] andreastt: asdvv
+[20:14:05] andreastt: Uhm.  That was the kitten.
+[20:14:08] simonstewart: 2) Start reading the build.desc files pointed at by the command arguments (assuming we're doing a build)
+[20:14:27] simonstewart: I'm going to laying waste to a lot of kittens
+[20:15:00] simonstewart: The build file scanner will know enough to read the build files, convert them into an intermediate format and then determine which other build files to read
+[20:15:25] simonstewart: The results of each read are sent to the server process (debating whether to stream or batch them)
+[20:15:54] simonstewart: The server process looks at the number of CPUs on the current machine and starts that many builder processes
+[20:16:21] simonstewart: As each builder process starts it registers with the server, telling it what it can build (eg: 1 java_library, 1 java_test)
+[20:16:37] simonstewart: The server process now has an idea of the capacity it has for building which kinds of target
+[20:17:08] simonstewart: The set of targets to build is also known by the server
+[20:17:26] simonstewart: A really simple version would hold that set in the order recieved from the build file reader 
+[20:17:35] simonstewart: but you could do a topo sort, or something smarter if you need to
+[20:17:48] simonstewart: The server process notices that it has a builder free
+[20:18:03] andreastt: Is the idea to still shell out to the compile processes?
+[20:18:07] simonstewart: It scans down the set of targets to build looking for one with all its dependencies already met
+[20:18:25] simonstewart: andreastt: maybe, maybe not. For the first cut, everything will be in the same process.
+[20:18:36] simonstewart: But if you think this way from the start, it gets easier to distribute
+[20:19:11] simonstewart: the server scans down the list of build targets to build until it finds one that has all its dependencies already met and which is buildable by the builder process
+[20:19:36] andreastt: That's why I was asking.  Becuase if you shell out anyway, the multi-node setup you describe sounds much too complicate.d
+[20:19:41] simonstewart: That builder process is then assigned to build the target, which it does. When the process is available for more work it re-registers with the server
+[20:20:01] simonstewart: In effect, the server will have a constantly fluctuating pool of build processes to draw from
+[20:20:20] simonstewart: The build process itself falls into three steps: pre, during and post
+[20:20:41] simonstewart: The pre stage can do useful things like "calculate all the dependencies I need, possibly transitively, and request them"
+[20:20:59] simonstewart: The post can do things like "send useful logging messages indicating that this piece of work is done"
+[20:21:12] simonstewart: And that's CrazyFun TNG
+[20:21:20] simonstewart: Now, poke holes in it
+[20:22:00] simonstewart: Open questions in my head: could we handle multiple builds at the same time? 
+[20:22:01] andreastt: It sounds interesting, I'd welcome any work to make crazy fun more fun (-:
+[20:22:24] simonstewart: how do we deal with multiple target architectures (possibly use an implicit target?)
+[20:22:35] simonstewart: andreastt: does it sounds fatally flawed?
+[20:22:52] andreastt: No, but I need to review it when I don't have a cat blocking my screen.
+[20:22:58] simonstewart: Ha!
+[20:23:03] simonstewart: dawagner: your thoughts?
+[20:23:17] andreastt: Need to go pick up GF at hospital, see you tomorrow (-:
+[20:23:23] simonstewart: open question: how do we add new build targets to the running build?
+[20:23:31] simonstewart: Holy heck. Hope she's ok
+[20:23:38] andreastt: Hah, she works there (-:
+[20:23:47] simonstewart: Oh. OK. That's different :)
+[20:24:06] simonstewart: build targets: do we just bake these into the builder processes before the build starts?
+[20:24:14] simonstewart: Or do we support adding new types "mid build"
+[20:25:39] dawagner: Sounds reasonable :)
+[20:26:16] dawagner: Streaming in and out feels like concurrent builds shouldn't be too crazy - depends a little on whether we read files in the client or server process
+[20:26:36] dawagner: Adding new types sounds like more work than it's worth
+[20:26:36] simonstewart: Files get read on the client, transformed and then sent to the server
+[20:27:08] simonstewart: dawagner: sure, but it means that it's possible for someone not familiar with the CrazyFun source to add something that they need
+[20:28:00] dawagner: Sure, but not mid-build
+[20:28:34] simonstewart: Heh. Let's leave that out for this first cut
+[20:29:01] simonstewart: I was thinking of using (ugh) XML to bootstrap the build files thing until we can get a parser for the python subset used in the current build.desc files
+[20:29:36] simonstewart: Protobufs for communicating between (logical) processes
+[20:29:46] dawagner: Why don't we just load jython?
+[20:29:55] simonstewart: Because then people will write Python
+[20:29:57] dawagner: Python has built-in AST support
+[20:30:22] dawagner: We can restrict what you're allowed to do, sure, but using the built in parser seems handy
+[20:30:30] simonstewart: How easy is that?
+[20:30:30] dawagner: (Though I guess the grammar isn't too complex :))
+[20:31:18] simonstewart: Right: I want to get into the meaty "server and builders" thing quickly
+[20:31:30] simonstewart: Because the format of the build file is largely irrelevant
+[20:32:40] dawagner: Last time I told someone "I just implemented a parser for a subset of python" they laughed at me because it's trivially built-in :)
+[20:32:44] simonstewart: http://www.jython.org/docs/library/compiler.html
+[20:32:51] simonstewart: It's deprecated
+[20:33:44] dawagner: import ast ; ast.parse('x = 1 + 2')
+[20:35:03] simonstewart: Interesting
+[20:36:32] simonstewart: I'm going to have to read some docs, aren't I?
+[20:36:57] dude-x: ast has a safe compiler as well
+[20:37:03] dawagner: Could always just write the code anyway :p
+[20:37:23] simonstewart: No, I've been successfully derailed here
+[20:38:30] *detronizator poured himself some kentucky bourbon, in preparation for a nice sleep.
+[20:39:11] dawagner: brb
+[20:39:58] dawagner has joined #selenium
+[20:41:38] KaibutsuX: does anyone know how to disable firefox's highlighting of an input element when you mouseover it?
+[20:41:55] KaibutsuX: it doesn't seem to be dependent on the elements style, but more like an os level feature
+[20:45:52] mdgreenfield has joined #selenium
+[20:46:18] simonstewart: Nicking the jython and guava libraries from the selenium project
+[20:46:26] simonstewart: I think we can probably find a smaller jython version
+[20:49:51] dude-x: KaibutsuX: css a:hover can control that
+[20:50:45] KaibutsuX: I'll try that
+[20:51:23] dude-x: i vaguely recall the active pseudo selector too
+[20:57:25] barancev: simonstewart: what about guava? are you going to get rid of it entirely?
+[20:57:36] simonstewart: Absolutely not
+[20:57:42] simonstewart: That library is the jquery of java
+[20:57:47] dude-x: that's used for expectedConditions
+[20:58:01] simonstewart: Once you're used to it, going back is unthinkable
+[20:58:24] barancev: yes, I was frightened
+[20:59:01] simonstewart: frightened?
+[20:59:36] barancev: by your "Nicking the jython and guava libraries from the selenium project"
+[IRC logfile - Started Sun Nov  4 21:00:04 2012]
+[21:00:04] dude-x: :apidocs
+[21:00:04] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[21:00:12] simonstewart: Oh. And pushing them into the standalone crazyfun project
+[21:01:10] barancev: :)
+[21:03:48] KaibutsuX: dude-x: looks like I was looking for MozAppearance
+[21:04:26] dude-x: can you link me to that document?
+[21:04:44] dude-x: cause i want to know the context of your original question
+[21:06:47] dude-x: kids… there are kids playing basketball or something in the alley and i overhead one of them say : "I haven't changed my underwear in a month!" the other kid responds "You're dirty!"
+[21:07:09] KaibutsuX: dude, were you talking to me?
+[21:07:52] dude-x: KaibutsuX: yes, show the doc entry on MozApperance
+[21:08:40] KaibutsuX: https://developer.mozilla.org/en-US/docs/CSS/-moz-appearance
+[21:13:10] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Checking script evaluation result to prevent null reference exception. Fixes issue 4490 | https://code.google.com/p/selenium/source/detail?r=18065 | http://seleniumhq.org/ci.jsp?r=18065
+[21:14:27] dude-x: KaibutsuX: now i understand your question better
+[21:15:09] KaibutsuX: yeah it seems that sometimes my firefox instance is getting focus messed up
+[21:15:27] KaibutsuX: sometimes I get screenshots with the border, sometimes without
+[21:15:34] dude-x: KaibutsuX: in the past I used regular css to not to underline
+[21:16:48] dude-x: but it wasn't a special prefixed one
+[21:17:11] KaibutsuX: well my input only gets the blue highlight if I'm using the windows7 aero glass theme and the only thing that removes it in that case is: mozAppearance='none'
+[21:17:22] KaibutsuX: but that changes the look of it in many other ways as well
+[21:17:34] dude-x: oh interesting
+[21:17:41] KaibutsuX: I can't figure out how to simply ignore the focus, I think it's os level focusing
+[21:18:02] dude-x: last time i fiddled with CSS was in 2008
+[21:18:08] KaibutsuX: but when my tests get run, the test automatically moves the mouse cursor way out oft he way, like 10,0000x200 so the mouse shouldn't be in the way
+[21:20:13] dude-x: that's by using the actions class right?
+[21:20:35] KaibutsuX: no, I'm using os level mouse handling
+[21:21:03] KaibutsuX: my tests don't do any mouse manipulation, it's all just ele.send_keys for the most part
+[21:21:20] dude-x: interesting...
+[21:21:23] dude-x: windows eh?
+[21:21:25] mdgreenfield has joined #selenium
+[21:21:43] dude-x: have you looked at the actions class?
+[21:22:09] KaibutsuX: yeah, I've used it
+[21:23:41] KaibutsuX: whats really weird is, before I take any screenshot, I perform a blanket function to try and make sure nothing is currently focues, highlighted or anything like that by doing a "//body".click() and somehow this element is still sometimes coming up as 'focused'
+[21:24:39] dude-x: yeah
+[21:24:48] dude-x: i' m not sure what's that about
+[21:25:13] dude-x: body click() will be the center of the page though
+[21:25:13] KaibutsuX: It's intermittent, but it's always one this one page in particular
+[21:25:47] KaibutsuX: yeah, AutomatedTester thought that would be the best way to defocus everything
+[21:26:02] KaibutsuX: and in my case, the body never has any events to be fired inadvertantly
+[21:27:20] KaibutsuX: If I could just disable Aero, then I dont think it would ever happen, but alas we use our screenshots for documentation and apparently 'Aero makes it look pretty'
+[21:42:02] dude-x: i see
+[21:44:00] smccarthy2 has joined #selenium
+[21:56:39] mdgreenfield has joined #selenium
+[IRC logfile - Started Sun Nov  4 22:12:46 2012]
+[22:12:46] stackedsax has joined #selenium
+[22:31:38] mdgreenfield has joined #selenium
+[22:39:52] stackedsax has joined #selenium
+[22:44:02] simonstewart has left #selenium
+[IRC logfile - Started Sun Nov  4 23:07:12 2012]
+[23:07:12] mdgreenfield has joined #selenium
+[23:16:45] alexglow has joined #selenium
+[23:42:57] mdgreenfield has joined #selenium
+[23:48:11] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Re-enabling .NET PhantomJS tests. | https://code.google.com/p/selenium/source/detail?r=18066 | http://seleniumhq.org/ci.jsp?r=18066
+[23:51:10] selbot2: 03james.h.evans.jr@gmail.com half a minute ago - JimEvans: No remote HTTP servers implementing the WebDriver JSON wire protocol use the Expect-100 header. Turn this off for the .NET bindings' client. | https://code.google.com/p/selenium/source/detail?r=18067 | http://seleniumhq.org/ci.jsp?r=18067

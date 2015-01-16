@@ -1,0 +1,807 @@
+[IRC logfile - Started Thu Dec 13 00:00:32 2012]
+[00:00:32] AutomatedTester: jimevans: have they been set to ignore
+[00:00:32] jleyba: jimevans: in what way?
+[00:00:43] jimevans: this one: http://code.google.com/p/phantomjs/issues/detail?id=815 (which is probably related to https://bugs.webkit.org/show_bug.cgi?id=47978) 
+[00:00:51] detronizator: jleyba: yes, phantomjs UA specifically
+[00:00:56] jimevans: AutomatedTester: not yet.
+[00:01:25] detronizator: jimevans: but it's not in the CI, right?
+[00:01:40] detronizator: so it's not like I'm going to have another chicken little moment :)
+[00:01:43] detronizator: RIGHT?
+[00:01:48] jimevans: detronizator: not yet. wouldn't expect it to be until at least phantomjs 1.8
+[00:02:03] jimevans: once that's out the door, it's fair game. :)
+[00:02:05] detronizator: more like PhantomJS 5.10.11
+[00:02:14] AutomatedTester: detronizator: we dont need to release anything for this issue
+[00:02:24] AutomatedTester: it just falls into the normal release cycle
+[00:03:07] detronizator: AutomatedTester: jimevans: I'm a bit nervous about having those tests in CI yet
+[00:03:10] jimevans: but that bug i referenced above affects some test cases where we do a window.open with a relative path in the test page.
+[00:03:35] detronizator: jimevans: also, there are many crashes in phantomjs to which we still have no fix
+[00:04:07] detronizator: no caused by ghostdriver (I have tried everything!), but actual QtWebKit issues
+[00:04:12] jimevans: detronizator: they're pretty stable, my friend. Tests run: 626, Failures: 10, Errors: 5, Time elapsed: 293.631 sec
+[00:04:34] detronizator: jimevans: WAY better than I'd expected
+[00:04:39] jimevans: (of course, that's with the alerts tests and the async javascript tests ignored)
+[00:05:19] jimevans: (and a few others that i know will fail because they fail in the .net versions of the same tests)
+[00:05:26] detronizator: jimevans: good news, a gentleman named Jon in Oxford is taking care of updating to Qt 4.8.4
+[00:05:36] jimevans: saw that on the mailing list. :)
+[00:05:39] detronizator: that should carry bugfixes for QtWebKit
+[00:05:57] detronizator: jimevans: I also have few fixes in 1.0.1
+[00:06:06] jimevans: groovy.
+[00:06:08] detronizator: that I think it's almost ready to go out
+[00:06:18] detronizator: and I should make it for Phantom 1.8
+[00:06:28] detronizator: that fixes the "wait on some click" issue
+[00:06:43] simonstewart: detronizator, jimevans : a capability is the way to go
+[00:06:58] jleyba: jimevans,detronizator: executeAsyncScript doesn't work with ghost driver?
+[00:07:07] detronizator: simonstewart: will do sir
+[00:07:13] girija has left #selenium
+[00:07:19] jimevans: detronizator: i would encourage you to use the java webdriver tests as a tool to help you root out other issues too.
+[00:07:28] detronizator: jleyba: it should! 
+[00:07:38] lukeis: jleyba: it does, there are just some issues / edge cases i think (didn't jarib run into one)
+[00:07:41] detronizator: jimevans: yesterday I tried to launch it
+[00:07:48] jimevans: (now that crazy-fun will run those tests and all)
+[00:07:56] detronizator: it was really not very verbose and hanged 
+[00:08:12] jleyba: are there prebuilts available somewhere?  i want to try it out but don't want to kill my machine right now
+[00:08:33] jleyba: nvm… I'll stop being lazy and go use my imac
+[00:08:42] detronizator: jleyba: no - we still haven't arranged a continuous build system
+[00:09:00] SlexAxton has joined #selenium
+[00:09:04] detronizator: jleyba: more precisely: we haven't got the resources to do that :)
+[00:09:05] jleyba: simonstewart: have you had a chance to compare the rmbp to your iMac?
+[00:09:26] jimevans: detronizator: yeah, i'll agree on the lack of verbosity. what revision were you running against?
+[00:09:43] detronizator: I synched yesterday night and run
+[00:09:47] detronizator: wait a sec
+[00:10:11] detronizator: jimevans: r18301
+[00:10:14] selbot2: 03jari.bakken 1 day ago - JariBakken: Bump ruby gem version to 2.28.0.dev | https://code.google.com/p/selenium/source/detail?r=18301 | http://seleniumhq.org/ci.jsp?r=18301
+[00:10:44] jimevans: detronizator: ah. my changes didn't land until r18303.
+[00:10:46] selbot2: 03james.h.evans.jr@gmail.com 1 day ago - JimEvans: Ignoring Java tests for features not implemented in PhantomJS/GhostDriver  | https://code.google.com/p/selenium/source/detail?r=18303 | http://seleniumhq.org/ci.jsp?r=18303
+[00:10:54] jimevans: that should solve the hang, at least.
+[00:11:03] detronizator: jimevans: will give it another go
+[00:11:05] jimevans: brb
+[00:11:50] SlexAxton: Hi all, I have been using bunyip to more or less run a command like: `bunyip test.html -b 'ios, ff, ie'` that would push my test.html page that I'm serving through a proxy to make it accessible, then run browserstack servers against it on those browsers and asynchronously return the test results for each browser. However I'd like to use selenium and specifically webdriver. What's the most similar set up to this with those tools. I'm
+[00:11:50] SlexAxton:  totally cool with using saucelabs too (as I was using browserstack).
+[00:12:34] simonstewart has left #selenium
+[00:12:40] simonstewart has joined #selenium
+[00:14:25] AutomatedTester: no idea what bunyip is 
+[00:15:00] KaibutsuX: do you guys have a changelog for 2.28 yet?
+[00:15:07] simonstewart: :changelog
+[00:15:08] selbot2: .NET: http://goo.gl/SL88L | Java: http://goo.gl/50JPE | Ruby: http://goo.gl/K9ayk | Python: http://goo.gl/Ikm8u | IDE: http://goo.gl/tm4FM
+[00:15:13] simonstewart: "Yes"
+[00:15:27] KaibutsuX: an updated one to reflect 2.28?
+[00:15:39] SlexAxton: AutomatedTester: it's just a tool that allows me to do what I explained
+[00:16:02] KaibutsuX: ahh, i was seeing ruby and python were still on 2.27
+[00:16:45] AutomatedTester: simonstewart: why are there .NET changes in the java changelog?
+[00:17:16] simonstewart: Because they seemed relevant?
+[00:17:22] simonstewart: I read the descriptions, not the files that changes.
+[00:17:25] simonstewart: changed
+[00:17:41] simonstewart: Jim's note about a possible performance regression and a new capability seemed like a good thing to call out
+[00:18:15] AutomatedTester: ok
+[00:19:34] KaibutsuX: so are there changes to Python and Ruby bindings or are they just misisng from changelog?
+[00:20:02] jarib: ruby won't have a 2.28 release
+[00:20:09] jarib: it'd be a re-release of 2.27.2
+[00:20:25] selbot2: 03david.burns@theautomatedtester.co.uk less than 10 seconds ago - DavidBurns adding python changelog | https://code.google.com/p/selenium/source/detail?r=18337 | http://seleniumhq.org/ci.jsp?r=18337
+[00:20:40] KaibutsuX: ahh, thanks. ha, thanks AutomatedTester
+[00:22:15] dude-x1 has joined #selenium
+[00:23:54] jarib: IMO this should've been 2.27.X, since it was basically done to correct a java packaging bug and AFAIK there are no changes to common components
+[00:24:42] AutomatedTester: jarib: I thought we agreed that server never gets the x
+[00:24:48] AutomatedTester: thats a client number
+[00:25:14] jarib: ok? can't recall that discussion
+[00:27:16] AutomatedTester: I found one versioning discussion 
+[00:27:44] AutomatedTester: https://groups.google.com/forum/?fromgroups=#!topic/webdriver/320oXQX4fPU
+[00:29:38] AutomatedTester: https://groups.google.com/forum/?fromgroups=#!searchin/selenium-developers/versioning$20thoughts/selenium-developers/GbGiFA5wRpY/JzmdxS2QLxcJ
+[00:29:58] AutomatedTester: jarib: thats why I thought server got the X but I might have interpreted it differently
+[00:30:12] AutomatedTester: s/differently/wrongly
+[00:31:06] AutomatedTester: never got the X even
+[00:31:32] jarib: yeah
+[00:32:23] AutomatedTester: I remember at GTAC last year I had to do a patch release on Java for some reason and bumped all the numbers
+[00:32:41] jarib: i remember that too, ruby skipped that as well
+[00:33:22] jarib: or was that some other time
+[00:33:36] jarib: no, probably GTAC
+[00:34:01] jarib: ruby goes straight from 2.10.0 (october 27) to 2.12.0 (november 9)
+[00:34:08] AutomatedTester: yea the GTAC one was because I did a release and then broke something that Sauce relied on
+[00:34:24] AutomatedTester: so we patched and released during the lunch break
+[00:34:32] AutomatedTester: thats all I remember
+[00:35:10] detronizator: AutomatedTester: when you guys broke stuff in Sel at Neustar we had to wait to get the fix in
+[00:35:12] detronizator: :(
+[00:35:31] AutomatedTester: detronizator: did you speak to us?
+[00:35:36] jarib: the conclusion from the mailing list makes sense, still feels pointless to push a gem with no changes
+[00:35:52] detronizator: AutomatedTester: I was about to add stuff :)
+[00:35:59] detronizator: after I started hanging around here
+[00:36:05] detronizator: things moved much faaster
+[00:36:20] AutomatedTester: detronizator: and iirc, sauce supplied the patch to fix it
+[00:36:36] AutomatedTester: detronizator: since we most selenium committers were at the conf
+[00:36:54] AutomatedTester: also :kittens
+[00:36:54] selbot2: Before you say you cannot provide html, think of the kittens! http://jimevansmusic.blogspot.ca/2012/12/not-providing-html-page-is-bogus.html
+[00:37:05] detronizator: AutomatedTester: when I joined Neustar, Mark Watson wasn't really active here
+[00:37:20] detronizator: I don't know if it was just because he was leaving or he never did
+[00:37:22] AutomatedTester: detronizator: I thought you worked for plightbo
+[00:37:42] AutomatedTester: if he didnt give you time for Se...
+[00:37:42] detronizator: plightbo wan't writing code regularly anymore
+[00:38:02] detronizator: AutomatedTester: again, I was going to add stuff to that thought
+[00:38:03] detronizator: :)
+[00:38:17] AutomatedTester: type faster dammit :P
+[00:38:24] detronizator: in short: opening an active comms channel made us move master
+[00:38:28] detronizator: faster*
+[00:38:34] detronizator: (u make me typo)
+[00:38:50] detronizator: before was a pain: mark had done all sort of crazy shit
+[00:38:59] AutomatedTester: sheesh, you would think english isnt your first language :P
+[00:39:02] detronizator: to patch selenium internally
+[00:39:24] AutomatedTester: internally?!?!?!?!
+[00:39:34] detronizator: patrick was always suggesting to get active here
+[00:39:36] detronizator: and he was right
+[00:39:47] detronizator: all the issues afterwards were smooth to change,fix,address
+[00:40:02] *AutomatedTester goes all Incredible Hulk when people dont upstream fixes
+[00:40:03] detronizator: or, in case I was on the wrong path, I got diverted quickly in the right direction
+[00:40:16] detronizator: AutomatedTester: me to, calm down
+[00:40:17] detronizator: :)
+[00:40:51] detronizator: I had a similar issue in Amazon with GhostDriver: and I turned green too
+[00:41:05] detronizator: now it's about to move "forward" and start contributing back
+[00:41:22] detronizator: but it's slow and I still get green-ish when I read emails of OS advocates
+[00:41:28] jimevans: "don't make AutomatedTester angry. you wouldn't like him when he's angry." :)
+[00:41:34] detronizator: :)
+[00:41:45] detronizator: somehow I can imagine AutomatedTester turning Green
+[00:41:56] detronizator: he has a believable "hulk" face :)
+[00:42:29] AutomatedTester: there are few things that get me really annoyed. 1) My sister 2) People trolling OSS 3) People not upstreaming fixes to OSS projects
+[00:42:46] detronizator: your sister?
+[00:42:49] detronizator: lol
+[00:43:04] detronizator: is that in order of annoyance?
+[00:43:10] AutomatedTester: pretty much
+[00:43:21] AutomatedTester: I am sure my sister has a personality disorder
+[00:43:34] jimevans: i have someone who can help with that. :)
+[00:43:44] AutomatedTester: jimevans: there is no hope
+[00:44:05] simonstewart: Would love to see what happened if your sister refused to upstream fixes to an OSS project because she thought that people involved with OSS were asshats
+[00:44:27] detronizator: AutomatedTester: Got it! Your sister developed Mosaic and it's now at Microsoft and evangelising IE6?
+[00:44:29] detronizator: :)
+[00:44:31] *AutomatedTester borrows llaskin1's armoury and goes postal
+[00:44:59] jimevans: "what's wrong, AutomatedTester?" "nothing that an ak-47 and a tall building wouldn't cure."
+[00:45:01] detronizator: simonstewart: ROTFL
+[00:46:01] detronizator: jimevans: pretty sure an AK-47 doesn't serve the purpose from a tall building
+[00:46:22] AutomatedTester: detronizator: you'll be surprised
+[00:46:48] AutomatedTester: AK-47's are lethal because their barrels are crap
+[00:47:12] AutomatedTester: instead of spinning neatly  they start tumbling
+[00:47:18] AutomatedTester: and do more damage that way
+[00:47:25] *detronizator starting to reconsider any future joke about AutomatedTester as "better not possing him off"
+[00:47:39] AutomatedTester: detronizator: better not poss me off
+[00:47:47] *AutomatedTester wonders what poss is
+[00:47:58] AutomatedTester: is it poss piss
+[00:48:10] AutomatedTester: piss poss pish
+[00:48:39] *detronizator is considering hugging AutomatedTester to calm him down and no git-vs-svn-jokes are coming to his mind anymore
+[00:48:49] AutomatedTester: yay, I found the test I wrote for Selenium many moons ago
+[00:49:15] AutomatedTester: I like hugs
+[00:49:51] detronizator: will provide some next time in exchange for all the ammo you have for the AK-47
+[00:49:53] *hugs likes AutomatedTester.
+[00:50:06] detronizator: hugs: LOL
+[00:50:17] simonstewart: wow. hugs is here
+[00:50:21] *AutomatedTester hugs hugs
+[00:50:24] hugs: ohai
+[00:50:38] jimevans: detronizator: well, "ar-15" would've been a strictly more appropriate choice but that's not the movie quote.
+[00:50:45] AutomatedTester: its oh bearded one v2!
+[00:51:05] detronizator: this is a pub, this is not a chatroom anymore
+[00:51:43] AutomatedTester: how you doing hugs
+[00:51:53] detronizator: where are the darts (that I'm crap at), the pool (at which I'm even worse) and the booze?
+[00:51:59] hugs: AutomatedTester: I'm procrastinating from writing a blog post for Wired. :-)
+[00:52:29] AutomatedTester: on robots?
+[00:52:39] AutomatedTester: probably a silly question
+[00:53:54] hugs: well, the story starts with Dave Hunt's Selenium script for playing PACMAN
+[00:53:56] hugs: ( http://seleniumexamples.com/blog/examples/play-pacman-with-selenium-2/ )
+[00:54:20] davehunt_: hello
+[00:54:22] hugs: I'm blaming that as the beginning of the fascination with combining Selenium and video games. :-)
+[00:54:31] hugs: sup, davehunt
+[00:54:34] davehunt_: oh, I'm being blamed
+[00:54:38] *davehunt_ leaves
+[00:54:38] hugs: :-)
+[00:54:41] davehunt_: :P
+[00:55:03] davehunt_: hugs: I have a garage now.. going to build something cool soon! :)
+[00:55:12] hugs: sidenote... robot's getting renamed on Monday to "appibot" http://appibot.com/
+[00:55:25] hugs: davehut: a garage? eggsellent!
+[00:55:38] davehunt_: hugs: when do I get my appibot kit? ;)
+[00:55:45] AutomatedTester: *steeple fingers*
+[00:56:00] hugs: davehunt: https://tindie.com/shops/hugs/robot-that-plays-angry-birds/
+[00:56:07] hugs: did i promise you one? :-)
+[00:56:24] jleyba has joined #selenium
+[00:56:25] davehunt_: hugs: I think I made you promise me one :)
+[00:57:00] lukeis: only 4 left!!! ;)
+[00:57:10] hugs: was that before or after that 3rd Guinness?
+[00:57:12] davehunt_: I better hurry! :P
+[00:57:25] hugs: I'm an idiot and selling them below cost. :-)
+[00:57:57] davehunt_: hugs: I need to clear some space, and then I'll place my order
+[00:58:21] hugs: sorry everyone else... didn't mean to spam the list with my robot advert. :-)
+[00:58:27] davehunt_: heh
+[00:58:47] AutomatedTester: hugs: its fine, we werent speaking about anything interesting
+[00:59:45] lukeis: i think we all like a little robot talk every once in a while ;)
+[00:59:59] hugs: okay, then... back to talkin' robots. :-)
+[IRC logfile - Started Thu Dec 13 01:00:26 2012]
+[01:00:26] hugs: Here's some recent "fun" code: An inverse kinematics library in Python
+[01:00:27] hugs: https://gist.github.com/4231272
+[01:01:21] *lukeis just went crosseyed with the maths
+[01:01:43] hugs: You need an inverse kinematics algorithm to translate an X,Y coordinate on the screen into commands for the robot's motors.
+[01:02:12] hugs: The canonical guide to delta robot kinematics is here: http://forums.trossenrobotics.com/tutorials/introduction-129/delta-robot-kinematics-3276/
+[01:02:40] hugs: Honestly, I don't understand the math either... I merely got it to work. :-)
+[01:03:26] AutomatedTester: hugs: you should start playing with CSS3 Transforms
+[01:03:40] AutomatedTester: the maths there is... well it hurts
+[01:04:00] jimevans: detronizator: since we were speaking of phantomjs issues, this one affects the java webdriver tests too: http://code.google.com/p/phantomjs/issues/detail?id=302
+[01:04:10] AutomatedTester: jimevans: he left
+[01:04:16] jimevans: so he dit.
+[01:04:21] jimevans: er. did
+[01:04:26] AutomatedTester: hugs: https://developer.mozilla.org/en-US/docs/CSS/transform-function
+[01:05:29] Cside_away has joined #selenium
+[01:05:50] hugs: Thanks for the link, AutomatedTester. :-) I'm a glutton for math I don't understand.
+[01:06:24] AutomatedTester: hugs: it makes for interesting cases where webdriver visibility it wrong
+[01:06:34] AutomatedTester: is wrong even
+[01:06:58] AutomatedTester: and Firefox OS is full of them
+[01:07:15] AutomatedTester: since it does to CSS what we needed JS for many years ago
+[01:09:45] hugs: davehunt_: was your Selenium script for Pacman the first Selenium script for a video game amongst the committers?
+[01:10:08] hugs: aka "patient zero"
+[01:10:11] davehunt_: hugs: afaik...
+[01:10:44] hugs: got it. yeah, so you get the blame/credit. :-)
+[01:10:47] davehunt_: trying to think if I did one before that
+[01:11:11] davehunt_: I rewrote it in Python this year
+[01:11:15] AutomatedTester: Zelkjo "forked" it didnt he?
+[01:11:21] davehunt_: but it still sucks
+[01:11:31] davehunt_: AutomatedTester: yeah, I put out a challenge and he took it up
+[01:13:54] dude-x has joined #selenium
+[01:14:06] AutomatedTester: i should go to bed
+[01:14:18] lukeis: hugs / jcarr / awilson820: what happened to http://www.seleniumconf.org/ ?
+[01:14:32] lukeis: i hope 2012 isn't coming soon ;)
+[01:14:38] jcarr: I dunno, I guess 2012 is coming soon?
+[01:17:45] ShawnM has joined #selenium
+[01:18:23] AutomatedTester: laters all
+[01:26:06] hugs: lukeis: woah, that site looks hideous
+[01:26:23] hugs: I'll ping ashley right now
+[01:29:54] awilson820: woah
+[01:30:01] awilson820: i don't know how that happened...
+[01:30:21] awilson820: well, i did have adam switch the old site to http://2012.seleniumconf.org/
+[01:30:27] awilson820: which looks equally terrible
+[01:30:34] hugs: never send an automated test to do a human's job...
+[01:30:46] hugs: wait, reverse that...
+[01:32:05] lukeis: 2011 looks good still ;)
+[01:32:15] awilson820: hm, i'll investigate
+[01:32:19] awilson820: i have a new banner to go into the 2013 site
+[01:33:08] lukeis: silly mortals, thinking there will be a 2013...
+[01:37:12] awilson820: ok, talked to adam
+[01:37:21] awilson820: he said he made that happen in the middle of the night. hence, the "2012"
+[01:37:23] awilson820: :-)
+[01:37:25] selbot2: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Random type check/cast clean-up and other non-functional changes. | https://code.google.com/p/selenium/source/detail?r=18338 | http://seleniumhq.org/ci.jsp?r=18338
+[01:37:38] awilson820: he's going to port over our old wordpress to this and i'll fix everything up
+[01:37:52] awilson820: hopefully we'll be able to announce the conference next week, we have a call tomorrow to finalize date and venue
+[01:39:04] lukeis: w00t
+[01:42:40] ner0x has joined #selenium
+[01:49:56] simonstewart has joined #selenium
+[01:52:27] art_man1 has joined #selenium
+[IRC logfile - Started Thu Dec 13 02:06:54 2012]
+[02:06:54] selbot2: 03nirvdrum@gmail.com half a minute ago - KevinMenard: Made comment easier to read. | https://code.google.com/p/selenium/source/detail?r=18339 | http://seleniumhq.org/ci.jsp?r=18339
+[02:07:33] mreedell has joined #selenium
+[02:20:11] jimevans: right. leaving for now. but later, there's steak!
+[02:20:22] lukeis: see ya 
+[02:20:28] jimevans has left #selenium
+[02:30:39] HighSpeed has joined #selenium
+[02:30:55] HighSpeed has joined #selenium
+[02:34:55] DarkRift has joined #selenium
+[02:34:55] DarkRift has joined #selenium
+[02:35:21] HighSpeed has joined #selenium
+[IRC logfile - Started Thu Dec 13 03:13:43 2012]
+[03:13:43] alexglow has joined #selenium
+[03:14:58] DarkRift has joined #selenium
+[03:14:58] DarkRift has joined #selenium
+[03:21:06] alexglow has joined #selenium
+[03:51:29] art_man1 has joined #selenium
+[IRC logfile - Started Thu Dec 13 04:02:47 2012]
+[04:02:47] Cside has joined #selenium
+[04:13:43] stephend has joined #selenium
+[04:15:12] noahsussman has joined #selenium
+[04:25:22] santiycr has joined #selenium
+[04:32:15] solofight has joined #selenium
+[04:32:51] solofight: People i have a selenium test case written in python - now if i want the script to be invocated from another python file - how do i call it ?
+[04:35:35] solofight: here is my code
+[04:35:36] solofight: http://pastebin.com/YmirShWU
+[04:35:47] solofight: and when i call it runs and says ok
+[04:36:04] solofight: but the actual activity didn't happen (opening browser and doing stuff)
+[04:36:15] solofight: but when i run the file seperately it works fine
+[04:40:43] p0deje has joined #selenium
+[04:48:19] jeichar has joined #selenium
+[04:55:24] jeichar has joined #selenium
+[IRC logfile - Started Thu Dec 13 05:07:08 2012]
+[05:07:08] solofight: guys - need help !
+[05:07:27] solofight: how do i call a selenium test case from another python file ?
+[05:07:40] solofight: chrome_settings_test.unittest.setUp() wont work
+[05:08:00] solofight: chrome_settings_test.unittest.main() says OK but the actual execution of opening the browser and all didnt happen
+[05:23:13] santiycr: I generally just use nose to run tests
+[05:23:36] santiycr: you can probably just import the class, then run unittest.main()
+[05:24:09] santiycr: from chrome_settings_test import YourTestCaseClass
+[05:24:18] santiycr: import unittest
+[05:24:22] santiycr: unittest.main()
+[05:27:02] solofight: santiycr: thanks for replying !
+[05:27:34] solofight: when i import and call unittest.main() and run the program in command prompt - it says 1 test ran success OK and stuff
+[05:27:42] solofight: but the browser didnt open and google
+[05:30:23] santiycr: solofight:  are you sure you're talking about a selenium test? maybe it's just a regular unit test that doesn't use a browser
+[05:30:54] solofight: santiycr: when i execute the same code from command prompt it opens browser and googles
+[05:31:09] santiycr: hm
+[05:31:15] solofight: when i invocate using another python code it just says - test ran success Ok and nothing else
+[05:31:58] solofight: santiycr: this can be easy if use nose ?
+[05:32:10] Mkop has joined #selenium
+[05:32:25] santiycr: solofight:  v
+[05:32:26] santiycr: http://stackoverflow.com/questions/869519/running-unittest-main-from-a-module
+[05:32:32] santiycr: that may be the problem!
+[05:32:39] rananda has joined #selenium
+[05:33:07] santiycr: both answers should help you
+[05:51:59] SamuraiJack has joined #selenium
+[IRC logfile - Started Thu Dec 13 06:23:58 2012]
+[06:23:58] jeichar has joined #selenium
+[06:27:06] solofight: santiycr: am wrong - when i said using unittest.main()  reports 1 test run successfully but the browser doesn't show up - it actually says 0 test ran successfully
+[06:27:28] solofight: santiycr: using nose i can perform this easily ?
+[06:30:53] SlexAxton has left #selenium
+[06:32:22] santiycr: solofight: maybe, I don't think easier than the solutions I just sent from stack overflow
+[06:32:27] santiycr: http://stackoverflow.com/questions/869519/running-unittest-main-from-a-module
+[06:34:07] solofight: santiycr: i went through that but confuses on which is the main selenium program there and which is the another prohram which is calling it
+[06:35:21] solofight: can you please help ?
+[06:35:37] solofight: def finish is a custom function or selenium built in like teardown and others ?
+[06:35:59] Manoj has joined #selenium
+[06:39:27] stephend: solofight: are you just starting out?
+[06:39:41] stephend: with Python / Selenium, I mean, together?
+[06:39:48] stephend: we use both, and we use py.test
+[06:39:48] solofight: stephend: yes
+[06:40:03] stephend: we also extend unittest into unittestzero
+[06:40:15] stephend: so we can have some different assert libraries
+[06:40:34] stephend: take a look through https://github.com/mozilla/mozwebqa-test-templates, if you're interested
+[06:41:24] stephend: and if you want the flexibility to do sauce labs / in-house Grid, etc., also https://github.com/davehunt/pytest-mozwebqa
+[06:42:11] stephend: (not trying to convert you from nose, but if you're interested in looking at something else to compare, by all means)
+[06:45:06] solofight: stephend: thank you - will look learn about it when i improve my level of python and selenium
+[06:45:38] Manoj: stephend: that was a template explaining page object pattern as well right ? the first link
+[06:45:40] santiycr: solofight:  https://gist.github.com/4274570
+[06:45:48] santiycr: and with that, you owe me a beer
+[06:46:31] Manoj: santiycr: your cssify is just awesome, till now just works cool for all that i have converted.
+[06:46:52] Manoj: I think even I owe a beer :P
+[06:47:08] stephend: solofight: np
+[06:47:22] stephend: solofight: also, stop by our channel anytime -- #mozwebqa on irc.mozilla.org
+[06:47:29] stephend: given time + people around, we'd be happy to talk to you
+[06:47:51] stephend: Manoj: yes, though not in as full detail as written elsewhere
+[06:48:11] Manoj: yup, but that is enough to get started with the PO
+[06:48:17] santiycr: Manoj: you're welcome and yes, you can buy me a beer anytime :)
+[06:48:27] Manoj: Come to India then ;)
+[06:48:35] santiycr: I'll take that
+[06:48:36] santiycr: :)
+[06:48:51] solofight: santiycr: awesomeeee - module= did it
+[06:48:53] stephend: Manoj: indeed
+[06:48:55] solofight: thanks so much
+[06:49:01] stephend: provides a quick and simple overview
+[06:49:13] santiycr: \o/
+[06:49:40] Manoj: stephend: I have promised that I will come back after 2 weeks a week ago. and I will.
+[06:49:48] santiycr: solofight: you're welcome, happy to did it
+[06:50:04] stephend: Manoj: we'll be around whenever you have time
+[06:50:30] santiycr: oh hai, 4am on my computer, haven't seen you since yesterday!
+[06:50:34] Manoj: I still have the notes, that was noted by me when AJ was helping me to setup the VirtualWrapper env
+[06:52:05] Manoj: santiycr: that was for ?
+[IRC logfile - Started Thu Dec 13 07:00:14 2012]
+[07:00:14] santiycr: Manoj:  just my weird way to say "oh wow, it's 4am and I'm on my computer again"
+[07:00:40] Manoj: okay.. I thought you had a beer already ;)
+[07:02:10] santiycr: well, I had a few, like 4 hours ago
+[07:02:14] santiycr: :)
+[07:02:50] Manoj: Enjoy.....
+[07:05:46] Guest26587 has joined #selenium
+[07:06:35] papegaaij has joined #selenium
+[07:08:58] solofight has left #selenium
+[07:09:32] Manoj: Stephend: my idea of Tshits and some certificates have been implemtend ? lol i shouldn't ask that now as I am not In
+[07:09:35] Manoj: but just checking
+[07:14:08] Manoj: we ll chat abt this on the #mozwebqa it would be in appropriate here.
+[07:14:58] stephend: Manoj: you're not in that channel, so we can't, yet, but since you asked, we'll look at http://openbadges.org/en-US/ next year during our work week
+[07:15:01] stephend: we want the time to do it right
+[07:15:11] stephend: also, no formal program yet at mozilla for t-shirts, etc.
+[07:16:13] Manoj: stepehnd: sure I understand.
+[07:31:28] p0deje has joined #selenium
+[07:37:36] detronizator has joined #selenium
+[07:39:39] simonstewart has joined #selenium
+[IRC logfile - Started Thu Dec 13 08:33:29 2012]
+[08:33:29] Hronom has joined #selenium
+[08:39:00] testingb0t has joined #selenium
+[08:48:00] jamesoram has joined #selenium
+[08:49:22] freynaud has joined #selenium
+[08:49:31] alexglow has joined #selenium
+[08:50:11] Bebe_sel has joined #selenium
+[08:54:40] testingb0t1 has joined #selenium
+[08:55:10] selbot2_ has joined #selenium
+[08:57:33] kallisti has joined #selenium
+[IRC logfile - Started Thu Dec 13 09:03:05 2012]
+[09:03:05] Cside has joined #selenium
+[09:15:56] girija has joined #selenium
+[09:18:26] Bebe_sel has joined #selenium
+[09:23:06] Dave_B has joined #selenium
+[09:27:10] jlopez has joined #selenium
+[09:28:53] DarkRift has joined #selenium
+[09:28:53] DarkRift has joined #selenium
+[09:28:58] jeichar has joined #selenium
+[09:37:24] jamesoram has joined #selenium
+[09:37:38] stan_ has joined #selenium
+[09:41:05] solofight_ has joined #selenium
+[09:41:18] solofight_: how to pass command line variale to selenium code ?
+[09:41:43] solofight_: i have a python script and doing a sys.argv results in error as mentioned in this thread by some other person
+[09:41:54] solofight_: http://mail.python.org/pipermail/tutor/2009-July/070457.html
+[09:43:43] solofight_: got it
+[09:49:56] teodosia_sel has joined #selenium
+[09:53:24] Selenium has joined #selenium
+[09:56:42] rbalent has joined #selenium
+[IRC logfile - Started Thu Dec 13 10:03:36 2012]
+[10:03:36] zac_sel has joined #selenium
+[10:05:51] p0deje has joined #selenium
+[10:06:37] admc has joined #selenium
+[10:11:21] Selenium: no mods no masters
+[10:29:29] jamesoram has joined #selenium
+[10:29:30] zeljkof has joined #selenium
+[10:36:11] jamesoram has joined #selenium
+[10:42:23] MadMerlin|work_ has joined #selenium
+[IRC logfile - Started Thu Dec 13 11:06:22 2012]
+[11:06:22] selbot2_: 03eran.mes@gmail.com half a minute ago - EranMes on behalf of RicardoSantos: Clean up after the Python FirefoxDriver by deleting the temporary folder after the driver quits. | https://code.google.com/p/selenium/source/detail?r=18340 | http://seleniumhq.org/ci.jsp?r=18340
+[11:07:32] girija has left #selenium
+[11:10:22] sburjan has joined #selenium
+[11:13:15] freynaud_ has joined #selenium
+[11:13:55] Manoj has joined #selenium
+[11:18:06] caddoo has joined #selenium
+[11:38:05] jamesoram has joined #selenium
+[11:39:38] dawagner has joined #selenium
+[11:40:33] h8R has joined #selenium
+[11:58:58] Swadq has joined #selenium
+[IRC logfile - Started Thu Dec 13 12:07:40 2012]
+[12:07:40] samphippen has joined #selenium
+[12:09:06] jamesoram has joined #selenium
+[12:31:12] davehunt has joined #selenium
+[12:36:16] icio has joined #selenium
+[12:38:31] nirvdrum has joined #selenium
+[12:57:41] p0deje has joined #selenium
+[12:59:23] aweiteka has joined #selenium
+[IRC logfile - Started Thu Dec 13 13:03:07 2012]
+[13:03:07] jamesoram has joined #selenium
+[13:09:54] freynaud has joined #selenium
+[13:21:14] dawagner has joined #selenium
+[13:21:15] xtian_ has joined #selenium
+[13:30:27] amitev has joined #selenium
+[13:31:20] ner0x has joined #selenium
+[13:33:46] nimeacuerdo has joined #selenium
+[13:40:12] dawagner: Very quiet today...
+[13:43:10] nacho has joined #selenium
+[13:44:41] RossPatterson has joined #selenium
+[13:44:41] ChanServ has altered RossPatterson's mode: +o
+[13:48:06] samphippen has joined #selenium
+[13:52:05] sburjan has joined #selenium
+[13:58:13] mreedell has joined #selenium
+[13:59:50] eranm_ has joined #selenium
+[IRC logfile - Started Thu Dec 13 14:02:19 2012]
+[14:02:19] jamesoram has joined #selenium
+[14:11:19] bluescreen10 has joined #selenium
+[14:14:25] cmcgraw has joined #selenium
+[14:19:04] vila has joined #selenium
+[14:20:42] adamgoucher has joined #selenium
+[14:21:33] cgoldberg has joined #selenium
+[14:23:45] jamesoram has joined #selenium
+[14:24:42] vila has joined #selenium
+[14:29:04] jamesoram has joined #selenium
+[14:29:40] eranm_ has joined #selenium
+[14:30:48] eranm__ has joined #selenium
+[14:31:36] art_man1 has joined #selenium
+[14:33:05] vila has joined #selenium
+[14:38:21] ql6wlld has joined #selenium
+[14:42:13] stan_ has joined #selenium
+[14:43:01] danqa has joined #selenium
+[14:52:20] jlopez has joined #selenium
+[14:53:07] AutomatedTester: :yt band aid - do they know it's christmas
+[14:53:08] selbot2_: Band aid 1984 - Do they know it's Christmas - http://www.youtube.com/watch?v=to652Gy9blI&feature=youtube_gdata
+[14:55:55] adamgoucher: :yt northern lights tears are not enough
+[14:55:55] selbot2_: Tears Are Not Enough - Northern Lights - http://www.youtube.com/watch?v=VJN3u1wAWIk&feature=youtube_gdata
+[14:56:03] adamgoucher: (the canadian response to that one)
+[14:57:38] noahsussman has joined #selenium
+[14:57:47] *AutomatedTester is listening to a christmas CD now
+[14:58:07] *dawagner is listening to Taylor Swift.  Each to their own :p
+[14:58:46] jamesoram has joined #selenium
+[14:58:55] adamgoucher: #ischristmasoveryet (crossing the twitter and irc streams)
+[14:59:23] AutomatedTester: dawagner: thats next
+[14:59:51] AutomatedTester: I am working on moz#814768
+[14:59:53] selbot2_: 03David Burns :automatedtester NEW/ Marionette-actors should be aware of when a frame closes so tests can resume - https://bugzilla.mozilla.org/show_bug.cgi?id=814768
+[IRC logfile - Started Thu Dec 13 15:00:13 2012]
+[15:00:13] AutomatedTester: it has a slight annoying quality of hanging the tests
+[15:00:21] rath has joined #selenium
+[15:00:25] AutomatedTester: since the mode of transport gets deleted before we reply
+[15:00:35] dawagner: Handy!
+[15:00:52] AutomatedTester: very
+[15:01:44] davehunt: adamgoucher: never cross the streams
+[15:01:55] adamgoucher: except when you have to
+[15:02:07] davehunt: yes. that's okay
+[15:02:30] adamgoucher: or for snarky effect. which is actually more important than 'have to'
+[15:02:40] davehunt: that too
+[15:02:51] davehunt: almost never
+[15:05:14] AutomatedTester: :yt Brenda Lee - Rockin' around the christmas tree
+[15:05:15] selbot2_: Brenda Lee -Rockin around the Christmas Tree - http://www.youtube.com/watch?v=jPZCNCJt-zw&feature=youtube_gdata
+[15:07:12] samphippen has joined #selenium
+[15:07:36] AutomatedTester: :yt The puppini sisters - jingle bells
+[15:07:37] selbot2_: Michael Bubl� & The Puppini Sisters - Jingle Bells - http://www.youtube.com/watch?v=GlWkUGjoLRY&feature=youtube_gdata
+[15:09:15] medwards has joined #selenium
+[15:10:06] medwards: Hi, I'd like to reuse a webdrivers implicit wait value in an ExpectedCondition, but I won't have access to it except via the driver. Is there a way to determine this value?
+[15:18:22] WSelenium has joined #selenium
+[15:18:29] medwards: Even something tougher, like using JSONWireProtocol directly to send messages asking for this info?
+[15:18:38] danqa has joined #selenium
+[15:19:13] adamgoucher: just set it in a config file or something. (and then disable implicit waits entirely)
+[15:19:45] medwards: a) I can't, I'm writing utility functions for other users who can set implicit_wait in a variety of ways
+[15:19:55] medwards: B) you're recommending that I avoid implicit waits entirely?
+[15:20:07] adamgoucher: implicit waits == sloppy code.
+[15:20:29] WSelenium: Is selenium currently having issues with scrolling in firefox?
+[15:20:49] medwards: adamgoucher: So... I should just explicitly wait for page loads to finish?
+[15:21:11] adamgoucher: medwards: yes. ignore that the idea of an implicit wait was ever broached in the api
+[15:22:02] medwards: This sounds a bit backwards, it was the only way selenium became halfway useful.... can you make the case a little bit more strongly, or post me to more data/problem descriptions?
+[15:22:45] medwards: Like, you do realize for anyone with code that isn't so performant or is in a resource-starved testing environment, that no implicit wait means writing explicit waits for *everything*
+[15:23:09] adamgoucher: yup. and it will be properly synchronized.
+[15:23:31] adamgoucher: if you use page objects, and you should, you explicitly sync on the page object
+[15:23:31] medwards: And noisy as all hell
+[15:23:43] medwards: Are page objects exposed in the Python API?
+[15:23:53] medwards: scratch that, I'll look on my own, I can use google :P
+[15:23:55] adamgoucher: no. you need to create them yourself
+[15:24:13] adamgoucher: objects are part of python; they are the statements that start with 'class' :D
+[15:24:22] medwards: :P
+[15:24:33] medwards: I thought it was an object to inherit from the Selenium API
+[15:24:42] WSelenium: adamgoucher: same Adam Goucher from the Selenium Blog?
+[15:24:55] AutomatedTester: medwards: page objects is a design methodology to go with Selenium
+[15:25:00] AutomatedTester: :wiki PageObjects
+[15:25:01] adamgoucher: nope. java has some helpers with it (as does c# i think)
+[15:25:02] selbot2_: 1: 03PageObjects: The Page Object pattern represents the screens of your web app as a series of objects - https://code.google.com/p/selenium/wiki/PageObjects
+[15:25:27] adamgoucher: python is elegant enough to not need helpers in it
+[15:25:34] medwards: ah, yeah, this makes sense as the best way to organize test code if its all being developed
+[15:25:44] *adamgoucher trolls all the people
+[15:26:02] adamgoucher: WSelenium: yes. same.
+[15:26:05] AutomatedTester: adamgoucher: you forgot to troll jarib and ruby
+[15:26:15] medwards: Ruby trolls itself
+[15:26:31] adamgoucher: is that possible? he'd just out-type my troll into a solution
+[15:26:33] AutomatedTester: touché
+[15:26:37] WSelenium: exciting, I enjoy the blog posts tons of useful information thanks for that
+[15:27:36] medwards: OK, well, lets maybe rip off the bandage early, what do you guys think of Gherkin-based stuff that don't need smart design methodologies, like Salad: https://github.com/wieden-kennedy/salad
+[15:28:05] AutomatedTester: you dont need BDD
+[15:28:22] medwards: It's been pretty nice for our QA department. The tests suck visually because they don't encapsulate the page behaviour into a DSL like PageObjects are all about, but then you don't need someone to know how to make classes.
+[15:28:36] medwards: I know *I* don't need it, but the manual QA lead does
+[15:28:44] adamgoucher: if you are doing bdd (and all that it /really/ means), use a bdd tool. otherwise, dont
+[15:28:57] AutomatedTester: medwards: one second while I get some of our tests to show you
+[15:28:58] adamgoucher: manual qa != automation. automation == programming.
+[15:29:11] AutomatedTester: if the manual qa can't read this then perhaps you need a new manual qa
+[15:29:27] medwards: AutomatedTester: yeah thats a political fight I can't win, but I hear you :P
+[15:29:40] AutomatedTester: medwards: well its easy to win
+[15:29:41] adamgoucher: you can change your organization, or change your organization.
+[15:29:46] AutomatedTester: refuse to support bdd
+[15:29:53] AutomatedTester: or leave
+[15:29:55] medwards: adamgoucher: Except our tests, for all their ugly messiness are automations of the work that manual QA used to do.
+[15:30:22] medwards: I'd like to see what AutomatedTester has first
+[15:30:23] adamgoucher: so dont support it. 'sorry, this is not maintainable. here are some patterns that are supportable'
+[15:30:26] AutomatedTester: https://github.com/mozilla/marketplace-tests/blob/master/tests/desktop/consumer_pages/test_reviews.py
+[15:30:43] AutomatedTester: medwards: we dont use BDD and that is very readable
+[15:31:32] adamgoucher: i need better example scripts …. https://github.com/Element-34/Py.Saunter-Examples/blob/master/ebay/scripts/DressShirts.py
+[15:31:41] *adamgoucher adds that to his list of things to do
+[15:32:13] AutomatedTester: medwards: look on github at all our selenium tests
+[15:32:24] Dave_B: I'm currently using some lovely Gherkin tests and its endlessly annoying doing almsot anything. Not sure if I can justify just scrapping them though :(
+[15:32:26] AutomatedTester: its normally <project>-tests
+[15:32:50] adamgoucher: sunk costs are sunk. you can't get them back.
+[15:32:53] medwards: Haha, I wouldn't expect selenium tests to be BDD anyways.
+[15:33:09] adamgoucher: but you can sink more into sunk-en-ness
+[15:33:10] medwards: Can I see what some of the page objects look like?
+[15:33:19] medwards: well these are public repos
+[15:33:20] medwards: I'm an idiot
+[15:33:21] AutomatedTester: medwards: its all on github
+[15:33:22] medwards: moving on
+[15:33:36] AutomatedTester: Mozilla is proudly OSS
+[15:33:40] AutomatedTester: even our tests :)
+[15:33:49] adamgoucher: https://github.com/Element-34/Py.Saunter-Examples/blob/master/ebay/modules/pages/shirts.py is what my style looks like.
+[15:34:36] adamgoucher: page objects are a pattern, there are similarities and differences between mozillas and mine. but they both accomplish the same thing
+[15:34:42] medwards: no it makes sense
+[15:34:52] medwards: encapsulate the DSL for your given domain
+[15:35:00] medwards: makes the actual tests much simpler and easier to read
+[15:35:01] AutomatedTester: exactly
+[15:35:22] pquinn80 has joined #selenium
+[15:35:32] medwards: its all logical and I'm behind you guys, I just think you can then expose that to a Gherkin parser and let other people maintain them.
+[15:35:36] AutomatedTester: our Exploratory QA Leads read them and know where to not test since its covered
+[15:35:54] medwards: maintain the tests
+[15:35:56] AutomatedTester: medwards: so you want to abstract an abstraction?
+[15:36:09] medwards: Why not, everything is solveable with one more level, right? :P
+[15:36:17] AutomatedTester: sure
+[15:36:28] AutomatedTester: medwards: just remember you will still feel the pea
+[15:36:35] medwards: haha
+[15:36:35] medwards: true
+[15:36:38] medwards: I'm feeling it right now
+[15:36:54] medwards: Q: "Where is the implicit wait stored?"
+[15:37:03] medwards: A: "Use Page objects stupid."
+[15:37:05] medwards: :P
+[15:37:41] AutomatedTester: medwards: excuse adamgoucher's brashness, he is constantly grumpy. Its the cold in Canada getting to him
+[15:37:52] medwards: adamgoucher: maple leaf, represent.
+[15:38:01] medwards: I need to find a hockey team in my new country but I heard they are all bad in Germany.
+[15:38:20] AutomatedTester: medwards: dont troll adamgoucher with Hockey, it gets him more grumpy
+[15:38:28] adamgoucher: no, the answer is not 'use page objects stupid', its 'use explicit waits'
+[15:38:40] adamgoucher: or! troll adamgoucher with hockey, it gets him more grumpy
+[15:38:48] medwards: lulz
+[15:39:03] medwards: ok, but in a Page object you would have explicit waits after or before some actions right?
+[15:39:05] AutomatedTester: medwards: we recommend you dont use implicit wait because they last the length of a session
+[15:39:25] medwards: yeah I get the reasoning, I'm trying to figure out the best practice using explicit waits now
+[15:39:26] AutomatedTester: and if you are constantly changing them and not knowing what the value could be you will be very sad
+[15:39:43] medwards: ok, let me lay out a scenario and where my questions are:
+[15:40:10] adamgoucher: all my page objects (except the ones i have to point to… self fail there) have a wait_until_loaded method which will synch whatever that page object is for.
+[15:40:22] medwards: ah
+[15:40:32] medwards: ok so is there a generic way to do that or do you just wait for the most critical thing?
+[15:40:40] noahsussman has joined #selenium
+[15:40:49] AutomatedTester: medwards: you wait for what you need and then carry on
+[15:41:05] AutomatedTester: sometimes what you need might not be the element you need to interact with
+[15:41:16] adamgoucher: whatever 'done' means, is what you sync to. could be an element present, visible, some js state, whatever
+[15:41:26] medwards: yeah, shopping cart availability is important even if you plan on just clicking a menu item.
+[15:42:36] medwards: OK, so at the end of the day we just do a smart, specific, wait any time we anticipate moving on to the next page
+[15:42:43] adamgoucher: who needs twitter to avoid work when you have irc! :D
+[15:43:08] medwards: is this all in the PageObjects wiki? If I'm just rehashing whats on there then I can go and read it.
+[15:43:19] adamgoucher: yes … though its more like after you have moved to the next page since you are waiting for the browser to catch up with your script
+[15:43:26] adamgoucher: it is .. and it isnt.
+[15:44:34] medwards: right, I misordered that
+[15:44:46] medwards: OK, imma looking at examples now again
+[15:44:51] smccarthy has joined #selenium
+[15:44:54] pquinn80: I'm not sure if this is the right place to ask the question -- but will the latest client drivers be linked to from the download page at seleniumhq.org?  It's still rockin' 2.25...
+[15:45:22] eranm_ has joined #selenium
+[15:47:02] adamgoucher: http://code.google.com/p/selenium
+[15:47:11] medwards: adamgoucher: ok, but your pysaunter examples don't really change the page... like go_to_mens_shirts takes you to a new page, but there isn't some other page object and there is definitely no waiting
+[15:47:21] medwards: also you have a typo in throbber
+[15:47:35] adamgoucher: ya.. i need better examples that i can share publically
+[15:49:01] eranm__ has joined #selenium
+[15:50:18] medwards: can you pseudocode what that would look like? I'm thinking the go_to_x method instantiates an XPageObject and returns that so you still have a handle to your current page
+[15:50:39] adamgoucher: http://pastebin.com/4E82v8tc is a better one
+[15:51:08] pquinn80: adamgoucher: thanks, but I was specifically asking about seleniumhq.org -- it seems like that site is getting out of date with all the latest changes
+[15:51:31] adamgoucher: we know. site is changing to new infrastructure and there are dns problems
+[15:51:52] pquinn80: thanks!
+[15:53:23] danqa: jarib: Hi Jari, u there?
+[15:54:27] adamgoucher: http://pastebin.com/BUvrJ9MZ has two different styles of using webdriverwait
+[15:54:31] rananda has joined #selenium
+[15:55:57] AutomatedTester: pquinn80: google code is our canonical source for downloads
+[15:56:12] medwards: hurr, 'waiter'
+[15:56:13] medwards: sorry
+[15:56:40] medwards: ok, next up...
+[15:57:02] pquinn80: AutomatedTester: thanks, yeah I know - I just usually send people to seleniumhq.org for help
+[15:57:05] medwards: Dave_B: Can you share some examples of your BDD tests?
+[15:57:35] dude-x1 has joined #selenium
+[15:57:41] Dave_B: I've not written any publicly viewable ones :/
+[15:58:02] adamgoucher: :kittens ?
+[15:58:03] selbot2_: Before you say you cannot provide html, think of the kittens! http://jimevansmusic.blogspot.ca/2012/12/not-providing-html-page-is-bogus.html
+[15:58:17] KaibutsuX: lol
+[15:58:26] *Dave_B goes to sanitise some stuff and pastey it
+[IRC logfile - Started Thu Dec 13 16:00:30 2012]
+[16:00:30] santiycr has joined #selenium
+[16:01:28] santiycr: :help
+[16:02:00] Dave_B: So its jsut dull steps like: http://pastebin.com/VYx9jSb5
+[16:02:09] Dave_B: and in my case i'm using 'behave'
+[16:02:14] santiycr: :log
+[16:02:15] selbot2_: http://illicitonion.com/selogs/selenium/2012/12/13.txt | http://illicitonion.com/selogs/search
+[16:02:29] santiycr: :seen simonstewart
+[16:02:30] selbot2_: simonstewart was last seen about 8 hours ago, quitting.
+[16:02:43] AutomatedTester: santiycr: did you break Simon last night?
+[16:03:40] santiycr: :note simonstewart I contacted the bouncycastle foliks. They suggested a fix for the performance issue, where the DSA key generation numbers are set upfront, sadly it didn't make a difference :( Any other ideas appreciated  
+[16:03:41] selbot2_: ok!
+[16:03:45] santiycr: AutomatedTester:  I hope not
+[16:04:12] santiycr: :)
+[16:04:53] medwards: Dave_B: That doesn't look so bad, your step implementations could just call page objects right?
+[16:05:32] rath has left #selenium
+[16:05:32] Dave_B: yeah :)
+[16:06:19] Dave_B: oh, don't use behave though, its kinda horrible :p a lesson I learned a bit alte
+[16:06:52] Dave_B: *late
+[16:07:05] medwards: we're working with lettuce and right now have a feeling that its worse than Behave
+[16:07:16] medwards: Steve is seriously thinking about just porting Salad over wholesale.
+[16:07:29] mand_ has joined #selenium
+[16:07:38] mand_: Hi
+[16:07:42] Dave_B: behave looks like: http://pastebin.com/EcVaXHF8
+[16:08:06] medwards: This part is the same as lettuce
+[16:08:16] Dave_B: the problem being it goes horribly wrong if you want to import stuff between features
+[16:08:43] medwards: isn't there a scenario context you can shove things into?
+[16:08:51] medwards: kind of the contemporary of 'world' in lettuce?
+[16:08:58] mand_: I have a problem with IEServerDriver, It works as far as it opens an IE8 window and shows the inital WebDriver page and then goes to about:blank, but it fails to load my URL and selenium says "Failed to navigate to ... ; This usally means the call to the COM object failed"
+[16:09:04] Dave_B: yeah there is, jsut kept the example super-simple
+[16:09:05] mand_: Any idea what could be the problem?
+[16:09:43] nhirata has joined #selenium
+[16:14:49] selbot2_: 03santiycr less than 20 seconds ago - SantiagoSuarezO: start using static, pre-generated dsa key parameters. Per suggestion of the BC folks | https://code.google.com/p/selenium/source/detail?r=18341 | http://seleniumhq.org/ci.jsp?r=18341
+[16:14:54] KaibutsuX: mand_: are your IE settings all set correctly?
+[16:15:05] KaibutsuX: protected mode and all that?
+[16:17:13] intchanter-work has joined #selenium
+[16:19:36] mand_: Yes
+[16:19:52] mand_: I've tried both variants, all with protected mode and all without protected mode
+[16:20:04] mand_: Apart from that, do I need other settings?
+[16:20:07] medwards: hrm
+[16:20:12] medwards: how does this work if I already have the element?
+[16:20:16] KaibutsuX: can you navigate to public sites like google?
+[16:20:38] medwards: like w.until(lambda driver: visibility_of(my_element))?
+[16:20:39] mand_: Yes
+[16:20:48] mand_: I've downloaded Java and Selenium from the VM
+[16:20:55] medwards: where visibility_of is from expected_conditions
+[16:20:56] mand_: through IE
+[16:21:58] KaibutsuX: if it's workihng for external sites, I assume there is some restriction on your url that you're using
+[16:23:06] mand_: Well, I can browse to those sites in IE manually
+[16:23:08] mand_: And it works
+[16:23:35] mand_: Oh, ok, you're right, it was a Basic Auth thing
+[16:23:38] KaibutsuX: I would look in IE > Internet Options > Security > Go through all the zones and click the sites button, 
+[16:23:42] KaibutsuX: ahh
+[16:23:46] mand_: Sorry, I got messed up, a site without auth works
+[16:24:00] mand_: Sorry, I didn't think of this since it worked when I manually entered pw
+[16:24:04] KaibutsuX: np
+[16:24:17] mand_: Thanks a lot :)
+[16:25:03] WSelenium: Is there currently a noted scroll issue in firefox for the current selenium?
+[16:27:15] WSelenium: Hello?
+[16:27:39] KaibutsuX: WSelenium: you'll have to look at http://code.google.com/p/selenium/issues/list
+[16:27:46] eranm_ has joined #selenium
+[16:27:48] KaibutsuX: I don't know 
+[16:28:37] adamgoucher: if you are using ff17, you must be running >= 2.27.0 selenium
+[16:28:39] mand_: Darn, now my tests run on IE but it crashes after every 3rd step
+[16:29:05] KaibutsuX: welcome to IE ;)
+[16:29:17] WSelenium: using 2.28
+[16:29:37] WSelenium: looks like I need to fill out a ticket :\
+[16:31:30] WSelenium: also, any word on what is going on with the official selenium site and updates?
+[16:32:12] Dave_B: medwards: Yeah you can do that. I'm not actually doing it but no reason why it wouldn't be possible
+[16:35:53] Spanktar has joined #selenium
+[16:36:07] santiycr: :ci
+[16:36:08] selbot2_: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[16:36:54] WSelenium has left #selenium
+[16:38:08] samphippen has joined #selenium
+[16:46:23] stephend has joined #selenium
+[16:58:44] stephend has joined #selenium
+[16:59:22] danqa: Has anyone ever seen this error when running ruby selenium webdriver tests on Windows 7 with IE8
+[16:59:23] danqa:  Errno::EBADF:
+[16:59:23] danqa:        Bad file descriptor - listen(2)
+[16:59:45] danqa: I cannot find much info on it
+[IRC logfile - Started Thu Dec 13 17:00:49 2012]
+[17:00:49] alexglow has joined #selenium
+[17:04:35] mand_: Is there something like a stable version of the IEServerDriver?
+[17:04:59] mand_: Or are the weekly releases stable?
+[17:05:28] adamgoucher: the whenever-jim-releases-it version is the stable version, yes
+[17:06:39] pquinn80 has left #selenium
+[17:06:58] Mkop has joined #selenium
+[17:08:36] AutomatedTester: mand_: whatever is in the downloads section of Google Code is the stable version
+[17:08:40] AutomatedTester: :downloads
+[17:08:41] selbot2_: http://seleniumhq.org/download/ and https://code.google.com/p/selenium/downloads/list
+[17:08:48] AutomatedTester: from the google code url
+[17:20:17] Shakyj has joined #selenium
+[17:28:45] art_man1 has joined #selenium
+[17:38:35] adamgoucher has joined #selenium
+[17:49:53] sfbrian has joined #selenium
+[17:50:15] admc has joined #selenium
+[17:53:55] sassda has joined #selenium
+[IRC logfile - Started Thu Dec 13 18:03:51 2012]
+[18:03:51] jimevans has joined #selenium
+[18:04:02] jleyba has joined #selenium
+[18:07:26] Manoj has joined #selenium
+[18:08:17] teodosia_sel has left #selenium
+[18:09:16] llaskin has joined #selenium
+[18:10:13] pquinn80 has joined #selenium
+[18:19:29] danqa has joined #selenium
+[18:20:59] stackedsax has joined #selenium
+[18:24:45] Manoj: Its Silent today.. with no chats here ?
+[18:26:40] davehunt has joined #selenium
+[18:33:23] llaskin has left #selenium
+[18:37:02] jimevans: :yt david gray babylon
+[18:37:03] selbot2_: David Gray - Babylon - http://www.youtube.com/watch?v=ANzKrSuUblc&feature=youtube_gdata
+[18:50:59] jcarr has joined #selenium
+[18:53:14] detronizator has joined #selenium
+[IRC logfile - Started Thu Dec 13 19:07:55 2012]
+[19:07:55] davehunt has joined #selenium
+[19:08:45] danqa has joined #selenium
+[19:12:50] cmcgraw has joined #selenium
+[19:15:56] SamuraiJack has joined #selenium
+[19:23:05] nirvdrum has joined #selenium
+[19:37:00] AutomatedTester: :yt The Puppini Sisters - Jingle Bells
+[19:37:01] selbot2_: Michael Bubl� & The Puppini Sisters - Jingle Bells - http://www.youtube.com/watch?v=GlWkUGjoLRY&feature=youtube_gdata
+[19:48:59] nacho has joined #selenium
+[19:50:33] mreedell has joined #selenium
+[19:58:43] rbalent has joined #selenium
+[IRC logfile - Started Thu Dec 13 20:00:56 2012]
+[20:00:56] mreedell has joined #selenium
+[20:06:09] FalCone has joined #selenium
+[20:06:10] ignacio_ has joined #selenium
+[20:06:34] mreedell has joined #selenium
+[20:07:50] ner0x has joined #selenium
+[20:11:55] FalCone: Uh
+[20:12:04] FalCone: I get a list of elements by <a> tags
+[20:12:07] FalCone: I wanna pull the hrefs
+[20:12:33] FalCone: But then after a couple I get a selenium.common.exceptions.StaleElementReferenceException: Message: u'getAttribute execution failed;\n Element is no longer attached to the DOM'  
+[20:12:43] FalCone: Do I have mysterious disappearing links? :<
+[20:12:54] FalCone: I'm not changing frames or anything.
+[20:13:25] Dude-X: stale element reference errors means the page is still loading or executing javascript 
+[20:14:18] FalCone: Hmm.
+[20:14:20] bfife has joined #selenium
+[20:14:22] FalCone: but it's after a .get
+[20:14:26] FalCone: so it's probably js doing stuff.
+[20:14:43] FalCone: If I wanted to get a final link list, I should probably put a wait/sleep before I go for the get, right?
+[20:15:08] Dude-X: are you familiar with webdriver wait?
+[20:15:59] mreedell has joined #selenium
+[20:21:01] Swadq has joined #selenium
+[20:23:57] llaskin1 has joined #selenium
+[20:24:02] llaskin1: anyone know spok or geb?
+[20:24:51] adamgouchertoo has joined #selenium
+[20:26:11] llaskin1: adamgoucher
+[20:26:15] llaskin1: ever heard of spok or Geb?
+[20:28:30] danqa has joined #selenium
+[20:29:27] jimevans_ has joined #selenium
+[20:35:39] eranm_ has joined #selenium

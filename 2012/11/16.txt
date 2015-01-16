@@ -1,0 +1,552 @@
+[IRC logfile - Started Fri Nov 16 00:21:08 2012]
+[00:21:08] JackDandy has joined #selenium
+[IRC logfile - Started Fri Nov 16 01:20:47 2012]
+[01:20:47] milligan has joined #selenium
+[01:36:10] awilson820 has joined #selenium
+[01:38:07] dogarrhea has joined #selenium
+[01:38:26] dogarrhea: so the chrome driver is just sitting there. and the selenium program is doing nothing
+[01:38:39] dogarrhea: why is it not working?
+[01:39:09] dogarrhea: [1115/175424:FATAL:webdriver_automation.cc(266)] Check failed: version_parts.size() == 4 && base::StringToInt(version_parts[2], &build_no). Can't rewrite message (type: 959) because unknown server (version: ***CHANNEL_ERROR**
+[01:39:23] dogarrhea: i think it's time for selenium version 3 4 5 6 7 8 9 10
+[01:39:26] dogarrhea: since they can't get any versions right
+[01:39:42] KaibutsuX: chromedriver is a POS
+[01:39:54] stephend: by they, you mean the contributors in this channel that keep the project alive?
+[01:40:27] dogarrhea: i mean Google.
+[01:40:45] dogarrhea: who pays developers to make this piece of shit take up space on the internet
+[01:40:59] dogarrhea: i tried firefox driver before this and it just stops running tests for no reason
+[01:41:03] dogarrhea: no errros. just hangs.
+[01:41:07] stephend: dogarrhea: it's worked for me for 5 years
+[01:41:28] dogarrhea: mmm hmmm
+[01:41:40] stephend: you could file a well-written issue
+[01:41:47] KaibutsuX: dogarrhea, are you on the latest chromedriver?
+[01:41:53] KaibutsuX: and I assume latest chrome?
+[01:41:55] o3u has joined #selenium
+[01:41:57] dogarrhea: it's like 2.9 or something
+[01:42:29] KaibutsuX: mine is: VERSION chromedriver-23.0.1240.0
+[01:42:38] KaibutsuX: or you mean 29.0?
+[01:44:10] dogarrhea: let me check
+[01:44:35] dogarrhea: chromedriver_win_22_0_1203_0b.zip is what it says in download list
+[01:44:47] KaibutsuX: well I would upgrade it
+[01:45:06] KaibutsuX: my 23 is old, i havent used it in a while and I had problems with chromes update schedule always breaking the driver
+[01:45:48] dogarrhea: http://code.google.com/p/chromedriver/downloads/list ?
+[01:45:54] dogarrhea: this is where I got the driver
+[01:46:13] KaibutsuX: yeah you want 23.1240
+[01:46:20] dogarrhea: i'm basically using try catch to restart the driver every time it fails which is every 2 minutes or so
+[01:48:10] KaibutsuX: well the problem isn't the driver doing things, it's usually just connecting to the driver, which would explain why it's just sitting there
+[01:48:15] KaibutsuX: I would try the update and see what happens
+[01:48:54] dogarrhea: running the test again
+[01:49:52] KaibutsuX: fyi, firefox's driver is integrated with selenium and much faster than chrome
+[01:50:06] dogarrhea:  Element is no longer attached to the DOM (WARNING: The server did not provide any stacktrace information) another error
+[01:50:12] stackedsax has joined #selenium
+[01:50:44] KaibutsuX: thats a legitimate error
+[01:50:47] KaibutsuX: what are you testing?
+[01:51:11] dogarrhea: seeing if some xpath element exists
+[01:51:11] KaibutsuX: I assume that was a StaleElementException
+[01:51:26] KaibutsuX: you mean some element exists using xpath?
+[01:51:59] dogarrhea: yea. upon the the restart of the chrome driver it goes through it 
+[01:52:48] KaibutsuX: why are you restarting chromedriver?
+[01:52:57] KaibutsuX: it should start, run your test and then close
+[01:53:16] dogarrhea: because it likes to error all the time
+[01:53:27] KaibutsuX: what language are you in?
+[01:53:30] dogarrhea: java
+[01:53:35] KaibutsuX: jesus
+[01:53:48] KaibutsuX: well you mean when you get that error you kill the driver and restart?
+[01:54:29] dogarrhea: sometimes it can't find an element
+[01:54:48] dogarrhea: sometimes it hangs for a long time. this morning i left it running and somehow it bypassed the try catch and never bothered to restart at all
+[01:55:02] dogarrhea: sometimes it hangs and does nothing
+[01:55:23] KaibutsuX: can you paste your code to pastebin or something?
+[01:55:35] KaibutsuX: i dont know java very well but I can take a look
+[01:56:25] dogarrhea: hrm i can't really do it. it's corporate
+[01:56:41] dogarrhea: right now it's stuck on waiting for some request to finish for about 2 minutes or so
+[01:56:46] KaibutsuX: strip out the test and url, just give me the driver.start and try catch block
+[01:56:52] dogarrhea: and the driver is just sitting and sitting and sitting
+[01:57:28] KaibutsuX: are you using wrappers or calling the native webdriver methods?
+[01:57:40] KaibutsuX: I think you need to narrow it down to what exactly is causing the problem
+[01:57:48] dogarrhea:        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Alex\\Downloads\\chromedriver_win_23.0.1240.0\\chromedriver.exe");        WebDriver driver = new ChromeDriver();  this is how i start it heh
+[01:58:37] dogarrhea: http://www.pasteall.org/37270  this is the contents of the catch block
+[01:58:41] KaibutsuX: just checking, that path isn't by channce the zip file that you downloaded is it?
+[01:58:50] KaibutsuX: you did unpack it?
+[01:59:07] dogarrhea: that i did.
+[01:59:10] KaibutsuX: haha ok
+[01:59:34] dogarrhea: [1115/175424:FATAL:webdriver_automation.cc(266)] Check failed: version_parts.size() == 4 && base::StringToInt(version_parts[2], &build_no). Can't rewrite message (type: 959) because unknown server (version: ***CHANNEL_ERROR**  i don't even know what this error means. this is what i saw when i came back
+[IRC logfile - Started Fri Nov 16 02:00:12 2012]
+[02:00:12] KaibutsuX: you're not using the RC server are you?
+[02:00:45] dogarrhea: rc server?
+[02:01:39] KaibutsuX: i mean you're not connecting to something like: http://localhost:444/wd/hub
+[02:01:56] KaibutsuX: you just call driver.get('http://www.google.com') right?
+[02:02:04] dogarrhea: in my webdriver geturl stuff?
+[02:02:19] dogarrhea: nothing on my localhost that i'm connecting to
+[02:02:24] KaibutsuX: ok
+[02:02:41] KaibutsuX: so what if you do simple tests like just do a get('http://www.google.com') ?
+[02:02:43] KaibutsuX: does that load?
+[02:02:55] dogarrhea: yes. 
+[02:03:05] dogarrhea: it waits for quite a while on "trying to resolve proxy"
+[02:03:57] KaibutsuX: hmm, let me look at something
+[02:05:57] dogarrhea: i think some of these stale element things are caused by reallly slow driver execution
+[02:06:18] KaibutsuX: well that sucks
+[02:06:19] KaibutsuX: http://code.google.com/p/chromedriver/issues/detail?id=141
+[02:06:46] KaibutsuX: well stale usually means that the element was successfully retreived the page has changed since then
+[02:07:02] KaibutsuX: maybe it's an issue with the java/chromedriver bindings
+[02:07:13] KaibutsuX: you could try downgrading chrome if thats possible
+[02:15:18] stackedsax has joined #selenium
+[02:22:35] alexglow has joined #selenium
+[02:28:30] knorrium_ has joined #selenium
+[02:42:54] klrmn has left #selenium
+[02:52:34] dogarrhea: cool it hung again
+[02:52:41] dogarrhea: just sitting there. doing nothing. being useless
+[02:53:52] dogarrhea: http://code.google.com/p/selenium/issues/detail?id=4399#c1 cool. no one even says "not going to fix" or anything 
+[02:53:58] dogarrhea: google has become the new microsoft.
+[02:54:03] dogarrhea: just ignore bugs
+[02:54:12] dogarrhea: it's ok. they'll figure it out
+[02:54:16] smccarthy has joined #selenium
+[02:55:30] dogarrhea: i guess google Version 23.0.1271.64 m is too high tech
+[02:55:35] dogarrhea: chrome that is
+[02:56:54] dogarrhea: https://www.google.com/search?q=selenium+hangs&oq=selenium+hangs&aqs=chrome.0.57l2j59l2j60l2.1698&sugexp=chrome,mod=4&sourceid=chrome&ie=UTF-8#hl=en&safe=off&tbo=d&sclient=psy-ab&q=selenium+hangs+chrome&oq=selenium+hangs+chrome&gs_l=serp.3..0i8j0i8i30.8724.9412.0.9466.7.6.0.0.0.0.139.477.3j2.5.0.les%3B..0.0...1c.1.5jT-cDj1Kxs&pbx=1&bav=on.2,or.r_gc.r_pw.r_qf.&fp=292f6e679a24cbca&bpcl=38625945&biw=1920&bih=936  
+[02:57:08] dogarrhea: first few links. no thread reply. another link "try turning off UAC" lol???
+[02:57:10] dogarrhea: this is so bad
+[02:59:43] smccarthy: anyone know if the san francisco selenium meetup from today was recorded and will be online later?
+[IRC logfile - Started Fri Nov 16 03:01:33 2012]
+[03:01:33] dogarrhea: 1115/191624:ERROR:ipc_channel_win.cc(129)] pipe error: 109 [1115/191624:ERROR:ipc_sync_channel.cc(378)] Canceling pending sends [1115/191624:ERROR:automation_proxy.cc(319)] Channel error in AutomationProxy. cool. non useful errors
+[03:01:57] dogarrhea: i hate this piece of shit selenium. i tried it in selenium 1. now 2. nothing changes much
+[03:02:08] dogarrhea: o well i'll just write my own OS level automation
+[03:02:17] dogarrhea has left #selenium
+[03:55:49] selbot2_: 03luke.semerau@gmail.com half a minute ago - LukeIS: setting mime-type on expected_conditions py docs | https://code.google.com/p/selenium/source/detail?r=18160 | http://seleniumhq.org/ci.jsp?r=18160
+[IRC logfile - Started Fri Nov 16 04:03:24 2012]
+[04:03:24] stackedsax has joined #selenium
+[04:48:40] Dude-X_ has joined #selenium
+[04:55:26] dogarrhea has joined #selenium
+[04:55:31] dogarrhea: The Element is not Attached to the DOM A common technique used for simulating a tabbed UI in a web app is to prepare DIVs for each tab, but only attach one at a time, storing the rest in variables. In this case, it's entirely possible that your code might have a reference to an element that is no longer attached to the DOM (that is, that has an ancestor which is "document.documentElement").  If WebDriver throws a stale element ex
+[04:55:41] dogarrhea: hurray. i MUST use error handling as flow control 
+[04:55:48] dogarrhea: how can this be any more stupid.
+[04:56:12] dogarrhea: http://seleniumhq.org/exceptions/stale_element_reference.html
+[04:58:24] dogarrhea: "oh the test errored in a try/catch block. there must be something wrong. But No, this is how selenium works. it has to error for it to work"
+[IRC logfile - Started Fri Nov 16 05:15:20 2012]
+[05:15:20] Raj_ has joined #selenium
+[05:17:14] jcarr has joined #selenium
+[05:19:27] Raj_: Hello Guys can any one please explain me what page object model is and how to use with Selenium WebDriver and C#
+[05:51:35] DarkRift has joined #selenium
+[05:51:35] DarkRift has joined #selenium
+[IRC logfile - Started Fri Nov 16 06:11:28 2012]
+[06:11:28] softmanpetro has joined #selenium
+[06:12:56] acidchild has joined #selenium
+[06:14:12] acidchild: Hello, i am attempting to use EC2 selenium grid. it's requesting an AWS cert/key instead of access key and secret. anyone know if this bug has been fixed?
+[06:14:39] acidchild: selenium should be able to use AWS_ACCESS_KEY and AWS_SECRET_KEY. like ec2-api-tools.
+[IRC logfile - Started Fri Nov 16 07:03:45 2012]
+[07:03:45] papegaaij has joined #selenium
+[07:04:59] zac_sel has joined #selenium
+[07:17:17] SamuraiJack has joined #selenium
+[07:20:11] jlopez has joined #selenium
+[07:36:49] selbot2_: 03barancev half a minute ago - AlexeiBarantsev: Cleaning out dead code | https://code.google.com/p/selenium/source/detail?r=18161 | http://seleniumhq.org/ci.jsp?r=18161
+[07:46:08] rbalent has joined #selenium
+[IRC logfile - Started Fri Nov 16 08:08:20 2012]
+[08:08:20] mikeg has joined #selenium
+[08:27:32] Plumm3R has joined #selenium
+[08:33:41] matthewrobbins has joined #selenium
+[08:34:21] Plummer has joined #selenium
+[08:34:51] Ardesco has joined #selenium
+[08:41:10] fi-sh has joined #selenium
+[08:45:00] AutomatedTester has joined #selenium
+[IRC logfile - Started Fri Nov 16 09:05:02 2012]
+[09:05:02] sburjan has joined #selenium
+[09:15:35] jamesoram has joined #selenium
+[09:18:12] Archdude_ has joined #selenium
+[09:25:29] riotz has joined #selenium
+[09:32:13] davehunt has joined #selenium
+[09:32:52] freynaud has joined #selenium
+[09:36:41] cgoldberg has joined #selenium
+[09:38:12] Bebe_sel has joined #selenium
+[09:38:52] testingb0t has joined #selenium
+[09:46:34] teodosia_sel has joined #selenium
+[09:47:20] selbot2_: 03barancev less than 20 seconds ago - AlexeiBarantsev: Closing opened streams to prevent resource leaking | https://code.google.com/p/selenium/source/detail?r=18162 | http://seleniumhq.org/ci.jsp?r=18162
+[09:48:50] selbot2_: 03barancev half a minute ago - AlexeiBarantsev: Rectification of selenese command return values in WDBS | https://code.google.com/p/selenium/source/detail?r=18163 | http://seleniumhq.org/ci.jsp?r=18163
+[09:52:50] selbot2_: 03barancev half a minute ago - AlexeiBarantsev: Fixing dependencies to repair the build | https://code.google.com/p/selenium/source/detail?r=18164 | http://seleniumhq.org/ci.jsp?r=18164
+[09:54:40] riotz has joined #selenium
+[09:56:58] jamesoram has joined #selenium
+[IRC logfile - Started Fri Nov 16 10:00:05 2012]
+[10:00:05] jamesoram has joined #selenium
+[10:02:19] selbot2_: 03barancev half a minute ago - AlexeiBarantsev: Rewriting the same in multiple words instead of using guava (why it can't compile on CI? locally it is OK) | https://code.google.com/p/selenium/source/detail?r=18165 | http://seleniumhq.org/ci.jsp?r=18165
+[10:09:07] riotz has joined #selenium
+[10:16:15] zelo has joined #selenium
+[10:17:48] Arun_ has joined #selenium
+[10:20:15] Arun__ has joined #selenium
+[10:30:15] xeranas_ has joined #selenium
+[10:32:49] caddoo has joined #selenium
+[10:36:35] Bebe_sel has joined #selenium
+[10:43:15] matthewrobbins_ has joined #selenium
+[IRC logfile - Started Fri Nov 16 11:06:38 2012]
+[11:06:38] xeranas has joined #selenium
+[11:07:29] freynaud_ has joined #selenium
+[11:19:04] Osleg has joined #selenium
+[11:24:43] rananda has joined #selenium
+[11:30:15] Karthi4187 has joined #selenium
+[11:30:53] Karthi4187: Hi Guys
+[11:32:16] Karthi4187: I have one query.. how can we identify Ajax element is loaded
+[11:32:17] Karthi4187: ?
+[11:43:35] Karthi4187 has left #selenium
+[IRC logfile - Started Fri Nov 16 12:00:36 2012]
+[12:00:36] dawagner has joined #selenium
+[12:02:04] Ardesco: if you are using jquery sending over  "jQuery.active === 0" is quite effective
+[12:02:09] Ardesco: oh he's gone
+[12:02:10] Ardesco: doh
+[12:03:14] freynaud_: dawagner: 2 calls working with the atoms. thx for all the help yesterday. I think I do a fast implementation using synthetised evt now :)
+[12:03:56] rbalent has joined #selenium
+[12:03:56] rbalent has joined #selenium
+[12:11:59] dawagner: freynaud_: Woo! :D
+[12:20:56] kanth has joined #selenium
+[12:21:19] kanth: hi every one
+[12:21:26] ^A^kira: щ.
+[12:21:27] ^A^kira: o/
+[12:26:10] barancev: freynaud_: hi! if you have a hour of free time would you please triage issues marked as Component=Grid , close inappropriate ones, leave comments in other ones
+[12:27:56] freynaud_: barancev: putting that on my todo
+[12:28:12] barancev: thanks!
+[12:56:28] jamesoram has joined #selenium
+[IRC logfile - Started Fri Nov 16 13:02:44 2012]
+[13:02:44] ignacio_ has joined #selenium
+[13:27:42] RossPatterson has joined #selenium
+[13:27:42] ChanServ has altered RossPatterson's mode: +o
+[13:30:01] cmcgraw has joined #selenium
+[13:30:16] stephend has joined #selenium
+[13:30:43] zelo has joined #selenium
+[13:38:24] farlan has joined #selenium
+[13:41:32] Osleg has joined #selenium
+[13:48:13] Swadq has joined #selenium
+[13:49:04] DaveI has joined #selenium
+[13:52:39] davehunt has joined #selenium
+[13:56:43] jamesoram has joined #selenium
+[IRC logfile - Started Fri Nov 16 14:24:55 2012]
+[14:24:55] jamesoram has joined #selenium
+[14:35:24] rpereira_ has joined #selenium
+[14:42:52] baijum has joined #selenium
+[14:48:00] farlan has joined #selenium
+[14:50:19] farlan has joined #selenium
+[14:52:09] toabctl has joined #selenium
+[IRC logfile - Started Fri Nov 16 15:00:01 2012]
+[15:00:01] jimevans has joined #selenium
+[15:03:05] farlan has left #selenium
+[15:03:10] farlan has joined #selenium
+[15:04:05] intchanter-work has joined #selenium
+[15:07:21] selbot2_: 03barancev less than 20 seconds ago - AlexeiBarantsev: Implementing ability to pass additional command line options to Firefox. Fixes issue 3688 | https://code.google.com/p/selenium/source/detail?r=18166 | http://seleniumhq.org/ci.jsp?r=18166
+[15:07:55] milligan has joined #selenium
+[15:10:39] stephend has joined #selenium
+[15:12:28] dude-x has joined #selenium
+[15:19:43] jfunk has joined #selenium
+[15:25:30] stackedsax has joined #selenium
+[15:28:58] smccarthy has joined #selenium
+[15:32:51] selbot2_: 03barancev less than 20 seconds ago - AlexeiBarantsev: Throwing IOException instead of NullPointerException if a directory can't be read. Fixes issue 3630 | https://code.google.com/p/selenium/source/detail?r=18167 | http://seleniumhq.org/ci.jsp?r=18167
+[15:39:55] farlan has left #selenium
+[15:41:03] farlan has joined #selenium
+[15:47:25] smccarthy has joined #selenium
+[IRC logfile - Started Fri Nov 16 16:07:18 2012]
+[16:07:18] alexglow has joined #selenium
+[16:16:34] ner0x has joined #selenium
+[16:18:11] fi-sh has left #selenium
+[16:22:18] lukeis has joined #selenium
+[16:23:28] jimevans: grr… bureaucracy getting in the way of getting things done.
+[16:24:06] lukeis: such is life
+[16:25:05] jimevans: it wouldn't be so bad if i just knew what *part* of the bureaucracy to poke. :)
+[16:25:59] stackedsax has joined #selenium
+[16:28:41] lukeis: jimevans: is this with "us" or something else?
+[16:29:11] jimevans: lukeis: in this particular instance, it's with "us". p4 triggers, specifically.
+[16:29:27] lukeis: ah, IT Releng 
+[16:38:14] MadMerlin|work_ has joined #selenium
+[16:41:53] adamgoucher: poke all the bureaucracy! :)
+[16:42:36] testingb0t1 has joined #selenium
+[16:44:13] dude-x: adamgoucher: good selenium blog update
+[16:44:25] dude-x: even the gifs one was funny
+[16:44:48] adamgoucher: the gifs one was /awesome/ :D
+[16:45:13] chrisculver701: agreed
+[16:45:48] chrisculver701: I love the dad catching the kid from the swing on the fly
+[16:47:10] lukeis: this is 'musical' so I'm sharing with you kiddos ;)  :yt this land is mine
+[16:47:12] selbot2_: This Land is Mine - http://www.youtube.com/watch?v=-evIyrrjTTY&feature=youtube_gdata
+[16:47:49] adamgoucher: yup. unless you have kids (or yound nieces/nephews/etc) you can't really appreciate how quickly you can react to things
+[16:47:53] jcarr has joined #selenium
+[16:48:01] smccarthy has joined #selenium
+[16:49:18] dude-x: my older brother told me he felt like superman after the birth of his daughter; when things fall he would snap down and catch things as it if were nothing
+[16:49:53] smccarthy2 has joined #selenium
+[16:50:04] lukeis: it is uncanny… i also feel like my reaction time and ability to snatch things mid flight has increased significantly
+[16:51:43] cozby has joined #selenium
+[16:52:03] adamgoucher: lukeis: that video is pretty funny. and historically accurate!
+[16:52:21] lukeis: i thought so too!
+[16:53:59] dude-x: just looked at that gif again; that is amazing he catches him nonchalantly
+[16:54:18] lukeis: jcarr: congrats on pulling off a double header ;) I only caught some of last night, but sounded like it went well
+[16:54:34] RossPatterson: jimevans: Love the final hat-tip to :yt Tom Lehrer - Who's Next
+[16:54:35] selbot2_: Tom Lehrer - Who's Next - with intro - http://www.youtube.com/watch?v=oRLON3ddZIw&feature=youtube_gdata
+[16:55:33] smccarthy has joined #selenium
+[16:55:42] jcarr: lukeis: went very well, thanks :)
+[16:56:21] jimevans: RossPatterson: i do love Tom Lehrer, but i don't know what you mean. :)
+[16:56:57] Spanktar has joined #selenium
+[16:57:36] RossPatterson: Oh ... if you click through to the dramatis personae, that describes all the cartoon guys, the description of the Angel of Death links to that Lehrer video :-)
+[16:58:19] farlan has joined #selenium
+[16:59:38] teodosia_sel has left #selenium
+[IRC logfile - Started Fri Nov 16 17:00:48 2012]
+[17:00:48] freynaud_: what's the reason for testAnElementFoundInADifferentFrameIsStale ? as long as we have a reference to and element, and it's still on the page, why does it matter we're not in the same frame anymore ?
+[17:05:19] jimevans: RossPatterson: okay, i get it. lukeis posted the link to the video, not me though, hence my confusion.
+[17:05:33] xeranas has joined #selenium
+[17:08:39] lukeis: freynaud_: if you find an element and switch frames you loose reference to that element, but if you switch back to it you'll still have the reference. frame context matters
+[17:09:05] lukeis: s/loose/lose/ :)
+[17:09:25] freynaud_: lukeis:  I don't get that. Why do I have to loose the reference ?
+[17:09:54] lukeis: the frame (window) has the reference to the found object… not window.top
+[17:10:01] RossPatterson: DOH!
+[17:10:29] freynaud_: lukeis: that's an implementation detail, a user doesn't see if the content comes from a iframe or not
+[17:11:10] lukeis: true… but we've leaked implementation of the frame issue out through the api
+[17:11:48] lukeis: if we didn't have switch_to_frame, then I would agree with you :)
+[17:12:08] stackedsax has joined #selenium
+[17:12:15] freynaud_: lukeis: hum, annoying.
+[17:13:10] lukeis: frames are a bitch… i wish they were removed from the html spec :)
+[17:15:15] barancev: frames are for good, they isolate potenially dangerous content from the main page (think about adv banners)
+[17:16:26] barancev: if you suggest to add another container with isolation to the html spec it will be the same essentially
+[17:16:28] lukeis: that's a cop out for allowing advertisers to put whatever content they want on a (your) site
+[17:17:15] lukeis: not saying it'll happen… but I could envision a world without frames ;)
+[17:19:51] barancev: no advertisement -> no google as we know it :)
+[17:20:16] lukeis: they could still do ads with JS
+[17:20:41] barancev: too dangerous, without isolation
+[17:20:52] barancev: text only?
+[17:21:25] barancev: lynx browser...
+[17:21:45] lukeis: thinking of frames, i think the frame switching api needs a way to switch_to_frame_parent
+[17:22:25] lukeis: or maybe it does and I've never tried switching to execute_script("return window.parent")
+[17:22:32] lukeis: hmm
+[17:22:34] barancev: I suggested this to simonstewart, but my authority was not enough to beat his authority :)
+[17:22:45] lukeis: did he shoot it down?
+[17:22:50] barancev: yes
+[17:22:58] lukeis: give any valid reason? :)
+[17:23:32] lukeis: we have commit access… we could add it and then let him revert it ;)
+[17:23:51] barancev: "you can do this with existing API - just go to top (default_content) and then back to a required frame"
+[17:23:57] lukeis: boooooo
+[17:24:17] lukeis: i've had to deal with a site 5 levels deep… really annoying to get to a sibling frame
+[17:24:57] barancev: let's sign a petition in support of switchTo().parentFrame() ?
+[17:25:04] lukeis: signed
+[17:26:57] adamgoucher: what i want is driver.current_frame so i can switch into a frame then back out
+[17:27:17] *adamgoucher has two frame happy clients right now...
+[17:27:51] barancev: back out? not to the parent but to an arbitrary frame?
+[17:29:02] adamgoucher: yup. or more correctly back to the frame i was in before skipping to a different frame to click a button
+[17:29:50] barancev: it's the parent only, in the current API
+[17:30:08] barancev: you can switch to a child frame with switchTo().frame(...)
+[17:30:22] barancev: child only
+[17:30:37] barancev: so "back out" == "to the parent"
+[17:31:03] *jimevans thinks of the nightmare in the IE driver of keeping different frame references, and begins weeping uncontrollably
+[17:31:08] lukeis: sounds like adamgoucher wants switch_to_frame_parent ;)
+[17:31:49] *barancev hugs jimevans
+[17:32:03] dude-x: so Hostess is going bankrupt. good riddance. their junk food tastes like a chemistry experiment gone wrong
+[17:32:20] barancev: no long jumps, only switch to the parent, that's all
+[17:33:15] lukeis: jimevans: window.parent isn't a *hard* reference to find, is it? :)
+[17:33:40] sfbrian has joined #selenium
+[17:33:46] jimevans: dude-x: don't be hating on my ding-dongs. their chocolatey hockey-puck goodness got me through a lot of days. (and yes, the double entendre potential was intentional)
+[17:34:39] jimevans: lukeis: no, it's not, but keeping track of an arbitrary frame, so you can hop in and out at will? *shudder*
+[17:34:42] dude-x: i guess I'm bitter that when i was a kid that hostess stuff was more expensive compared to little debbies
+[17:34:45] awilson820 has joined #selenium
+[17:35:01] lukeis: oh, heck no jimevans, not proposing that ;)
+[17:35:39] jimevans: just to throw a fly in the ointment, what do you do if you're already at window.top? throw, or silently succeed?
+[17:36:09] jimevans: s/silently succeed and be wildly inconsistent with the rest of the api/
+[17:36:34] barancev: NoSuchFrameException?
+[17:37:27] jimevans: not only that, but it'd be a good idea to get that before the w3c spec authors. :)
+[17:37:46] jimevans: commit access isn't good enough anymore! :)
+[17:37:54] lukeis: bah ;)
+[17:38:22] lukeis: those spec authors are hardly around anymore ;) 
+[17:40:41] lukeis: at least simon starts work on monday… hopefully in a couple weeks we'll actually see more of him :)
+[17:40:57] sassda has joined #selenium
+[17:42:54] jimevans: i expect david to be back on monday too, he's just halfway 'round the world at the moment.
+[17:43:37] jimevans: i don't remember when simon heads out to california. i do know he's going to be there awhile.
+[17:43:38] lukeis: true… who else is involved in the spec? eran?
+[17:43:49] jimevans: i'm in the working group too.
+[17:43:50] jimevans: :)
+[17:44:02] KaibutsuX has joined #selenium
+[17:44:03] lukeis: then *do* something jimevans ;)
+[17:44:27] jimevans: sorry, i've decided i'm done with doing things. 
+[17:44:46] lukeis: meh, can't argue with that
+[17:45:10] barancev: btw, what about 2.27? :
+[17:45:10] jimevans: i've been beaten up enough :)
+[17:45:42] lukeis: someone needs to take the bacon… barancev you volunteering?
+[17:46:40] jimevans: i'm not touching it until eranm fixes the linux native events alert tests.
+[17:47:29] barancev: no sir, I'm going for a week vacation tomorrow -- The Sinai Peninsula, 5* club hotel, lots of sun, relax, beer for free...
+[17:48:05] lukeis: i too will be out all next week… going to disneyland with the kids followed by turkey day
+[17:48:18] jimevans: besides, next week being a super short week for US-based folks, we'll want to wait until at least the week after.
+[17:48:34] barancev: I'd wait for FF17 too
+[17:48:49] barancev: it's in 5 days
+[17:49:00] lukeis: maybe we should run the tests against it ;)
+[17:49:02] jimevans: the disney folks need a place called "dadland" as part of the magic kingdom. 
+[17:49:16] lukeis: they serve booze in CA ;)
+[17:49:54] jimevans: not at the magic kingdom in florida. epcot, sure, especially during the food and wine festival.
+[17:49:58] *jimevans was just there
+[17:50:13] dude-x: ah i still remmeber only epcot served booze
+[17:50:18] dude-x: and i was there in the 90's
+[17:50:34] jimevans: a buddy of mine has a standup routing about the happiest f*cking place on earth.
+[17:50:41] lukeis: hmm, actually i think only california adventure serves booze… well that and in the restaurants
+[17:50:48] jimevans: and they need "dad land"
+[17:51:30] jimevans: featuring a ride where you get a beer and a plate of wings, a sporting event on a tv, and no squalling little ones.
+[17:51:44] lukeis: sounds kinda like hooters ;)
+[17:52:51] jimevans: well, yeah, but one where you need it, after dealing with all the idjits and their brats. most people are okay, but there's always that *one* family that really gets on your nerves.
+[17:52:56] dude-x: except there are kids at hooters some days
+[17:52:59] santiycr has joined #selenium
+[17:53:19] jimevans: a little oasis of calm in the chaos of the magic kingdom :)
+[17:53:35] jimevans: mmm. wings and beer. lunchtime!
+[17:53:40] lukeis: heh… i'm not anticipating a *relaxing* trip
+[17:55:21] selbot2_: 03ajaykemparaj@gmail.com less than 10 seconds ago - AjayKemparaj:Edited wiki page UsingWebDriver through web user interface. | https://code.google.com/p/selenium/source/detail?r=18168 | http://seleniumhq.org/ci.jsp?r=18168
+[17:57:54] nhirata has joined #selenium
+[IRC logfile - Started Fri Nov 16 18:02:47 2012]
+[18:02:47] jleyba has joined #selenium
+[18:11:31] dude-x: firebug/firepath seems to have trouble with SVG elements :/
+[18:13:22] barancev: is SessionNotFoundException deprecated? there is not a single usage
+[18:14:29] barancev: I think we should chhose between SessionNotFoundException and SessionTerminatedException
+[18:14:43] barancev: one should remain, another one should go away
+[18:16:38] barancev: SessionNotFoundException is better because we never can know whether a session with the given ID is terminated ot never existed
+[18:17:34] barancev: I should rework it...
+[18:17:45] barancev: just implemented on this week
+[18:18:41] stackedsax has joined #selenium
+[18:18:53] lukeis: +1  i saw you re-added status code 6 ;)
+[18:19:41] barancev: the question is which java exception should be raised if a browser returns 6
+[18:20:04] lukeis: SessionNotFound sounds appropriate
+[18:20:15] lukeis: much more than terminated
+[18:20:27] barancev: now I think this way too
+[18:23:40] barancev: what's WindowNotFoundException? how is it different from NoSuchWindowException?
+[18:23:57] barancev: ah, sorry, it's opera namespace
+[18:25:36] dude-x: i was just thinking, i've met many female programmers, but no female hispanic programmers… and only 1 black female programmer (though black male programmers are rare too)
+[18:31:08] tribhuvan has joined #selenium
+[18:31:19] tribhuvan: hi team
+[18:31:45] rpereira has joined #selenium
+[18:32:34] adamgoucher: and/or loosely coupled gang of misfits :)
+[18:32:59] lukeis: says the man who is 'sick' and wants a slurpee ;)
+[18:33:26] tribhuvan: i am using selenium Rc with chrome 23.0 version.. i am unable to run that with selenium standalone server 2.20 to present server version
+[18:33:55] tribhuvan: but the same is running perfectly in 2.19 
+[18:34:11] tribhuvan: i posted this quesry in selenium-user, bbut no response
+[18:34:41] ^A^kira: Hello 
+[18:34:48] jleyba: why don't you just use the ChromeDriver? (wrap it in WebDriverBackedSelenium if you're using the RC API)
+[18:34:58] ^A^kira: guys is there any conviniet way to assign custom user-agent for webdriver
+[18:34:59] ^A^kira: ?
+[18:35:10] jleyba: depends on the browser
+[18:35:16] ^A^kira: phantomjs
+[18:35:42] jleyba: Can't help you there.  Haven't used ghostdriver yet
+[18:37:39] lukeis: you'd have to hack around in the ghostdriver js, but basically you just need to add this line "page.settings.userAgent = 'your-user-agent'"  
+[18:37:42] ^A^kira: isn't there some convinient way more or less same for every driver?
+[18:37:48] lukeis: no
+[18:37:56] jleyba: and there probably won't be
+[18:38:05] lukeis: the point of webdriver is to use that browser… not to spoof user agents
+[18:39:09] ^A^kira: ye but phantomjs sending itself like "Python-urllib/2.7"
+[18:39:27] lukeis: is that a problem?
+[18:39:33] ^A^kira: which is unexceptable for website which checks useragents
+[18:39:49] jleyba: no, not really
+[18:40:53] jleyba: anyway, here's how you can do it with ChromeDriver:  https://gist.github.com/4089891
+[18:46:08] sassda: I am trying to maximize the window on webdriver using the js bindings, but I can't find the method like in Java, anyone knows it?
+[18:47:24] jleyba has joined #selenium
+[18:47:29] stackedsax has joined #selenium
+[18:48:26] barancev: sassda: driver.manage().window().maximize()
+[18:50:06] sassda: oh? thats pretty simple, I didn't find any mention of it going trough the code of the binding, lemme try
+[18:52:42] sassda: it returns em the error message Object [object Object] has no method 'window'  :(
+[18:52:47] sassda: *me
+[18:56:06] barancev: is it Java? are you sure?
+[18:56:25] barancev: ah, sorry, I misread, you're using JS binding
+[18:57:01] barancev: jleyba: ^^^ ?
+[18:57:14] jleyba: give me a few.  in a meeting
+[IRC logfile - Started Fri Nov 16 19:00:31 2012]
+[19:00:31] jleyba: :log
+[19:00:32] selbot2_: http://illicitonion.com/selogs/selenium/2012/11/16.txt | http://illicitonion.com/selogs/search
+[19:05:31] jleyba: sassda: maximize is not implemented.  I'll add it when I get back to my desk (~40 minutes)
+[19:08:16] sassda: oh, cool, thanks!
+[19:10:34] barancev: that's how we develop selenium :)
+[19:10:45] h8R has joined #selenium
+[19:14:00] jcarr has joined #selenium
+[19:15:33] RossPatterson has joined #selenium
+[19:15:33] ChanServ has altered RossPatterson's mode: +o
+[19:25:40] rbalent has joined #selenium
+[19:27:42] jfunk has joined #selenium
+[19:28:50] selbot2_: 03barancev half a minute ago - AlexeiBarantsev: SessionTerminatedException -> SessionNotFoundException | https://code.google.com/p/selenium/source/detail?r=18169 | http://seleniumhq.org/ci.jsp?r=18169
+[19:34:57] jleyba: barancev: When is SessionNotFoundException thrown?
+[19:35:07] jleyba: ErrorCodes#toStatusCode doesn't have a case for it
+[19:35:43] barancev: jleyba: I've commitd changes to ErrorCodes in Java
+[19:35:51] barancev: other languaged to be updated soon
+[19:36:03] barancev: it's re-added code 6: NoSuchSession
+[19:36:17] barancev: :wiki JsonWireProtocol
+[19:36:18] selbot2_: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[19:36:35] barancev: 6: NoSuchDriver
+[19:37:17] barancev: see also SessionHandlingTests in Java
+[19:37:18] rpereira has joined #selenium
+[19:38:25] barancev: I know why you ask...
+[19:38:28] barancev: wait a moment...
+[19:38:49] barancev: I forgot to commit a file
+[19:38:51] selbot2_: 03barancev half a minute ago - Alexeibarantsev: Adding forgotten file | https://code.google.com/p/selenium/source/detail?r=18170 | http://seleniumhq.org/ci.jsp?r=18170
+[19:38:57] barancev: that's it
+[19:43:15] dude-x has joined #selenium
+[19:43:55] dude-x has joined #selenium
+[19:47:51] selbot2_: 03jmleyba@gmail.com half a minute ago - JasonLeyba: Implement the Window.maximize() for WebDriverJS. | https://code.google.com/p/selenium/source/detail?r=18171 | http://seleniumhq.org/ci.jsp?r=18171
+[19:48:32] jleyba: sassda: ^^
+[19:49:23] barancev: InvalidSelectorException vs IllegalLocatorException -- why the two?
+[19:49:35] jleyba: no clue
+[19:49:56] jleyba: our error codes were based off the original IE driver
+[19:50:25] sassda: thanks jleyba :D
+[19:51:51] barancev: jleyba: only one of them is in ErrorCodes -- 32: InvalidSelector
+[19:52:08] barancev: IllegalLocatorException is a bastard
+[19:52:41] jleyba: InvalidSelectorException extends NoSuchElement
+[19:53:25] jleyba: and is used by the HtmlUnitDriver only
+[19:54:04] jleyba: based on its usage, i think htmlunit should be throwing an IllegalArgumentException
+[19:54:41] barancev: InvalidSelectorException is a first class citizen, see ErrorCodes, line 164
+[19:55:34] barancev: and line 108
+[19:56:11] barancev: ok, time to clean it up...
+[19:56:30] barancev: what? I was going to have a vacation? hmm..
+[19:58:34] testingb0t has joined #selenium
+[19:59:42] farlan has left #selenium
+[IRC logfile - Started Fri Nov 16 20:03:43 2012]
+[20:03:43] nhirata has joined #selenium
+[20:07:31] ignacio_ has joined #selenium
+[20:12:22] jleyba has joined #selenium
+[20:24:38] Swadq has joined #selenium
+[20:47:10] bfife has left #selenium
+[20:52:40] phasze has joined #selenium
+[20:53:26] phasze: Trying to get the keyPress to work with the "Enter" key with the selenium IDE, can anyone help with this?  Doesn't recognize \13.
+[20:59:39] phasze: Nevermind, figured it out. Thanks anyway
+[20:59:49] dude-x: your welcome!
+[IRC logfile - Started Fri Nov 16 21:00:01 2012]
+[21:00:01] jleyba has joined #selenium
+[21:01:00] KaibutsuX: *you're
+[21:01:04] *KaibutsuX slaps dude-x around a bit with a large trout
+[21:01:10] *dude-x still takes credit for good vibes
+[21:01:21] KaibutsuX: :)
+[21:05:13] santiycr has joined #selenium
+[21:05:57] dude-x: i have a mac os x question: the activty monitor on my mac mini shows me a cpu activity meter with 4 bars; my macbook pro shows only one bar (it's quadcore)
+[21:07:01] KaibutsuX: and the mini is a quadcore?
+[21:09:50] dude-x: it's dual core with HT
+[21:10:02] dude-x: i found someone posted this on macrumors forum
+[21:10:12] dude-x: but the poster was satisfied with opening an external CPU graph
+[21:10:16] dude-x: but i don't want to do that
+[21:10:40] lukeis has joined #selenium
+[21:10:42] dude-x: both systems are mountain lion
+[21:16:34] dude-x: in other news, a guy tweeted that he may go to jail for looking at a URL and adding a 1 to a number
+[21:16:40] freynaud has joined #selenium
+[21:16:48] dude-x: accused of breaking into a fortune 100 website
+[21:19:36] jleyba has joined #selenium
+[21:23:26] KaibutsuX: lol
+[21:23:42] KaibutsuX: hackers these days
+[21:24:02] dude-x: i do that sometimes
+[21:24:23] dude-x: i get linked to a picture, and i see DSC0013
+[21:24:34] KaibutsuX: you know whats awesomme, is where I work we support some cgi flags in our environment
+[21:24:42] KaibutsuX: one of them is &causeCore
+[21:24:53] KaibutsuX: you know to generate a dump
+[21:25:15] KaibutsuX: someday I want to write a selenium test that just brute forces websites with variants of common words like that
+[21:25:49] dude-x: haha
+[21:26:12] dude-x: my last job had internal controls but it was firewalled by IP
+[21:27:11] KaibutsuX: yeah we don't really have fancy things like firewalls
+[21:27:49] KaibutsuX: speaking of brute-forcing, you know you can earn 15points/day if you signup to use Bing rewards? It seems like they give 1pt per every unique multicharacter search
+[21:28:05] KaibutsuX: I have a selenium script to search for the current timestamp every know 15 times
+[21:28:17] KaibutsuX: $5 amazon card after like 650 points
+[21:28:56] dude-x: crazy
+[21:29:18] dude-x: even though it's low effort, the reward isn't worth the effort
+[21:29:47] lukeis: if you keep it up you'll make a whopping $40 / year
+[21:31:25] KaibutsuX: it's more the satisfaction that I'm slowly screwing MS
+[21:32:01] lukeis: heh… now if you created like 500 unique users and did that, then you'd be closer to that goal
+[21:33:29] KaibutsuX: ha, they required my address and all that
+[21:33:33] KaibutsuX: but good idea :)
+[21:34:35] lukeis: if you live in a house, call it an appartment and have units 1-500 ;)
+[21:35:14] lukeis: they'll likely catch on though 
+[21:35:38] KaibutsuX: lol
+[21:35:58] *lukeis has gamed a few systems in my time...
+[21:37:07] lukeis: remember when they used to do those mail in CD's thing and gave you like 2 for free… yeah, there were  a lot of different people who lived at my house
+[21:40:35] dude-x: i wonder how columbia house made money
+[21:40:43] dude-x: oh i know taking advantage of people's inertia 
+[21:43:12] lukeis: i never sent them a dime ;) thx for mailing me free shit!  I'm probably still on a list somewhere, but that was over 10 years ago now
+[21:54:26] jleyba has joined #selenium
+[IRC logfile - Started Fri Nov 16 22:15:24 2012]
+[22:15:24] stackedsax has joined #selenium
+[22:26:27] jleyba has joined #selenium
+[22:37:05] awilson8201 has joined #selenium
+[22:45:29] davehunt has joined #selenium
+[IRC logfile - Started Fri Nov 16 23:24:45 2012]
+[23:24:45] alexglow has joined #selenium
+[23:55:04] AutomatedTester has joined #selenium

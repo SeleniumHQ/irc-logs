@@ -1,0 +1,166 @@
+[IRC logfile - Started Sun Jan  6 00:07:40 2013]
+[00:07:40] enbergj has joined #selenium
+[00:15:57] admc has joined #selenium
+[00:24:57] enbergj has joined #selenium
+[00:33:34] enbergj has joined #selenium
+[00:45:17] enbergj has joined #selenium
+[00:51:51] enbergj has joined #selenium
+[00:57:25] enbergj has joined #selenium
+[IRC logfile - Started Sun Jan  6 01:02:43 2013]
+[01:02:43] plightbo has joined #selenium
+[01:03:44] enbergj has joined #selenium
+[01:16:29] enbergj has joined #selenium
+[01:23:05] enbergj has joined #selenium
+[01:30:42] enbergj has joined #selenium
+[01:57:38] enbergj has joined #selenium
+[01:58:32] nhirata has joined #selenium
+[IRC logfile - Started Sun Jan  6 02:14:27 2013]
+[02:14:27] enbergj has joined #selenium
+[02:18:30] DaveIngram has joined #selenium
+[02:23:06] enbergj has joined #selenium
+[02:35:47] enbergj has joined #selenium
+[IRC logfile - Started Sun Jan  6 03:04:06 2013]
+[03:04:06] enbergj has joined #selenium
+[03:10:39] enbergj has joined #selenium
+[03:19:17] enbergj has joined #selenium
+[03:34:02] enbergj has joined #selenium
+[03:41:41] enbergj has joined #selenium
+[03:49:18] enbergj has joined #selenium
+[03:49:43] lukeis has joined #selenium
+[03:54:10] hack has joined #selenium
+[03:56:55] enbergj has joined #selenium
+[03:58:35] jost has joined #selenium
+[IRC logfile - Started Sun Jan  6 04:02:00 2013]
+[04:02:00] jost: I'm trying to make the webdriver wait for all images on a page to be loaded... This is how I've tried it: http://pastebin.com/yGAzibyY
+[04:02:28] jost: The problem is that nodes seem to go into endless loops when they are faced with this.
+[04:03:14] jost: but only when the node is an IE-node.
+[04:03:20] jost: Version 7-9
+[04:03:50] lukeis: have you tried that javascript directly on IE?
+[04:05:56] jost: yes
+[04:06:54] lukeis: set a break point in your test and see where it is looping forever?
+[04:09:36] jost: its the wait.until-part. The javascript is sent to the node over and over again
+[04:10:43] lukeis: which would imply the function is always evaluating to false, assuming you didn't set an infinite timeout, it does timeout right?
+[04:13:51] jost: it does time out... 
+[04:18:57] lukeis: so, the question becomes why is it always evaluating to false. some images not 'complete'? And IE can be a hassle in this regard (UI bugs), I don't recall exactly all the inconsistencies around image loading with IE
+[04:20:51] jost: lukeis, yes, you got the problem...
+[04:21:20] jost: there is an img-tag with src="". It is regarded as complete by all browsers except IE.
+[04:21:49] lukeis: ah, that will cause IE to request an 'img' at the same location as the page
+[04:22:22] lukeis: i think it considers that incomplete or something when it gets the html back as a response
+[04:23:02] lukeis: i would call that a UI bug… shouldn't have a <img src=""> on the page because of that issue
+[04:28:32] stackedsax has joined #selenium
+[04:30:03] jost: Seems so... but changing it is not realistic for now, because I'm building tests to prepare for refactorings... so I've just added a check for an empty src-element. That works in IE > 7, but IE 7 returns the directory of the current element.
+[04:30:57] enbergj has joined #selenium
+[04:32:59] lukeis: that would make sense, i would special case the check for <= IE7 that would check the current url too
+[04:33:24] lukeis: driver.getCurrentUrl() :)
+[04:35:07] jost: I'm checking if the src-attribute ends with '/', that should work too
+[04:38:31] enbergj has joined #selenium
+[04:44:11] alexglow has joined #selenium
+[04:44:42] enbergj has joined #selenium
+[04:55:24] enbergj has joined #selenium
+[IRC logfile - Started Sun Jan  6 05:07:05 2013]
+[05:07:05] enbergj has joined #selenium
+[05:13:34] enbergj has joined #selenium
+[05:19:55] enbergj has joined #selenium
+[05:30:40] enbergj has joined #selenium
+[05:34:07] o3u has joined #selenium
+[05:44:35] akoumjian has joined #selenium
+[05:51:26] AnuragGambhir58 has joined #selenium
+[05:54:06] AnuragGambhir58 has joined #selenium
+[IRC logfile - Started Sun Jan  6 06:06:45 2013]
+[06:06:45] enbergj has joined #selenium
+[06:15:59] Archdude_ has joined #selenium
+[06:16:26] enbergj_ has joined #selenium
+[06:30:13] AnuragGambhir has joined #selenium
+[06:30:19] enbergj has joined #selenium
+[06:31:03] friskd has joined #selenium
+[06:37:12] AnuragGambhir88 has joined #selenium
+[06:39:54] enbergj has joined #selenium
+[06:40:31] megha has joined #selenium
+[06:49:35] enbergj has joined #selenium
+[06:58:06] alexglow has joined #selenium
+[IRC logfile - Started Sun Jan  6 07:08:38 2013]
+[07:08:38] megha has joined #selenium
+[07:30:25] o3u has joined #selenium
+[07:51:05] AnuragGambhir58 has joined #selenium
+[IRC logfile - Started Sun Jan  6 08:06:35 2013]
+[08:06:35] alexglow has joined #selenium
+[08:11:53] AnuragGambhir58 has joined #selenium
+[08:29:44] SamuraiJack has joined #selenium
+[IRC logfile - Started Sun Jan  6 09:10:07 2013]
+[09:10:07] AnuragGambhir88 has joined #selenium
+[IRC logfile - Started Sun Jan  6 10:34:36 2013]
+[10:34:36] testingb0t has joined #selenium
+[IRC logfile - Started Sun Jan  6 11:03:16 2013]
+[11:03:16] megha has joined #selenium
+[11:28:45] o3u has joined #selenium
+[11:54:51] krosenvold has joined #selenium
+[IRC logfile - Started Sun Jan  6 12:22:19 2013]
+[12:22:19] samphippen has joined #selenium
+[12:25:17] rbalent has joined #selenium
+[12:25:18] rbalent has joined #selenium
+[12:37:55] DaveIngram has joined #selenium
+[IRC logfile - Started Sun Jan  6 13:50:45 2013]
+[13:50:45] jj99 has joined #selenium
+[IRC logfile - Started Sun Jan  6 15:10:12 2013]
+[15:10:12] AnuragGambhir has joined #selenium
+[15:22:25] xiaoli has joined #selenium
+[IRC logfile - Started Sun Jan  6 16:03:02 2013]
+[16:03:02] SamuraiJack_ has joined #selenium
+[16:06:35] nirvdrum has joined #selenium
+[16:12:43] hack has joined #selenium
+[16:19:28] AnuragGambhir88 has joined #selenium
+[16:24:01] hack has joined #selenium
+[16:24:12] cheezy has joined #selenium
+[16:29:57] hack has joined #selenium
+[16:32:40] AnuragGambhir has joined #selenium
+[16:53:01] alexglow has joined #selenium
+[16:59:12] dawagner has joined #selenium
+[16:59:31] dawagner: :note santiycr FYI the http://saucelabs.com/support/policy link on https://saucelabs.com/tos 404s?
+[16:59:32] selbot2_: ok!
+[IRC logfile - Started Sun Jan  6 17:22:47 2013]
+[17:22:47] cgoldberg has joined #selenium
+[17:24:07] cheezy has joined #selenium
+[17:24:16] cgoldberg: has anyone used phontom.js from the python webdriver bindings (ghostdriver)?
+[17:27:36] cgoldberg: phantom.js that is
+[17:35:36] DarkRift has joined #selenium
+[17:35:36] DarkRift has joined #selenium
+[IRC logfile - Started Sun Jan  6 18:46:14 2013]
+[18:46:14] admc has joined #selenium
+[IRC logfile - Started Sun Jan  6 19:08:30 2013]
+[19:08:30] stackedsax has joined #selenium
+[19:09:35] megha has joined #selenium
+[19:14:28] amitev has joined #selenium
+[19:21:23] DaveIngram has joined #selenium
+[19:51:49] moo-_- has joined #selenium
+[19:52:31] AutomatedTester has joined #selenium
+[IRC logfile - Started Sun Jan  6 20:03:01 2013]
+[20:03:01] moo has joined #selenium
+[20:04:27] AutomatedTester has joined #selenium
+[IRC logfile - Started Sun Jan  6 21:00:04 2013]
+[21:00:04] amitev has joined #selenium
+[21:08:52] alexglow has joined #selenium
+[21:22:59] admc has joined #selenium
+[21:40:07] lukeis has joined #selenium
+[21:40:57] lukeis: cgoldberg: i have (phantomjs w/ python se), since i wrote it :) any issues?
+[21:41:27] cgoldberg: lukeis, no.. it works awesome :)  i just blogged about it.. was playting with it this afternoon
+[21:41:37] lukeis: coolio ;)
+[21:41:46] cgoldberg: great stuff.. thanks
+[21:41:59] lukeis: meh, i basically copied the chrome code
+[21:42:06] lukeis: :)
+[21:43:24] lukeis: cgoldberg: just reading your blog, you don't need to build the source yourself, the latest release (pre-compiled phantomjs 1.8) works 
+[21:43:28] lukeis: with webdriver
+[21:43:41] cgoldberg: lukeis, sweet!.. i'll update the post
+[21:44:22] cgoldberg: i was going by the GhostFriver docs
+[21:44:28] cgoldberg: GhostDriver
+[21:45:18] lukeis: ivan readily accept's pull requests ;) (and gentle nudging about small stuff like this)
+[IRC logfile - Started Sun Jan  6 22:02:07 2013]
+[22:02:07] amitev has joined #selenium
+[22:04:46] Spanktar has joined #selenium
+[22:15:14] ner0x has joined #selenium
+[22:51:49] noahsussman has joined #selenium
+[22:54:06] megha has joined #selenium
+[22:54:21] noahsussman has joined #selenium
+[22:56:36] noahsussman has joined #selenium
+[IRC logfile - Started Sun Jan  6 23:17:27 2013]
+[23:17:27] gabrielrotbart has joined #selenium
+[23:49:29] alexglow has joined #selenium

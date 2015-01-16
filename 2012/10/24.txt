@@ -1,0 +1,948 @@
+[IRC logfile - Started Wed Oct 24 00:18:46 2012]
+[00:18:46] detronizator: jimevans: hey
+[00:18:48] detronizator: u still here?
+[00:19:04] llaskin: anything i can do ya for?
+[00:20:03] detronizator: llaskin: me?
+[00:21:34] jimevans: detronizator: hey
+[00:21:55] detronizator: jimevans: I see what you say - you are right, definitely not handled yet
+[00:22:01] detronizator: but it could be easily fixable
+[00:22:14] jimevans: okay. i'll take your word for it.
+[00:22:14] detronizator: if the submit is changed and "wrapped" in the execFuncAndWaitForLoad
+[00:22:24] jimevans: ah. i see what you're getting at.
+[00:22:25] detronizator: the submit "expects" a load
+[00:22:36] detronizator: worst case, I handle it with a timeout
+[00:22:53] jimevans: that sounds appropriate.
+[00:23:01] detronizator: the other approach would be to monitor for bubbling events on the body: too convoluted.
+[00:23:07] jimevans: agreed.
+[00:23:29] detronizator: I'll file an issue, unless you were going to
+[00:23:37] jimevans: no, go ahead.
+[00:24:02] jimevans: i think you can see how i spent my weekend. :)
+[00:24:38] detronizator: yes
+[00:24:59] detronizator: and good news: my bride-to-be is "leaving me for a week alone"
+[00:25:10] detronizator: I know how I'm going to spend my "lonely time"
+[00:25:11] jimevans: oooh. hack time!
+[00:25:26] detronizator: hack? more like "finish that bloody ghostdriver before people kill me"
+[00:25:31] detronizator: you in particular :)
+[00:25:32] jimevans: :)
+[00:25:55] detronizator: jimevans: ah - did you find today the Patch I'm waiting for merge? the PhantomJSDriver binding?
+[00:26:01] detronizator: I'd love to tick that out of my todo list
+[00:26:15] jimevans: i did. i really want to get 2.26 released before i merge it in though.
+[00:26:20] jimevans: sigh.
+[00:26:21] detronizator: kool
+[00:26:43] detronizator: I predicted it would never make it for 2.26
+[00:26:52] detronizator: give priority to 2.26, no worries.
+[00:26:58] jimevans: about that native keys pull request. i'm sure i missed something there, so when you get a chance to look it over, i'd appreciate you doing so with some care.
+[00:27:11] detronizator: I will
+[00:27:19] detronizator: you added quite a bit of stuff
+[00:28:13] jimevans: it's a big change. i was trying to get the interactions tests working. mostly did, too.
+[00:28:43] jimevans: we still have the async javascript execution crash, right?
+[00:28:59] jimevans: (i disabled those tests for now)
+[00:29:23] detronizator: yes
+[00:29:30] detronizator: that is phantomjs
+[00:30:12] detronizator: it's nothing we do: phantomjs crashes and I have had for long the feeling that something is fishy around the area of changes that were done to "accomodate" the Google Crashing stuff
+[00:30:22] detronizator: honest: never spent time understadning that thing
+[00:30:48] detronizator: I'm not sure anyone actually takes the bug reports with "dumps attached" and analyses them
+[00:30:56] detronizator: I feel it was added "because it's cool"
+[00:31:02] detronizator: not because we know how to use it
+[00:31:24] detronizator: and in such cases, I'm a fund of old-style debugger + printfs
+[00:31:25] detronizator: never failed me
+[00:31:44] jimevans: well, just to give you a status update on the .NET integration tests. the alerts tests and the 'executing async javascript' tests are disabled. with my native events fix and the file upload hack, the tests pass at 98%.
+[00:33:51] detronizator: ah
+[00:33:54] detronizator: the file upload hack
+[00:34:00] detronizator: got a question about that, if you got time
+[00:34:07] detronizator: I want to clarify my head jimevans
+[00:34:12] jimevans: sure. go ahead.
+[00:34:48] detronizator: so, the way WebDrivers tend to work, is to fill the file upload field as a "input type=text" kind of element
+[00:35:08] detronizator: the local path to the file is written in the text box, that happens to be input type=file
+[00:35:13] detronizator: am I right?
+[00:35:53] jimevans: sort of. browsers have started to not allow that to work anymore, rendering the text box portion of the file upload control as disabled, so it can't be typed into.
+[00:36:29] detronizator: k
+[00:36:37] detronizator: so, what you guys do within the client side
+[00:36:43] detronizator: is to "intercept" on "sendKeys"
+[00:36:49] detronizator: and if a path is detected
+[00:36:59] jimevans: i can tell you how IE does it. it fires off a different thread, and executes a javascript click on the element in that thread. that thread blocks, and we look for the file dialog and fill it in by sending keystrokes to it.
+[00:37:16] detronizator: k
+[00:37:29] detronizator: so that's what you are trying to do with phantomjs too
+[00:37:41] detronizator: the difference is that phantomjs requires you to "pre-type" the path
+[00:37:44] detronizator: in a temporary var
+[00:37:51] detronizator: that is picked up once you just click on the item
+[00:37:56] jimevans: not really. i'm just trying to use phantomjs's upload file feature.
+[00:38:15] detronizator: and that's how it works internally
+[00:38:45] detronizator: so, the think to do
+[00:38:47] jimevans: i'll take your word on that.
+[00:39:15] detronizator: so, if everything is clear in my head (and I have had a bourbon, so I might be slightly drunk :))
+[00:39:26] jimevans: :D
+[00:39:34] detronizator: we need to "pre-type" the path (and you do that already)
+[00:39:48] detronizator: than click on the input type=file
+[00:40:00] detronizator: the phantomjs code that is ALREADY in place will do the rest
+[00:40:12] davehunt has joined #selenium
+[00:40:18] detronizator: the api for file upload at the moment requires you to pass both Element to click + path
+[00:40:34] detronizator: I can make an API that DOESN'T require the element to click
+[00:40:44] detronizator: but than leaves to the developer to click on the element
+[00:40:49] detronizator: you follow me?
+[00:40:55] detronizator: or have I lost both of us :)
+[00:41:51] jimevans: well, to be completely accurate, the current api requires a css selector that selects a file element, but yes, that's it essentially. if you can create a phantomjs api that lets us get around that without needing to specify the element, we're golden.
+[00:42:31] detronizator: than, unless the bourbon was too high on alchool (and I don't think there is such a thing)
+[00:42:34] jimevans: my idea was to get the element out of the cache, and pass it into a new uploadFile() api that would take the element itself, but i think your approach would be cleaner.
+[00:42:40] detronizator: we might have a solution approach
+[00:43:00] detronizator: Taking elements OUT of the page is a problem
+[00:43:10] detronizator: the pointer to it are resolvable only within the page itself
+[00:43:28] jimevans: as you say.
+[00:43:30] detronizator: so, it "might" work, but we might also just hit a QtWebKit barrier: I haven't tried
+[00:43:51] jimevans: i think you're probably right.
+[00:44:10] detronizator: avoiding the whole thing might be better: ultimately we just need the path to be "ready to be typed" once the "File Selector Popup window" is invoked by WebKit
+[00:44:42] detronizator: tomorrow I'll wake up and I'll remember nothing of this
+[00:44:49] detronizator: I'd better write it in the issue :)
+[00:44:56] jimevans: good idea. :)
+[00:46:38] jimevans: incidentally, when i was playing about with the file upload stuff originally, i tried to get it done by mimicking what phantomjs's uploadFile() method did, but i was unsuccessful.
+[00:46:39] detronizator: done
+[00:46:54] detronizator: mmm
+[00:47:14] detronizator: as I said: I might be just drunk and this idea has a major flaw that I totally miss now :)
+[00:47:15] jimevans: the reason, i think, is because inside that element it calls .evaluateJavaScript() on the QWebElement located by the css selector.
+[00:47:44] detronizator: and it was failing on that, right?
+[00:47:46] jimevans: i don't know what that does, unless it mucks about with the 'this' pointer.
+[00:48:00] jimevans: not so much failing as just not working.
+[00:48:31] detronizator: simply, when you do a "page.evaluate("function(){ return document.querySelector('#id'); })"
+[00:48:36] detronizator: you are NOT getting an element
+[00:48:41] detronizator: you are getting something weird
+[00:48:47] jimevans: oh, no, that i know.
+[00:48:48] detronizator: a pointer to something that you can't use anymore
+[00:49:18] jimevans: when i was trying it, i was trying to call the javascript that phantomjs calls, but that wasn't working.
+[00:49:29] jimevans: again, i suspect because the "this" object wasn't what i expected it to be.
+[00:49:35] jimevans: s/expected/needed/
+[00:49:46] jimevans: but i really don't know for certain.
+[00:49:59] detronizator: y - but I think expected is the right word: QtWebKit is definitely NOT designed for what we made it do
+[00:50:15] detronizator: we have went well beyond his design purposes
+[00:50:26] detronizator: I think when/if we go on Qt5 
+[00:50:30] detronizator: that will be PhantomJS 2.0
+[00:50:35] jimevans: right.
+[00:50:43] detronizator: and that should carry the new JS engine
+[00:50:45] detronizator: based on V8
+[00:50:52] detronizator: and with a binding that can do MUCH more
+[00:51:12] detronizator: now... it's time to go for me
+[00:51:14] jimevans: yep. anyway, it's late.
+[00:51:19] detronizator: yes
+[00:51:20] jimevans: go to bed. i'm going home.
+[00:51:25] detronizator: ;)
+[00:51:29] detronizator: talk you soon
+[00:51:32] jimevans: later.\
+[00:51:36] detronizator: bye
+[00:51:38] jimevans has left #selenium
+[00:54:33] bluescreen10 has joined #selenium
+[00:55:53] mreedell has joined #selenium
+[IRC logfile - Started Wed Oct 24 01:04:17 2012]
+[01:04:17] llaskin has joined #selenium
+[01:04:57] stackedsax has joined #selenium
+[01:05:43] nirvdrum has joined #selenium
+[01:10:01] aivaturi has left #selenium
+[01:10:55] girija has joined #selenium
+[01:11:21] girija has left #selenium
+[01:19:21] gabrielr_ has joined #selenium
+[01:22:34] ner0x has joined #selenium
+[01:22:39] jcarr has left #selenium
+[01:39:03] aweiteka has joined #selenium
+[01:45:59] gabrielrotbart has joined #selenium
+[01:50:30] o3u has joined #selenium
+[IRC logfile - Started Wed Oct 24 02:02:55 2012]
+[02:02:55] admc has joined #selenium
+[02:27:51] testobsessed has joined #selenium
+[IRC logfile - Started Wed Oct 24 03:00:24 2012]
+[03:00:24] santiycr has joined #selenium
+[03:01:55] admc has joined #selenium
+[03:02:45] jleyba has joined #selenium
+[03:21:04] ner0x: Which chromedriver should I be using?
+[03:33:56] ner0x: *.23 ?
+[03:34:40] admc has joined #selenium
+[03:36:49] testobsessed has joined #selenium
+[03:37:11] awilson820 has joined #selenium
+[03:37:16] awilson820 has left #selenium
+[03:39:44] gabrielrotbart has joined #selenium
+[03:49:44] JackDandy has joined #selenium
+[03:49:45] JackDandy has joined #selenium
+[03:50:10] ner0x: Anyone awake? :-)
+[IRC logfile - Started Wed Oct 24 04:11:47 2012]
+[04:11:47] santiycr: ner0x:  use the latest here: https://code.google.com/p/chromedriver/downloads/list
+[04:11:57] santiycr: with the latest chrome
+[04:12:22] santiycr: though generally it's not a huge deal if you keep using an old version for a while
+[04:13:48] ner0x: santiycr: For some reason chrome won't work.
+[04:14:00] ner0x: santiycr: Caused by: org.openqa.selenium.WebDriverException: proxy must be of type dictionary, not null. Received: null
+[04:15:01] santiycr: chrome and chromedriver are mainly compatible one or two versions 
+[04:15:11] santiycr: oh, you using perl?
+[04:15:24] ner0x: santiycr: Yes.
+[04:15:28] santiycr: perl sets the proxy setting == null by default 
+[04:15:32] santiycr: which chrome doesn't like
+[04:15:53] ner0x: I can override it no problem, if you can tell me what the correct default settings are.
+[04:16:17] santiycr: set it to an empty map
+[04:16:27] santiycr: or even better, just remove it from the desired capabilities being sent
+[04:16:27] ner0x: {} ?
+[04:16:30] santiycr: yeah
+[04:16:46] santiycr: if it's not included in the hash sent to selenium, it should be just fine
+[04:17:16] ner0x: I think Selenium::Remote::Driver automatically includes it.
+[04:17:27] santiycr: yeah, that's kind of a bug
+[04:17:36] santiycr: I know an old version of chromedriver just dealt with it fine
+[04:17:48] santiycr: though recently it started failing on it
+[04:18:12] ner0x: proxy => { proxyType => 'direct' } makes it work.
+[04:18:19] santiycr: at Sauce Labs we drop it (if null) before passing the request to chromedriver
+[04:18:22] ner0x: proxy => {} also fails
+[04:18:27] santiycr: oh, interesting
+[04:18:42] santiycr: would you mind reporting it to the perl selenium bindings? 
+[04:19:41] ner0x: santiycr: I'll just patch the module to set it to that by default. I can't hurt anything.
+[04:19:52] santiycr: yeah, for sure :)
+[04:19:54] ner0x: s/I/It*
+[04:20:12] santiycr: that's better than an error causing value
+[04:20:19] ner0x: Correct.
+[04:20:30] ner0x: You know there is Test::WWW::Selenium as well right?
+[04:20:34] santiycr: actually, thinking about it twice, not setting it at all, let's selenium figure out what's best
+[04:20:35] ner0x: Not entirely sure why it gets no love.
+[04:20:48] santiycr: which is a more maintainable option long term
+[04:21:06] ner0x: Test::WWW::Selenium is definitely more used.
+[04:21:23] santiycr: yeah, the perl community hasn't caught up much on the automated testing bandwagon 
+[04:21:33] santiycr: at least not that I've seen
+[04:21:35] ner0x: santiycr: False.
+[04:21:36] santiycr: alright! Time to run, 8:30pm here
+[04:21:44] santiycr: ner0x: hm interesting
+[04:21:55] ner0x: santiycr: Automated testing is beaten into our heads, actually.
+[04:22:21] ner0x: santiycr: We just don't have many bindings for popular resources unless we make them ourselves. :)
+[04:25:46] alexglow has joined #selenium
+[04:27:35] santiycr: ner0x:  alright, this is the perfect queue to recruit you into becoming the official maintainer of the perl client bindings 
+[04:27:47] santiycr: though sadly, really gotta drop
+[04:27:56] santiycr: food for thought! ;)
+[04:27:58] santiycr: cheers
+[IRC logfile - Started Wed Oct 24 05:13:36 2012]
+[05:13:36] stackedsax has joined #selenium
+[05:57:48] zelo has joined #selenium
+[IRC logfile - Started Wed Oct 24 06:10:21 2012]
+[06:10:21] soc42 has joined #selenium
+[06:39:42] alexglow has joined #selenium
+[06:57:16] jeichar has joined #selenium
+[06:58:19] andreastt: ner0x: We have a department here at Opera that uses Perl for their WebDriver testing.
+[06:58:29] andreastt: Not sure specifically what library they use though.
+[IRC logfile - Started Wed Oct 24 07:08:06 2012]
+[07:08:06] admc has joined #selenium
+[07:08:21] papegaaij has joined #selenium
+[07:17:27] Nari has joined #selenium
+[07:26:44] Karol_123 has joined #selenium
+[07:30:36] Nari: Am not able to get good search results for closing and opening a remote webdriver refernce (.close() and then .get())
+[07:31:14] Nari: can anyone help me with that?
+[07:42:48] Nari: I just figured that reinstantiating helps, but if there's a nicer way to close and open the browser i'd be happy to listen
+[07:55:53] dekroning has joined #selenium
+[IRC logfile - Started Wed Oct 24 08:04:51 2012]
+[08:04:51] peroksid has joined #selenium
+[08:04:59] peroksid: Hi guys
+[08:05:28] peroksid: I am using Python bindings, send_keys to trigger file uplod
+[08:05:32] jazz_ has joined #selenium
+[08:05:48] peroksid: This command blocks from further progress of test
+[08:06:05] peroksid: I am trying to understand if this behaviour is "legal"
+[08:06:22] peroksid: Is there someone around who wants to chat about this?
+[08:06:25] andreastt: :note AutomatedTester Did you see webdriverplus.org?
+[08:06:26] selbot2: ok!
+[08:11:46] andreastt: peroksid: Which browser are you using?
+[08:11:48] Nari: Oh, update on my problem - I lost cookies because of the reinstantiation. Any neat way to close and open?
+[08:13:14] jazz_: anyone around who knows how to load firefox with a profile settings in webdriver.js?
+[08:16:33] andreastt: jazz_: In theory it should just be a matter of encoding the profile as a base 64 string and assign it to the "firefox_profile" capability.
+[08:16:55] andreastt: I don't know about the JS binding, but most other bindings have utilities to make this slightly easier.
+[08:17:42] Ardesco has joined #selenium
+[08:18:23] jazz_: ok, thanks! I will try that
+[08:19:33] andreastt: This would be the Java alternative:
+[08:19:35] andreastt: FirefoxProfile profile = new FirefoxProfile();
+[08:19:35] andreastt: DesiredCapabilities caps = DesiredCapabilities.Firefox();
+[08:19:35] andreastt: caps.SetCapability("firefox_profile", profile.ToBase64String());
+[08:19:36] andreastt: IWebDriver driver = new RemoteWebDriver(caps);
+[08:19:56] andreastt: Actually that's C#, fetched from http://stackoverflow.com/questions/6048276/how-to-set-firefox-profile-using-remotewebdriver-net.  But pretty much the same in Java.
+[08:21:27] Ardesco has joined #selenium
+[08:22:29] jazz_ has left #selenium
+[08:26:33] peroksid has left #selenium
+[08:28:36] testingb0t has joined #selenium
+[08:42:19] rbalent has joined #selenium
+[08:44:38] sburjan has joined #selenium
+[08:50:45] davehunt has joined #selenium
+[IRC logfile - Started Wed Oct 24 09:10:37 2012]
+[09:10:37] teodosia_sel has joined #selenium
+[09:12:22] Bebe_sel has joined #selenium
+[09:13:59] Nari has joined #selenium
+[09:22:37] Bebe_ has joined #selenium
+[09:24:39] Kowal has joined #selenium
+[09:26:04] Kowal: hi there! Does anyone ever succeeded in using IEDriverServer to test the iframe content? I cannot figure this out, it fails to find the elements by xpath, and I'm sure I've waiting long enough for the frame to load.
+[09:26:39] Kowal: the only thing I can do there is to execute javascript code. Essentially I would have to rewrite my selenium test to JS code.
+[09:31:45] jamesoram has joined #selenium
+[09:32:11] Kowal: are there any known bugs/workarounds for IEDriverServer vs testing iframe ?
+[09:49:06] zac_sel has joined #selenium
+[09:57:09] Nari has joined #selenium
+[09:57:31] jarib has joined #selenium
+[IRC logfile - Started Wed Oct 24 10:05:14 2012]
+[10:05:14] jamesoram has joined #selenium
+[10:05:47] jibay has joined #selenium
+[10:24:48] Nari2 has joined #selenium
+[10:48:38] caddoo has joined #selenium
+[10:51:44] lucabox has joined #selenium
+[IRC logfile - Started Wed Oct 24 11:12:23 2012]
+[11:12:23] Kowal has left #selenium
+[11:34:46] Mkop has joined #selenium
+[11:36:07] dekroning has joined #selenium
+[11:54:19] davehunt has joined #selenium
+[IRC logfile - Started Wed Oct 24 12:01:26 2012]
+[12:01:26] pa has joined #selenium
+[12:30:39] llaskin has joined #selenium
+[12:32:58] davehunt|mobile has joined #selenium
+[12:39:12] jamesoram has joined #selenium
+[12:39:31] jarib has joined #selenium
+[12:44:01] ner0x has joined #selenium
+[12:50:56] zelo has joined #selenium
+[12:56:24] aweiteka has joined #selenium
+[12:58:02] jarib has joined #selenium
+[IRC logfile - Started Wed Oct 24 13:00:26 2012]
+[13:00:26] AutomatedTester has joined #selenium
+[13:00:26] selbot2: AutomatedTester: note from andreastt about 5 hours ago: Did you see webdriverplus.org? 
+[13:01:31] AutomatedTester: andreastt: I have seen that
+[13:02:30] barancev: kinda watir API but for python?
+[13:02:50] AutomatedTester: barancev: kinda
+[13:07:37] Dave_B has joined #selenium
+[13:08:28] ejelinek has joined #selenium
+[13:11:36] davehunt has joined #selenium
+[13:12:30] barancev: either I'm a complete moroon, or something bad happened to native events long ago
+[13:13:15] xtian_ has joined #selenium
+[13:13:19] barancev: https://gist.github.com/3945806 -- it's 2.25.0 release, and this scripts returns the following capabilities:
+[13:13:33] barancev: Capabilities [{platform=LINUX, javascriptEnabled=true, cssSelectorsEnabled=true, hasMetadata=true, handlesAlerts=true, browserName=firefox, nativeEvents=false, webdriver.remote.sessionid=1351081697660, takesScreenshot=true, version=10.0}]
+[13:13:53] barancev: nativeEvents=false, why???
+[13:14:38] barancev: the same issue with other browser versions: Capabilities [{platform=LINUX, javascriptEnabled=true, cssSelectorsEnabled=true, hasMetadata=true, handlesAlerts=true, browserName=firefox, nativeEvents=false, webdriver.remote.sessionid=1351081767472, takesScreenshot=true, version=13.0.1}]
+[13:15:50] jamesoram has joined #selenium
+[13:17:21] barancev: and, on the opposite, on windows nativeEvents=true always, no matter what capabilities I pass to the constructor
+[13:17:30] ner0x: Who would be the "perl binding maintainer" be?
+[13:20:15] barancev: ner0x: there is no "official" perl binding, which one do yo mean?
+[13:20:55] ner0x: barancev: I know that. How can we change that?
+[13:21:12] ner0x: There are two that come to mind Test::WWW::Selenium and Selenium::Remote::Driver
+[13:27:00] ebi has joined #selenium
+[13:27:07] sburjan has joined #selenium
+[13:30:10] cmcgraw has joined #selenium
+[13:30:24] llaskin has joined #selenium
+[13:36:07] Nari has joined #selenium
+[13:42:51] ignacio_ has joined #selenium
+[13:52:02] nirvdrum has joined #selenium
+[13:52:42] aweiteka has joined #selenium
+[13:54:03] mreedell has joined #selenium
+[13:55:18] Shakyj has joined #selenium
+[13:56:16] wez has joined #selenium
+[IRC logfile - Started Wed Oct 24 14:01:45 2012]
+[14:01:45] ngriffin has joined #selenium
+[14:02:27] jab416171|Cloud has joined #selenium
+[14:10:13] CarlJokl has joined #selenium
+[14:10:47] bluescreen10 has joined #selenium
+[14:15:19] stackedsax has joined #selenium
+[14:18:32] sburjan has joined #selenium
+[14:30:38] Thelas has joined #selenium
+[14:30:52] mdgreenfield has joined #selenium
+[14:31:59] mcaddoo has joined #selenium
+[14:32:22] Thelas: I've just started with using Selenium WebDriver in Python, and for some reason am unable to use is_text_present, which I believe should be the function's name.  Is the syntax something other than "driver.is_text_present(string)"?
+[14:33:19] mdgreenfield has left #selenium
+[14:35:11] Dave_B: I'm new to WebDriver also, hopefully someone better will come along - but I thought is_text_present was Selenium 1 not WebDriver?
+[14:36:30] Dave_B: So maybe something like "assert 'my text' in driver.get_element_by_x('locator').text"
+[14:39:21] gates has joined #selenium
+[14:42:53] jimevans has joined #selenium
+[14:43:06] merrihew has joined #selenium
+[14:44:54] cgoldberg has joined #selenium
+[14:46:33] jimevans: barancev: any luck with reverting the problem-child checkin? sorry to ask, but the googlers seem to be MIA.
+[14:47:13] barancev: jimevans: I've found even worst thing to investigate
+[14:47:14] dude-x has joined #selenium
+[14:47:26] jimevans: charming.
+[14:47:29] AutomatedTester has joined #selenium
+[14:47:57] barancev: https://gist.github.com/3945806 -- this code against 2.25 release returns Capabilities [{platform=LINUX, javascriptEnabled=true, cssSelectorsEnabled=true, hasMetadata=true, handlesAlerts=true, browserName=firefox, nativeEvents=false, webdriver.remote.sessionid=1351081697660, takesScreenshot=true, version=10.0}]
+[14:48:03] brokenthumbs has joined #selenium
+[14:48:22] barancev: native events are always off, no matter what's requested
+[14:48:30] jimevans: well, that's suboptimal
+[14:48:40] barancev: in r17633 eranm fixed it (!!!)
+[14:48:44] selbot2: 03eran.mes@gmail.com 2 months ago - EranMes on behalf of EmmaSoderberg: Support for required capabilities. Required capabilities take precedence over desired capabilities. | https://code.google.com/p/selenium/source/detail?r=17633 | http://seleniumhq.org/ci.jsp?r=17633
+[14:48:56] barancev: and the problems started to be
+[14:49:19] jimevans: so has native events never worked for firefox?
+[14:49:43] Thelas: Is there any equivalent to is_text_present in WebDriver?  The element I'm trying to check for text has no id or name.
+[14:49:57] barancev: I've tried versions down to 2.18 on sauce using this script -- they are always false
+[14:50:43] barancev: when I run local FirefoxDriver I can set native events on or off, it's ok
+[14:50:55] barancev: on Windows
+[14:51:05] barancev: later I'll be able to check on LInux too
+[14:51:12] cgoldberg: Thelas, write an assertion against a WebElement's source?  or entire page source
+[14:52:15] Thelas: I can't really assert the entire page source as I know that much of it will change, I just need to make sure that specific text does show up on it.  Unless there's a way to say something like get_element_by_style, but I somehow doubt that one exists?
+[14:52:33] rbalent has joined #selenium
+[14:52:33] rbalent has joined #selenium
+[14:52:35] jimevans: Thelas: how about getting the element by css selector?
+[14:53:48] Thelas: Not entirely sure what you mean, sorry.
+[14:54:24] jimevans: can you find the element using a CSS selector? can you use the javascript document.querySelector() function to get a reference to the element?
+[14:55:15] jimevans: if the term 
+[14:55:15] jimevans: "
+[14:55:44] jimevans: Thelas: if the term "css selector" is foreign to you, it might be worth your while to research it.
+[14:56:27] Dude-X: AutomatedTester: i am new to py.test; how do I  set up py.test so that if there's an exception during a webdriver test it will call the driver to take a screenshot?
+[14:57:58] AutomatedTester: Dude-X: have a look at https://github.com/davehunt/pytest-mozwebqa
+[14:58:06] AutomatedTester: it does all the heavy lifting in there
+[14:58:20] Dude-X: okay thanks
+[IRC logfile - Started Wed Oct 24 15:00:11 2012]
+[15:00:11] barancev: jimevans: actually, I don't know what to do about 2.26 in this situation
+[15:00:26] barancev: I'd suggest to run tests for native events locally (as many browsers as possible)
+[15:00:49] barancev: and use CI results for synthetic events only
+[15:00:52] jimevans: barancev: but isn't the problem in the remote case for firefox? that reproduces locally too, right?
+[15:01:28] Thelas: jimevans: Oh, that's what you meant by css selector. Apparently I need to actually be awake to code.  The only attribute the tag has is style, will [style=color:red;font-weight:bold] even work?
+[15:01:37] barancev: jimevans: yes, on a linux VM when I run tests with RemoteWebDriver
+[15:01:52] jimevans: i'm thinking it's pretty much a blocking bug. we can't release with a crash when you switch windows if you happen to be using RemoteWebDriver.
+[15:01:58] barancev: atm I'm on another machine with no access to my virtual lab
+[15:02:25] barancev: jimevans: I can easily fix it :)
+[15:02:58] jimevans: barancev: *what* can you easily fix?
+[15:03:17] barancev: jimevans: I can fix crashes
+[15:03:33] jarib has joined #selenium
+[15:03:34] barancev: by reverting 17633
+[15:03:57] jimevans: and retain native events?
+[15:04:07] Nari has joined #selenium
+[15:04:26] barancev: jimevans: no :)
+[15:04:43] jimevans: i give up. 
+[15:04:47] jimevans: seriously. i quit.
+[15:05:06] jimevans: i'm dropping the damned bacon and leaving.
+[15:05:07] barancev: they were always off before r17633, and we could live with it
+[15:05:10] selbot2: 03eran.mes@gmail.com 2 months ago - EranMes on behalf of EmmaSoderberg: Support for required capabilities. Required capabilities take precedence over desired capabilities. | https://code.google.com/p/selenium/source/detail?r=17633 | http://seleniumhq.org/ci.jsp?r=17633
+[15:05:46] CarlJokl: Hello, it sounds like you are already in a fairly involved discussion
+[15:05:58] barancev: here is a piece of code eranm added that allowed to set native events: if (key == 'nativeEvents') {
+[15:05:59] barancev: 231    +            driver.enableNativeEvents = value;
+[15:05:59] barancev: 232    +          }
+[15:06:25] jimevans: CarlJokl: just go ahead and speak up. :)
+[15:06:28] barancev: and this code causes crashes
+[15:06:59] barancev: before this commit native evnts were off, always
+[15:07:22] barancev: so now again I don't know what is the real root cause of the crashes
+[15:07:37] barancev: and no idea how to fix it other than set native events off again
+[15:07:45] CarlJokl: I am a QA automation engineer / Developer in Test at Electronic Arts
+[15:07:57] jimevans: barancev: i get that. what we really need is someone with intimate knowledge of how the native events code is *supposed* to work on linux, and to get in here and fix it. and those people have been otherwise occupied apparently.
+[15:08:16] CarlJokl: I have been working with some initial prototyping using the Android remote control web driver.
+[15:08:22] barancev: jimevans: agree
+[15:08:31] llaskin: CarlJokl: how do you like working for EA?
+[15:08:39] CarlJokl: A little over 6 months
+[15:09:07] CarlJokl: This is my first time in a QA automation role. All my previous work has been core development
+[15:09:11] CarlJokl: Anyway
+[15:09:54] CarlJokl: I was having some issues using the Android driver. I wondered if actually getting involved in the project would help. Looking up information about that brought me to this IRC chat
+[15:10:47] jimevans: CarlJokl: getting involved in the project is a Good Thing™.
+[15:11:14] CarlJokl: I don't know what is involved. Does this involve signing a contributor agreement?
+[15:11:19] jimevans: and the android components could use some love.
+[15:11:27] jimevans: CarlJokl: yep. :cla
+[15:11:28] selbot2: http://goo.gl/qC50R
+[15:11:31] jimevans: that one.
+[15:12:05] jimevans: then check out the code, make your changes, and submit a patch.
+[15:12:13] jimevans: we use subversion as our version control system.
+[15:12:29] jimevans: people with the commit bit will review the patch, and apply it for you.
+[15:13:07] jimevans: i don't personally touch the android driver code, but there are some who do (none of them in the channel at the moment, i don't think)
+[15:15:58] CarlJokl: For the sake of the form. Is it better to use my private email or work email? I joined the Google group with one of my work email addresses.
+[15:15:59] Dave_B: Thelas: If you're still around... you could always do something like 'driver.find_element_by_css_selector("body").text' if you only care about the text being present somewhere, not interested in where. Not lovely, but might get the result you want
+[15:16:17] Thelas: Oh, that'd make sense. Thanks.
+[15:16:40] Bebe_sel has joined #selenium
+[15:16:46] Dave_B: :) np, hope it works!
+[15:17:07] mdgreenfield has joined #selenium
+[15:17:55] jimevans: CarlJokl: it doesn't matter to the project. the company might have other thoughts, so you might want to run it by them.
+[15:18:21] CarlJokl: That would make sense
+[15:18:23] jimevans: CarlJokl: you'll probably want to join the developers' list too, if you haven't already.
+[15:18:31] jimevans: (assuming you meant the users' list)
+[15:18:43] jimevans: s/list/google group/
+[15:18:47] mdgreenfield has left #selenium
+[15:23:05] rpereira_ has joined #selenium
+[15:25:49] AutomatedTester has joined #selenium
+[15:31:56] ignacio_ has joined #selenium
+[15:33:24] CarlJokl: Does anyone know how many people are actively working on the Android drivers?
+[15:36:00] jimevans: CarlJokl: less than 3? i don't know really. all of our google friends seem to be offline at the moment. there are usually two or three here in the channel on a regular basis.
+[15:41:32] Nari: hello
+[15:42:47] Nari: I come with a question on reopening browsers and how that affects cookies, can anyone indulge me? :)
+[15:43:03] jimevans: Nari: :ask
+[15:43:03] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[15:44:46] Nari: okay, got that! I want to close and reopen a browser without instantiating it again
+[15:44:48] Bebe_sel has joined #selenium
+[15:45:33] jimevans: Nari: that seems counterintuitive.
+[15:46:16] jimevans: can you rephrase that another way?
+[15:47:01] Nari: Ok, I just want to hold on to the persistent cookies without passing around profiles
+[15:47:32] Nari: I ran some tests on IE, firefox and chrome and IE for some reason, didn't lose the cookies on reinstantiating WebDriver
+[15:48:00] jimevans: Nari: that's because the IE driver is really, really dumb with respect to cookies.
+[15:48:30] jimevans: IE has no concept of a "profile" other than the global one used by the currently-logged-in user.
+[15:48:31] Nari: to rephrase, I just want to simulate how a user would close and re-open a browser to go back to the same site to find only some of his settings saved
+[15:49:03] jimevans: so IE behaves like you want it to, but firefox and chrome don't, mainly because they start with a clean profile each time.
+[15:49:31] Nari: correct, I arrived at the same conclusion, but my next task would be to find the most elegant solution to that
+[15:49:35] jimevans: would the cookies API work for you?
+[15:50:43] Nari: Can't I preserve a profile reference instead?
+[15:50:44] jimevans: there are methods off of driver.manage() in java (or the equivalent in other languages.
+[15:51:13] jimevans: i thought you didn't want to pass around profiles.
+[15:51:31] jimevans: no, you can't retain the *same* profile between instances of a browser.
+[15:51:37] Nari: Ah!
+[15:51:46] jimevans: firefox in particular will copy the profile that you specify.
+[15:51:50] Nari: well, I would rather preserve a profile than play around with cookies
+[15:51:59] Nari: for firefox, I could try using the default profile
+[15:52:10] jimevans: the reason for that is to consider the case where you want to run multiple instances of the browser running different tests.
+[15:52:31] jimevans: if both are pointing to the *same* profile, rather than a copy, you run the risk of them stepping on each other.
+[15:54:22] jimevans: so your options are to keep a template profile around which already has the cookies you're interested in (which probably defeats the purpose), or use the cookie manipulation functions.
+[15:55:05] stephend has joined #selenium
+[15:55:38] jimevans: your code may not be running multiple browser instances, so you may not care that each instance has to have its own profile, but the library can't be so blasé about it.
+[15:55:43] stackedsax has joined #selenium
+[15:56:46] Nari: I would use the cookie manipulation api, but the last time I used it, it ended up creating a duplicate cookie
+[15:57:06] jimevans: that sounds suboptimal
+[15:57:07] Nari: the only difference between the two cookies was a dot in front of the domain name
+[15:59:03] jimevans: Nari: then that's a standard vs. a non-standard cookie.
+[15:59:33] Nari: I should research that
+[IRC logfile - Started Wed Oct 24 16:00:58 2012]
+[16:00:58] Nari: jimevans, pardon the digression - I ran some tests on IE10 and since I've run into you, would you mind me asking if anything has improved?
+[16:01:04] Nari: to me it felt just like IE9
+[16:02:02] jimevans: define "improved". in the browser itself? in the IE driver? 
+[16:02:51] Nari has joined #selenium
+[16:03:01] Nari: sorry, connection dropped
+[16:03:38] jimevans: so as i was saying, what do you mean by "improved"? in IE itself? in the IE driver? what?
+[16:04:51] Nari: in IE itself
+[16:06:23] jimevans: Nari: i wouldn't know, to be honest. i don't work for microsoft anymore, so i don't know what's been improved, other than what they publicly claim has been improved.
+[16:09:47] DaveIngram has joined #selenium
+[16:15:54] Nari: well, I meant changes in IE that made writing the driverserver easier for you, but I guess there isn't any. And for my reopening issue, I think I'd go with what you suggested - holding on to the persistent cookies and adding them, thanks!
+[16:16:14] Nari: that would make*
+[16:16:32] lukeis has joined #selenium
+[16:17:11] jimevans: Nari: i appreciate wanting to make writing the driver easier, but since it still has to support IE 6, 7, 8, and 9, there's not much we could really take advantage of.
+[16:18:29] dregin has joined #selenium
+[16:18:49] mdgreenfield has joined #selenium
+[16:19:13] mdgreenfield has left #selenium
+[16:19:43] nhirata has joined #selenium
+[16:23:43] testingb0t1 has joined #selenium
+[16:32:55] lukeis_ has joined #selenium
+[16:33:26] jfunk has joined #selenium
+[16:37:07] jfunk has joined #selenium
+[16:37:23] lukeis has joined #selenium
+[16:39:12] lukeis has joined #selenium
+[16:43:25] SamuraiJack has joined #selenium
+[16:48:12] bfife has left #selenium
+[16:48:13] IrnoHide93 has joined #selenium
+[16:51:23] Androidnewbe has joined #selenium
+[16:53:30] mdgreenfield has joined #selenium
+[16:53:30] DaveIngram has joined #selenium
+[16:53:38] Shakyj has joined #selenium
+[16:53:38] bluescreen10 has joined #selenium
+[16:53:42] Dude-X_ has joined #selenium
+[16:54:28] Androidnewbe: hello
+[16:54:42] Androidnewbe: I need some help
+[16:54:46] Androidnewbe: please
+[16:54:47] mdgreenfield has left #selenium
+[16:54:51] Androidnewbe: is anyone here ?
+[16:55:07] stephend: just us chickens
+[16:55:23] Androidnewbe: thank god :)
+[16:55:33] bfife has joined #selenium
+[16:56:09] Androidnewbe: I have posted my problem on this tutorial it last post my name is Karol
+[16:56:13] Androidnewbe: http://deors.wordpress.com/2012/02/02/selenium-webdriver-grid-1/#comment-347
+[16:56:31] Androidnewbe: if someone could have a look it wold be great
+[16:56:42] Androidnewbe: its probably siple thing to fix
+[16:57:20] bfife: dosen't show up
+[16:57:30] bfife: maybe the comment is pending ?
+[16:57:48] Androidnewbe: oh yest exactly
+[16:57:53] Androidnewbe: ok ill post it here
+[16:58:23] Androidnewbe: I have some problems, I have my hub node on windows 7 which is installed on virtual machine (Desktop Parallels) on Mac, now on Mac I have IE,FF,Chrome,Safari and Opera
+[16:58:32] teodosia_sel has left #selenium
+[16:58:45] Androidnewbe: when I register the Mac node with the hub on windows it does work but the hub displays the always the default browsers and I cannot test against safari and opera, even if I specify in my json config file that I want one FireFox it still shows the default 5 firefoxes, 5 chromes and 1 IE.
+[16:59:15] Androidnewbe: Any idea what might be the reason ?
+[16:59:17] jleyba has joined #selenium
+[16:59:29] Androidnewbe: My command line to set up the mac done is:
+[16:59:39] Androidnewbe: java -jar selenium-server-standalone-2.25.0.jar -role node -hub http://xx.xx.xx.xxx:4444/grid/register\ -nodeConfig nodeConfig.txt
+[16:59:54] Androidnewbe: f I set up another node on windows and modify the above config to ron only one instance of Firefox, the change is reflected in the hub console but no changes applied on the mac node are reflected. I have no idea why.
+[IRC logfile - Started Wed Oct 24 17:00:49 2012]
+[17:00:49] Androidnewbe: maybe it is to do with the environmental variables on Mac ?
+[17:00:59] Androidnewbe: it's really wierd
+[17:01:00] bfife: can you specify browsers with -browser instead?
+[17:01:07] bfife: would that work?
+[17:01:11] Androidnewbe: still the same problem
+[17:01:16] Androidnewbe: i tired
+[17:01:20] alexglow has joined #selenium
+[17:01:21] Androidnewbe: tried
+[17:01:32] Androidnewbe: i hate Mac
+[17:01:43] Androidnewbe: my json confing is
+[17:02:05] Androidnewbe: oh i canno paste it here
+[17:02:14] bfife: yeah probably too long
+[17:02:18] jimevans: :gist
+[17:02:19] selbot2: Please paste >3 lines of text to https://gist.github.com
+[17:03:14] Androidnewbe: http://justpaste.it/1g8b
+[17:03:33] Androidnewbe: can you guys see that ?
+[17:04:07] Ardesco_ has joined #selenium
+[17:04:31] lukeis: Androidnewbe: is that your nodeConfig.txt ?
+[17:04:33] Androidnewbe: the strangest thing is that if I run the test on hub it will exectue test on my mac but only on ff,ie and chrome
+[17:04:39] Androidnewbe: yes
+[17:04:57] lukeis: “host”: ip,  <- is problematic
+[17:05:45] Dave_B: i think he edited out the ip
+[17:06:12] Androidnewbe: no i just add the ip in the command line
+[17:06:33] Androidnewbe: java -jar selenium-server-standalone-2.25.0.jar -role node -hub http://xx.xx.xx.xxx:4444/grid/register\ -nodeConfig nodeConfig.txt
+[17:06:58] Androidnewbe: where in xx palces i put the ip address of the hub
+[17:07:12] lukeis: that host ip is supposed to be your local host, the one you're running that command on
+[17:07:34] Androidnewbe: the one in the config file ?
+[17:07:54] lukeis: yes
+[17:08:20] Androidnewbe: so i need to put ip address of my node i there right ?
+[17:08:26] lukeis: huh… maybe not
+[17:08:37] lukeis: http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/grid/common/defaults/DefaultNode.json
+[17:09:16] Androidnewbe: lol that where i got it form in the firs place
+[17:09:35] Androidnewbe: from* first*
+[17:09:48] lukeis: ok… well, platform should be in quotes: "MAC"
+[17:10:04] pa has joined #selenium
+[17:10:23] bfife: sigh. reboot machine, webdriver scripts stop working
+[17:11:12] Androidnewbe: thanks lukeis ill try
+[17:11:37] lukeis: Androidnewbe: and why do you have a backslash at the end of your url 'register\'
+[17:13:33] Androidnewbe: beacause i type it in mac terminal and you have to do it this way because it retared
+[17:14:01] Androidnewbe: waht is how the guy does it on the tutorial postet above
+[17:14:33] AutomatedTester: barancev: have you had a chance to debug the native events issue?
+[17:15:16] barancev: AutomatedTester: have you missed our talk with jimevans?
+[17:15:25] AutomatedTester: barancev: obviously
+[17:16:00] Androidnewbe: holly crap it worked
+[17:16:06] Androidnewbe: shit
+[17:16:16] Androidnewbe: thanks lukeis
+[17:16:20] Androidnewbe: shit
+[17:16:30] barancev: AutomatedTester: in short: reverting 17633 can fix the issue, but it'll retire native events
+[17:16:31] Androidnewbe: i  spent like 2 days on this hahaha
+[17:16:42] AutomatedTester: retire?
+[17:16:46] lukeis: barancev: what if an earlier revision is what cause nativeEvents to be disabled?
+[17:16:46] jimevans: AutomatedTester: we've come to find out that native events were disabled on linux before eranm's checkin, and native events is actually broken.
+[17:17:01] AutomatedTester: oh
+[17:17:19] barancev: here is a sample script: https://gist.github.com/3945806
+[17:17:41] AutomatedTester: jimevans: so plan of action? fix or are we releasing?
+[17:17:47] lukeis: but yeah… i see that 2.25 isn't 'enabling' it by what you said…. i wonder which version may have actually had it working...
+[17:18:27] smccarthy has joined #selenium
+[17:18:27] barancev: if you run it, you can see that actual capabilities are Capabilities [{platform=LINUX, javascriptEnabled=true, cssSelectorsEnabled=true, hasMetadata=true, handlesAlerts=true, browserName=firefox, nativeEvents=false, webdriver.remote.sessionid=1351081697660, takesScreenshot=true, version=10.0}]
+[17:18:38] jimevans: lukeis: apparently, it's been broken at least as far back as 2.18, according to barancev.
+[17:18:45] lukeis: man...
+[17:18:58] lukeis: what about on windows?
+[17:19:03] jimevans: barancev: is that accurate?
+[17:19:14] Dude-X: i don't think that's true, i've tested native events in linux using 2.23, 2.24, 2.25
+[17:19:27] lukeis: Dude-X: are you *sure* it's enabled? :)
+[17:19:43] jimevans: Dude-X: have you checked the capabilities you've gotten back from the driver to make sure it's *really* enabled?
+[17:19:46] barancev: Dude-X: via FirefoxDriver or RemoteWebDriver?
+[17:20:37] jimevans: oh, right. this issue only manifests itself via RemoteWebDriver, right?
+[17:20:42] Dude-X: FirefoxDriver, java, I've observed tests are twice as slow; drag and drop events look better with Native events when i'm looking at Firefox. Click events work consistently on CSS :hover things
+[17:20:42] bfife: were there any webdriver chats at GTAC 2012 that might have been recorded and floating around anywhere?
+[17:21:00] bfife: just watched the 2011 one with the fire alarm.
+[17:21:05] AutomatedTester: bfife: there was no GTAC 2012
+[17:21:59] bfife: guess that would do it.
+[17:22:28] barancev: let me make some additional experiments on my Linux VM, in a couple of hours I hope to provide more info on the issue
+[17:22:35] stackedsax has joined #selenium
+[17:22:36] JackDandy has joined #selenium
+[17:22:38] JackDandy has joined #selenium
+[17:24:03] Dude-X: so it's native events via RemoteDriver that is broken?
+[17:25:45] barancev: at least on sauce, yes
+[17:26:11] Androidnewbe: does Grid 2 support Safari ?
+[17:26:33] Androidnewbe: i cannot see it on my hub console
+[17:28:27] lukeis: barancev: I can't find any version that using RWD that returns a capabilities saying nativeEvents: True on linux… went back to 2.0.0
+[17:28:44] barancev: lukeis: so bad
+[17:28:50] JackDandy has joined #selenium
+[17:28:51] JackDandy has joined #selenium
+[17:29:13] barancev: our CI was lying to us
+[17:29:18] Spanktar has joined #selenium
+[17:31:20] cgoldberg has joined #selenium
+[17:32:47] ner0x: barancev: Did you happen to see my question about a maintained perl binding?
+[17:34:11] barancev: ner0x: do you want to be a maintainer? or is it a rhetorical question? :)
+[17:34:26] sfbrian has joined #selenium
+[17:34:42] ner0x: barancev: I was considering offering my services depending on what it entails, yes.
+[17:34:47] sassda has joined #selenium
+[17:34:55] jleyba: ner0x: we're not going to add perl bindings to the webdriver project.
+[17:35:17] ner0x: jleyba: And why not?
+[17:35:19] testobsessed has joined #selenium
+[17:35:34] Androidnewbe: so do you guys know if version 2 works with safari ?
+[17:35:55] Androidnewbe: i have just run it but seemd like the brawser disapeard
+[17:36:10] jleyba: ner0x: it's not necessary, adds bloat to the project, belongs in a sub-project, there are sub-projects for it already, and SSS
+[17:36:16] jleyba: where SSS = "Simon Said So"
+[17:36:17] awilson820 has joined #selenium
+[17:36:34] barancev: jleyba: only the last point couns :)
+[17:36:46] testobsessed has left #selenium
+[17:37:01] ner0x: jleyba: SSS?
+[17:37:31] jleyba: barancev: I'd love for more stuff to be moved into sub-projects.
+[17:37:41] jleyba: *cough* IDE *cough*
+[17:38:51] AutomatedTester: jleyba: thats a nasty cough you have there
+[17:38:53] AutomatedTester: you ok?
+[17:38:54] ner0x: jleyba: Maybe not in the main project. But an "official" perl binding is more along the lines of what I meant.
+[17:39:37] Androidnewbe: is it possible to stop pop up blocking fomr the test script ?
+[17:40:21] awilson820 has left #selenium
+[17:40:35] barancev: I'd prefer "certified" instead of "official" -- we need a sort of test set that a subproject should implement and pass to be "certified"
+[17:40:59] ner0x: barancev++ # precisely.
+[17:41:26] ner0x: Either way, I'll volunteer my services for the perl version of such a binding.
+[17:43:34] barancev: ok, I run a test on my local Linux VM -- it can set native events on or off (via RemoteWebDriver, from a windows host machine)
+[17:43:45] lukeis: hey jleyba are you aware of any testing abilities for Chrome on Android? or do you guys just manually test that?
+[17:44:23] barancev: so the question now is: why sauce don't set native events on?
+[17:44:38] jarib: lukeis: the new chromedriver will probably address that eventually
+[17:44:48] jarib: (from reading the design doc)
+[17:45:06] lukeis: via simulator?
+[17:45:24] lukeis: or embedded on a device?
+[17:45:56] jarib: i guess "all of the above" since it's using the remote debugger
+[17:46:23] *jarib is guessing
+[17:46:27] lukeis: :)
+[17:47:14] jarib: but i'd be very surprised if that's not what's about to happen.
+[17:48:15] jleyba: lukeis: What do you mean testing abilities?
+[17:48:37] lukeis: like run selenium or any automation framework against it
+[17:48:52] jleyba: no, it's not possible
+[17:49:15] lukeis: *yay*
+[17:49:56] ner0x: jleyba: Do you have a suggest in regards to the certification, etc.
+[17:50:59] jleyba: ner0x: implement a client that uses our protocol and implement our test suite.  if you can pass the test suite using the Selenium server, then you're considered compliant
+[17:51:20] jleyba: lukeis: It won't always be like that
+[17:51:49] lukeis: the future chromedriver? like jarib is guessing?
+[17:52:22] ner0x: jleyba: Two exist currently. Any docs on the difference between RC and WebDriver ?
+[17:52:58] jleyba: ner0x: forget RC, it's been marked for death (Selenium 3.0 will officially deprecate it)
+[17:53:22] jleyba: That, and no one ever touches it anymore unless they absolutely have to
+[17:53:47] jleyba: ner0x: http://code.google.com/p/selenium/wiki/JsonWireProtocol
+[17:54:16] ner0x: jleyba: Not for myself. I just want to learn the difference in order to tell if the perl bindings need a rewrite/are deprecated.
+[17:54:47] ner0x: I figure the more I learn, the better suited I am for implementing your test suite.
+[17:56:56] smccarthy has joined #selenium
+[IRC logfile - Started Wed Oct 24 18:03:53 2012]
+[18:03:53] barancev: so, now, after 17633 we can set native events on or off, it's fixed
+[18:04:01] adamgoucher has joined #selenium
+[18:04:30] barancev: ant the only question is: why it causes browser to gracefully quit when you close a window?
+[18:05:04] barancev: we don't need to revert 17633, we need to fix this window-related issue
+[18:05:47] barancev: that can be reproduced only 1) on Linux, 2) when you run tests remotely
+[18:08:11] ner0x: jleyba: Where can I find your test suite?
+[18:08:41] jleyba: ner0x: http://selenium.googlecode.com/svn/trunk/java/client/test/org/openqa/selenium/
+[18:09:38] aweiteka has joined #selenium
+[18:09:48] aivaturi has joined #selenium
+[18:09:52] ner0x: jleyba: Going to take a bit to figure all that out.
+[18:10:05] ner0x: Does anyone know the docs I was talking about? The one that compares RC vs WebDriver.
+[18:19:58] jimevans: barancev: but it sounds like we have another issue as well, and that's the native events tests for firefox are failing on windows too.
+[18:20:55] Swadq has joined #selenium
+[18:32:26] cgoldberg has joined #selenium
+[18:34:00] admc has joined #selenium
+[18:37:44] jibay_ has joined #selenium
+[18:40:03] smccarthy2 has joined #selenium
+[18:42:25] smccarthy has joined #selenium
+[18:43:43] barancev: well, I've found which line of code causes browser crash
+[18:44:22] barancev: it's function notifyOfSwitchToWindow, http://code.google.com/p/selenium/source/browse/trunk/javascript/firefox-driver/js/utils.js#100
+[18:46:07] barancev: what's this function doing?
+[18:48:23] stackedsax has joined #selenium
+[18:49:01] djdevin has joined #selenium
+[18:49:59] Dude-X: anyone know if Facebook has test accounts to test FB authentication?
+[18:50:11] Dude-X: 3rd party site registration
+[18:50:42] AutomatedTester: Dude-X: they have way to get up test accounts
+[18:51:08] AutomatedTester: barancev: its getting the native events in http://code.google.com/p/selenium/source/browse/trunk/javascript/firefox-driver/js/utils.js#209
+[18:51:15] AutomatedTester: and then trying to call a method on there
+[18:51:24] Dude-X: AutomatedTester:  good to know I'll check it out then
+[18:52:14] barancev: AutomatedTester: yes, it's what was the question about -- what it is doing in C code?
+[18:52:23] *barancev is trying to find it now
+[18:52:28] AutomatedTester: barancev: ahh
+[18:55:27] barancev: what bad can happen if I comment out this function?
+[18:55:56] jfunk has joined #selenium
+[18:56:09] santiycr has joined #selenium
+[18:56:15] barancev: it's a notification to x_ignore_nofocus
+[18:59:22] lukeis: the window might not get focus? … so working with the window will end up having issues if it's not in focus?
+[IRC logfile - Started Wed Oct 24 19:00:12 2012]
+[19:00:12] lukeis: (better than a crash)
+[19:01:19] lukeis: and I love that this is linux only ;) http://code.google.com/p/selenium/source/browse/trunk/cpp/webdriver-firefox/native_events.cpp#69
+[19:01:37] aweiteka has joined #selenium
+[19:03:19] ignacio_ has joined #selenium
+[19:08:59] jarib: is this the last blocker? perhaps ping eran by email?
+[19:09:12] jarib: now that we have more detail.
+[19:09:14] jarib: barancev: ^
+[19:10:07] barancev: may be it's not the last one, because windows tests on CI are not green too
+[19:11:49] awilson820 has joined #selenium
+[19:15:25] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Function notifyOfSwitchToWindow is commented out (temporarily?) because it quits the browser unexpectedly. | https://code.google.com/p/selenium/source/detail?r=17998 | http://seleniumhq.org/ci.jsp?r=17998
+[19:15:44] barancev: let's look at this fix first
+[19:16:06] barancev: and then to Windows
+[19:20:11] djdevin has left #selenium
+[19:21:27] barancev: IE6 fails due to "persistant hover issue"
+[19:21:54] barancev: as well as IE7
+[19:23:37] barancev: and IE8, ans IE9
+[19:23:54] barancev: jarib: let's @Ignore this test in IE? ^^^
+[19:24:26] barancev: santiycr: how is FF16 on sauce?
+[19:26:33] jimevans: barancev: the IE test was added by eranm when he introduced the capability to make the persistent hover function configurable. it has never passed to my knowledge.
+[19:27:26] santiycr: barancev:  ready to use :)
+[19:27:29] santiycr: as well as FF17
+[19:27:57] barancev: ok, I'll reconfigure CI soon
+[19:30:25] selbot2: 03barancev less than 10 seconds ago - AlexeiBarantsev: Run "persistent hovering" test in local environment only. | https://code.google.com/p/selenium/source/detail?r=17999 | http://seleniumhq.org/ci.jsp?r=17999
+[19:48:11] detronizator has joined #selenium
+[19:51:21] jimevans: detronizator: hey mate. how's it going?
+[19:52:19] pa has joined #selenium
+[IRC logfile - Started Wed Oct 24 20:08:58 2012]
+[20:08:58] jcarr has joined #selenium
+[20:09:49] dekroning has joined #selenium
+[20:11:40] Ardesco has joined #selenium
+[20:18:53] barancev: why syntho tests are failing? no signs of failures in the raw log
+[20:19:18] barancev: santiycr: why these jobs are marked failed?
+[20:19:49] santiycr: barancev:  which jobs?
+[20:19:52] santiycr: have a link?
+[20:20:03] barancev: http://ci.seleniumhq.org:8080/job/Firefox%2010%20Linux%20Synthesized%20Java%20Tests/1361/testReport/junit/org.openqa.selenium/PartialLinkTextMatchTest/testDriverCanGetLinkByLinkTestIgnoringTrailingWhitespace/
+[20:20:17] barancev: https://saucelabs.com/jobs/2e4a5b819d7142368e2f98ac998d53e1
+[20:20:43] barancev: what "Command duration or timeout: 221 milliseconds" means?
+[20:20:48] santiycr: that stdout is kind of confusing 
+[20:21:19] santiycr: Error - Test did not see a new command for 180 seconds. Timing out.
+[20:21:24] santiycr: that's what sauce says
+[20:21:51] santiycr: which means, "you never sent us a driver.quit request, we'll stop this session so that we don't over-bill you"
+[20:22:58] santiycr: barancev:  where do you see the "Command duration or timeout: 221 milliseconds" message?
+[20:23:13] barancev: santiycr: http://ci.seleniumhq.org:8080/job/Firefox%2010%20Linux%20Synthesized%20Java%20Tests/1361/testReport/junit/org.openqa.selenium/PartialLinkTextMatchTest/testDriverCanGetLinkByLinkTestIgnoringTrailingWhitespace/
+[20:23:40] santiycr: oh, I see
+[20:23:47] santiycr: that part may come from selenium's 
+[20:24:07] santiycr: ok, so here's my read of what happened:
+[20:24:27] santiycr: Sauce Labs gave up on this session, because no new commands happened in 180 seconds
+[20:24:44] santiycr: then the test came back from the dead and started sending further commands 
+[20:25:05] santiycr: though at that point, Sauce Labs had already given up and killed the session
+[20:25:09] rtyler has joined #selenium
+[20:25:26] santiycr: to address this, there's two options:
+[20:25:46] santiycr: increase the amount of time that Sauce Labs will wait for new commands before deciding something went wrong on the client side
+[20:26:03] santiycr: or just figure out what the client side is not sending new commands in over 180 seconds
+[20:26:08] rtyler: I'm trying to figure out who I was talking to in here about helping with the FOSDEM dev room
+[20:26:12] *rtyler leers around
+[20:26:24] santiycr: the first option is easier, though the second one seems like a better approach 
+[20:26:39] santiycr: rtyler:  I'd be happy to help
+[20:26:46] rtyler: santiycr: are you going to FOSDEM?
+[20:26:56] santiycr: nope, can we fix that? ;)
+[20:27:37] santiycr: oh, EM stands for European Meeting
+[20:27:39] santiycr: nvm
+[20:27:41] rpereira_ has joined #selenium
+[20:27:41] santiycr: :P
+[20:28:48] santiycr: barancev: is there a chance the tests are stuck doing some I/O between sending more commands to Sauce??
+[20:29:27] barancev: I don't know, but I see you're right
+[20:29:29] santiycr: barancev:  or maybe the box is hitting a resource limit? (CPU, Bandwidth)
+[20:29:54] barancev: Oct 24, 2012 6:55:35 PM org.openqa.selenium.remote.RemoteWebDriver log
+[20:29:54] barancev: INFO: Executing: getAvailableLogTypes [2e4a5b819d7142368e2f98ac998d53e1, getAvailableLogTypes {}]
+[20:29:55] santiycr: an easy answer is to just make sauce wait longer
+[20:29:58] barancev: and then
+[20:30:15] barancev: Oct 24, 2012 6:58:50 PM org.openqa.selenium.remote.RemoteWebDriver log
+[20:30:15] barancev: INFO: Executing: get [2e4a5b819d7142368e2f98ac998d53e1, get {"url":"http://a.22.ci.seleniumhq.org:2310/common/simpleTest.html"}]
+[20:30:22] santiycr: wow, 3 minutes
+[20:30:24] santiycr: WTF
+[20:30:26] barancev: yes
+[20:30:37] barancev: what was between these two commands???
+[20:30:57] santiycr: has dawagner been hanging out here lately?
+[20:31:02] santiycr: :seen dawagner
+[20:31:02] selbot2: dawagner was last seen 1 day ago, quitting.
+[20:31:05] barancev: some long operation? deadlock? blocking>
+[20:32:00] santiycr: well, you know what, we can just change the "idle-timeout" capability for sauce to wait longer
+[20:32:15] santiycr: whatever it takes to get a blue build right now is acceptable for me
+[20:32:16] barancev: no, I
+[20:32:23] santiycr: you're investigating?
+[20:32:41] barancev: I'll try to understant what's there timeots are
+[20:32:54] rtyler: santiycr: are you not allowed to come to europe?
+[20:32:56] rtyler: too cold? :)
+[20:33:55] testobsessed has joined #selenium
+[20:36:10] testobsessed has left #selenium
+[20:36:14] rtyler: there was some guy that hugs introduced me to, but I've forgotten his name
+[20:42:59] adamgoucher has joined #selenium
+[20:45:40] Dude-X: has anyone found differences of IE9 between Vista and Windows 7?
+[20:45:51] Dude-X: as far as websites are rendered?
+[20:52:06] adamgoucher has joined #selenium
+[20:52:33] llaskin: so a company came claling via the selenium-dev list....they are in NY...with a local office...I've already crushed their QA test, but it seems that they want someone in NY...and i'm not moving:(
+[20:52:37] llaskin: oh well
+[20:53:25] Dude-X: what company is this in NY?
+[20:57:14] Dude-X: llaskin: ^
+[20:57:34] llaskin: pm Dude.
+[20:57:38] jimevans: llaskin: was it yodle by chance?
+[20:57:41] llaskin: hahahaha
+[20:57:43] llaskin: yes.
+[20:57:59] llaskin: did she mail merge everyone on the devs list jim?
+[20:58:37] jimevans: they've got a recruiter who's being a little less-than-selective in looking for people.
+[20:58:52] jimevans: i doubt it was *everyone* on the dev list.
+[20:59:16] llaskin: i crushed their QA test...it was "can you use firebug" for the most part...
+[20:59:34] llaskin: the last piece of it will take me a few min to come up with the solution...but given enough time I can def do it:)
+[IRC logfile - Started Wed Oct 24 21:00:26 2012]
+[21:00:26] Dude-X: was it a recruiter?
+[21:00:31] llaskin: yea
+[21:00:35] llaskin: but they have a test on their website
+[21:01:01] santiycr: rtyler: spent almost a month there in 2012 for conferences, something tells me it won't happen again at least for 6 months
+[21:01:48] llaskin: santiycr: come back to beantown
+[21:02:16] santiycr: llaskin:  that will definitely happen 
+[21:04:41] admc has joined #selenium
+[21:05:54] alexglow has joined #selenium
+[21:06:04] ignacio_ has joined #selenium
+[21:06:12] AutomatedTester: llaskin: I found they emailed people who have committed lately
+[21:06:37] AutomatedTester: the yodle people
+[21:07:20] llaskin: i haven't committed in a while...
+[21:10:33] llaskin: i should probably get around to that when I get a few free minutes at work
+[21:12:51] Zack has joined #selenium
+[21:13:18] rtyler: AutomatedTester: were you the one I was talking with about FOSDEM
+[21:13:51] Zack: requesting help: sendKeys() with tinymce in firefox. 
+[21:14:01] AutomatedTester: rtyler: perhaps
+[21:14:15] AutomatedTester: rtyler: unfortunately I cant make FOSDEM next year :/
+[21:14:30] rtyler: OH NOES
+[21:14:49] AutomatedTester: I am sure that andreastt will be there
+[21:14:50] llaskin: Zack, :ask your questions
+[21:14:50] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[21:15:13] barancev: ok, IE tests are green now
+[21:15:14] AutomatedTester: and there will be other Mozillians
+[21:15:33] Zack: @llaskin I am able to locate the iframe, I switch my driver to iframe.  I then enter the tinymce textbox (shows blinking cursor) but will not send keys
+[21:15:40] rtyler: AutomatedTester: I was hoping to find some Selenium community folks to help me run the Teting and Automation devroom :)
+[21:17:10] nirvdrum has joined #selenium
+[21:18:30] selbot2: 03barancev less than 20 seconds ago - AlexeiBarantsev: Commenting out notifyOfCloseWindow too. | https://code.google.com/p/selenium/source/detail?r=18000 | http://seleniumhq.org/ci.jsp?r=18000
+[21:19:05] jimevans: i'll be back on in a couple of hours.
+[21:19:07] jimevans has left #selenium
+[21:20:58] barancev: santiycr: have you upgraded chrome or chromedriver recently?
+[21:22:12] barancev: chrome linux test started to fail since Oct 19, chrome windows tests started to fail today
+[21:22:34] barancev: with similar simptoms (alerts handling)
+[21:24:03] mdgreenfield1 has joined #selenium
+[21:27:35] llaskin: Zack can u provide an html snippet of your page?  and perhaps some of your code?  :gist
+[21:27:36] selbot2: Please paste >3 lines of text to https://gist.github.com
+[21:27:39] Ardesco has joined #selenium
+[21:29:25] barancev: so 2hr timeouts are caused by some other thing, ok
+[21:29:47] barancev: hey, it was commit 18000!
+[21:29:59] mdgreenfield1 has left #selenium
+[21:30:07] barancev: it should be lucky
+[21:31:41] bfife: gg
+[21:31:45] llaskin1 has joined #selenium
+[21:34:52] Dude-X: AutomatedTester: apparently firefox 16 has a useful feature to validate email addresses when you use html5 tags
+[21:35:16] Dude-X: how can i disable that so that i can  test functionality
+[21:35:19] KaibutsuX: i thought all html5 input type=email supported that>?
+[21:35:33] Dude-X: safari doesn't 
+[21:35:38] *Dude-X checks chrome
+[21:35:50] KaibutsuX: execute_script(type=text)?
+[21:36:28] Dude-X: ah disable it via javascript
+[21:36:33] Dude-X: that's an easy way
+[21:37:27] KaibutsuX: oh you wanted the hard way? ;)
+[21:37:31] AutomatedTester: Dude-X: why do you want to disable it?
+[21:37:50] Dude-X: i want to test functionality of entering invalid email
+[21:38:11] Dude-X: i enter invalid email and then click 'submit'
+[21:38:27] Dude-X: but Chrome and FF intervene. Which is cool, but it's not webdrive-able
+[21:38:58] Dude-X: it's okay if i click submit on blank email though
+[21:39:00] AutomatedTester: Dude-X: do you need a browser for that test?
+[21:39:29] Dude-X: i'm testing that the page says "Please enter a valid email" in the error div of that page
+[21:39:36] detronizator: :note jimevans just saw your message - I was having dinner :)
+[21:39:37] selbot2: ok!
+[21:39:57] Dude-X: on the other hand, we are targeting html5 browsers so maybe i don't need to test that explcitly
+[21:40:01] KaibutsuX: Dude-X, you have js checking the email format in addition to the input type=email?
+[21:40:40] AutomatedTester: KaibutsuX: HTML5 elements check it for you
+[21:40:48] AutomatedTester: so the browser does the validation
+[21:40:59] KaibutsuX: AutomatedTester: I know, thats why it sounded like he was trying to double test
+[21:41:04] Dude-X: KaibutsuX: apparently the submit js does validate the email
+[21:41:28] Dude-X: and it then displays a message at the bottom of the form to please enter a valid email
+[21:41:36] KaibutsuX: if you have an html5 input then assuming the browser isn't broken, you would never get your own custom message in that div
+[21:42:32] Dude-X: but i want to be thorough
+[21:43:28] bfife: anyone know what revision 2.25 was cut from off-hand?
+[21:43:34] Zack: @llaskin1 https://gist.github.com/3948815
+[21:43:46] KaibutsuX: Dude-X: driver.get('url?email=bullshit')
+[21:43:49] KaibutsuX:  :)
+[21:44:07] Dude-X: nah that would go into the webservice/unit tests
+[21:54:32] santiycr: barancev:  we have indeed upgraded chrome in our boxes
+[IRC logfile - Started Wed Oct 24 22:03:38 2012]
+[22:03:38] barancev: santiycr: so you broke two tests :)
+[22:04:13] santiycr: lol
+[22:04:14] barancev: I guess they should be broken locally too
+[22:04:16] santiycr: sorry about that
+[22:04:27] barancev: need to run test_chrome
+[22:04:44] santiycr: the browser version installed in our boxes now is:
+[22:05:11] Dude-X: so the website i'm testing, it has jquery 1.7 and when i try to do a simple execute_script('return $('#parent');") the command doesn't return to the REPL at all
+[22:05:43] santiycr: Win 7: 22.0.1229.94
+[22:05:52] santiycr: Win XP: 22.0.1229.94
+[22:06:02] santiycr: Win 8: 21.0.1180.89
+[22:06:11] santiycr: Linux: 22.0.1229.94
+[22:06:27] santiycr: we'll probably upgrade Win 8 within the next few weeks
+[22:08:03] barancev: santiycr: I think you should know that it's impossible to run Firefox tests with enabled native events on sauce :)
+[22:08:14] Zack: @llaskin1 I figured it out Thanks anyways
+[22:08:34] santiycr: barancev: how did that happen?
+[22:09:31] barancev: try to create a browser, request native events and call getCapabilities
+[22:09:35] santiycr: we have native events running on sauce with every selenium outthere
+[22:09:36] barancev: https://gist.github.com/3945806 -- here is a sample
+[22:10:16] barancev: I mean FF on linux with native events on
+[22:10:31] santiycr: oh, linux one
+[22:10:35] barancev: it was a selenium bug :)
+[22:10:47] santiycr: wow
+[22:11:00] barancev: that was fixed by eranm and this broke our CI
+[22:11:00] santiycr: maybe FF10 doesn't support native events with Se 2.25.0?
+[22:11:05] Zack has left #selenium
+[22:11:07] santiycr: I see
+[22:11:10] santiycr: darn
+[22:11:25] santiycr: could this be connected to the fact that we don't have a window manager running on our linux boxes?
+[22:11:35] barancev: no
+[22:11:54] santiycr: does this work just fine locally?
+[22:11:56] barancev: I think no, may be it is connected
+[22:12:00] santiycr: linux + firefox + native events
+[22:12:13] barancev: it is true always when you run tests on linux remotely
+[22:12:26] barancev: locally with FirefoxDriver all is ok
+[22:12:46] barancev: remotely native events can't be activated
+[22:13:19] barancev: this will be fixed in 2.26
+[22:13:51] barancev: time to go
+[22:14:10] santiycr: barancev|NotHere:  thanks for getting to the bottom of this
+[22:17:51] stackedsax has joined #selenium
+[22:18:37] Dude-X: if there's a javascript error on the page, does that block execute_script('return expr' ) from completing?
+[22:31:58] Ardesco has joined #selenium
+[22:48:51] jleyba: Dude-X: I think that depends on the browser
+[22:59:45] JackDandy has joined #selenium
+[22:59:45] JackDandy has joined #selenium
+[IRC logfile - Started Wed Oct 24 23:06:50 2012]
+[23:06:50] mdgreenfield has joined #selenium
+[23:09:01] AutomatedTester has joined #selenium
+[23:37:12] rbalent has joined #selenium
+[23:37:12] rbalent has joined #selenium
+[23:44:58] icio has joined #selenium
+[23:56:30] ooo has joined #selenium

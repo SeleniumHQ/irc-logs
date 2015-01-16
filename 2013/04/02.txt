@@ -1,0 +1,650 @@
+[IRC logfile - Started Tue Apr  2 10:33:50 2013]
+[IRC logfile - Started Tue Apr  2 10:34:59 2013]
+[10:35:09] selloggingbot has joined #selenium
+[10:35:13] dawagner: Hi selloggingbot :)
+[10:39:03] girija: how can we set proxy for safari ?
+[10:39:11] girija: of type pac
+[10:41:10] Bebe_sel has joined #selenium
+[10:52:03] seesusi has joined #selenium
+[10:55:24] AutomatedTester: :cla
+[10:55:24] selbot2: http://goo.gl/qC50R
+[IRC logfile - Started Tue Apr  2 11:07:47 2013]
+[11:07:47] liberus has joined #selenium
+[11:08:42] sburjan has joined #selenium
+[11:10:28] itatitat has joined #selenium
+[11:11:21] Wessix has joined #selenium
+[11:12:30] simonstewart has joined #selenium
+[11:12:31] selbot2: simonstewart: note from AutomatedTester 4 days ago: why do we build up location of element using offset* calls? Is it because we needed to support firefox 2? 
+[11:13:00] simonstewart: AutomatedTester: the original location code was derived from Core, so probably
+[11:13:25] AutomatedTester: simonstewart: ok, going to rip it out and do The Right Thing™
+[11:13:36] simonstewart: Without breaking things :)
+[11:13:41] AutomatedTester: simonstewart: which gives us nice CSS3 location support
+[11:13:53] AutomatedTester: I made the change locally and all tests pass
+[11:13:59] simonstewart: If you're modifying the atoms, please check IE6 too
+[11:14:22] AutomatedTester: support in IE was there from 4 for what I want to do
+[11:14:28] AutomatedTester: so its all good :)
+[11:14:36] AutomatedTester: its Firefox that was slow to the game
+[11:14:50] simonstewart: Then please make sure there are no further regressions in the IE 6 continuous build :)
+[11:15:34] AutomatedTester: ok, will raise marionette bugs, since its ported code and then get cracking
+[11:15:39] simonstewart: Ta
+[11:16:37] AutomatedTester: simonstewart: jimevans apparently got native events working via nsIDOMWindowUtils, according to a message he left me
+[11:16:50] AutomatedTester: but wanted to chat with him about it first
+[11:16:51] simonstewart: Nice. 
+[11:16:58] simonstewart: He pinged me on twitter about it too
+[11:17:26] AutomatedTester: I got click() doing native on FirefoxOS
+[11:17:34] simonstewart: native native?
+[11:17:36] AutomatedTester: touch, as to be expected, doesnt work properly
+[11:17:50] AutomatedTester: the event queue actions it as though its native
+[11:17:52] simonstewart: Of course not
+[11:17:58] simonstewart: I had a look at the TouchActions recently
+[11:18:04] simonstewart: Cripes, they're hard to use
+[11:18:26] AutomatedTester: Malini has first draft of her addition to the spec
+[11:18:31] AutomatedTester: I need my red pen and to read it
+[11:18:34] simonstewart: Nice. Will be happy to review
+[11:18:55] AutomatedTester: but yes, touch is a nightmare
+[11:19:14] simonstewart: It is, as you say, a nightmare
+[11:19:20] simonstewart: But the TouchActions are just plain hard to use
+[11:19:33] simonstewart: I wanted to drag a UI element 100 px to the right
+[11:19:40] simonstewart: Turned out to be a real dog to do
+[11:19:41] AutomatedTester: Patrick Lauche, ex-Opera dev rel, is currently writing a blog post about how each device/OS works with touch atm
+[11:20:05] AutomatedTester: Lauke... I cant remember how to spell surname
+[11:20:19] AutomatedTester: he is mates with Bruce Lawson
+[11:20:41] simonstewart: Bruce is a top chap
+[11:20:59] AutomatedTester: he is... and a very angry man...
+[11:21:06] AutomatedTester: makes you look cheerful :)
+[11:21:38] andreastt: AutomatedTester: Lauke.
+[11:21:50] AutomatedTester: thats him
+[11:22:10] andreastt: According to the almighty intranet, his middle name is Herbert.
+[11:22:10] AutomatedTester: He is writing it for Robert Nyman so assume its going on Hacks.mozilla.org
+[11:22:13] andreastt: Don't tease him (=
+[11:22:38] AutomatedTester: andreastt: he is a top chap, chatted to him, via twitter all about touch
+[11:22:41] andreastt: He is.
+[11:22:42] AutomatedTester: and about ARIA
+[11:22:54] AutomatedTester: shame Opera fired him
+[11:23:15] andreastt: Indeed.
+[11:23:38] AutomatedTester: along with all the top engineers they also let go...
+[11:23:48] rbalent has joined #selenium
+[11:24:42] AutomatedTester: right coffee then code
+[11:25:05] AutomatedTester: hawt! I got a clean thousand on bugzilla
+[11:25:14] AutomatedTester: moz#857000
+[11:25:15] selbot2: 03Nobody; OK to take it and work on it NEW/ update marionette location code to not use offset - https://bugzilla.mozilla.org/show_bug.cgi?id=857000
+[11:29:46] AutomatedTester: simonstewart: how is the presentation for GTAC coming along?
+[11:30:13] simonstewart: It's coming. I've a bunch of conferences coming up and the GTAC talk is one of the decks I need to prepare
+[11:30:23] simonstewart: The decks are similar, but each conference gets a difference focus
+[11:31:08] AutomatedTester: simonstewart: the one in london is that only for Facebook developers
+[11:31:16] AutomatedTester: or open for general public?
+[11:31:22] simonstewart: public with an invitation
+[11:31:30] simonstewart: It's anyone using the facebook mobile tech
+[11:32:06] dawagner: Hello hello everyone!
+[11:32:09] simonstewart: yo
+[11:32:28] andreastt: Ahoy
+[11:32:42] AutomatedTester: word
+[11:32:49] dawagner: Have I missed anything exciting?
+[11:33:09] simonstewart: I fixed the build for once
+[11:33:13] simonstewart: But you knew that
+[11:33:14] dawagner: Woo!
+[11:37:04] barancev: FF20 today?
+[11:38:09] phishy has joined #selenium
+[11:38:36] AutomatedTester: :google Firefox release schedule
+[11:38:37] selbot2: Releases - Mozilla Wiki: https://wiki.mozilla.org/Releases
+[11:39:52] AutomatedTester: barancev: https://wiki.mozilla.org/RapidRelease/Calendar looks like it
+[11:42:30] simonstewart: Today? I hope we work
+[11:43:50] AutomatedTester: barancev: have you run any tests on it?
+[11:44:25] itatitat has joined #selenium
+[11:44:33] barancev: not yet, extra busy on paid work
+[11:44:51] AutomatedTester: ok cool
+[11:45:25] barancev: (that is related to HtmlUnitDriver to my displeasure)
+[11:47:37] barancev: btw, I've updated selenium to HtmlUnit 2.12, with CSS3 support
+[11:47:52] simonstewart: I'd not even noticed it had been released.
+[11:47:54] simonstewart: Thank you!
+[11:48:03] *AutomatedTester grumbles about CSS3
+[11:48:14] barancev: :)
+[11:48:28] barancev: CSS3 Selectors are cool
+[11:48:42] simonstewart: :yt popcorn
+[11:48:43] selbot2: Hot Butter- Popcorn Song - http://www.youtube.com/watch?v=DBYjZTdrJlA&feature=youtube_gdata
+[11:49:17] andreastt: WindowsUtils.thisisWindows() is the old way of preventing a test from being run on Windows, yes?
+[11:49:41] simonstewart: Where's it used?
+[11:49:50] *simonstewart opens selenium in ij
+[11:50:00] andreastt: WindowsUtilsUnitTest
+[11:50:19] simonstewart: And in the launchers for RC
+[11:50:35] simonstewart: s/launchers/Locators/
+[11:50:58] simonstewart: We should probably aim to kill anything with "Utils" in the name as a matter of course
+[11:52:54] andreastt: Apart from the missing guard for Windows, does this look okay to you guys? https://github.com/SeleniumHQ/selenium/pull/10/files
+[11:53:43] simonstewart: Why not make tryKill a vararg?
+[11:53:45] simonstewart: biab
+[11:54:46] itsmikerudolph has joined #selenium
+[11:55:14] andreastt: Indeed.  The patch is from a colleague of mine.  I can fix it up.
+[IRC logfile - Started Tue Apr  2 12:12:55 2013]
+[12:12:55] AutomatedTester: bbl
+[12:16:36] jamesoram has joined #selenium
+[12:27:01] zeljkof has joined #selenium
+[12:27:34] testingb0t has joined #selenium
+[12:28:21] andreastt: So what is the process now for committing other people's patches to Selenium?
+[12:28:37] andreastt: Do I merge it in?  Does it have to be signed off?
+[12:29:22] jibay has joined #selenium
+[12:29:37] cheezy has joined #selenium
+[12:32:13] simonstewart: andreastt: sign it off, but leave them as the author
+[12:32:31] barancev: :wiki CommitterGitWorkflow#Handling_a_pull_request
+[12:32:33] selbot2: No results.
+[12:32:40] barancev: heh
+[12:32:42] barancev: https://code.google.com/p/selenium/wiki/CommitterGitWorkflow#Handling_a_pull_request
+[12:32:54] barancev: thanks to simonstewart
+[12:34:05] simonstewart: I should point out that jarib suggests https://gist.github.com/jarib/5254998
+[12:35:05] simonstewart: andreastt: I take it you're handling that WindowsUtil.kill fix, then?
+[12:35:52] andreastt: I've never signed off a patch before, what should the value be?
+[12:36:14] simonstewart: That "-s" flag does the necessary
+[12:36:17] andreastt: I used a bit of a different process for squashing the commits.  But as long as it's one commit it's alright?
+[12:36:47] andreastt: Ah right.  abc123... is the SHA.
+[12:36:57] simonstewart: One commit is right
+[12:37:03] simonstewart: On to HEAD
+[12:37:04] selbot2: 03barancev about 13 hours ago - Adding a test to search for an element by a CSS3 selector | https://code.google.com/p/selenium/source/detail?r=ef4c5e8 | http://dashboard.ci.seleniumhq.org/#/revision/ef4c5e88ec9881011ffcb166b51b76570a8208ef
+[12:37:16] simonstewart: So we have a lovely linear history that might not be chronologically sorted
+[12:37:24] andreastt: simonstewart: I usually do `git rebase -i `git merge-base HEAD origin/master` instead.
+[12:37:26] selbot2: 03barancev about 13 hours ago - Adding a test to search for an element by a CSS3 selector | https://code.google.com/p/selenium/source/detail?r=ef4c5e8 | http://dashboard.ci.seleniumhq.org/#/revision/ef4c5e88ec9881011ffcb166b51b76570a8208ef
+[12:37:48] simonstewart: I have no idea what "merge-base" does, but it looks terrifying
+[12:38:00] andreastt: It outputs the point where the branch you're on branched off.
+[12:38:41] simonstewart: clever
+[12:39:21] simonstewart has left #selenium
+[12:39:26] simonstewart has joined #selenium
+[12:39:28] andreastt: <3 git commit --amend
+[12:39:48] rbalent has joined #selenium
+[12:39:49] rbalent has joined #selenium
+[12:40:35] simonstewart: Only on my local git repo
+[12:41:27] Selenium-Git has joined #selenium
+[12:41:27] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/ST6-tQ
+[12:41:27] Selenium-Git: 13selenium/06master 14b0c2b26 15Daniel Bengtsson: WindowsUtils.kill() fix...
+[12:41:27] Selenium-Git has left #selenium
+[12:41:43] andreastt: Will the pull request on Github be clsoed automatically?
+[12:42:18] simonstewart: You have to close it through the interfacve
+[12:42:33] andreastt: I don't have access to that, can you do it?
+[12:42:42] barancev: should TestUtilities.isInternetExplorer return true for HtmlUnit in IE compatibility mode?
+[12:42:53] simonstewart: "Probably"
+[12:43:15] andreastt: simonstewart: https://github.com/SeleniumHQ/selenium/pull/10
+[12:43:17] millenium has joined #selenium
+[12:44:01] simonstewart: Yup. Just hit the "close" button when you're done. I like to tell people the git commit id and warn them that I rebased their change
+[12:44:36] andreastt: simonstewart: I don't see a close button (-:
+[12:44:43] simonstewart: I do. 
+[12:44:53] simonstewart: Want me to close it, or shall we figure out what the smeg is going on?
+[12:44:54] andreastt: I suspect I'm not a member.
+[12:45:06] andreastt: Well, danielb won't mind (-:
+[12:45:28] simonstewart: What's your github id?
+[12:45:29] barancev: simonstewart: context of my question -- we have special code for IE that breaks HtmlUnit tests: https://code.google.com/p/selenium/source/browse/java/client/test/org/openqa/selenium/WindowSwitchingTest.java#229
+[12:45:51] simonstewart: ah ha
+[12:45:53] andreastt: simonstewart: andreastt
+[12:45:55] simonstewart: Added
+[12:45:57] nirvdrum has joined #selenium
+[12:46:03] simonstewart: Reload the page and try again :)
+[12:46:09] andreastt: simonstewart: Thanks
+[12:46:17] simonstewart: NP. Thank you
+[12:46:41] simonstewart: Hmmm...
+[12:46:44] simonstewart: That looks funky
+[12:46:55] andreastt: Done.
+[12:46:56] simonstewart: Why are we not expecting the alert for IE6?
+[12:47:06] simonstewart: Looks like we should be putting in a wait for the alert to be present
+[12:47:12] simonstewart: and then handling it properly
+[12:48:05] barancev: I think that's because only IE7+ brings the alert :)
+[12:48:13] simonstewart: Gah!
+[12:48:24] davehunt has joined #selenium
+[12:49:43] simonstewart: davehunt: it's been a while since we had a selenium meetup in LON
+[12:49:54] simonstewart: Ahh…. http://gs.statcounter.com/#browser_version_partially_combined-CN-monthly-201203-201303
+[12:50:08] davehunt: simonstewart: it has, yes
+[12:50:25] davehunt: I recently had a message from someone who would like to present
+[12:50:37] simonstewart: We should think about organising one again
+[12:50:41] davehunt: simonstewart: the last one was in November iirc, and you weren't able to attend
+[12:51:09] simonstewart: According to that chart, IE6 usage in China has slimped from ~25% to ~5% in about a year
+[12:51:15] simonstewart: davehunt: I know
+[12:51:17] simonstewart: I get busy
+[12:51:26] davehunt: I tend to do them every six months or so
+[12:51:30] simonstewart: China was place propping up global IE6 usage
+[12:52:37] simonstewart: StatsCounter doesn't even register IE6 as a top 12 browser in the same time period in the uk
+[12:53:28] simonstewart: davehunt: cool
+[12:59:04] AutomatedTester: simonstewart: doesnt stats counter count GET requests from a browser?
+[12:59:12] simonstewart: It's one data source
+[12:59:22] simonstewart: I'm also looking at facebook's own metrics
+[12:59:48] AutomatedTester: the GET requests are very skewed thanks to Chromes future caching
+[12:59:57] simonstewart: Possibly
+[IRC logfile - Started Tue Apr  2 13:00:09 2013]
+[13:00:09] simonstewart: That's why I use more than one source for this sort of thing
+[13:04:47] AutomatedTester: jesus christ... are Google actively non-Chrome users lives a little sadder by not testing GMail...
+[13:05:26] AutomatedTester: or maybe since Marissa has left they dont have a decent designer anymore...
+[13:06:20] simonstewart: ?
+[13:07:17] AutomatedTester: getting screenshot
+[13:08:30] AutomatedTester: maybe its my expectation  but https://www.evernote.com/shard/s63/sh/872a26e0-083b-4123-b4d0-56fa7662123f/5034854949d7fc0c9cf0fe17d230ebdf looks awful
+[13:09:10] AutomatedTester: looks like the "Here's how" is missing something behind it
+[13:09:38] andreastt: Wow.
+[13:09:51] andreastt: from __future__ import absolute_import makes the Python import path a little more sane.
+[13:09:58] simonstewart: AutomatedTester: looked that way in chrome for me
+[13:10:05] andreastt: I can't see how I missed that.
+[13:20:17] rbalent has joined #selenium
+[13:20:17] rbalent has joined #selenium
+[13:22:48] farlan has joined #selenium
+[13:25:43] aweiteka has joined #selenium
+[13:26:26] Selenium-Git has joined #selenium
+[13:26:26] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/4LyZ8A
+[13:26:26] Selenium-Git: 13selenium/06master 142b0840b 15Simon Stewart: Use the vararg syntax rather than building an array.
+[13:26:26] Selenium-Git has left #selenium
+[13:26:47] *dawagner wonders why china has stopped using ie6
+[13:26:54] simonstewart: I wondered that too
+[13:26:58] simonstewart: I have a theory
+[13:27:06] simonstewart: Or two theories
+[13:27:25] simonstewart: 1) Too many sites started looking like ass in IE6, so they're switching en masse
+[13:27:55] simonstewart: 2) Sites within China often use toolkits as a skeleton and build from there. One of those toolkits has switched to chromeframe
+[13:29:59] barancev: 3) pirates spread win7 more than winxp :)
+[13:30:15] simonstewart: maybe, though win7 usage doesn't appear to show the same uptick
+[13:30:24] simonstewart: And it phones home a lot more than XP
+[13:30:30] simonstewart: (which is why XP is popular with pirates)
+[13:30:53] barancev: yes, and the size of the distribution package
+[13:30:55] simonstewart: (and because an XP image couldn't be updated without verifying it, IE6 tended to be the browser that was used on pirate xp)
+[13:31:24] p_l: simonstewart: I think the real reason why XP is more popular with pirates is that the dumbasses who insist on using XP because they don't understand much have to grab XP from torrents
+[13:31:50] p_l: majority of legal XP deployments came either from volume licensing, or from OEM installs
+[13:32:04] p_l: same with Vista and 7
+[13:32:45] p_l: meanwhile people were on the bandwagon of "XP good, Vista bad!" and built progressive frankensteined torrents of XP
+[13:33:23] p_l: (also, probably something crappily coded didn't work on Vista/7)
+[13:34:11] llaskin has joined #selenium
+[13:34:28] AutomatedTester: hasnt China created a fork of Chromium?
+[13:34:42] simonstewart: Maybe that too. We just don't know
+[13:35:12] nirvdrum: Send in a spy!
+[13:39:53] ddary has joined #selenium
+[13:43:02] barancev: simonstewart broke the maven build
+[13:43:07] simonstewart: Again>?
+[13:43:09] barancev: "The system is out of resources"
+[13:43:13] simonstewart: I have the skills
+[13:43:39] barancev: selenium-android-driver ........................... FAILURE
+[13:44:00] barancev: stack overflow in compiler?
+[13:44:17] simonstewart: Looks like it
+[13:44:53] barancev: seems unrelated to the last commit
+[13:45:25] simonstewart: Agreed
+[13:45:38] simonstewart: BTW, who wants the release bacon?
+[13:45:40] simonstewart: Anyone?
+[13:46:39] simonstewart: Firefox 20 is out, we should get native events working and push
+[13:46:50] simonstewart: I use "we" in the loosest possible sense
+[13:51:57] ddary has joined #selenium
+[IRC logfile - Started Tue Apr  2 14:05:10 2013]
+[14:05:10] llaskin has joined #selenium
+[14:06:42] bluescreen10 has joined #selenium
+[14:08:00] riv_ has joined #selenium
+[14:08:34] itatitat has joined #selenium
+[14:12:48] cheezy has joined #selenium
+[14:23:53] Revery has joined #selenium
+[14:24:42] qaguy has joined #selenium
+[14:33:49] cgoldberg has joined #selenium
+[14:41:29] knorrium has joined #selenium
+[14:45:38] brokenthumbs has joined #selenium
+[14:53:19] AutomatedTester: simonstewart: looks like the atoms use the right thing for element position
+[14:53:27] simonstewart: Hurrah!
+[14:53:32] AutomatedTester: its just FirefoxDriver code that is wrong
+[14:53:39] AutomatedTester: it doesnt use the atoms
+[14:53:43] AutomatedTester: well, from what I can see
+[14:53:56] simonstewart: One easy thing to do, then :)
+[14:54:12] dawagner: Woah.  Robotium are trying to change getText: https://groups.google.com/group/robotium-developers/browse_thread/thread/275300db75cc9986#
+[14:55:08] simonstewart: Ah. The "do we mean 'value' when we call 'text'" question?
+[14:55:34] dawagner: Yes
+[14:55:37] simonstewart: I thought that they were modeling after RC
+[14:55:41] simonstewart: rather than webdriver
+[14:55:44] dawagner: Looks like it, from the API
+[14:56:45] andreastt: "As expected".  Indeed.
+[14:57:11] icio has joined #selenium
+[14:57:59] simonstewart: To be fair, it is expected by some people. We get posts about that to the selenium lists on a semi-regular basis
+[14:58:48] qaguy has joined #selenium
+[14:59:10] mreedell-work has joined #selenium
+[IRC logfile - Started Tue Apr  2 15:00:23 2013]
+[15:00:23] liberus has joined #selenium
+[15:01:10] gdennis has joined #selenium
+[15:01:37] zeljkof has joined #selenium
+[15:05:25] Selenium-Git has joined #selenium
+[15:05:25] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06jruby-update at 14ecb6aa3: 02http://git.io/tqbnfQ
+[15:05:25] Selenium-Git has left #selenium
+[15:05:54] mreedell-work has joined #selenium
+[15:06:04] simonstewart: jarib: did you land the update?
+[15:07:37] barancev has joined #selenium
+[15:08:36] simonstewart: dawagner: what was the last public figure for the number of web tests run at google?
+[15:08:39] intchanter-work has joined #selenium
+[15:09:57] dawagner: I quote four million browsers per day
+[15:10:32] simonstewart: DroidCon want a CV from me. I thought I'd put that in there :)
+[15:10:40] dawagner: :P
+[15:10:56] leonardoro has joined #selenium
+[15:15:33] Selenium-Git has joined #selenium
+[15:15:33] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 3 new commits to 06master: 02http://git.io/0uiGgA
+[15:15:33] Selenium-Git: 13selenium/06master 1428b4a63 15Alexei Barantsev: Making isFirefox and isInternetExplorer return false for HtmlUnitDriver...
+[15:15:33] Selenium-Git: 13selenium/06master 14164bdc4 15Alexei Barantsev: Fixing case of "no active element" for HtmlUnitDriver
+[15:15:33] Selenium-Git: 13selenium/06master 14645bb62 15Alexei Barantsev: Ignoring some HtmlUnitDriver tests that fail in IE compatibility mode
+[15:15:33] Selenium-Git has left #selenium
+[15:16:23] wolcanus has joined #selenium
+[15:16:51] davehunt has joined #selenium
+[15:19:14] adamgoucher has joined #selenium
+[15:21:56] AutomatedTester: I do love how long it takes to get an updated tree via Git...
+[15:22:00] AutomatedTester: MOAR HISTORY PLEASE!!!
+[15:23:47] cheezy has joined #selenium
+[15:24:27] Selenium-Git has joined #selenium
+[15:24:27] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/jKJp7g
+[15:24:27] Selenium-Git: 13selenium/06master 14b208087 15AutomatedTester: switching getElementLocation to use getClientBoundingRect internally since that returns the correct value and supports CSS3 transform coord
+[15:24:27] Selenium-Git has left #selenium
+[15:31:34] Hz0_ has joined #selenium
+[15:38:33] AutomatedTester: simonstewart: can you please PM me Patrick Gansterer's email from the CLA spreadsheet
+[15:39:01] AutomatedTester: the git workflow doesnt like me and lost all the commit history on the pull command
+[15:39:22] simonstewart: Done
+[15:42:10] fatguylaughing has joined #selenium
+[15:46:47] AutomatedTester: Must. Not. Get. Angry. At. The. IDE.
+[15:47:22] simonstewart: KILL IT WITH FIRE
+[15:47:24] diminoten: I still do all my git work on the command line, I just get too nervous otherwise
+[15:47:28] intchanter-work: Or alternately, you could make it watch as you kill its family and friends, and then slowly torture it to death.
+[15:47:39] simonstewart: This just got a lot darker
+[15:47:54] AutomatedTester: Git != IDE
+[15:47:59] intchanter-work: At least I didn't bring up IDEs.  :-p
+[15:48:10] AutomatedTester: I deleted 1 file from IJ and it took 30s
+[15:48:21] simonstewart: What have you done to it?
+[15:48:27] simonstewart: WHAT HAVE YOU DONE?
+[15:48:28] simonstewart: etc
+[15:48:29] AutomatedTester: 30 bloody seconds to delete a 2kb file...
+[15:48:29] simonstewart: etc
+[15:48:30] simonstewart: etc
+[15:48:40] *AutomatedTester SMASH
+[15:48:57] intchanter-work: AutomatedTester: That's a good color on you.  :-)
+[15:49:10] AutomatedTester: a good what?
+[15:49:19] intchanter-work: The green.
+[15:49:26] intchanter-work: Oh, sorry...
+[15:49:27] AutomatedTester: oh... colour
+[15:49:31] intchanter-work: s/color/colour/
+[15:49:35] AutomatedTester: :D
+[15:49:52] simonstewart: Good lad, intchanter 
+[15:50:05] nirvdrum: AutomatedTester: Get a real laptop.
+[15:50:08] *AutomatedTester goes to tell his neighbour about the silly Americans and their spelling
+[15:50:27] simonstewart: nirvdrum: he's already got a rather spiffy macbook pro
+[15:50:34] simonstewart: Can't get maor real than that
+[15:50:36] intchanter-work: It's very silly that the spellings diverged.
+[15:50:41] nirvdrum: simonstewart: I said a "real laptop" :-)
+[15:50:47] AutomatedTester: nirvdrum: my rMBP with 16GB RAM and 500GB SSD is just not cutting it...
+[15:51:02] intchanter-work: It was a horrible thing to do to a language that had already been mangled past reason by multiple invading cultures.
+[15:51:06] nirvdrum: AutomatedTester: You may just need to bump the heap size for IDEA.
+[15:51:13] nirvdrum: Selenium is a rather large project.
+[15:51:26] simonstewart: Pfft!
+[15:51:56] nirvdrum: AutomatedTester: http://www.jetbrains.com/idea/webhelp/increasing-memory-heap.html
+[15:52:16] nirvdrum: simonstewart: Well, I've certainly encountered larger codebases.  But IDEA's default heap is a bit anemic.
+[15:52:22] simonstewart: true
+[15:52:57] *AutomatedTester thinks he has found nirvdrum's computer... http://goo.gl/InVvR 
+[15:53:04] AutomatedTester: goes to order quickly and expense it
+[15:53:29] stephend has joined #selenium
+[15:53:48] nirvdrum: My model isn't available any more. But it's basically a 15" version of this: https://www.system76.com/laptops/model/bonx6
+[15:54:13] AutomatedTester: nirvdrum: when did you get rid of the 17" MBP?
+[15:54:16] nirvdrum: I've been Apple free for over a year now.  It's been liberating.
+[15:54:32] Revery: nirvdrum: yay!
+[15:54:51] AutomatedTester: nirvdrum: must have done wonders for your back...
+[15:55:02] nirvdrum: Heh.  They way about the same.
+[15:55:07] AutomatedTester: or maybe not, that machine is HUGE
+[15:55:10] nirvdrum: Whoa.  They weigh about the same.
+[15:55:13] Revery: man, if they just replaced the numpad with a sane layout for pageup/pagedown that laptop keyboard layout might *actually* make sense
+[15:55:28] nirvdrum: Yeah, this machine is a beast.  I can do up to 32 GB RAM.
+[15:55:52] *AutomatedTester *currently* doesnt need that much RAM
+[15:56:01] AutomatedTester: if I was compiling Chrome I would
+[15:56:07] nirvdrum: AutomatedTester: But, yeah, I got rid of the MBP about a year ago.  Lion pissed me off constantly.  And I got tired of MacOS X eating 72 GB RAM for whatever it was doing and whacking the shit out of swap.
+[15:56:52] nirvdrum: I tried booting Linux natively on it, but they also hobbled EFI so it works like crap in anything but MacOS.
+[15:57:03] AutomatedTester: i wanted to get a Linux desktop and MBA for travelling
+[15:57:15] AutomatedTester: since I still need OSX for part of my work
+[15:57:25] AutomatedTester: but the paperwork from IT put me off
+[15:57:55] awilson820 has joined #selenium
+[15:58:14] nirvdrum: I've been toying with getting a Mac mini just to play with ios-driver.
+[15:58:45] nirvdrum: Oh, the other big knock against the MBP is it destroyed my fingers.
+[15:58:54] nirvdrum: That was a big one.
+[15:59:19] AutomatedTester: fingers or wrists?
+[15:59:24] nirvdrum: Fingers.
+[IRC logfile - Started Tue Apr  2 16:00:08 2013]
+[16:00:08] AutomatedTester: i found out I can expense your keyboard if I wanted it
+[16:00:22] nirvdrum: It may just be that I type like a sasquatch, but those chicklet keys are anything but ergonomic.  Besides lacking curvature, they're half height and hit the backplane rather rigidly.
+[16:00:51] nirvdrum: So, they induced a lot of joint pain.
+[16:01:20] AutomatedTester: i actually like it
+[16:01:26] nirvdrum: The wrist pain is there and certainly wasn't aided by the wonderful cerated edge that Apple decided to add as par of the unibodies.
+[16:02:32] nirvdrum: This laptop has a chicklet keyboard (most do now -- thanks Apple), but it's softer for me *shrug*
+[16:02:45] nirvdrum: I was also typing an insane amount.
+[16:02:47] AutomatedTester: I rarely use my laptop keyboard
+[16:03:11] nirvdrum: I did when taking the train or when I wanted to sit outside or my living room.
+[16:03:24] nirvdrum: You know, using the portable nature of a laptop.
+[16:03:41] AutomatedTester: I dont travel daily 
+[16:03:46] AutomatedTester: the joy of WFH
+[16:03:50] Revery: nirvdrum: you are right, even if people like it but the keyboard is ergonomically terrible
+[16:04:13] nirvdrum: What kills me is the previous gen MBPs had an awesome keyboard.  But I guess they didn't look as cool.
+[16:04:50] stephend has joined #selenium
+[16:05:11] nirvdrum: This one: http://imageshack.us/photo/my-images/38/004k.jpg/sr=1
+[16:05:40] nirvdrum: Besides cooking my testicles, that may have been my favorite portable.
+[16:06:03] ShawnM has joined #selenium
+[16:08:05] llaskin: has anyone noted that when a FF update happens, they start getting rbuf_fill errors until they upgrade firefox?
+[16:13:35] doglino has joined #selenium
+[16:18:48] sine_nitore has joined #selenium
+[16:21:31] Selenium-Git has joined #selenium
+[16:21:31] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/1sCv_w
+[16:21:31] Selenium-Git: 13selenium/06master 146bbba24 15Patrick Gansterer: Adding better support for SVG within Firefox. Has better scrolling to element and allows JavaScript execution...
+[16:21:31] Selenium-Git has left #selenium
+[16:23:50] barancev: HtmlUnit has basic SVG support, need to check ЫМП-related tests, may be unignore
+[16:26:46] dude-x has joined #selenium
+[16:29:32] smccarthy has joined #selenium
+[16:36:27] alexglow has joined #selenium
+[16:38:42] stephend has joined #selenium
+[16:39:43] selenium566 has joined #selenium
+[16:41:22] qaguy has joined #selenium
+[16:42:29] selenium566: Hi! I have about ~70 selenium tests written in python and testing them all is taking long time. How can I run my tests on multiple machines (maybe use Amazon EC2) to make my tests finish faster?
+[16:43:05] selenium566: on multiple machines*
+[16:43:09] nirvdrum: selenium566: The easiest thing to do is check out saucelabs.com.  Otherwise, you can use selenium grid.
+[16:43:45] lukeis has joined #selenium
+[16:43:45] dude-x: selenium566 well what test harness are you using? (nose, py.test, your own custom one)?
+[16:43:51] selenium566: nirvdrum: thanks. can i deploy my code to suaclabs or do i have to rewrite everything?
+[16:44:21] nirvdrum: You need to run your site some place.  Then you run your test code using them as your selenium connection.
+[16:44:36] selenium566: aah. got it. thanks a lot
+[16:50:30] girija has joined #selenium
+[16:53:49] simonstewart: Right. Time to head home.
+[16:53:53] simonstewart: Toodle-pip
+[16:53:54] simonstewart has left #selenium
+[16:57:08] nhirata has joined #selenium
+[IRC logfile - Started Tue Apr  2 17:00:56 2013]
+[17:00:56] wolcanus has joined #selenium
+[17:01:51] davehunt has joined #selenium
+[17:01:52] ShawnM has joined #selenium
+[17:05:24] testing has joined #selenium
+[17:05:57] testing: Hey quick question for you guys. Is there any way to use the DragAndDrop action with Points rather than a web element?
+[17:09:05] jimevans has joined #selenium
+[17:09:05] selbot2: jimevans: note from AutomatedTester about 7 hours ago: thats awesome, I noticed the location calculating code is wrong the other day and have an outstanding note for simonstewart 
+[17:12:41] phishy has joined #selenium
+[17:15:58] ssims has joined #selenium
+[17:16:29] ssims: I need some docs on adding the adblock extension to chrome driver
+[17:16:52] ssims: I could not get the crx file for adblock but I have the source
+[17:18:27] jarib: :note simonstewart i haven't landed the jruby update. my approach seems to cause trouble on windows which i haven't found time to dig into
+[17:18:27] selbot2: ok!
+[17:27:08] qaguy has joined #selenium
+[17:32:59] ryanpetrello has joined #selenium
+[17:35:11] Swadq has joined #selenium
+[17:39:04] ryanpetrello has joined #selenium
+[17:40:55] stackedsax has joined #selenium
+[17:41:05] jleyba has joined #selenium
+[17:41:59] sfbrian has joined #selenium
+[17:42:11] jimevans: bah! firefox 20 is ga today
+[17:42:44] lukeis: saw simon ask for bacon takers
+[17:42:55] lukeis: yay, we have logs again ;)
+[17:43:10] lukeis: wb dawagner
+[17:44:07] tinygeo has joined #selenium
+[17:44:29] zeljkof has joined #selenium
+[17:45:34] tinygeo has left #selenium
+[17:46:18] Archdude_ has joined #selenium
+[17:47:31] Stephen has joined #selenium
+[17:48:22] ddary has joined #selenium
+[17:48:23] qaguy has joined #selenium
+[17:50:30] gdennis has left #selenium
+[17:55:21] ddary has joined #selenium
+[17:57:00] dawagner: lukeis: Thanks!
+[17:57:05] dawagner: How's life? :)
+[17:57:24] admc has joined #selenium
+[17:58:02] lukeis: busy :)  hope you had a nice trip
+[17:59:17] gdennis has joined #selenium
+[IRC logfile - Started Tue Apr  2 18:00:15 2013]
+[18:00:15] SamuraiJack: hi
+[18:00:42] SamuraiJack: is it possible to get the browser version (or may be UA string) from a test driver instance?
+[18:00:54] SamuraiJack: *web driver instance
+[18:01:24] dawagner: Yep, lovely and relaxing and full of food :)
+[18:01:30] SamuraiJack: only with "executeScript()" ?..
+[18:01:31] jleyba: executeScript("return window.navigator.userAgent")
+[18:01:42] SamuraiJack: jleyba: aha, thanks!
+[18:01:49] awilson820 has joined #selenium
+[18:05:48] AutomatedTester: jimevans: can you look at https://github.com/SeleniumHQ/selenium/pull/28 when you have a mo
+[18:06:12] AutomatedTester: landed first 1/2 already from pull 27
+[18:06:49] mashiara_ has joined #selenium
+[18:13:56] mreedell-work has joined #selenium
+[18:14:31] testingb0t has joined #selenium
+[18:23:11] dude-x has joined #selenium
+[18:24:02] towski has joined #selenium
+[18:24:34] Stephen has joined #selenium
+[18:27:17] SamuraiJack has joined #selenium
+[18:28:30] dawagner: Anyone? How do I set my google code password to push to the git repo?
+[18:28:48] dawagner: My ~/.netrc contains the line the settings page says to put
+[18:29:19] jleyba: dawagner: what else is in .netrc?
+[18:29:24] dawagner: Nothing
+[18:29:35] dawagner: Just the one line, without leading or trailing whitespace
+[18:29:36] lukeis: mine just has:  machine code.google.com login luke.semerau@gmail.com password <hashpassword>
+[18:29:38] mashiara_ has left #selenium
+[18:29:57] jleyba: I had this problem before.  I forget what the solution was...
+[18:30:26] lukeis: reboot? ;)
+[18:30:31] intchanter-work: dawagner: Could be permissions on the file.
+[18:30:47] intchanter-work: But that's a shot in the dark.
+[18:30:51] jleyba: dawagner: are you getting a specific error
+[18:30:52] jleyba: ?
+[18:31:15] dawagner: fatal: remote error: Invalid username/password.
+[18:31:30] dawagner: You may need to use your generated googlecode.com password; see https://code.google.com/hosting/settings
+[18:31:35] cheezy has joined #selenium
+[18:31:40] dawagner: AAH
+[18:31:42] dawagner: I remember this one!
+[18:31:45] dawagner: My remote has my username in!
+[18:32:40] jimevans: AutomatedTester: not sure the approach for IE will work correctly. i've not found the contains() method to be entirely reliable.
+[18:33:24] Selenium-Git has joined #selenium
+[18:33:24] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/7Z1ksA
+[18:33:24] Selenium-Git: 13selenium/06master 14a5844f7 15Daniel Wagner-Hall: Set content length for redirects...
+[18:33:24] Selenium-Git has left #selenium
+[18:35:15] dawagner: Success!
+[18:35:34] lukeis: call it a day ;)
+[18:36:42] pa has joined #selenium
+[18:45:32] qaguy: git status
+[18:45:33] farlan has left #selenium
+[18:45:46] qaguy: whoops wrong window. Sorry guys
+[18:45:52] dimacus1: qaguy: 4 files cahnged, 3 commits behind
+[18:46:05] qaguy: hehe
+[18:46:07] qaguy: :)
+[18:46:32] santiycr has joined #selenium
+[18:53:32] Stephen has joined #selenium
+[IRC logfile - Started Tue Apr  2 19:05:50 2013]
+[19:05:50] manoj_ has joined #selenium
+[19:07:08] ssims has joined #selenium
+[19:09:44] SamuraiJack has joined #selenium
+[19:15:21] wolcanus has joined #selenium
+[19:20:20] jimevans: jleyba: yt?
+[19:20:25] jleyba: yes
+[19:20:32] jimevans: have you seen http://stackoverflow.com/questions/15222647/unable-to-execute-selenium-webdriver-scripts-in-safari-5-browser
+[19:20:53] jimevans: (we may be experiencing something similar here at work, is why i ask)
+[19:21:35] jleyba: I think that means the websocket connection was closed.
+[19:22:34] jleyba: The driver should probably try to reconnect when that happens
+[19:23:40] SupplyCrawler has joined #selenium
+[19:23:47] SupplyCrawler: Halp
+[19:24:10] SupplyCrawler: I'm loading pages through firefox driver, but some pages just don't stop loading assets
+[19:24:11] SupplyCrawler: like, ever
+[19:24:33] SupplyCrawler: I know for Chrome you can load like a stop-load plugin or something. is there something similar for firefox?
+[19:26:13] SupplyCrawler: :U
+[19:28:52] ddary has joined #selenium
+[19:31:15] liberus has joined #selenium
+[19:34:07] alexglow has joined #selenium
+[19:34:18] Wessix2 has joined #selenium
+[19:41:10] AutomatedTester: santiycr: hey, can you wordsmith your proposal for GSoC a little please
+[19:42:05] santiycr: AutomatedTester:  sure!
+[19:42:18] AutomatedTester: laters all
+[19:42:54] barancev: SupplyCrawler: https://code.google.com/p/selenium/wiki/FirefoxDriver#-Beta-_load_fast_preference
+[19:47:53] riv_ has joined #selenium
+[19:51:06] barancev: what are criteria for companies to be published on http://docs.seleniumhq.org/support/ ?
+[19:51:59] riv_ has joined #selenium
+[19:54:34] barancev: when and how selenium should be mentioned?
+[19:55:00] barancev: on some sites linked from the support page it's hard enough to find something related to selenium
+[19:55:01] lukeis: it's loose criteria… do you mention you use / do Selenium
+[19:55:17] nirvdrum: We've generally required that it be a dominant feature.
+[19:55:41] nirvdrum: If it helps any, I've abstained from listing Mogotest despite being a heavy Selenium user because I don't directly support or sell it.
+[19:57:04] barancev: a dominant feature != mention selenium once on the site
+[19:59:25] sayd has left #selenium
+[IRC logfile - Started Tue Apr  2 20:00:08 2013]
+[20:00:08] nirvdrum: I agree.
+[20:00:49] lukeis: barancev: feel free to moderate as such
+[20:01:27] barancev: wtf! http://www.imolinfo.it/en/search/search.php?q=selenium
+[20:01:55] barancev: if you have *this* on your site how can you sell yourself as a testing professional :)
+[20:02:49] qaguy has joined #selenium
+[20:03:10] lukeis: hahaha
+[20:03:16] lukeis: oops ;)
+[20:06:40] barancev: ok, I'll go through it. should I send notifications by email to the site owners that we are going to remove the link from the list?
+[20:07:17] lukeis: sure, if you want
+[20:07:22] jleyba: Why do we list any at all?
+[20:07:30] lukeis: i don't know ;)
+[20:07:36] jleyba: Seems a bit tacky to promote commercial services from an open source project
+[20:07:45] *lukeis wonders when our NASCAR page will start?
+[20:08:07] jleyba: That makes more sense since it's paid sponsorship
+[20:08:47] jleyba: (not that I'm fond of the idea, but I don't care enough to argue against it)
+[20:08:52] barancev: agreed, it would be much more straightforward
+[20:09:29] barancev: we are not a doorway service :)
+[20:10:16] lukeis: delete all the links ;)
+[20:11:39] barancev: Gomez and dynaTrace are Compuware now (they were aquired), of course not a single mention of Selenium on the Compuware site
+[20:13:16] barancev: not a single mention even on the ThoughtWork's site, the cradle of Selenium
+[20:14:04] manoj_: there is no mention for even, the Tavant Technologies
+[20:16:31] lukeis: it may have been invented at thoughtworks, but most of the inventors no longer work there ;)
+[20:17:11] lukeis: at least the consultants at thoughtworks heavily push selenium and/or other testing
+[20:23:08] nirvdrum: I think it made more sense during its genesis when Selenium was trying to promote itself as a useful, stable product.
+[20:23:27] nirvdrum: The whole "nobody ever got fired for buying IBM" mentality.
+[20:23:42] nirvdrum: But, yeah, it's evolved substantially since then.
+[20:25:43] Wessix has joined #selenium
+[20:28:19] SupplyCrawler: Huh, that's weird.
+[20:28:34] SupplyCrawler: Open one url, do stuff like get_all_elements_by_tag_name and stuff
+[20:28:43] SupplyCrawler: open another, it just hangs on doing stuff :|
+[20:28:49] SupplyCrawler: firefoxdriver why?
+[20:28:50] SupplyCrawler: :(
+[20:31:43] jibay has joined #selenium
+[20:35:11] Wessix has joined #selenium
+[20:35:29] barancev: SupplyCrawler: https://code.google.com/p/selenium/wiki/FirefoxDriver#-Beta-_load_fast_preference
+[20:38:13] SupplyCrawler: barancev would that affect if my driver can or can't interact with things? :<
+[20:44:35] SupplyCrawler: This stuff seems really finnicky ._.
+[20:46:39] ddary has joined #selenium
+[20:50:28] ddary has left #selenium
+[20:56:13] ShawnM_ has joined #selenium
+[20:57:23] barancev: SupplyCrawler: this loading strategy will allow to interact with the page while resources (images etc) are still loading
+[IRC logfile - Started Tue Apr  2 21:00:03 2013]
+[21:00:03] SupplyCrawler: Okay, well, uh
+[21:00:19] SupplyCrawler: First I gotta figure out why it won't interact at all with anything after the first .get
+[21:11:06] SupplyCrawler: the page is loading, .get is finishing
+[21:11:12] SupplyCrawler: but it just sits there when it's trying do do like a uh
+[21:11:18] SupplyCrawler: get_all_elements_by_tag_name
+[21:11:35] SupplyCrawler: Anyone know what that might be? (Firefoxdriver, python)
+[21:12:04] phishy has joined #selenium
+[21:14:54] Wessix has joined #selenium
+[21:25:29] qaguy has joined #selenium
+[21:30:53] b00b00 has joined #selenium
+[21:47:27] Turzai has joined #selenium
+[21:51:49] lukeis has joined #selenium
+[IRC logfile - Started Tue Apr  2 22:02:49 2013]
+[22:02:49] admc has joined #selenium
+[22:05:16] admc has joined #selenium
+[22:06:34] awilson820 has joined #selenium
+[22:10:03] davehunt has joined #selenium
+[22:11:41] Wessix has joined #selenium
+[22:16:41] towski has joined #selenium
+[22:27:59] Keavon has joined #selenium
+[22:39:08] itatitat has joined #selenium
+[22:42:30] dude-x has joined #selenium
+[IRC logfile - Started Tue Apr  2 23:12:41 2013]
+[23:12:41] qaguy has joined #selenium
+[23:15:42] Wessix2 has joined #selenium
+[23:23:52] ssims has joined #selenium
+[23:33:51] barancev|2 has joined #selenium
+[23:34:51] santiycr has joined #selenium
+[23:35:27] jleyba has joined #selenium
+[23:36:08] jleyba: Does FF20 require another Selenium release?
+[23:39:45] barancev|2 has joined #selenium
+[23:39:59] dude-x: usually it does for native events….
+[23:43:07] dude-x: the good news is that FF20 seems to work with 2.31
+[23:43:16] dude-x: at least on my mac.
+[23:43:25] lukeis: heh, native events == false ;)
+[23:43:28] barancev|2: synchronized events, yes
+[23:43:36] dude-x: but i can't test native events on the mac.
+[23:43:43] lukeis: not until mday
+[23:43:43] barancev|2: synthesized, even :)
+[23:43:43] selbot2: M-Day: day in the future when Marionette is made available for non-debug builds
+[23:43:51] dude-x: synthetic
+[23:44:22] dude-x: v23 will have invisible scrollbars on the mac
+[23:44:29] dude-x: come to think of it, they should fix scrolling on the mac
+[23:44:31] dude-x: it's slow
+[23:44:49] barancev|2: hmm... IE9 does not support submit buttons outside a form?

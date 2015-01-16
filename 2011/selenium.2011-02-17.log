@@ -1,0 +1,530 @@
+2011-02-17T00:09:15  *** dmachi1 has joined #selenium
+2011-02-17T00:09:15  *** dmachi has quit IRC
+2011-02-17T00:24:15  *** sburjan has joined #selenium
+2011-02-17T00:44:19  *** andialbrecht_ is now known as andialbrecht
+2011-02-17T00:52:56  *** admc has quit IRC
+2011-02-17T01:01:19  *** andialbrecht is now known as andialbrecht_
+2011-02-17T01:17:15  *** zmijunkie has quit IRC
+2011-02-17T01:44:15  *** sburjan has quit IRC
+2011-02-17T01:45:14  *** Snekatis has joined #selenium
+2011-02-17T01:58:00  *** sburjan has joined #selenium
+2011-02-17T02:06:07  *** Putr|Away is now known as Putr
+2011-02-17T02:23:53  *** Snekatis has quit IRC
+2011-02-17T02:24:11  *** dereke has joined #selenium
+2011-02-17T02:24:39  *** sephinroth has quit IRC
+2011-02-17T02:28:43  *** soc42 has quit IRC
+2011-02-17T02:30:02  *** AutomatedTester has joined #selenium
+2011-02-17T02:30:15  <AutomatedTester> jarib: any joy over IEDriver stuff?
+2011-02-17T02:39:57  <AutomatedTester> simonstewart: ping...
+2011-02-17T02:40:17  <AutomatedTester> wonders if he will be working late again
+2011-02-17T02:41:48  <jarib> AutomatedTester: sorry, lost my connection last night
+2011-02-17T02:41:54  <jarib> seems to happen sometimes around midnight
+2011-02-17T02:42:06  <AutomatedTester> jarib: no worries, I was tired and went to bed
+2011-02-17T02:42:36  <jarib> unfortunately, the fact that you couldn't reproduce with a MS-built python doesn't really narrow it down
+2011-02-17T02:42:54  <jarib> it would be cool if you could try the screenshot thing as well
+2011-02-17T02:42:56  <jarib> it's much simpler :)
+2011-02-17T02:43:57  <AutomatedTester> test case for me to repo?
+2011-02-17T02:44:17  <jarib> #1271
+2011-02-17T02:44:18  <selbot2> jari.bakken open/accepted IE driver hangs on exit after taking screenshot - http://code.google.com/p/selenium/issues/detail?id=1271
+2011-02-17T02:44:22  <jarib> see the gist there
+2011-02-17T02:44:44  <AutomatedTester> ok, just need to look at something else first and then will build a python version
+2011-02-17T02:45:01  <jarib> cool. it's just 4 lines :)
+2011-02-17T02:53:04  <AutomatedTester> sigh... that didnt break
+2011-02-17T02:57:52  <davehunt> wow... sometimes I'm sure I'm the only one moderating selenium-users
+2011-02-17T03:05:58  *** paul8155421 has quit IRC
+2011-02-17T03:06:09  <AutomatedTester> i dont have access so can't help
+2011-02-17T03:07:32  <AutomatedTester> right jarib, will look at that bug now
+2011-02-17T03:09:37  <jarib> thanks
+2011-02-17T03:10:48  *** soc42 has joined #selenium
+2011-02-17T03:11:35  <AutomatedTester> jarib: It didnt crash
+2011-02-17T03:11:48  <AutomatedTester> but the screenshot code isnt working...
+2011-02-17T03:12:31  *** davehunt is now known as davehunt|away
+2011-02-17T03:12:37  <AutomatedTester> jarib: what is the issue with Ruby->IEDriver?
+2011-02-17T03:12:48  <jarib> it hangs at exit if you take a screenshot
+2011-02-17T03:12:56  <jarib> all of ruby's at_exit hooks finish, then it just hangs
+2011-02-17T03:13:18  <AutomatedTester> wfm
+2011-02-17T03:13:19  <AutomatedTester> soz
+2011-02-17T03:13:22  <jarib> and we can't reproduce with other langs
+2011-02-17T03:13:37  <jarib> well, if the screenshot code isn't working, then you might not hit the same case
+2011-02-17T03:13:45  <jarib> if i don't take the screenshot, it exits fine
+2011-02-17T03:13:51  <AutomatedTester> it is working...
+2011-02-17T03:13:54  <AutomatedTester> the writing to disk isnt
+2011-02-17T03:14:12  <AutomatedTester> if I get the base64 version I get the string
+2011-02-17T03:14:13  <jarib> hmm
+2011-02-17T03:14:19  <jarib> let me see if that will reproduce
+2011-02-17T03:14:24  <jarib> (not saving)
+2011-02-17T03:14:49  <AutomatedTester> let me explain better because I am doing a really bad job of it
+2011-02-17T03:15:16  <AutomatedTester> the decoding from base64 to PNG isnt producing a viewable image
+2011-02-17T03:15:19  <AutomatedTester> the png is on the disk
+2011-02-17T03:15:22  <AutomatedTester> but I cant see it
+2011-02-17T03:15:51  <jarib> ah
+2011-02-17T03:16:17  <jarib> ok, it hangs even if i don't save
+2011-02-17T03:17:38  <[530]> I get this blank popup when I try to select a popup in ie8 on windows7, so can't get anythong done in the popup I want, got a screenshot http://imagebin.org/138392
+2011-02-17T03:18:10  <[530]> using the python driver
+2011-02-17T03:20:03  <AutomatedTester> ahh popups...
+2011-02-17T03:22:01  <[530]> but it all works in firefox.. is not window.open overridden properly or something? also windows have no id's in ie8 only names
+2011-02-17T03:23:12  <AutomatedTester> hmm
+2011-02-17T03:23:26  <AutomatedTester> [530]: lemme pull up the bindings quickly
+2011-02-17T03:24:23  <AutomatedTester> [530]: try select window instead
+2011-02-17T03:24:38  <[530]> did that too..
+2011-02-17T03:24:42  <AutomatedTester> selenium.select_window("name=windowname")
+2011-02-17T03:24:43  <[530]> no effect
+2011-02-17T03:24:46  <AutomatedTester> oh
+2011-02-17T03:24:58  <[530]> i'll try again..
+2011-02-17T03:25:05  <[530]> dod not use name=
+2011-02-17T03:25:11  <[530]> did
+2011-02-17T03:25:21  <AutomatedTester> i am just reading the docstring so dunno if it will work
+2011-02-17T03:27:03  <AutomatedTester> jarib: this IEDriver stuff, could it be a bug in Ruby/COM Interop?
+2011-02-17T03:27:13  <AutomatedTester> and the bindings are exposing it?
+2011-02-17T03:28:23  <[530]> AutomatedTester: no effect
+2011-02-17T03:28:56  <AutomatedTester> hmmm
+2011-02-17T03:29:10  <AutomatedTester> well there appears to be an old bug, just looking it up
+2011-02-17T03:29:24  <AutomatedTester> but it suggests that sometimes it cant get the window.open
+2011-02-17T03:29:36  <AutomatedTester> in that case fire a open_window
+2011-02-17T03:30:00  <[530]> so make a open_window in my js?
+2011-02-17T03:30:19  <jarib> AutomatedTester: ruby is just using ffi to launch the server. no COM stuff being done from ruby directly
+2011-02-17T03:30:38  <jarib> i wrote a c extension to eliminate ffi as the cause, didn't help
+2011-02-17T03:30:53  <AutomatedTester> [530]: in the test, let me get the bug first
+2011-02-17T03:31:21  <AutomatedTester> [530]: http://jira.openqa.org/browse/SEL-339
+2011-02-17T03:33:24  <AutomatedTester> jarib: python is doing COM Interop
+2011-02-17T03:34:06  <[530]> AutomatedTester: That is onload, this one is opened by onclick on a link
+2011-02-17T03:34:56  <AutomatedTester> [530]: dunno then if its not selecting it
+2011-02-17T03:36:21  <[530]> where can i see the code that does the overriding, new to java and selenium..
+2011-02-17T03:36:24  <[530]> ?
+2011-02-17T03:36:53  *** soc42 has quit IRC
+2011-02-17T03:37:03  <selbot> New news from builds: WEB-SEHQ-66 was SUCCESSFUL : Updated by michael.tamm2 <http://xserve.openqa.org:8085/browse/WEB-SEHQ-66> || WEB-SEHQ-65 was SUCCESSFUL : Updated by michael.tamm2 <http://xserve.openqa.org:8085/browse/WEB-SEHQ-65> || WEB-SEHQ-64 was SUCCESSFUL : Updated by tkumarb <http://xserve.openqa.org:8085/browse/WEB-SEHQ-64> || WEB-SEHQ-63 was SUCCESSFUL : Updated by michael.tamm2 <http://xserve.openqa.org:8085/browse/WEB-SEHQ-63> || WEB-SEHQ-62 was SUCCESSFUL : Updated by theautomatedtester <http://xserve.openqa.org:8085/browse/WEB-SEHQ-62> || WEB-SEHQ-61 was SUCCESSFUL : Updated by peter.newhook <http://xserve.openqa.org:8085/browse/WEB-SEHQ-61> || WEB-SEHQ-60 was SUCCESSFUL : Updated by peter.newhook <http://xserve.openqa.org:8085/browse/WEB-SEHQ-60> || WEB-SEHQ-59 was SUCCESSFUL : Updated by peter.newhook <http://xserve.openqa.org:8085/browse/WEB-SEHQ-59> || IDE-EDITOR-97 has FAILED : Manual build by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-97> || WEB-SEHQ-58 was SUCCESSFUL : Updated by tkumarb <http://xserve.openqa.org:8085/browse/WEB-SEHQ-58> || WEB-SEHQ-57 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-57> || WEB-SEHQ-56 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-56> || WEB-SEHQ-55 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-55> || WEB-SEHQ-54 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-54> || WEB-SEHQ-53 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-53> || WEB-SEHQ-52 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-52> || WEB-SEHQ-51 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-51> || WEB-SEHQ-50 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-50> || WEB-SEHQ-49 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-49> || WEB-SEHQ-48 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-48> || WEB-SEHQ-47 was SUCCESSFUL : Updated by pgrandje <http://xserve.openqa.org:8085/browse/WEB-SEHQ-47> || IDE-EDITOR-96 has FAILED : Manual build by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-96>
+2011-02-17T03:45:43  <AutomatedTester> [530]: http://code.google.com/p/selenium/source/browse/trunk/javascript/selenium-core/scripts/selenium-browserbot.js#382
+2011-02-17T03:45:48  <AutomatedTester> that is the popup
+2011-02-17T03:46:25  <AutomatedTester> http://code.google.com/p/selenium/source/browse/trunk/javascript/selenium-core/scripts/selenium-browserbot.js#357
+2011-02-17T03:46:28  <AutomatedTester> that is window
+2011-02-17T03:48:38  *** kylls has joined #selenium
+2011-02-17T03:48:39  *** kylls has joined #selenium
+2011-02-17T03:51:44  <AutomatedTester> jarib: you there?
+2011-02-17T03:51:47  <AutomatedTester> sorry to bother
+2011-02-17T03:52:34  <[530]> in comments for open window // note that in IE the "windowName" argument must be a valid javascript identifier, it seems.
+2011-02-17T03:52:43  <[530]> but tried that too
+2011-02-17T03:53:32  <AutomatedTester> popups are the bane of selenium tbh
+2011-02-17T03:54:26  *** Putr is now known as Putr|Away
+2011-02-17T03:54:32  <[530]> but i wonder if overriding open is the issue
+2011-02-17T03:57:03  <[530]> should make a function open_window(windowName, windowFeatures, replaceFlag)) {} an then make selenium override window.open_window instead
+2011-02-17T03:58:41  <[530]> ant that popup also happens in another frame that the top
+2011-02-17T04:02:15  <selbot2> theautomatedtester 2011-02-17 12:07 DavidBurns Fixed saving screenshots to disk - http://code.google.com/p/selenium/source/detail?r=11472
+2011-02-17T04:04:21  <[530]> can i unzip a jar, modify it then zip it again to test some changes?
+2011-02-17T04:05:12  <AutomatedTester> [530]: yea
+2011-02-17T04:05:31  <AutomatedTester> *sigh* Google code is so slow
+2011-02-17T04:08:00  *** ryzer-afk has quit IRC
+2011-02-17T04:09:34  *** carlisia_ has joined #selenium
+2011-02-17T04:09:43  *** mbeierl has joined #selenium
+2011-02-17T04:12:19  *** carlisia has quit IRC
+2011-02-17T04:19:39  *** ryzer-afk has joined #selenium
+2011-02-17T04:23:22  *** nirvdrum has joined #selenium
+2011-02-17T04:25:50  <jarib> AutomatedTester: yes
+2011-02-17T04:36:01  *** dereke_ has joined #selenium
+2011-02-17T04:37:42  *** dereke__ has joined #selenium
+2011-02-17T04:37:42  *** dereke has quit IRC
+2011-02-17T04:40:10  *** cpg is now known as cpg|away
+2011-02-17T04:41:23  *** dereke_ has quit IRC
+2011-02-17T04:43:53  <AutomatedTester> jarib: how do I know if a browser is "javascript enabled" for webdriver?
+2011-02-17T04:45:22  <jarib> AutomatedTester: check the capabilities returned when you create the session
+2011-02-17T04:50:40  *** kpiwko has quit IRC
+2011-02-17T04:51:43  <[530]> AutomatedTester found it no _ allowed in window id ;)
+2011-02-17T04:52:08  <[530]> oh, um it is allowed
+2011-02-17T04:55:13  *** kpiwko has joined #selenium
+2011-02-17T05:11:38  <[530]> oh, hta opens a new window, and i think window.name is undefined
+2011-02-17T05:14:30  *** cburroughs has joined #selenium
+2011-02-17T05:22:56  *** RossPatterson has joined #selenium
+2011-02-17T05:28:28  *** brettporter has quit IRC
+2011-02-17T05:32:01  <[530]> hm, trying to edit the jar, but cant run it when i rename back to .jar, says it is corrupt
+2011-02-17T05:34:00  *** sburjan has quit IRC
+2011-02-17T05:34:05  *** rbalent has joined #selenium
+2011-02-17T05:42:46  *** limyreth has joined #selenium
+2011-02-17T05:46:58  *** mandric has joined #selenium
+2011-02-17T05:46:59  *** KirillJacobson has joined #selenium
+2011-02-17T05:47:10  *** sburjan has joined #selenium
+2011-02-17T05:52:38  *** Putr|Away is now known as Putr
+2011-02-17T06:01:37  *** limyreth has left #selenium
+2011-02-17T06:04:19  *** soc42 has joined #selenium
+2011-02-17T06:04:20  *** esteele has joined #selenium
+2011-02-17T06:09:17  <selbot2> peter.newhook@gmail.com 2011-02-17 14:14 PeterNewhook: Corrected Tarun's question about code formatting - http://code.google.com/p/selenium/source/detail?r=11473
+2011-02-17T06:10:27  *** KirillJacobson has quit IRC
+2011-02-17T06:10:51  *** sburjan has quit IRC
+2011-02-17T06:12:20  *** sburjan has joined #selenium
+2011-02-17T06:31:36  *** gnofi has joined #selenium
+2011-02-17T06:45:11  *** skip has joined #selenium
+2011-02-17T06:47:19  <skip> Hey, any Grid guys on?
+2011-02-17T06:50:07  *** mandric has quit IRC
+2011-02-17T07:06:43  *** lfryc has quit IRC
+2011-02-17T07:09:08  *** lfryc has joined #selenium
+2011-02-17T07:12:06  *** Deter_Dangler has joined #selenium
+2011-02-17T07:16:02  *** skip has quit IRC
+2011-02-17T07:17:13  *** skip has joined #selenium
+2011-02-17T07:18:20  *** xirkus has joined #selenium
+2011-02-17T07:18:35  *** LRain has joined #selenium
+2011-02-17T07:19:31  *** sburjan has quit IRC
+2011-02-17T07:19:32  *** skip has quit IRC
+2011-02-17T07:19:54  *** skiphuffman has joined #selenium
+2011-02-17T07:20:34  *** nirvdrum has quit IRC
+2011-02-17T07:20:45  *** skiphuffman has quit IRC
+2011-02-17T07:20:50  *** skiphuffman has joined #selenium
+2011-02-17T07:24:49  *** andytinkham has joined #selenium
+2011-02-17T07:28:04  <selbot2> theautomatedtester 2011-02-17 15:32 DavidBurns Adding DesiredCapabilites to Python - http://code.google.com/p/selenium/source/detail?r=11474
+2011-02-17T07:28:14  *** mandric has joined #selenium
+2011-02-17T07:31:32  *** hans_ has joined #selenium
+2011-02-17T07:32:14  <hans_> hi! is the current trunk versin of selenium grid able to work with selenium2?
+2011-02-17T07:32:16  *** jimevans has joined #selenium
+2011-02-17T07:33:33  <AutomatedTester> hans_: there i a branch for Grid2 which supports it
+2011-02-17T07:33:57  <AutomatedTester> jimevans: hey
+2011-02-17T07:34:12  <hans_> is it very alpha? i mean very instabile or can in use it quite ok already?
+2011-02-17T07:34:21  <AutomatedTester> hans_: pass
+2011-02-17T07:34:27  <AutomatedTester> I think its quite stable
+2011-02-17T07:34:34  <jimevans> AutomatedTester: hey.
+2011-02-17T07:34:39  <AutomatedTester> its been donated by ebay
+2011-02-17T07:34:54  <AutomatedTester> jimevans: python doesnt reproduce the crash that ruby does
+2011-02-17T07:35:31  *** esteele has left #selenium
+2011-02-17T07:35:40  <jimevans> AutomatedTester: wow. okay then. that's... interesting.
+2011-02-17T07:35:58  <AutomatedTester> I have been speaking to jarib about it
+2011-02-17T07:36:43  <jimevans> anything great insights?
+2011-02-17T07:36:44  <AutomatedTester> but no where closer to solving it
+2011-02-17T07:36:48  <AutomatedTester> none
+2011-02-17T07:37:04  <AutomatedTester> we had a look at how python is built to see if that might give us a cluse
+2011-02-17T07:37:08  <AutomatedTester> clue even
+2011-02-17T07:38:51  <AutomatedTester> jimevans: do you want my python script?
+2011-02-17T07:39:24  <jimevans> i'll take a look at it. dunno if i'd be able to parse it. :)
+2011-02-17T07:39:28  *** skiphuffman is now known as skip
+2011-02-17T07:39:46  *** antlong has joined #selenium
+2011-02-17T07:40:01  *** XCulver has joined #selenium
+2011-02-17T07:41:11  <AutomatedTester> jimevans: https://gist.github.com/831946
+2011-02-17T07:41:25  <AutomatedTester> its only quick and dirty
+2011-02-17T07:42:44  <jarib> AutomatedTester: python.exe is built with Visual C++, so it doesn't exclude mingw as the culprit
+2011-02-17T07:42:48  <jarib> uhm
+2011-02-17T07:43:01  <jarib> s/AutomatedTester/jimevans
+2011-02-17T07:43:48  <jimevans> got it.
+2011-02-17T07:43:51  <jarib> although i can't really understand why that should fail
+2011-02-17T07:44:03  <jimevans> i can't either, to be honest.
+2011-02-17T07:44:11  *** dmachi1 has quit IRC
+2011-02-17T07:44:35  <jarib> jimevans: if visual studio has any nice tracing tools, it would be interesting to try to see what it's waiting for with the screenshot hang
+2011-02-17T07:44:48  <jimevans> i'll look into that next.
+2011-02-17T07:45:04  <jarib> ok. thought maybe it could be related since that's also ruby-only
+2011-02-17T07:45:10  *** Deter_Dangler has quit IRC
+2011-02-17T07:45:25  <jimevans> right after i get my 'execute-.net-tests-on-a-machine-without-visual-studio' issues fixed.
+2011-02-17T07:45:32  <jarib> aha
+2011-02-17T07:45:35  <jarib> gotcha.
+2011-02-17T07:47:43  <jimevans> my end goal is to try to debug the various reports of crashing on different os/ie platform combinations
+2011-02-17T07:48:01  <jimevans> but i don't want to install VS if I don't have to (it's a beast of an install)
+2011-02-17T07:49:39  *** dmachi has joined #selenium
+2011-02-17T07:51:00  *** lfryc has quit IRC
+2011-02-17T07:52:56  <hans_> where can i find the grid2 branch? i only found https://github.com/ph7/selenium-grid with google
+2011-02-17T07:53:30  *** KirillJacobson has joined #selenium
+2011-02-17T07:53:36  <AutomatedTester> hans_: http://selenium.googlecode.com
+2011-02-17T07:53:44  <AutomatedTester> there is a branch in there
+2011-02-17T07:58:40  *** nirvdrum has joined #selenium
+2011-02-17T08:00:02  *** kpiwko has quit IRC
+2011-02-17T08:03:54  *** hans_ has quit IRC
+2011-02-17T08:06:59  *** KirillJacobson has quit IRC
+2011-02-17T08:09:07  *** paul8155421 has joined #selenium
+2011-02-17T08:11:17  *** lawcab has joined #selenium
+2011-02-17T08:15:59  *** paul8155421 has quit IRC
+2011-02-17T08:16:28  *** paul8155421 has joined #selenium
+2011-02-17T08:20:10  <lawcab> hello
+2011-02-17T08:20:19  <lawcab> other than the main selenium site
+2011-02-17T08:20:38  <lawcab> are there other good places to get recources? examples?
+2011-02-17T08:22:06  <AutomatedTester> lawcab: www.theautomatedtester.co.uk, but I am biased
+2011-02-17T08:22:21  <lawcab> hahahaha
+2011-02-17T08:22:23  <lawcab> cool
+2011-02-17T08:23:52  <lawcab> have one more question
+2011-02-17T08:24:02  <AutomatedTester> sure
+2011-02-17T08:24:08  <lawcab> is there good tool to transform html to xpath
+2011-02-17T08:24:25  <AutomatedTester> xpather, firefind
+2011-02-17T08:24:33  <AutomatedTester> well it doesnt do it for you
+2011-02-17T08:24:39  <AutomatedTester> but you can test with them
+2011-02-17T08:25:26  *** dereke has joined #selenium
+2011-02-17T08:25:26  *** dereke__ has quit IRC
+2011-02-17T08:25:43  *** stephendonner has joined #selenium
+2011-02-17T08:26:12  <RossPatterson> XPather will do the find for you too - just right click on the element, choose Show in XPather.
+2011-02-17T08:27:26  <lawcab> after I do the Show Xpather
+2011-02-17T08:27:38  <lawcab> I should do Inner HTML/XML
+2011-02-17T08:28:01  <RossPatterson> Show in XPather
+2011-02-17T08:28:45  <RossPatterson> "Show in XPather" will give you an XPath in the main window.  You can also choose one of the selected elements and then see other XPaths in the XPath tab.
+2011-02-17T08:30:06  <lawcab> can i convert a cssselector to xpath
+2011-02-17T08:33:08  *** Undisclosedpower has quit IRC
+2011-02-17T08:36:40  *** Undisclosedpower has joined #selenium
+2011-02-17T08:40:08  *** amitev has quit IRC
+2011-02-17T08:40:12  *** amitev2 has joined #selenium
+2011-02-17T08:41:40  <RossPatterson> lawcab: That depends on the specific items in the XPath.  For many XPaths, yes.
+2011-02-17T08:42:13  <lawcab> so let us say I am trying to get the xpath for an input
+2011-02-17T08:42:21  <RossPatterson> Sorry, I answered the question backwards.  Yes, I believe almost all CSS locators can be converted to XPath.
+2011-02-17T08:42:38  <RossPatterson> Got a concrete example?
+2011-02-17T08:42:41  <lawcab> <input xmlns="http://www.w3.org/1999/xhtml" type="image" tabindex="11" alt="Create Account" src="/images/servlets/SignOn/createaccount.gif" />
+2011-02-17T08:43:09  <RossPatterson> So how would you code the CSS selector for that?
+2011-02-17T08:43:32  <AutomatedTester> RossPatterson: only xpath that can't, as far as I know, are ones that walk the tree backwards
+2011-02-17T08:44:51  <lawcab> [src="/images/servlets/SignOn/createaccount.gif"]
+2011-02-17T08:44:53  *** retornam has joined #selenium
+2011-02-17T08:46:02  <RossPatterson> AutomatedTester: I think some of the more sophisticated XPath functions have no CSS equivalent (e.g., translate(), not(), and all of the numerics).
+2011-02-17T08:46:18  <AutomatedTester> yea
+2011-02-17T08:47:04  <RossPatterson> lawcab: So the XPath equivalent would be //*[@src="/images/servlets/SignOn/createaccount.gif"], which means "any element at any depth in the document that has an SRC attribute that is /images/...".
+2011-02-17T08:47:36  <lawcab> ok
+2011-02-17T08:47:55  <lawcab> so from that i can now use the functions
+2011-02-17T08:48:21  <RossPatterson> lawcab: You might find //input[contains(@src, "/images/servlets/SignOn/createaccount.gif")] to be both a little faster and a little more resilient.
+2011-02-17T08:48:42  <lawcab> cool
+2011-02-17T08:48:48  *** sburjan has joined #selenium
+2011-02-17T08:50:17  <lawcab> RossPatterson: Super thanks
+2011-02-17T08:50:23  <RossPatterson> De nada.
+2011-02-17T08:50:31  *** fission6 has joined #selenium
+2011-02-17T08:50:41  <fission6> AutomatedTester: you around?
+2011-02-17T08:51:48  <AutomatedTester> fission6: momentarily
+2011-02-17T08:52:14  <fission6> hey there, good morning
+2011-02-17T08:53:03  <fission6> had a question id like to impart on your wisdom, i am making baby step progress with selenium 2, ran into the following issue though when trying to select and item from a form which I can visibly see, selenium.webdriver.common.exceptions.ElementNotVisibleException: Element is not currently visible and so may not be interacted with
+2011-02-17T08:53:16  <fission6> AutomatedTester: ^
+2011-02-17T08:53:53  <AutomatedTester> is the Item visible when you try interact with it?
+2011-02-17T08:54:15  <AutomatedTester> if its display:none or hidden or anything you wont be allowed to
+2011-02-17T08:54:25  * jimevans sighs heavily, not looking forward to a Visual Studio installation...
+2011-02-17T08:57:06  *** rbalent has quit IRC
+2011-02-17T08:59:00  *** hans_ has joined #selenium
+2011-02-17T09:00:29  <fission6> AutomatedTester: its visible, I mean I can see the select box when running the test, not sure if that means its truly "visibile"
+2011-02-17T09:02:05  *** Putr is now known as Putr|Away
+2011-02-17T09:02:43  <hans_> could someone pls tell me why 'svn co http://selenium.googlecode.com/svn/branches/grid2' doesnt work? error: 400 bad request for /svn/!svn/vcc/default
+2011-02-17T09:03:13  <hans_> i can successfully do: svn ls http://selenium.googlecode.com/svn/branches/grid2
+2011-02-17T09:04:03  <jarib> hans_: google code's svn isn't the most stable. perhaps retry a couple of times
+2011-02-17T09:04:17  <hans_> :-( ok thx
+2011-02-17T09:05:22  <jarib> fission6: "i can visibly see" isn't good enough - it's very likely not visible at the point in time selenium tries to use it
+2011-02-17T09:05:34  <jarib> so you probably need to wait for it to become visible
+2011-02-17T09:06:21  <fission6> i tried that i put a very long wait in there time.sleep(4)
+2011-02-17T09:06:48  <jarib> ok. what's the html of the element?
+2011-02-17T09:09:01  <fission6> <select name="attribute" id="id_attribute"><option><optionsgroup><option>..
+2011-02-17T09:09:26  <fission6> i can tell you that this select field is placed into the dom by jquery simulating a click on another button in the page
+2011-02-17T09:11:05  *** maraujop has joined #selenium
+2011-02-17T09:11:44  <maraujop> Q: is there any way to run selenium with a browser loaded with previous sessions? I'm trying to test oauth login, thanks
+2011-02-17T09:17:49  *** hans_ has quit IRC
+2011-02-17T09:20:25  <antlong> maraujop, use a custom profile
+2011-02-17T09:20:49  <maraujop> antlong: I'm trying hard but if I use one selenium fails to connect
+2011-02-17T09:24:50  <fission6> well i dont know, ill guess ill comeback in a bit
+2011-02-17T09:30:55  *** pnitin has quit IRC
+2011-02-17T09:34:40  *** amitev2 has quit IRC
+2011-02-17T09:34:44  *** amitev has joined #selenium
+2011-02-17T09:42:10  *** fuzzygroove has joined #selenium
+2011-02-17T09:46:00  *** sfbrian has joined #selenium
+2011-02-17T09:46:02  *** Putr|Away is now known as Putr
+2011-02-17T09:46:20  *** sburjan has quit IRC
+2011-02-17T09:46:27  *** jgarvin has quit IRC
+2011-02-17T09:48:21  <RossPatterson> hans_: Works for me.
+2011-02-17T10:16:29  *** pnitin has joined #selenium
+2011-02-17T10:28:07  *** soc42 has quit IRC
+2011-02-17T10:28:29  *** fission6 has quit IRC
+2011-02-17T10:32:23  *** afowler has joined #selenium
+2011-02-17T10:32:42  <selbot2> berrada@google.com 2011-02-17 18:37 Edited wiki page AndroidDriver through web user interface. - http://code.google.com/p/selenium/source/detail?r=11475
+2011-02-17T10:33:15  <afowler> i'm taking a look at http://code.google.com/p/selenium/issues/detail?id=567 -- any devs that i can talk to? i have a few suggestions
+2011-02-17T10:33:28  <afowler> (re: keyDown in googlechrome)
+2011-02-17T10:33:53  *** admc has joined #selenium
+2011-02-17T10:34:35  *** dereke_ has joined #selenium
+2011-02-17T10:37:58  *** dereke has quit IRC
+2011-02-17T10:38:40  *** dereke__ has joined #selenium
+2011-02-17T10:39:49  *** dereke_ has quit IRC
+2011-02-17T10:40:15  *** dereke has joined #selenium
+2011-02-17T10:42:34  *** fission6 has joined #selenium
+2011-02-17T10:42:51  <fission6> how do i do a test for a link existing in sel 2
+2011-02-17T10:43:22  *** dereke__ has quit IRC
+2011-02-17T10:54:51  <fission6> now alive in here, haha
+2011-02-17T10:56:06  <jimevans> fission6: depending on the language, issue a findElement for the link, and catch the NoSuchElementException if it doesn't exist.
+2011-02-17T10:56:16  <fission6> cool thanks
+2011-02-17T11:01:40  *** KirillJacobson has joined #selenium
+2011-02-17T11:04:11  *** dhackner has joined #selenium
+2011-02-17T11:16:11  *** pnitin has quit IRC
+2011-02-17T11:16:26  <fission6> is there a way when i start a test run to make firefox show up in the front of my desktop it always shows up behind the console
+2011-02-17T11:17:34  *** KirillJacobson has quit IRC
+2011-02-17T11:28:40  *** ian_mac has joined #selenium
+2011-02-17T11:31:41  <kpowell> is there a guide anywhere for grid2 setup/use?
+2011-02-17T11:33:55  *** KirillJacobson has joined #selenium
+2011-02-17T11:39:35  *** dereke_ has joined #selenium
+2011-02-17T11:39:37  *** dereke has quit IRC
+2011-02-17T11:41:10  <skip> Hey, is there a clever way to shut down an RC from the hub?
+2011-02-17T11:41:21  <skip> Or better yet, bounce it.
+2011-02-17T11:41:39  <skip> When I leave it hanging due to code errors.
+2011-02-17T11:45:00  *** KirillJacobson has quit IRC
+2011-02-17T11:50:28  <xirkus> anyone know how to include a &nbsp in an xpath expression being used by WebDriver?
+2011-02-17T11:53:25  *** lamdk has joined #selenium
+2011-02-17T11:54:33  <antlong> xirkus, why would you need that
+2011-02-17T11:57:08  *** brettporter has joined #selenium
+2011-02-17T12:03:00  *** mandric has quit IRC
+2011-02-17T12:04:28  *** dhackner has left #selenium
+2011-02-17T12:06:44  <xirkus> <antlong> I have an xpath expression that needs the &nbsp to disambiguate a contains() filter. I figured it out using a post by jarib on the watir groups. You have to use \u00a0 (the unicode for the &nbsp)
+2011-02-17T12:10:38  <antlong> interesting, i never needed that
+2011-02-17T12:14:39  *** KirillJacobson has joined #selenium
+2011-02-17T12:19:12  *** lawcab has quit IRC
+2011-02-17T12:22:54  *** maraujop has quit IRC
+2011-02-17T12:23:32  *** cpg|away is now known as cpg
+2011-02-17T12:27:15  <afowler> is there anybody here i can talk to about submitting a patch?
+2011-02-17T12:28:37  <RossPatterson> Not a lot of developers passing through today.  What's up?
+2011-02-17T12:29:14  <afowler> ah, i've got a patch for http://code.google.com/p/selenium/issues/detail?id=567
+2011-02-17T12:29:21  <afowler> i'm not a java dev, but it's just a fix for the JS
+2011-02-17T12:29:52  <RossPatterson> Nice.  And your question is?
+2011-02-17T12:30:23  <afowler> i'm about to post a comment to the ticket with the fix -- wasn't sure if i should pass it along directly to a committer
+2011-02-17T12:32:26  <RossPatterson> Yes and yes.  You can contact the committers via the selenium-devlopers list.  Mention the issue and that you've posted a patch.  It's a low traffic list, so they'll notice pretty quickly.  Someone will almost certainly volunteer to check it out and commit on your behalf.
+2011-02-17T12:33:08  <RossPatterson> But fair warning, it's a quiet day in Selenium-land.  I think a number of the committers are flying today.
+2011-02-17T12:33:33  <afowler> ha! will do -- thanks for the info
+2011-02-17T12:33:54  <RossPatterson> No problemo.  Patches are a Good Thing :-)
+2011-02-17T12:37:17  <RossPatterson> Goodnight Mr. and Mrs. America and all the ships at sea.
+2011-02-17T12:37:32  *** RossPatterson has quit IRC
+2011-02-17T12:39:45  *** mandric has joined #selenium
+2011-02-17T12:39:50  *** dereke__ has joined #selenium
+2011-02-17T12:43:22  *** dereke_ has quit IRC
+2011-02-17T12:48:50  *** skip has quit IRC
+2011-02-17T12:55:12  *** kylls has quit IRC
+2011-02-17T12:57:36  *** nirvdrum has quit IRC
+2011-02-17T12:57:56  *** nirvdrum has joined #selenium
+2011-02-17T13:00:10  *** xirkus has quit IRC
+2011-02-17T13:06:55  *** admc has quit IRC
+2011-02-17T13:13:50  *** fuzzygroove has left #selenium
+2011-02-17T13:14:06  <fission6> error running onStopped callback: TypeError: callback is not a function why do i get this when firefox closes
+2011-02-17T13:27:32  <fission6> if no elements are found using find_element_by, why is an error thrown? that makes unittesting tricker vs getting null or something
+2011-02-17T13:28:18  <fission6> well i guess i can use https://dev.axialmarket.com/app/opportunities/received/review/
+2011-02-17T13:28:20  <fission6> woops
+2011-02-17T13:28:27  <fission6> i mean assertRaises
+2011-02-17T13:36:09  *** cburroughs has quit IRC
+2011-02-17T13:44:27  <fission6> what gets returned if .get() fails
+2011-02-17T13:46:25  <antlong> try/except
+2011-02-17T13:46:42  *** admc has joined #selenium
+2011-02-17T13:56:48  <fission6> NoSuchElementException where is this declared if i want to import
+2011-02-17T14:09:30  *** xirkus has joined #selenium
+2011-02-17T14:09:47  <fission6> how do i avoid firefox opening and closing between each test case
+2011-02-17T14:19:51  <KirillJacobson> I am new to ruby/rake build. The build rev:11475 doesn't finish and fail in th FF:test. How to build standart-test.jar to run c# unit tests? I am getting 'general protection'  error in the new WebDriverIE and have to get to the root ofthe problem. I will share my findings. Kirill
+2011-02-17T14:20:52  <jimevans> KirillJacobson: What are you doing when you see the error?
+2011-02-17T14:27:19  <KirillJacobson> I am not sure if I understood your question. I have a set of selenium unit tests written in java. They are not mine and the person who wrote the is not here anymore. Six months ago these tests used to work. Now, with the new driver many things stopped working. I have 20b1. The major ofenders are "click" method (got a
+2011-02-17T14:30:26  <jimevans> I apologize for not being clearer. I was trying to find out what the test was doing when it crashed.
+2011-02-17T14:30:43  <jimevans> That would be a major clue where to start looking for the problem.
+2011-02-17T14:30:48  <KirillJacobson> Workaround with fireEvent) and wait for page to load. I am consistently getting GPE (java goes belley up with the close dialog box)
+2011-02-17T14:31:33  <jimevans> So these tests are using the 1.x API then? What version of IE?
+2011-02-17T14:32:40  <jimevans> Does the crash happen in the same place in the same test? Does it happen when you run the single crashing test in isolation?
+2011-02-17T14:33:30  *** mandric has quit IRC
+2011-02-17T14:33:43  <jimevans> I can almost guarantee that the problem is going to be in the C++ code of the IE driver.
+2011-02-17T14:35:32  <AutomatedTester> jimevans: if its Se1 it wont be using IEDriver
+2011-02-17T14:36:22  <jimevans> Yeah, but if Java itself is crashing, it's almost guaranteed that there's some native code happening somewhere.
+2011-02-17T14:36:38  <KirillJacobson> I am not shure about the version. I know that we are using the latest driver (IEDriver.dll). The system it rans on is Windows 7 (64 bit). Eclipse/java dev env. IE8 client.
+2011-02-17T14:36:47  <AutomatedTester> fission6: btw, the latest code in trunk will help you with htmlunit
+2011-02-17T14:37:11  <fission6> ok just getting some stuff up and going now and organzing my code / project structure
+2011-02-17T14:37:19  <fission6> excited to run it against htmlunit when the moment is right
+2011-02-17T14:37:22  <jimevans> KirillJacobson: That's a start. Is it the same test crashing in the same place every time?
+2011-02-17T14:37:28  <AutomatedTester> driver = webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.HTMLUNIT)
+2011-02-17T14:37:42  <AutomatedTester> thats all that should be needed
+2011-02-17T14:38:35  *** dereke_ has joined #selenium
+2011-02-17T14:39:59  <AutomatedTester> as always jimevans, you were correct
+2011-02-17T14:40:19  <AutomatedTester> did you and jarib get any closer with the ruby stuff?
+2011-02-17T14:40:44  <jimevans> AutomatedTester: haven't look at it since yesterday. i'm cleaning up some IE7 bits right now.
+2011-02-17T14:41:02  <AutomatedTester> fair enough
+2011-02-17T14:41:23  *** lamdk has quit IRC
+2011-02-17T14:41:54  <KirillJacobson> It crashases consistently while waiting for page to load. I know it is in the native code. I recompiled the new driver and can insert debug statments but i would prefer to ctreate a c# unit test and step through c++ in dev env. There are oter minor issues with the new code that i may fix along the way like temp
+2011-02-17T14:42:49  *** dereke__ has quit IRC
+2011-02-17T14:43:23  <KirillJacobson> Driver dll not deleted after the test (filemon shows that delete fails because th is locked)
+2011-02-17T14:43:49  <KirillJacobson> (sorry for spelling
+2011-02-17T14:44:21  <jimevans> KirillJacobson: Okay, that's a Java-specific thing. Using C# to find that problem won't work.
+2011-02-17T14:44:25  <KirillJacobson> Tiping on iphone because irc is blocked in the office)
+2011-02-17T14:44:40  <jimevans> You should be able to use C# to try to debug the crash, though.
+2011-02-17T14:45:07  <jimevans> As a tip, though, create your test in a console application, and attach the debugger to it.
+2011-02-17T14:45:14  <jimevans> Don't try to step through the managed code.
+2011-02-17T14:45:42  <jimevans> Sorry, attach the debugger to it to *only* debug native code.
+2011-02-17T14:45:49  *** cpg is now known as cpg|away
+2011-02-17T14:46:30  *** fission6 has quit IRC
+2011-02-17T14:46:32  *** nirvdrum has quit IRC
+2011-02-17T14:46:49  *** fission6 has joined #selenium
+2011-02-17T14:47:58  *** afowler has quit IRC
+2011-02-17T14:49:03  <KirillJacobson> The build failed again with thw firefox:test aborted and havent produced standard-test.jar required for c# unit tests
+2011-02-17T14:49:35  <jimevans> KirillJacobson: try "go //dotnet:ie-test"
+2011-02-17T14:50:09  <jimevans> "go -T" will show you all of the tasks available (but it's a long list).
+2011-02-17T14:51:26  *** dereke_ has quit IRC
+2011-02-17T14:51:49  <KirillJacobson> I have tried to change the test fixture to not  start java and call iedriver directly but something didn't work out in the environment manager
+2011-02-17T14:52:28  <jimevans> KirillJacobson: The "unit tests" are really "integration tests". They require a working web server. The test .jar provides that.
+2011-02-17T14:53:08  <jimevans> Did "go //dotnet:ie-test" not work?
+2011-02-17T14:53:29  <jimevans> (that should be from the root of your source tree)
+2011-02-17T14:54:28  <KirillJacobson> You are a life saver. It worked and now i have the jar with jettyserver
+2011-02-17T14:55:04  <jimevans> What part of the world are you in?
+2011-02-17T14:55:12  *** AutomatedTester has quit IRC
+2011-02-17T14:55:43  <jimevans> I ask, because I know you're going to have questions, and I'm about to leave for the day.
+2011-02-17T14:55:50  <KirillJacobson> I am ANT person and learning my ways with ruby/rakes
+2011-02-17T14:56:12  <KirillJacobson> I am from Boston
+2011-02-17T14:56:23  *** mandric has joined #selenium
+2011-02-17T14:56:31  *** fission6 has quit IRC
+2011-02-17T14:56:33  <jimevans> Ok, then we're in the same time zone. I'm in Tampa.
+2011-02-17T14:57:21  <jimevans> I'll be around off-and-on tomorrow during the workday. I probably know more about the C++ code in the IE driver than anyone else at the moment.
+2011-02-17T14:58:18  <KirillJacobson> Thank you very much. Now the framework shoud work and i have plenty things to try. I will report my findings tomorrow
+2011-02-17T15:00:24  <jimevans> Just remember my tip about not trying to step through C# code. There's an open issue on it (#1232)
+2011-02-17T15:00:27  <selbot2> (no owner) open/new Visual Studio debugging Selenium2 on Windows7 threading issue. - http://code.google.com/p/selenium/issues/detail?id=1232
+2011-02-17T15:06:07  *** LRain has quit IRC
+2011-02-17T15:07:05  <KirillJacobson> One more Q if you havent left yet. When i run Shoud open and xlose browser repeatedly test the IE comes up with an alert window - message from webpage - http localhost 1808. This alert prevents vrowser to close at the end of the test. How to disable the alert or kill it? It seems that ths alert always pops up for any page. I searched the code and couldn't find it. Thank you. Kirilll
+2011-02-17T15:08:57  <jimevans> KirillJacobson: That sounds like a JavaScript alert(). I've never seen that before on "any page".
+2011-02-17T15:09:25  <jimevans> Also, if you haven't already done so, you'll need to set the protected mode settings to be the same value for all zones (on or off).
+2011-02-17T15:09:44  *** antlong has quit IRC
+2011-02-17T15:12:14  *** jimevans has left #selenium
+2011-02-17T15:15:17  <KirillJacobson> Never mind about ab alert. It was my bad. I forgot to uninstall browser helper object from the machine wehe
+2011-02-17T15:16:31  <KirillJacobson> Where selenium build runs. Now your regression tests work fine
+2011-02-17T15:33:29  *** stephendonner has quit IRC
+2011-02-17T15:33:44  *** stephendonner has joined #selenium
+2011-02-17T15:36:03  *** andytinkham has quit IRC
+2011-02-17T15:36:09  *** andytinkham has joined #selenium
+2011-02-17T15:40:21  *** andytinkham has quit IRC
+2011-02-17T15:43:35  *** esteele has joined #selenium
+2011-02-17T15:49:28  *** xirkus has quit IRC
+2011-02-17T15:51:00  *** Fyrespray has joined #selenium
+2011-02-17T15:53:22  *** Fyrespray^ has quit IRC
+2011-02-17T15:54:03  *** dawagner has quit IRC
+2011-02-17T15:59:35  *** mandric has quit IRC
+2011-02-17T16:10:30  *** KirillJacobson has quit IRC
+2011-02-17T16:11:17  *** Putr is now known as Putr|Away
+2011-02-17T16:18:45  *** XCulver has quit IRC
+2011-02-17T16:18:59  *** cpg|away is now known as cpg
+2011-02-17T16:19:00  *** Fyrespray has quit IRC
+2011-02-17T16:19:53  *** kylls has joined #selenium
+2011-02-17T16:25:18  *** kylls has quit IRC
+2011-02-17T16:34:53  *** torrio has joined #selenium
+2011-02-17T16:36:35  <torrio> Hi, when running a test in python, using Selenium Grid ... is it possible to get the port of each test - while running ?
+2011-02-17T16:38:22  <torrio> Lets say i launch the hub on 4444, my "selenium instances" on 4445, 4446, 4447 and so on. All instances are connecting to 4444, is there any way to know - on which port each test is running ?
+2011-02-17T16:40:04  *** fuzzygroove has joined #selenium
+2011-02-17T16:41:40  *** fuzzygroove has left #selenium
+2011-02-17T16:51:51  *** cheezy has joined #selenium
+2011-02-17T16:52:04  *** cheezy has joined #selenium
+2011-02-17T16:57:43  *** cheezy has quit IRC
+2011-02-17T16:58:50  *** jleyba has quit IRC
+2011-02-17T16:59:52  *** Fyrespray has joined #selenium
+2011-02-17T17:04:46  *** Fyrespray has quit IRC
+2011-02-17T17:08:03  *** retornam has quit IRC
+2011-02-17T17:24:41  *** sfbrian_ has joined #selenium
+2011-02-17T17:28:33  *** sfbrian has quit IRC
+2011-02-17T17:59:39  *** stephendonner has quit IRC
+2011-02-17T18:02:35  *** simonstewart has left #selenium
+2011-02-17T18:03:29  *** sephinroth has joined #selenium
+2011-02-17T18:03:44  *** mbeierl has quit IRC
+2011-02-17T18:27:33  *** ian_mac2 has joined #selenium
+2011-02-17T18:29:51  *** cpg is now known as cpg|away
+2011-02-17T18:32:59  *** Fyrespray has joined #selenium
+2011-02-17T18:33:57  *** pnitin has joined #selenium
+2011-02-17T18:38:58  *** Fyrespray has quit IRC
+2011-02-17T18:53:48  *** admc has quit IRC
+2011-02-17T19:03:05  <selbot2> jmleyba 2011-02-18 03:08 JasonLeyba: Fix a build typo so the toggle atom actually toggles. - http://code.google.com/p/selenium/source/detail?r=11476
+2011-02-17T19:10:15  *** esteele has quit IRC
+2011-02-17T19:11:13  *** mandric has joined #selenium
+2011-02-17T19:32:39  *** pnitin has quit IRC
+2011-02-17T20:13:45  *** fuzzygroove has joined #selenium
+2011-02-17T20:13:48  *** nirvdrum has joined #selenium
+2011-02-17T20:30:19  *** fuzzygroove has left #selenium
+2011-02-17T20:34:02  *** nirvdrum has quit IRC
+2011-02-17T20:43:04  <selbot2> simon.m.stewart 2011-02-18 04:48 SimonStewart: Deleting the jsapi directory. To enable this, added a 'js_test' rule for running the existing js-based tests. Also added a 'debug-server' target to the Rakefile to replace //jsapi:debug:run. - http://code.google.com/p/selenium/source/detail?r=11477
+2011-02-17T20:49:58  *** Fyrespray has joined #selenium
+2011-02-17T20:54:10  *** Fyrespray has quit IRC
+2011-02-17T21:04:44  *** jdlee has quit IRC
+2011-02-17T21:08:06  *** pnitin has joined #selenium
+2011-02-17T21:21:57  <selbot2> simon.m.stewart 2011-02-18 05:27 SimonStewart: Checking in the missing js_test rule - http://code.google.com/p/selenium/source/detail?r=11478
+2011-02-17T21:36:00  <selbot2> simon.m.stewart 2011-02-18 05:41 SimonStewart: Deleting the unused iphone/test/java directory. This code was moved some time ago to the central java/client/test directory - http://code.google.com/p/selenium/source/detail?r=11479
+2011-02-17T21:39:45  *** Kirill_Jacobson has joined #selenium
+2011-02-17T21:40:30  *** cpg|away is now known as cpg
+2011-02-17T21:44:49  *** simonstewart_ has joined #selenium
+2011-02-17T21:45:16  <simonstewart_> G'day all
+2011-02-17T21:46:50  *** cpg is now known as gpc
+2011-02-17T21:47:02  *** gpc is now known as cpg
+2011-02-17T22:11:43  *** stephendonner has joined #selenium
+2011-02-17T22:17:35  *** Kirill_Jacobson has left #selenium
+2011-02-17T22:18:42  *** stephendonner has quit IRC
+2011-02-17T22:20:54  *** Fyrespray has joined #selenium
+2011-02-17T22:34:58  *** mayanks43 has joined #selenium
+2011-02-17T22:42:18  *** kpiwko has joined #selenium
+2011-02-17T23:01:21  *** retornam has joined #selenium
+2011-02-17T23:36:02  *** lfryc has joined #selenium
+2011-02-17T23:48:37  *** Fyrespray^ has joined #selenium
+2011-02-17T23:51:56  *** Fyrespray has quit IRC

@@ -1,0 +1,1322 @@
+2011-10-06T00:00:04  <stephend> 84.57 KB (86598 bytes) for https://crash-stats.mozilla.com/topcrasher/byversion/Firefox/10.0a1/7/all
+2011-10-06T00:01:54  *** soc42 has joined #selenium
+2011-10-06T00:03:14  <krosenvold> Good morning Ajay_
+2011-10-06T00:03:15  <barancev> isTextPresent -- seems this command caused the crash. if a page is huge, it might be an issue with space normalization as it should process the whole page
+2011-10-06T00:03:24  <stephend> ah
+2011-10-06T00:03:39  <stephend> I know the screenshot stuff is canvas
+2011-10-06T00:03:56  <stephend> I should try in chrome
+2011-10-06T00:04:37  <stephend> thx barancev, that makes sense
+2011-10-06T00:04:50  <stephend> also makes sense why we see it mostly in our production env. then
+2011-10-06T00:04:59  <stephend> (moar data there than on staging, to be sure)
+2011-10-06T00:07:51  *** zmijunkie has joined #selenium
+2011-10-06T00:11:56  <Ajay_> krosenvold: Morning ,#2613 might interest you but no sufficient info
+2011-10-06T00:12:15  <Ajay_> :help
+2011-10-06T00:12:15  <selbot2> #<issue-number>            - show issue
+2011-10-06T00:12:15  <selbot2> r<revision>                - show revision
+2011-10-06T00:12:16  <selbot2> :wiki                      - search the wiki
+2011-10-06T00:12:16  <selbot2> :yt                        - search YouTube
+2011-10-06T00:12:16  <selbot2> :note <receiver> <message> - send a note
+2011-10-06T00:12:16  <selbot2> :seen <nick>               - show when <nick> was last seen
+2011-10-06T00:12:16  <selbot2> :sehq                      - search SeleniumHQ
+2011-10-06T00:12:17  <selbot2> :newissue                  - link to issue the tracker
+2011-10-06T00:12:17  <selbot2> :apidocs                   - links to API docs
+2011-10-06T00:12:18  <selbot2> :downloads                 - link to the downloads page
+2011-10-06T00:12:18  <selbot2> :gist                      - link to gist.github.com
+2011-10-06T00:12:19  <selbot2> :ask                       - don't ask to ask.
+2011-10-06T00:12:20  <selbot2> :help                      - you're looking at it
+2011-10-06T00:12:21  <selbot2> :cla                       - link to Selenium's CLA
+2011-10-06T00:12:24  <selbot2> :log                       - link to today's chat log at saucelabs
+2011-10-06T00:12:35  <Ajay_>  #2613
+2011-10-06T00:12:36  <selbot2>  open/new Selenium webdriver memory leak - http://code.google.com/p/selenium/issues/detail?id=2613 [Type-Defect Priority-Medium]
+2011-10-06T00:13:59  <stephend> Ajay_: are you on 2.7.0?
+2011-10-06T00:14:09  <stephend> we haven't yet switched, just curious
+2011-10-06T00:14:25  <stephend> oh wow
+2011-10-06T00:14:43  <stephend> you can allocate more memory to the server; I should've known that (and should try it)
+2011-10-06T00:14:48  <stephend> we have to do that with Jenkins, too
+2011-10-06T00:15:58  <Ajay_> stephend: yes , we are 2.7
+2011-10-06T00:16:27  <stephend> cool
+2011-10-06T00:16:32  <stephend> how are you liking it?
+2011-10-06T00:16:35  <Ajay_> stephend: you should switch to webdriver too :)
+2011-10-06T00:16:41  <stephend> Ajay_: indeed
+2011-10-06T00:16:51  <stephend> we're doing that this quarter with a 105-test suite
+2011-10-06T00:16:57  <stephend> maybe more, if we can get the bandwidth
+2011-10-06T00:18:23  <stephend> we have no issues with our tests on sauce, and they're on 2.7.0
+2011-10-06T00:18:33  <stephend> but our issues tend to be Grid issues anyway
+2011-10-06T00:19:26  <Ajay_> stephend: catch hold of my mentor krosenvold
+2011-10-06T00:19:52  <Ajay_> he solved most of the concurrency issues in grid
+2011-10-06T00:20:17  <stephend> yeah, 2.6.0 was rock-solid for two days, for us
+2011-10-06T00:20:28  <stephend> then we added screenshots, and started seeing this slow-script stuff
+2011-10-06T00:20:48  <stephend> (and we had a lot of problems with 2.5.0 and below)
+2011-10-06T00:28:58  <Ajay_> stephend: just adding the screenshots slowed down ?
+2011-10-06T00:29:50  <stephend> Ajay_: screenshots + HTML reports
+2011-10-06T00:29:58  <stephend> we're using davehunt's new plugin
+2011-10-06T00:30:14  <stephend> https://github.com/davehunt/pytest-mozwebqa
+2011-10-06T00:31:12  *** barancev has quit IRC
+2011-10-06T00:31:52  *** stackedsax has quit IRC
+2011-10-06T00:35:22  *** Freeaqingme| has joined #selenium
+2011-10-06T00:40:11  *** ammar01 has joined #selenium
+2011-10-06T00:41:10  <Ajay_> does anybody have expreience on running  "go test_android" on real device ?
+2011-10-06T00:42:14  <stephend> Ajay_: thanks so much for your help
+2011-10-06T00:42:30  <stephend> 3 of my automation engineers are online and looking at the is_text_present call
+2011-10-06T00:42:36  <stephend> and they're cringing :-)
+2011-10-06T00:42:39  <stephend> so will fix soon
+2011-10-06T00:43:01  <Ajay_> stephend: i didnt do anything to thanks me :)
+2011-10-06T00:43:54  <Ajay_>  #2555
+2011-10-06T00:43:54  <selbot2>  open/new Memory issue when running with trustAllSSLCertificates - http://code.google.com/p/selenium/issues/detail?id=2555 [Type-Defect Priority-Medium Component-RC]
+2011-10-06T00:44:12  <Ajay_> *thanks = thank
+2011-10-06T00:44:22  <stephend> oh yeah, it was barancev, mostlly
+2011-10-06T00:44:24  <stephend> whoops
+2011-10-06T00:44:30  <stephend> good beer :-)
+2011-10-06T00:47:14  *** Yxven has joined #selenium
+2011-10-06T00:48:51  <krosenvold> stephend: grid only solid for 2 days ?
+2011-10-06T00:49:02  *** sburjan has joined #selenium
+2011-10-06T00:51:59  <stephend> yeah
+2011-10-06T00:52:07  <stephend> but we've changed code since then, added a new plugin
+2011-10-06T00:52:16  <stephend> started taking screenshots + saving html reports
+2011-10-06T00:52:37  <stephend> I remember we didn't have a single session issue for 2 days with 2.6.0
+2011-10-06T00:52:43  <stephend> we're using rc mode, BTW
+2011-10-06T00:53:08  *** evlew has quit IRC
+2011-10-06T00:53:14  <stephend> krosenvold: do you have any instrumented builds we could use?
+2011-10-06T00:53:41  <stephend> maybe we could run a debug as a test
+2011-10-06T00:53:54  <stephend> and send you the stack/snippet if/when we see the 500
+2011-10-06T00:55:32  *** mcr_mfc has joined #selenium
+2011-10-06T00:58:10  *** AutomatedTester has joined #selenium
+2011-10-06T01:00:11  *** mates has joined #selenium
+2011-10-06T01:01:52  <krosenvold> stephend: Whici issue is this ?
+2011-10-06T01:02:21  <stephend> krosenvold: we're getting a lot of 500s on our Grid infra
+2011-10-06T01:02:56  <krosenvold> stacktraces ?
+2011-10-06T01:03:03  *** Renacor has quit IRC
+2011-10-06T01:03:03  <stephend> I think at least one cause is that we're seeing a lot of slow-script dialogs
+2011-10-06T01:03:11  <stephend> because we used is_text_present on a huge page
+2011-10-06T01:03:14  <krosenvold> on get ?
+2011-10-06T01:03:30  <stephend> and because we use HTML reports and screen captures, it's OOMing
+2011-10-06T01:03:54  <krosenvold> The screen capture is memory intensive as hell, p your memory
+2011-10-06T01:03:57  <stephend> nah, on isTextPresent("no data")
+2011-10-06T01:03:57  <krosenvold> up
+2011-10-06T01:04:07  <stephend> krosenvold: I just do that from the command-line, right?
+2011-10-06T01:04:09  <stephend> like Jenkins
+2011-10-06T01:04:12  <krosenvold> yuop
+2011-10-06T01:04:14  <krosenvold> yup
+2011-10-06T01:04:35  <stephend> cool, I'll try java -Xms1024m -Xmx1024m -jar selenium-server-standalone-2.7.0.jar
+2011-10-06T01:04:39  <stephend> from that issue above
+2011-10-06T01:04:39  <stephend> thx
+2011-10-06T01:04:45  <stephend> well, 2.6.0, but yeah
+2011-10-06T01:06:19  *** Renacor has joined #selenium
+2011-10-06T01:10:11  *** Yxven has quit IRC
+2011-10-06T01:10:49  *** mcr_mfc1 has joined #selenium
+2011-10-06T01:10:50  *** mcr_mfc has quit IRC
+2011-10-06T01:14:42  <Renacor> https://gist.github.com/45470d1e7c30d0c1380c <-- why would an async js call throw a timeout exception?
+2011-10-06T01:23:47  *** MattR__ has joined #selenium
+2011-10-06T01:23:47  *** mcr_mfc1 has quit IRC
+2011-10-06T01:25:37  *** ThePeach has joined #selenium
+2011-10-06T01:26:27  <Ajay_> stephend: whats is your machine configuration ?
+2011-10-06T01:27:19  <Ajay_> you can play around with -Xmx
+2011-10-06T01:29:54  <stephend> Ajay_: I wanted to, but others didn't
+2011-10-06T01:30:02  <stephend> so we can look at the real issue
+2011-10-06T01:31:58  <davehunt> Yeah, thanks for the suggestion Ajay_, I'll be using it slightly differently, but still a good pointer
+2011-10-06T01:32:30  <davehunt> We launch via ant so not just a command line option for us, but I can experiment
+2011-10-06T01:32:30  *** MattR__ has quit IRC
+2011-10-06T01:32:44  *** MattR__ has joined #selenium
+2011-10-06T01:33:36  <Ajay_> davehunt: Cool
+2011-10-06T01:36:36  *** davehunt is now known as davehunt|away
+2011-10-06T01:42:14  *** mcr_mfc1 has joined #selenium
+2011-10-06T01:42:15  *** MattR__ has quit IRC
+2011-10-06T01:44:40  *** mcr_mfc1 has quit IRC
+2011-10-06T01:49:45  *** barancev has joined #selenium
+2011-10-06T01:50:12  *** mcr_mfc has joined #selenium
+2011-10-06T01:53:00  *** nitin has quit IRC
+2011-10-06T01:57:33  <barancev> today I've updated to HEAD and now I have problems with windows switching too
+2011-10-06T01:57:57  <barancev> postponing 2.8.0 :(
+2011-10-06T01:58:16  <krosenvold> barancev: Which browser/version ?
+2011-10-06T01:58:31  <barancev> FF6 + Win7
+2011-10-06T01:58:57  <barancev> JavaScript Error: "b.notifyOfSwitchToWindow is not a function
+2011-10-06T01:59:08  <barancev> with prebuilt dlls
+2011-10-06T02:00:09  <barancev> you may see yesterday's log, jarib wrote about it
+2011-10-06T02:05:41  <jarib> we found the cause
+2011-10-06T02:05:51  <jarib> the prebuilt .xpt's are outdated
+2011-10-06T02:06:14  <jarib> #2614
+2011-10-06T02:06:15  <selbot2>  open/accepted Updated prebuilds aren't copied in to the prebuild directories - http://code.google.com/p/selenium/issues/detail?id=2614 [Type-Defect Priority-Medium]
+2011-10-06T02:07:10  <barancev> go clean does not help
+2011-10-06T02:09:59  *** csanchez has quit IRC
+2011-10-06T02:15:27  *** xirkus has quit IRC
+2011-10-06T02:16:26  *** csanchez has joined #selenium
+2011-10-06T02:19:28  *** eranm has joined #selenium
+2011-10-06T02:21:57  *** sburjan has quit IRC
+2011-10-06T02:23:05  *** sburjan has joined #selenium
+2011-10-06T02:23:12  <eranm> jarib, morning. Still experiencing those failures?
+2011-10-06T02:28:00  *** barancev has quit IRC
+2011-10-06T02:30:55  <jarib> eranm: yes. the prebuilt .xpts aren't being updated
+2011-10-06T02:31:04  <jarib> #2614
+2011-10-06T02:31:05  <selbot2>  open/accepted Updated prebuilds aren't copied in to the prebuild directories - http://code.google.com/p/selenium/issues/detail?id=2614 [Type-Defect Priority-Medium]
+2011-10-06T02:31:13  *** barancev has joined #selenium
+2011-10-06T02:31:56  <jarib> so it's a crazyfun issue
+2011-10-06T02:33:00  <jarib> it's a bit sad that those of us who rely on releasing prebuilts have been shipping outdated .xpts for months :)
+2011-10-06T02:33:37  <eranm> Rather annoying, I'd say
+2011-10-06T02:33:53  <eranm> I'll have a look later on
+2011-10-06T02:37:48  <AutomatedTester> andreastt: yt?
+2011-10-06T02:39:45  <andreastt> AutomatedTester: I'm here (-:
+2011-10-06T02:40:04  <AutomatedTester> quick question does opera mini work on arm6 devices?
+2011-10-06T02:41:24  <andreastt> [11:54] <     jgraham> | Mini runs on almost anything
+2011-10-06T02:41:30  <andreastt> I'm being told.
+2011-10-06T02:41:46  *** nitin has joined #selenium
+2011-10-06T02:41:53  <AutomatedTester> ok cool
+2011-10-06T02:41:55  <andreastt> [11:54] <     zcorpan> | i think my phone has arm6. i have both mini and mobile
+2011-10-06T02:42:17  <andreastt> [11:55] <     zcorpan> | but i've failed to install firefox
+2011-10-06T02:42:19  <andreastt> Heh.
+2011-10-06T02:43:13  <AutomatedTester> andreastt: yea we dont work on arm6
+2011-10-06T02:43:32  <AutomatedTester> i was looking at our support and noticed that and was just curious
+2011-10-06T02:43:38  <andreastt> [11:56] <     jgraham> | Yeah, Mozilla need ARMv7. I think we support v6 on Mobile. Mini runs on almost anything.
+2011-10-06T02:44:47  <AutomatedTester> andreastt: i was asking because I wish we had a better mobile story in Africa, one that could compete with Opera
+2011-10-06T02:45:11  <AutomatedTester> but google are pushing cheap arm6 devices and we dont support that :?
+2011-10-06T02:45:13  <AutomatedTester> :/
+2011-10-06T02:45:15  <andreastt> It would be super-awesome if you could be on those kinds of devices as well!
+2011-10-06T02:45:31  <AutomatedTester> i totally agree
+2011-10-06T02:52:08  *** vrockai has joined #selenium
+2011-10-06T02:53:27  *** nitin has quit IRC
+2011-10-06T02:54:41  *** danielwh has quit IRC
+2011-10-06T02:55:06  *** dawagner has joined #selenium
+2011-10-06T02:55:07  <dawagner> :log
+2011-10-06T02:55:08  <selbot2> http://selenium.saucelabs.com/irc/logs/selenium.2011-10-06.log
+2011-10-06T02:56:12  *** oiiii has joined #selenium
+2011-10-06T02:57:39  <jarib> dawagner: yo
+2011-10-06T02:57:45  <dawagner> jarib: Hello! Where are we? :)
+2011-10-06T02:57:54  *** cburroughs has quit IRC
+2011-10-06T02:58:14  *** mcr_mfc has quit IRC
+2011-10-06T02:58:44  <jarib> i'm trying to build xpts and failing
+2011-10-06T02:58:52  <eranm> jarib, failing how?
+2011-10-06T02:59:41  <jarib> since it works for you, can you try this: https://gist.github.com/1267047 ?
+2011-10-06T03:01:02  <dawagner> Renacor: Timeout could be caused by 1) Not calling the callback function, or 2) Not calling it before the timeout set using driver.manage().timeouts().setScriptTimeout
+2011-10-06T03:01:05  <jarib> eranm: some missing dependencies
+2011-10-06T03:01:49  <dawagner> jarib: Yep, works for me - want me to check in the new xpt?
+2011-10-06T03:02:29  <jarib> dawagner: yes please
+2011-10-06T03:02:56  <jarib> are you guys able to build xpts on OS X?
+2011-10-06T03:03:09  *** zmijunkie_ has joined #selenium
+2011-10-06T03:03:30  <jarib> i'm getting https://gist.github.com/1267033
+2011-10-06T03:03:38  <jarib> can probably get it working on linux though
+2011-10-06T03:03:41  <selbot2> dawagner half a minute ago - DanielWagnerHall: Updating prebuild - http://code.google.com/p/selenium/source/detail?r=14052
+2011-10-06T03:04:32  <jarib> ok, let me run some tests with that
+2011-10-06T03:04:58  <dawagner> jarib: I get the same error on OSX
+2011-10-06T03:05:14  <dawagner> It's a known sdk problem
+2011-10-06T03:05:18  <jarib> k
+2011-10-06T03:05:30  <dawagner> https://groups.google.com/group/webdriver/browse_thread/thread/754d877f4045300a?pli=1
+2011-10-06T03:05:54  <dawagner> Ooh, with a workaround
+2011-10-06T03:06:41  *** zmijunkie has quit IRC
+2011-10-06T03:06:41  *** zmijunkie_ is now known as zmijunkie
+2011-10-06T03:06:48  * jarib runs some tests
+2011-10-06T03:09:34  <jarib> ugh, downloading gecko on windows isn't pretty
+2011-10-06T03:09:43  *** cheezy has joined #selenium
+2011-10-06T03:10:19  <jarib> dawagner: nice, it works
+2011-10-06T03:10:34  <jarib> i have some test failures for double clicking, but it could be the test
+2011-10-06T03:10:37  <dawagner> Clicking *and* window switching?
+2011-10-06T03:10:41  <jarib> yes
+2011-10-06T03:10:53  <jarib> no more missing functions
+2011-10-06T03:12:03  <jarib> just a couple of these
+2011-10-06T03:12:03  <jarib>     expected: "DoubleClicked"
+2011-10-06T03:12:03  <jarib>             got: "DoubleHello" (using ==)
+2011-10-06T03:12:55  <selbot2> jari.bakken 1 minute ago - JariBakken: Make downloading Gecko a bit more pleasant on Windows. - http://code.google.com/p/selenium/source/detail?r=14053
+2011-10-06T03:13:17  <eranm> jarib, log?
+2011-10-06T03:13:37  <jarib> dawagner: so can i close #2614 with the patch you applied?
+2011-10-06T03:13:38  <selbot2>  open/accepted Updated prebuilds aren't copied in to the prebuild directories - http://code.google.com/p/selenium/issues/detail?id=2614 [Type-Defect Priority-Medium]
+2011-10-06T03:13:41  *** danielwh has joined #selenium
+2011-10-06T03:13:51  <jarib> eranm: it's from the ruby tests
+2011-10-06T03:14:10  <eranm> Ok
+2011-10-06T03:14:31  <jarib> i'll run the java tests, and make sure it's not something with the test before i bother you :)
+2011-10-06T03:14:44  <dawagner> jarib: Yes please :)
+2011-10-06T03:14:48  <eranm> Fair enough. Have these tests ever passed for double click?
+2011-10-06T03:15:01  <jarib> not with native events
+2011-10-06T03:15:17  <jarib> so yeah, could have spotted this earlier
+2011-10-06T03:15:58  <jarib> but window switching has always worked
+2011-10-06T03:19:23  <selbot2> jari.bakken less than a minute ago - JariBakken: Make sure updated .xpts are copied into the prebuilt dirs. Fixes issue #2614. - http://code.google.com/p/selenium/source/detail?r=14054
+2011-10-06T03:19:32  <selbot2> jari.bakken 1 minute ago - JariBakken: Make sure updated .xpts are copied into the prebuilt dirs. Fixes issue #2614. - http://code.google.com/p/selenium/source/detail?r=14054
+2011-10-06T03:22:37  <jarib> yeah, the test needs a wait
+2011-10-06T03:22:48  *** vrockai has quit IRC
+2011-10-06T03:22:52  <jarib> (java has one for the same action)
+2011-10-06T03:25:14  *** vrockai_ has joined #selenium
+2011-10-06T03:25:47  * danielwh starts running the firefox tests in all the firefoxes again
+2011-10-06T03:26:42  <jarib> everything's nice and green in ruby now
+2011-10-06T03:27:00  * jarib goes for coffee
+2011-10-06T03:27:27  <selbot2> jari.bakken 1 minute ago - JariBakken: Add missing wait to double/context click spec. - http://code.google.com/p/selenium/source/detail?r=14055
+2011-10-06T03:27:27  <AutomatedTester> shopping has arrived and I kicked off tests
+2011-10-06T03:29:04  *** nirvdrum has joined #selenium
+2011-10-06T03:32:16  <danielwh> Woo, I'm starting to get firefox failures!
+2011-10-06T03:32:28  <jarib> :/
+2011-10-06T03:32:33  <jarib> like what?
+2011-10-06T03:33:05  <danielwh> Look like timing things
+2011-10-06T03:33:20  <dawagner> :gist
+2011-10-06T03:33:21  <selbot2> Please paste >3 lines of text to http://gist.github.com
+2011-10-06T03:33:31  <jarib> shouldn't the code your running be the same as before, theoretically?
+2011-10-06T03:33:35  *** cheezy has quit IRC
+2011-10-06T03:33:43  <danielwh> Yep
+2011-10-06T03:33:48  <dawagner> https://gist.github.com/1267110
+2011-10-06T03:40:50  *** csanchez has quit IRC
+2011-10-06T03:52:06  *** Ajay_ is now known as Ajay
+2011-10-06T03:52:28  *** brettporter has quit IRC
+2011-10-06T03:56:36  <jarib> dawagner: a flake? or do you have more new failures?
+2011-10-06T03:57:41  *** csanchez has joined #selenium
+2011-10-06T03:58:15  <danielwh> So far all the failures I've seen are flakes, trying to tidy them up a bit, but looking good for release in... 5 firefox versions' time... :)
+2011-10-06T03:59:34  * AutomatedTester just found he had disabled the python double click test 
+2011-10-06T04:00:21  *** xirkus has joined #selenium
+2011-10-06T04:03:04  <danielwh> Right, I am heading lunchwards, hopefully we will be good to go on my return :p
+2011-10-06T04:03:18  <jarib> great
+2011-10-06T04:05:01  *** nirvdrum_ has joined #selenium
+2011-10-06T04:05:36  *** nirvdrum has quit IRC
+2011-10-06T04:15:12  *** roltra has quit IRC
+2011-10-06T04:20:02  *** Ajay has quit IRC
+2011-10-06T04:20:09  *** mcr_mfc has joined #selenium
+2011-10-06T04:23:31  *** RossPatterson has joined #selenium
+2011-10-06T04:28:52  *** mcr_mfc1 has joined #selenium
+2011-10-06T04:28:52  *** mcr_mfc has quit IRC
+2011-10-06T04:30:58  *** __gotcha has joined #selenium
+2011-10-06T04:30:58  *** __gotcha has joined #selenium
+2011-10-06T04:33:42  *** Elvanor has quit IRC
+2011-10-06T04:38:50  *** MattR__ has joined #selenium
+2011-10-06T04:38:50  *** mcr_mfc1 has quit IRC
+2011-10-06T04:41:21  *** SamuraiJack has joined #selenium
+2011-10-06T04:42:00  *** nirvdrum has joined #selenium
+2011-10-06T04:42:08  *** SamuraiJack has quit IRC
+2011-10-06T04:42:10  *** nirvdrum_ has quit IRC
+2011-10-06T04:47:59  <barancev> go release don't copy prebuild, clean required :(
+2011-10-06T04:47:59  *** MattR__ has quit IRC
+2011-10-06T04:48:00  *** SamuraiJack has joined #selenium
+2011-10-06T04:48:18  *** MattR__ has joined #selenium
+2011-10-06T04:49:47  *** cburroughs has joined #selenium
+2011-10-06T04:50:34  <jarib> barancev: what do you mean?
+2011-10-06T04:51:24  <barancev> just updated from HEAD, run go release -- nothing happened, nothing was rebuilt
+2011-10-06T04:51:53  *** cgoldberg has joined #selenium
+2011-10-06T04:56:16  *** AutomatedTester has quit IRC
+2011-10-06T04:56:57  <jarib> barancev: why would it be?
+2011-10-06T04:56:57  *** MattR__ has quit IRC
+2011-10-06T04:57:17  *** MattR__ has joined #selenium
+2011-10-06T04:57:47  *** AutomatedTester has joined #selenium
+2011-10-06T04:57:50  <jarib> barancev: do you fall back to prebuilds for xpts?
+2011-10-06T05:01:06  *** csanchez has quit IRC
+2011-10-06T05:01:39  *** OperaDriver has joined #selenium
+2011-10-06T05:01:39  <OperaDriver> [operadriver] andreastt pushed 2 new commits to master: https://github.com/operasoftware/operadriver/compare/385b7bb...0793e20
+2011-10-06T05:01:39  <OperaDriver> [operadriver/master] Use a temporary profile and random port by default - Stuart Knightley
+2011-10-06T05:01:39  <OperaDriver> [operadriver/master] Set the logging level to FINE when running tests - Stuart Knightley
+2011-10-06T05:01:39  *** OperaDriver has left #selenium
+2011-10-06T05:02:16  <andreastt> Who can revoke Stuart's commit access, by the way?
+2011-10-06T05:04:35  <danielwh> andreastt: simon, patrick or jason
+2011-10-06T05:04:40  <danielwh> (So, Simon)
+2011-10-06T05:04:49  <andreastt> Cheers.
+2011-10-06T05:04:57  <andreastt> He's left Opera, you see.
+2011-10-06T05:05:04  <andreastt> (Yes, we're hiring. d-:)
+2011-10-06T05:05:22  <danielwh> He's welcome to continue contributing :p
+2011-10-06T05:05:29  <andreastt> That is true.
+2011-10-06T05:05:44  <barancev> jarib: probably
+2011-10-06T05:05:44  <andreastt> His commit access is personal, and not Opera-bound actually.
+2011-10-06T05:05:48  <andreastt> Guess we can leave it.
+2011-10-06T05:05:59  <barancev> I have already made clean
+2011-10-06T05:07:18  *** mcr_mfc1 has joined #selenium
+2011-10-06T05:07:19  *** MattR__ has quit IRC
+2011-10-06T05:19:01  <selbot2> dawagner 1 minute ago - DanielWagnerHall: Ignoring test which introduces noise in test results.  Issue 2282 already filed. - http://code.google.com/p/selenium/source/detail?r=14056
+2011-10-06T05:19:52  *** eekboom has joined #selenium
+2011-10-06T05:21:21  *** stockton has joined #selenium
+2011-10-06T05:25:42  *** jimevans has joined #selenium
+2011-10-06T05:26:08  <danielwh> Hi jimevans
+2011-10-06T05:26:24  <jimevans> Hi danielwh
+2011-10-06T05:26:30  <barancev> Win7x64: FF7, IE9, Chrome14 -- green
+2011-10-06T05:26:42  <danielwh> I was about to say let's go.  Then there was a compile error in ./go release.
+2011-10-06T05:26:47  *** mates has quit IRC
+2011-10-06T05:27:05  *** eekboom has quit IRC
+2011-10-06T05:27:24  <jimevans> Well that doesn't sound good.
+2011-10-06T05:30:01  <jimevans> But after solving that, we are ready to turn the crank?
+2011-10-06T05:30:40  *** cheezy has joined #selenium
+2011-10-06T05:33:39  <barancev> oh, god! test_rb generates so many log files. how to get the whole picture?
+2011-10-06T05:35:25  *** OperaDriver has joined #selenium
+2011-10-06T05:35:25  <OperaDriver> [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/08ec0b6c53a36df347d1a09073e38c84e38df9b1
+2011-10-06T05:35:25  <OperaDriver> [operadriver/master] Since -pd is ignored in gogi, -* is completely ignored and gogi cannot guess if an unknown flag should have had a value - Andreas Tolf Tolfsen
+2011-10-06T05:35:25  *** OperaDriver has left #selenium
+2011-10-06T05:35:29  <barancev> test_rb is green on WIn7 x64
+2011-10-06T05:41:21  * jimevans is very irritable today. 
+2011-10-06T05:41:51  *** mates has joined #selenium
+2011-10-06T05:43:45  <jimevans> Be right back.
+2011-10-06T05:43:47  *** jimevans has left #selenium
+2011-10-06T05:45:16  *** jimevans has joined #selenium
+2011-10-06T05:45:26  <jimevans> okay i'm back
+2011-10-06T05:46:17  <krosenvold> jimevans: I'm wondering, could you check if the .NET bindings call abort() on the Http client connection ?
+2011-10-06T05:48:06  <AutomatedTester> jarib: I thought, and hoping for correction, that watir-webdriver turns things in xpath for finding things on the page
+2011-10-06T05:48:19  <AutomatedTester> hi hi jimevans
+2011-10-06T05:49:07  <amitev> hi all! i have the feeling that selenium.waitForPageToLoad() doesn't work well with the IE driver
+2011-10-06T05:49:26  <selbot2> dawagner 18 minutes ago - DanielWagnerHall: Updating javadocs.  Hopefully the last big javadoc commit - http://code.google.com/p/selenium/source/detail?r=14057
+2011-10-06T05:49:39  <jimevans> AutomatedTester: hi
+2011-10-06T05:49:43  <selbot2> dawagner 18 minutes ago - DanielWagnerHall: Updating javadocs.  Hopefully the last big javadoc commit - http://code.google.com/p/selenium/source/detail?r=14057
+2011-10-06T05:50:11  <jimevans> krosenvold: i don't know if it does or not. it doesn't do so explicitly from the driver, but under the covers it might.
+2011-10-06T05:50:11  <selbot2> dawagner 18 minutes ago - DanielWagnerHall: Updating javadocs.  Hopefully the last big javadoc commit - http://code.google.com/p/selenium/source/detail?r=14057
+2011-10-06T05:50:41  *** ian_mac_ has joined #selenium
+2011-10-06T05:52:54  *** cheezy has quit IRC
+2011-10-06T05:53:07  <danielwh> Seriously?
+2011-10-06T05:53:17  <danielwh> I can commit the javadocs, but when I try to commit the changelog, google code craps out?
+2011-10-06T05:54:35  <jarib> AutomatedTester: that's true
+2011-10-06T05:54:54  <AutomatedTester> if i want to get the name of the task in the rakefile from inside the task I need to do what?
+2011-10-06T05:55:08  <AutomatedTester> jarib: Alister Scotts figures seem very skewed then...
+2011-10-06T05:55:22  <jarib> task(:foo) { |task| task.name }
+2011-10-06T05:55:32  <jarib> (i think)
+2011-10-06T05:55:38  <jarib> AutomatedTester: indeed, i replied to him about it
+2011-10-06T05:56:13  <jarib> since both capybara and watir-webdriver builds on selenium-webdriver, it seems odd they should perform better
+2011-10-06T05:57:32  <jarib> and his selenium-webdriver code could be better written, perhaps he's subconciously trying to make it look worse :P
+2011-10-06T05:58:08  <jarib> i'm sure he had concluded what API he'd recommend before sitting down to write the post :)
+2011-10-06T05:58:18  <danielwh> jimevans, jarib, AutomatedTester: Let's do this (if svn lets us)
+2011-10-06T05:58:25  <jarib> wee!
+2011-10-06T05:58:36  <AutomatedTester> danielwh: revision number?
+2011-10-06T05:58:39  <jimevans> let me commit the .net change log, then you can tag the release as far as i'm concerned.
+2011-10-06T05:58:41  * jarib goes to write the changelog
+2011-10-06T05:59:23  <jarib> damn, svn is slow
+2011-10-06T05:59:27  <danielwh> AutomatedTester: 14057
+2011-10-06T05:59:37  <AutomatedTester> danke
+2011-10-06T05:59:44  <danielwh> I've been trying to commit my changelog for the last few minutes, svn seems to be dying
+2011-10-06T06:00:05  <selbot2> dawagner 1 minute ago - DanielWagnerHall: Updating changelog for 2.8 - http://code.google.com/p/selenium/source/detail?r=14058
+2011-10-06T06:00:24  <jarib> danielwh: please go speed up bigtable
+2011-10-06T06:01:05  <AutomatedTester> wtf google code
+2011-10-06T06:01:08  <AutomatedTester> svn: REPORT of '/svn/!svn/vcc/default': 200 OK (https://selenium.googlecode.com)
+2011-10-06T06:01:11  <danielwh> :D
+2011-10-06T06:01:26  <AutomatedTester> 200 == ok last time I checked
+2011-10-06T06:03:05  *** mltolun has joined #selenium
+2011-10-06T06:03:44  * danielwh is playing with maven.  Hello internet.
+2011-10-06T06:04:07  *** Ajay has joined #selenium
+2011-10-06T06:04:09  <danielwh> https://code.google.com/p/selenium/source/list "There are no revisions on this subtree."
+2011-10-06T06:04:19  <jimevans> sigh. googlecode fail.
+2011-10-06T06:05:17  <AutomatedTester> ok so cant really do an up
+2011-10-06T06:05:44  <jimevans> whew. got the .net changelog committed. :)
+2011-10-06T06:06:33  <selbot2> james.h.evans.jr@gmail.com 2 minutes ago - JimEvans: Updating .NET CHANGELOG - http://code.google.com/p/selenium/source/detail?r=14059
+2011-10-06T06:07:05  <Ajay> :log
+2011-10-06T06:07:06  <selbot2> http://selenium.saucelabs.com/irc/logs/selenium.2011-10-06.log
+2011-10-06T06:07:18  *** OperaDriver has joined #selenium
+2011-10-06T06:07:18  <OperaDriver> [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/445a29111669af7939240a20bcaca29f53074ba2
+2011-10-06T06:07:18  <OperaDriver> [operadriver/master] Merge branch 'ecmascriptservice_OPDRV-40' of ssh://dvcs.oslo.osa/var/git/core-systems/webdriver-opera - Andreas Tolf Tolfsen
+2011-10-06T06:07:18  *** OperaDriver has left #selenium
+2011-10-06T06:07:43  <andreastt> Ajay: I'm getting to your patch (-;
+2011-10-06T06:07:50  <jimevans> jarib: does watir-webdriver cache elements?
+2011-10-06T06:08:17  * jimevans is also looking alister scott's latest blog entry
+2011-10-06T06:08:44  <danielwh> krosenvold: yt?
+2011-10-06T06:08:45  <jarib> it used to
+2011-10-06T06:08:47  <jarib> now it's configurable
+2011-10-06T06:08:52  <jarib> (and off by default)
+2011-10-06T06:08:55  <danielwh> Got a maven error trying to deploy
+2011-10-06T06:09:23  <jarib> i always run with the cache enabled.
+2011-10-06T06:09:58  <jimevans> ok. like AutomatedTester, i'm just trying to figure out the perf discrepancies.
+2011-10-06T06:11:41  *** Ajay has quit IRC
+2011-10-06T06:12:44  <jimevans> .net bindings build started. this will result in an automatic push to the *sigh* nuget repository.
+2011-10-06T06:14:43  <selbot2> dawagner 1 minute ago - Tagging 2.8 at revision 14059 - http://code.google.com/p/selenium/source/detail?r=14060
+2011-10-06T06:15:34  <danielwh> Balls.  Will re-tag that without all the maven changes
+2011-10-06T06:16:43  <RossPatterson> Alister's numbers make no sense.  Yo no hablo "ruby", per yo hablo "benchmark" muy bien.  I wonder if the Ruby "bench" package knows how to exclude things like first-run effects, etc.
+2011-10-06T06:16:47  <selbot2> david.burns@theautomatedtester.co.uk less than a minute ago - David Burns bumping version to 2.8 for python - http://code.google.com/p/selenium/source/detail?r=14061
+2011-10-06T06:17:11  *** jeichar has quit IRC
+2011-10-06T06:18:26  <jarib> he's only running it once
+2011-10-06T06:18:48  <selbot2> david.burns@theautomatedtester.co.uk less than a minute ago - DavidBurns updating change log for Python - http://code.google.com/p/selenium/source/detail?r=14062
+2011-10-06T06:18:50  <jarib> let's see what happens when it's run 10 times
+2011-10-06T06:18:57  <RossPatterson> jarib: Exactly.
+2011-10-06T06:19:30  <RossPatterson> And then exclude the first run, which causes library loads, etc. etc. etc.
+2011-10-06T06:20:41  <selbot2> dawagner half a minute ago - DanielWagnerHall: Deleting tags - had local changes from maven deploy - http://code.google.com/p/selenium/source/detail?r=14063
+2011-10-06T06:21:28  <jarib> selenium-webdriver  1.680000   0.830000  20.840000 ( 41.997472)
+2011-10-06T06:21:28  <jarib> watir-webdriver     1.890000   0.880000  22.970000 ( 43.447814)
+2011-10-06T06:21:29  <jarib> capybara            2.560000   0.930000  23.170000 ( 45.247295)
+2011-10-06T06:21:41  <RossPatterson> That's more like what I'd expect.
+2011-10-06T06:21:53  <jarib> yep
+2011-10-06T06:21:57  * jarib goes back to the changelog
+2011-10-06T06:23:30  <danielwh> Right, I'm going to try pushing to maven.  I wonder how wrong this will go.
+2011-10-06T06:23:52  <danielwh> Oh wait, first I need to download the internet again...
+2011-10-06T06:26:09  *** OperaDriver has joined #selenium
+2011-10-06T06:26:09  <OperaDriver> [operadriver] andreastt pushed 1 new commit to master: https://github.com/operasoftware/operadriver/commit/e8f1033da22080a318e6a47145685980010cd89f
+2011-10-06T06:26:09  <OperaDriver> [operadriver/master] Merge branch 'master' of https://github.com/ajayk/operadriver into ajayk-master - Andreas Tolf Tolfsen
+2011-10-06T06:26:09  *** OperaDriver has left #selenium
+2011-10-06T06:29:41  *** ian_mac_ has quit IRC
+2011-10-06T06:32:06  *** beakerman has joined #selenium
+2011-10-06T06:32:13  *** ian_mac_ has joined #selenium
+2011-10-06T06:32:33  <danielwh> krosenvold: I find it a bit weird that all of the projects were happy to build in maven with an incorrect junit dep, until selenium-support...
+2011-10-06T06:40:19  *** soc42 has quit IRC
+2011-10-06T06:40:57  *** dmachi has joined #selenium
+2011-10-06T06:40:58  *** dmachi1 has quit IRC
+2011-10-06T06:44:25  *** QAGuy has joined #selenium
+2011-10-06T06:45:37  <selbot2> david.burns@theautomatedtester.co.uk less than 20 seconds ago - DavidBurns reverting change to where it finds firefox that wasnt meant to be checked in - http://code.google.com/p/selenium/source/detail?r=14064
+2011-10-06T06:46:53  <jimevans> when will the release be in the central maven repository... :-P
+2011-10-06T06:46:55  * jimevans ducks
+2011-10-06T06:47:23  <jimevans> had to be the first one to say it...
+2011-10-06T06:47:29  <AutomatedTester> *sigh* releasing 2.8.1 already
+2011-10-06T06:47:53  <jimevans> that's what you get for testing it against nightlies... :)
+2011-10-06T06:48:10  <AutomatedTester> its a *minefield* i tell you
+2011-10-06T06:48:19  <jimevans> lol
+2011-10-06T06:48:21  <AutomatedTester> *ba doom tish* don't forget to tip your waiters
+2011-10-06T06:48:21  *** cgoldberg has quit IRC
+2011-10-06T06:48:41  <AutomatedTester> try the veal
+2011-10-06T06:50:00  <jimevans> gratz to everyone on a timely release. i love that we've gotten to almost simultaneous langauge binding releases.
+2011-10-06T06:51:45  <ian_mac_> is there any hope of http://code.google.com/p/selenium/issues/list?can=2&q=mootools&colspec=ID+Stars+Type+Status+Priority+Milestone+Owner+Summary&cells=tiles
+2011-10-06T06:51:51  <ian_mac_> those two issues getting fixed ever?
+2011-10-06T06:51:51  <AutomatedTester> wow the Python binary is getting large
+2011-10-06T06:53:16  <AutomatedTester> ian_mac: have you got something we can replicate it with
+2011-10-06T06:56:05  * danielwh punches maven a little bit
+2011-10-06T06:58:20  *** cgoldberg has joined #selenium
+2011-10-06T06:58:34  <AutomatedTester> and we are released
+2011-10-06T06:58:41  <AutomatedTester> Go Team!
+2011-10-06T06:59:13  <selbot2> jari.bakken less than a minute ago - JariBakken: Bump gem version to 2.8.0, update CHANGES - http://code.google.com/p/selenium/source/detail?r=14065
+2011-10-06T06:59:15  <AutomatedTester> glad we synergized for the win win situation that made as successful in the endeavor of releasing Selenium 2.8.
+2011-10-06T06:59:17  *** stockton has quit IRC
+2011-10-06T06:59:35  *** Fry33 has joined #selenium
+2011-10-06T07:00:41  <Fry33> Hi allm I see there's already avaliable 2.8 version, but what regarding andriod?I see there's no server for 2.7.0. Could you please provide any info regarding android?
+2011-10-06T07:00:52  *** beakerman has quit IRC
+2011-10-06T07:01:21  <cgoldberg> AutomatedTester, w00t.. i see 2.8.1 on pypi.. testing my framework now
+2011-10-06T07:01:52  <AutomatedTester> cgoldberg: yea, I had to do a quick minor release otherwise it was expecting Firefox Nightly
+2011-10-06T07:02:26  *** beakerman has joined #selenium
+2011-10-06T07:02:26  *** barancev has quit IRC
+2011-10-06T07:03:01  <jerware> How can I put comments in the IDE with out opening up the html file to doa <!-- -->  ?
+2011-10-06T07:03:13  <danielwh> :newissue
+2011-10-06T07:03:13  <selbot2> http://code.google.com/p/selenium/issues/entry
+2011-10-06T07:03:51  <AutomatedTester> jerware: there used to be a right click way to do it
+2011-10-06T07:04:15  <jerware> Oh thanks.  Insert new comment under insert new command.
+2011-10-06T07:08:12  *** csanchez has joined #selenium
+2011-10-06T07:14:48  <cgoldberg> AutomatedTester, hmm.. did anything change in 2.8 around webdriver quit() method?
+2011-10-06T07:15:44  <cgoldberg> AutomatedTester, sorry if that's a vague question.  but I've got a failing test that passes with 2.7 but not 2.8.. it's failing when calling quit()
+2011-10-06T07:16:23  <AutomatedTester> i dont think I did
+2011-10-06T07:16:42  <AutomatedTester> is this with the selenium server or without it?
+2011-10-06T07:17:00  *** lord1234 has joined #selenium
+2011-10-06T07:17:01  <cgoldberg> AutomatedTester, without.  just using webdriver /python
+2011-10-06T07:17:16  <danielwh> cgoldberg: Got a stack trace?
+2011-10-06T07:17:19  <AutomatedTester> whats the error?
+2011-10-06T07:17:59  <cgoldberg> AutomatedTester, danielwh : http://paste.ubuntu.com/703414/
+2011-10-06T07:18:48  *** stockton has joined #selenium
+2011-10-06T07:18:57  <AutomatedTester> wierd
+2011-10-06T07:20:27  <cgoldberg> AutomatedTester, just rolled back my client bindings to 2.7.0 and verified the same test passes
+2011-10-06T07:20:32  *** cakehero has joined #selenium
+2011-10-06T07:21:50  <AutomatedTester> hmm
+2011-10-06T07:22:08  <AutomatedTester> Ubuntu 11.04 ?
+2011-10-06T07:22:59  <cgoldberg> AutomatedTester, yup.. with latest stable Firefox 7
+2011-10-06T07:23:09  <AutomatedTester> just firing up a VM
+2011-10-06T07:23:18  <AutomatedTester> i cant see anything obvious
+2011-10-06T07:24:21  <cgoldberg> AutomatedTester, quit works fin on most cases, but is failing on this one, which does some switching between frames.  It's wrapped in my framework deeply, so I will try to create a simple python/webdriver script that shows it better
+2011-10-06T07:24:47  <AutomatedTester> ahhh that might make sense
+2011-10-06T07:26:04  *** barancev has joined #selenium
+2011-10-06T07:26:24  <AutomatedTester> I wonder, and maybe reaching, if r14011 has something to do with it
+2011-10-06T07:26:29  <selbot2> eran.mes@gmail.com 2 days ago - EranMes, on behalf of AndreasHaas: Indicate window switching by in-process function call, rather than a file on the filesystem. This solves issue 1326. - http://code.google.com/p/selenium/source/detail?r=14011
+2011-10-06T07:26:42  <jarib> cgoldberg: do you have native events enabled?
+2011-10-06T07:27:04  <selbot2> dawagner less than a minute ago - DanielWagnerHall: Correcting dependency in pom - http://code.google.com/p/selenium/source/detail?r=14066
+2011-10-06T07:27:06  <cgoldberg> jarib, not sure.. how would I know?
+2011-10-06T07:27:27  <jarib> on linux you'd have to explicitly enable it
+2011-10-06T07:27:42  <jarib> so if you don't know, you probably don't
+2011-10-06T07:27:53  <cgoldberg> jarib, i definitely don't then
+2011-10-06T07:27:56  <AutomatedTester> jarib: I might have an issue in my code then
+2011-10-06T07:28:40  <jarib> AutomatedTester: well, some of that code path is still run without native events, it's just a no-op
+2011-10-06T07:28:57  <jarib> but then again he's switching frames, not windows
+2011-10-06T07:29:04  <ian_mac_> AutomatedTester - I did, but kinda gave up back then, but I will create a new one and submit it
+2011-10-06T07:29:15  <AutomatedTester> i have it turned on by default in python
+2011-10-06T07:29:29  <jarib> oh
+2011-10-06T07:29:55  <jarib> then i will shut up :P
+2011-10-06T07:30:06  <AutomatedTester> http://code.google.com/p/selenium/source/browse/trunk/py/selenium/webdriver/firefox/firefox_profile.py#78
+2011-10-06T07:30:17  *** davehunt|away is now known as davehunt
+2011-10-06T07:30:18  <AutomatedTester> is it supposed to be false by default?
+2011-10-06T07:30:21  *** mltolun has quit IRC
+2011-10-06T07:30:41  <davehunt> are we passed the point of no return for 2.8? I have a small patch, but it can wait for 2.9.0
+2011-10-06T07:30:49  *** mcr_mfc1 has quit IRC
+2011-10-06T07:31:00  <jarib> AutomatedTester: in java and ruby (and i imagine .NET) it's on by default only on windows
+2011-10-06T07:31:02  <danielwh> davehunt: What's your patch?
+2011-10-06T07:31:51  <davehunt> danielwh: It's for #2616
+2011-10-06T07:31:52  <selbot2> dave.h...@gmail.com open/new Prevent output of entire HTML to console when using getHtmlSource - http://code.google.com/p/selenium/issues/detail?id=2616 [Type-Enhancement Priority-High]
+2011-10-06T07:32:12  *** naeg has joined #selenium
+2011-10-06T07:34:02  <danielwh> Hmm... What do people think?
+2011-10-06T07:34:29  <AutomatedTester> danielwh: we can do a 2.8.1 release quickly
+2011-10-06T07:34:57  <jarib> i thought the last digit was reserved for individual bindings
+2011-10-06T07:35:06  *** terevos has joined #selenium
+2011-10-06T07:35:09  <AutomatedTester> oh
+2011-10-06T07:35:12  <AutomatedTester> I dont know then
+2011-10-06T07:35:15  <danielwh> davehunt: Where's your patch?
+2011-10-06T07:35:39  <terevos> I have some questions about webdriver's interaction with selection boxes (multiple)
+2011-10-06T07:35:48  <jarib> it's an enhancement, not a regression. i vote for waiting for 2.9
+2011-10-06T07:36:08  <jarib> sorry davehunt :)
+2011-10-06T07:36:15  <terevos> when using .click on a selection box (multiple), it doesn't simply click, it ctrl+clicks..  (adds a selection rather than replacing)..
+2011-10-06T07:36:35  <terevos> so my question is:  how do you do a plain click (not clear the selection, but plain click)
+2011-10-06T07:36:37  <danielwh> I'm inclined to agree... davehunt how about you release it next week? ;)
+2011-10-06T07:36:47  <davehunt> jarib, danielwh: no problem
+2011-10-06T07:36:51  <davehunt> the patch is here: https://gist.github.com/1267587
+2011-10-06T07:37:29  <davehunt> So I should hold off committing until 2.8.0 is out?
+2011-10-06T07:37:48  <lord1234> jarib, terevos is here about the pastie that we talked about last nite
+2011-10-06T07:37:52  <lord1234> hi dan
+2011-10-06T07:38:11  <jarib> terevos: AFAIK you'll have to clear + click, or use the advanced interactions API
+2011-10-06T07:38:33  <terevos> right, I understand that there's a workaround, but I still need to test the difference between a click and ctrl+click in my application
+2011-10-06T07:39:51  <jarib> terevos: then use the advanced interactions api
+2011-10-06T07:39:59  <jarib> driver.action.click(element).perform
+2011-10-06T07:40:03  <jarib> that'll be a plain click.
+2011-10-06T07:40:11  <terevos> oh really?
+2011-10-06T07:40:13  <danielwh> 2.8.0 is out :) and I've just managed to tag - feel free to commit
+2011-10-06T07:40:22  <jarib> yes really :)
+2011-10-06T07:40:29  <jarib> well, i think so
+2011-10-06T07:40:31  <jarib> hmm
+2011-10-06T07:40:34  * jarib checks
+2011-10-06T07:40:40  <terevos> ok, I'll try it out
+2011-10-06T07:40:50  <selbot2> dawagner less than a minute ago - DanielWagnerHall: Tagging 2.8.0 at revision 14066 - http://code.google.com/p/selenium/source/detail?r=14067
+2011-10-06T07:40:50  <jarib> hmm, no
+2011-10-06T07:40:52  <jarib> i'm wrong
+2011-10-06T07:41:42  <jarib> i wonder if that's how we intended it when click on options was changed to do ctrl+click
+2011-10-06T07:42:21  <danielwh> jarib: It's a unsightly bit of API simon isn't a huge fan of, but didn't realise would be an issue with getting rid of toggle...
+2011-10-06T07:42:37  <jarib> i kicked and screamed
+2011-10-06T07:42:46  <jarib> about this very issue
+2011-10-06T07:43:01  <terevos> jarib: ah, so it was purposeful to change click to do ctrl+click?
+2011-10-06T07:43:01  <jarib> and simon said AUI would do the normal click
+2011-10-06T07:43:16  <jarib> terevos: yes (though not my decision)
+2011-10-06T07:43:36  <danielwh> jarib: Feel free to kick and scream at him s'more ;)
+2011-10-06T07:43:56  <danielwh> barancev: I resent you for how many changelog entries I had to make for your many bug fixes.  Well done.
+2011-10-06T07:44:22  <terevos> well, first of all, it doesn't mirror user behavior..  click should be plain click *always*
+2011-10-06T07:44:39  <selbot2> dave.hunt@gmail.com half a minute ago - DaveHunt: Fixed issue #2616. Console now contains '[HTML source]' instead of full source. - http://code.google.com/p/selenium/source/detail?r=14068
+2011-10-06T07:45:30  *** stockton has quit IRC
+2011-10-06T07:45:46  <danielwh> I think the potential resolution he had in mind was making WebElement.click toggle, and Actions.click do a real click
+2011-10-06T07:46:25  <jarib> yes
+2011-10-06T07:46:26  <AutomatedTester> is it using the synthetic mouse stuff he wanted ?
+2011-10-06T07:46:51  <jarib> it's discussed a little here
+2011-10-06T07:46:52  <jarib> https://groups.google.com/forum/#!msg/selenium-developers/fCJYjFAJXTk/hd3Sx0Ef43UJ
+2011-10-06T07:47:30  <AutomatedTester> wow, this vm's repo is really out of date
+2011-10-06T07:48:34  <terevos> yeah, confirmed the action.click does not work
+2011-10-06T07:49:27  *** santiycr has joined #selenium
+2011-10-06T07:49:59  <danielwh> I do believe I just started the push to maven central.
+2011-10-06T07:50:22  <terevos> so what steps can we take to either correct the action.click behavior or revert driver.click ?
+2011-10-06T07:51:54  <AutomatedTester> cgoldberg: repo updated, now building, I may need to download gecko so could be a while
+2011-10-06T07:52:10  *** andytinkham has joined #selenium
+2011-10-06T07:52:14  <cgoldberg> AutomatedTester, k
+2011-10-06T07:52:28  *** sburjan has quit IRC
+2011-10-06T07:52:51  <AutomatedTester> cgoldberg: just want to see how my frame tests go
+2011-10-06T07:54:04  <jarib> terevos: first step would be to figure out what the intended behaviour is
+2011-10-06T07:54:07  <lord1234> terevos, most likely, submit a bug to the google code issue tracker, and wait....
+2011-10-06T07:54:29  <jarib> i'll try to dig up the discussion
+2011-10-06T07:54:44  <terevos> thanks.. I would appreciate that
+2011-10-06T07:56:02  *** barancev has quit IRC
+2011-10-06T07:56:10  *** lukeis has joined #selenium
+2011-10-06T07:56:38  <selbot2> dawagner half a minute ago - DanielWagnerHall: Updating download links - http://code.google.com/p/selenium/source/detail?r=14069
+2011-10-06T07:57:30  <jarib> terevos: ok - so with native events, it works as i described - Actions.click is a plain click
+2011-10-06T07:57:41  <terevos> ah, I am using remote
+2011-10-06T07:57:56  <jarib> so the bug here seems to be that native and synthesized events differ in this case
+2011-10-06T07:59:19  *** vrockai_ has quit IRC
+2011-10-06T07:59:53  *** retornam has joined #selenium
+2011-10-06T08:01:20  <danielwh> Who do I talk to to get access to http://seleniumhq.wordpress.com?
+2011-10-06T08:02:12  <terevos> jarib: so is there a place to submit bugs? and is this something that I should do?
+2011-10-06T08:02:21  <jarib> :newissue
+2011-10-06T08:02:21  <selbot2> http://code.google.com/p/selenium/issues/entry
+2011-10-06T08:02:25  <jarib> yes
+2011-10-06T08:05:02  *** danielwh has quit IRC
+2011-10-06T08:08:34  *** Ajay has joined #selenium
+2011-10-06T08:09:50  <terevos> bug on it - http://code.google.com/p/selenium/issues/detail?id=2621
+2011-10-06T08:10:20  <terevos> doh..  I screwed the last part up with the example text
+2011-10-06T08:10:30  <jarib> no problem, i'll fix it
+2011-10-06T08:10:55  <terevos> thanks   (FYI, I'm on FF 3.6 if that matters at all)
+2011-10-06T08:11:10  <Ajay> andreastt: hi,
+2011-10-06T08:11:28  <jarib> btw, the issue has nothing to do with remote vs local. native events can be enabled or disabled in both cases
+2011-10-06T08:11:38  <terevos> oh, I misunderstood
+2011-10-06T08:12:14  *** rbalent has quit IRC
+2011-10-06T08:14:01  *** dawagner has quit IRC
+2011-10-06T08:14:10  *** dawagner has joined #selenium
+2011-10-06T08:16:56  <terevos> you want me to re-write a bit, or you gonna take care of all that.. sorry I didn't quite understand the issue
+2011-10-06T08:18:12  <Ajay> dawagner:hi
+2011-10-06T08:18:29  <dawagner> Hi Ajay
+2011-10-06T08:18:43  <Ajay> is the 2.8 out on maven ?
+2011-10-06T08:19:03  <dawagner> It's been pushed, it should take a couple of hours to arrive in central
+2011-10-06T08:19:04  <jarib> terevos: updated the issue
+2011-10-06T08:19:16  <Ajay> cool
+2011-10-06T08:19:32  <dawagner> Thanks for all your bug fixes :) You gave me a lot of things to have to put in the changelog!
+2011-10-06T08:19:57  <terevos> jarib: awesome..  thanks for the help in IDing the problem
+2011-10-06T08:20:03  <jarib> np
+2011-10-06T08:20:06  <Ajay> dawagner: was it for me :P
+2011-10-06T08:20:32  <Ajay> berrada: hi
+2011-10-06T08:21:07  <Ajay> berrada: can i run the test_android on a device directly , as emulator doesnt startup most of the times
+2011-10-06T08:22:37  <Ajay> dawagner: http://seleniumhq.org/download/ still points to 2.7 ,
+2011-10-06T08:23:22  <lord1234> jarib terevos and I are cut from similar cloths:-P
+2011-10-06T08:23:36  <lord1234> though he was almost a man of the cloth, but thats not here nor there
+2011-10-06T08:24:44  <terevos> jarib: BTW - in my experience, it's uncommon to get the kind of response you gave me from developers.
+2011-10-06T08:25:28  *** __gotcha has quit IRC
+2011-10-06T08:26:05  <selbot2> dawagner half a minute ago - DanielWagnerHall: Correcting method name - http://code.google.com/p/selenium/source/detail?r=14070
+2011-10-06T08:26:34  <lukeis> dawagner: thanks for updating the downloads page :) can't believe i haven't done it the last two releases ;)
+2011-10-06T08:27:33  <Ajay> lukeis: you  still have the honour for updating the maven page
+2011-10-06T08:27:40  <dawagner> Ajay: I've made the change in svn, looks like jarib killed the xserve again ;)
+2011-10-06T08:27:45  <AutomatedTester> dawagner: speak to adamgoucher
+2011-10-06T08:28:07  <dawagner> I was going to update the maven page when the release was actually in maven ;)
+2011-10-06T08:28:24  <lukeis> Ajay: not until it's actually in central :) ... plus i don't mind not being the one to update the page
+2011-10-06T08:28:51  *** stephend has quit IRC
+2011-10-06T08:29:17  <dawagner> lukeis: May be worth adding a note to https://code.google.com/p/selenium/wiki/ReleasingSelenium about changing the pages
+2011-10-06T08:29:46  <lukeis> ok
+2011-10-06T08:30:04  *** vrockai_ has joined #selenium
+2011-10-06T08:30:36  *** Ajay_ has joined #selenium
+2011-10-06T08:31:50  *** Ajay has quit IRC
+2011-10-06T08:33:35  <selbot2> luke.semerau@gmail.com half a minute ago - LukeIS: adding link to facebook's php bindings on downloads page - http://code.google.com/p/selenium/source/detail?r=14071
+2011-10-06T08:34:27  *** cerberos has joined #selenium
+2011-10-06T08:34:47  <Ajay_> waiting for adamgoucher to set the irc room topic :)
+2011-10-06T08:34:56  <dawagner> jarib: Can we kick the xserve? ;)
+2011-10-06T08:38:08  *** Ajay_ is now known as Ajay
+2011-10-06T08:38:26  <lukeis> dawagner: do you really do those steps for the javadocs that are listed? wouldn't it be easier to just have to javadocs target in the Rakefile just output to docs/api/java ? chaning steps 1,2,3 down to just step 1
+2011-10-06T08:38:59  <lukeis> oh... it's to ensure java files that were removed get removed from javadoc... nm
+2011-10-06T08:42:16  *** mates has quit IRC
+2011-10-06T08:45:46  <jarib> dawagner: we can
+2011-10-06T08:45:55  <jarib> although i'm close to giving up on it
+2011-10-06T08:46:10  *** DustinFay has joined #selenium
+2011-10-06T08:46:37  <jarib> bamboo should be coming up
+2011-10-06T08:46:57  <jarib> someone should kick the website agent (which runs on a machine i don't have access to)
+2011-10-06T08:47:03  <dawagner> Cheers :)
+2011-10-06T08:53:07  *** ammar01 has quit IRC
+2011-10-06T08:54:40  *** stackedsax has joined #selenium
+2011-10-06T08:56:31  *** oiiii has quit IRC
+2011-10-06T08:58:12  <lukeis> AutomatedTester: so everything that I just read you are the one and only person who can update / release the python libraries on pypi? (So if you keel over or decide selenium is rubbish we'll have to create a new one?) Is there no way to have more than one person allowed to update a package?
+2011-10-06T08:58:40  * lukeis doesn't like single points of failure ;)
+2011-10-06T08:58:44  *** stackedsax has quit IRC
+2011-10-06T08:58:44  *** melter has quit IRC
+2011-10-06T09:01:13  <selbot`> New news from builds: WEB-SEHQ-244 was SUCCESSFUL : Updated by Daniel Wagner-Hall, luke.semerau@gmail.com <http://xserve.openqa.org:8085/browse/WEB-SEHQ-244>
+2011-10-06T09:04:10  <selbot2> luke.semerau@gmail.com less than a minute ago - LukeIS: updated ReleasingSelenium wiki page, adding notes to update the SeHQ downloads page - http://code.google.com/p/selenium/source/detail?r=14072
+2011-10-06T09:04:10  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Based on a patch by AndreasHaas, using the atom to get an element's location in the viewport, scrolling if needed. Adds a new exception to indicate the move coordinates were past the renderable area. - http://code.google.com/p/selenium/source/detail?r=14073
+2011-10-06T09:04:56  *** stackedsax has joined #selenium
+2011-10-06T09:08:16  <eranm> !seen ato
+2011-10-06T09:08:24  <eranm> :seen ato
+2011-10-06T09:08:25  <selbot2> ato was last seen 28 days ago, quitting.
+2011-10-06T09:11:15  <selbot`> New news from builds: SE2-JS-15 was SUCCESSFUL (with 82 tests) : Updated by david.burns@theautomatedtester.co.uk, Daniel Wagner-Hall <http://xserve.openqa.org:8085/browse/SE2-JS-15>
+2011-10-06T09:11:17  <jarib> eranm: also known as andreastt
+2011-10-06T09:11:30  <eranm> andreastt, I recall Opera has somewhat extended the WebDriver API to test the browser's rendering itself
+2011-10-06T09:12:06  <eranm> Did you do the same in order to access the browser's UI itself?
+2011-10-06T09:12:23  <eranm> jarib, thanks
+2011-10-06T09:12:50  *** melter has joined #selenium
+2011-10-06T09:18:03  <AutomatedTester> lukeis: eranm, hugs and a couple others can release selenium
+2011-10-06T09:18:11  <AutomatedTester> onto pypi
+2011-10-06T09:18:12  <lukeis> coolio :)
+2011-10-06T09:18:30  *** andytinkham has quit IRC
+2011-10-06T09:18:36  <lukeis> pypi doesn't seem to like to tell others who the project owners / maintainers are... can't find the ui
+2011-10-06T09:19:13  <AutomatedTester> its right at the bottom
+2011-10-06T09:19:46  <AutomatedTester> Package Index Owner: maikroeder, hugs, tebeka, David.Burns
+2011-10-06T09:19:46  <AutomatedTester> Package Index Maintainer: tebeka, David.Burns, epall
+2011-10-06T09:21:35  *** davehunt is now known as davehunt|away
+2011-10-06T09:21:36  *** Spanktar has joined #selenium
+2011-10-06T09:23:52  *** lukeis has quit IRC
+2011-10-06T09:24:21  *** lukeis has joined #selenium
+2011-10-06T09:24:43  *** jleyba has joined #selenium
+2011-10-06T09:25:16  <lukeis> AutomatedTester: thx... i never learned to read
+2011-10-06T09:26:33  *** terevos has quit IRC
+2011-10-06T09:29:40  *** dmachi has quit IRC
+2011-10-06T09:30:18  *** Yxven has joined #selenium
+2011-10-06T09:30:33  <jarib> yay
+2011-10-06T09:30:36  <jarib> xserve crashed
+2011-10-06T09:30:46  <jarib> i think i have to disable the VM builds.
+2011-10-06T09:32:29  *** jimevans has left #selenium
+2011-10-06T09:35:34  <XRayCulver> anybody use Gallio/mbunit?
+2011-10-06T09:37:47  *** adamgoucher has joined #selenium
+2011-10-06T09:38:19  *** dmachi has joined #selenium
+2011-10-06T09:39:39  *** towski has joined #selenium
+2011-10-06T09:40:38  *** lfryc_wfh has quit IRC
+2011-10-06T09:40:41  <lord1234> has anyone run into on linux getting a "underined method 'closed?' error when trying to open firefox?
+2011-10-06T09:41:10  *** ChanServ sets mode: +o adamgoucher
+2011-10-06T09:41:20  <lord1234> holy crap, someone gets an op flag in this chatroom?
+2011-10-06T09:41:22  <lord1234> i've never seen that before
+2011-10-06T09:41:46  <jarib> lord1234: no. do you have a stacktrace?
+2011-10-06T09:41:47  *** adamgoucher changes topic to "Selenium 2.8.0 is out now -- day old bacon is still bacon"
+2011-10-06T09:42:12  <Ajay> lukeis:http://seleniumhq.org/about/platforms.html
+2011-10-06T09:42:19  <adamgoucher> lord1234: dont need to op-ify myself except to change the topic
+2011-10-06T09:43:23  <lord1234> jarib www.pastie.org/2650598
+2011-10-06T09:43:44  <Ajay> lukeis: should we say FF3+ for firefox as we support all the versions of FF
+2011-10-06T09:44:36  <jarib> lord1234: yeah, it's a ruby bug
+2011-10-06T09:44:48  <lukeis> Ajay:  you need to add a space when linking things ;)   feel free to update it, i haven't touched that page
+2011-10-06T09:44:58  <jarib> lord1234: i don't recall the details
+2011-10-06T09:45:06  <lord1234> so am i SoL?
+2011-10-06T09:45:11  <lord1234> like...no work around?
+2011-10-06T09:45:43  <jarib> well, it's just hiding the real error
+2011-10-06T09:46:08  <lord1234> i mean, identical code works on a different machine...
+2011-10-06T09:46:22  <jarib> right.
+2011-10-06T09:47:54  <lord1234> ok
+2011-10-06T09:47:56  <lord1234> or perhaps not
+2011-10-06T09:47:57  <lord1234> lol
+2011-10-06T09:48:01  <lord1234> well i know what is
+2011-10-06T09:48:02  *** ThePeach has quit IRC
+2011-10-06T09:48:52  <jarib> lord1234: what ruby version are you running? i think this one is very specific to that patch level
+2011-10-06T09:49:09  <jarib> so e.g. updating to a newer 1.8.7 may solve it (and show you the real error :)
+2011-10-06T09:49:17  <lord1234> actually i caught the issue after some more research
+2011-10-06T09:49:33  <lord1234> 1.8.7 is the version, but its an error because I Was trying to start a :remote firefox, and didn't have any grid set up.....
+2011-10-06T09:49:59  <jarib> right
+2011-10-06T09:50:26  <jarib> in any case, upgrading ruby to a either 1.9 or a newer patchlevel of 1.8.7 is probably a good idea
+2011-10-06T09:50:35  *** retornam has quit IRC
+2011-10-06T09:50:52  <jarib> bbl
+2011-10-06T09:51:18  *** stockton has joined #selenium
+2011-10-06T09:54:27  *** sfbrian has joined #selenium
+2011-10-06T09:54:52  *** barancev has joined #selenium
+2011-10-06T09:56:48  *** dmachi has quit IRC
+2011-10-06T09:57:10  *** Renacor has left #selenium
+2011-10-06T10:01:33  *** Renacor_ has joined #selenium
+2011-10-06T10:01:39  *** dmachi has joined #selenium
+2011-10-06T10:04:57  *** Spanktar is now known as spanky|away
+2011-10-06T10:08:15  *** zmijunkie_ has joined #selenium
+2011-10-06T10:09:09  *** zmijunkie has quit IRC
+2011-10-06T10:09:09  *** zmijunkie_ is now known as zmijunkie
+2011-10-06T10:12:52  *** cerberos has quit IRC
+2011-10-06T10:14:44  *** eranm has quit IRC
+2011-10-06T10:15:12  *** jfunk has joined #selenium
+2011-10-06T10:15:36  *** berrada has quit IRC
+2011-10-06T10:15:38  *** chson has joined #selenium
+2011-10-06T10:18:48  *** dmachi has quit IRC
+2011-10-06T10:20:34  *** ImthePC has quit IRC
+2011-10-06T10:22:30  *** ImthePC_ has joined #selenium
+2011-10-06T10:23:14  *** retornam has joined #selenium
+2011-10-06T10:24:15  *** dmachi has joined #selenium
+2011-10-06T10:30:46  *** Binken_ has joined #selenium
+2011-10-06T10:31:08  *** nitin has joined #selenium
+2011-10-06T10:32:05  *** andytinkham has joined #selenium
+2011-10-06T10:32:29  *** naeg has quit IRC
+2011-10-06T10:33:58  *** voodoofish1 has joined #selenium
+2011-10-06T10:36:02  *** dmachi has quit IRC
+2011-10-06T10:41:35  *** dmachi has joined #selenium
+2011-10-06T10:42:57  *** Yxven has quit IRC
+2011-10-06T10:44:49  <Ajay> lukeis: 2.8 is out on maven
+2011-10-06T10:46:07  *** lukeis has quit IRC
+2011-10-06T10:48:31  *** lukeis has joined #selenium
+2011-10-06T10:51:58  <dawagner> Ajay: Really? I don't see it on http://search.maven.org/#search%7Cga%7C1%7Cselenium
+2011-10-06T10:53:03  <Ajay> dawagner: maven search is crappy
+2011-10-06T10:53:03  <Ajay> http://repo1.maven.org/maven2/org/seleniumhq/selenium/selenium-server/2.8.0/
+2011-10-06T10:53:15  *** AutomatedTester has quit IRC
+2011-10-06T10:53:46  <dawagner> Ajay: 404s for me...
+2011-10-06T10:54:17  <Ajay> dawagner: weird
+2011-10-06T10:54:31  <Ajay> can somebody else try the link
+2011-10-06T10:57:36  <cgoldberg> I'm having the infamous "SSL Hostname Mismatch" issue that I've just googled the crap out of and can't figure out.  anyone have any tips to get FF to just accept *any* cert?
+2011-10-06T10:58:07  *** csanchez has quit IRC
+2011-10-06T10:58:21  <Ajay> cgoldberg: are you using RC or webdriver ?
+2011-10-06T10:58:30  <cgoldberg> Ajay, webdriver
+2011-10-06T10:58:50  <cgoldberg> i've tried the FF profile settings and no luck
+2011-10-06T10:59:03  <cgoldberg> a la:  profile.accept_untrusted_certs = False
+2011-10-06T10:59:03  <cgoldberg>             profile.set_preference("browser.ssl_override_behavior", 1)
+2011-10-06T10:59:04  <barancev> 404
+2011-10-06T11:00:46  <jarib-> cgoldberg: You want accept_untrusted_certs to be true
+2011-10-06T11:01:11  *** lukeis has quit IRC
+2011-10-06T11:01:39  <RossPatterson> dawagner: Ajay's link works.
+2011-10-06T11:01:43  *** lukeis has joined #selenium
+2011-10-06T11:02:00  <jarib-> but if the certificate is valid but is served from the wrong host, try assume_untrusted_issuer = false
+2011-10-06T11:02:06  <RossPatterson> Oops.
+2011-10-06T11:02:10  <RossPatterson> Ajay: It works.
+2011-10-06T11:02:22  <cgoldberg> jarib, thanks.. trying now
+2011-10-06T11:02:27  <jarib-> (or whatever the py equivalent is)
+2011-10-06T11:04:11  <cgoldberg> jarib, the py API doesn't have that (or I am blind)
+2011-10-06T11:04:53  <Ajay> dawagner: barancev: https://picasaweb.google.com/105727486357027632595/Maven
+2011-10-06T11:04:56  *** ImthePC_ has quit IRC
+2011-10-06T11:05:51  <dawagner> Ajay: I see it now :)
+2011-10-06T11:06:09  <dawagner> And so http://seleniumhq.wordpress.com/2011/10/06/selenium-2-8-released/ was written
+2011-10-06T11:06:54  <Ajay> dawagner: kudos to bacon holder :)
+2011-10-06T11:07:06  <cgoldberg> jarib, Python API for webdriver only has 'accept_untrusted_certs' in FirefoxProfile
+2011-10-06T11:08:10  <cgoldberg> my prob is slightly diff.. the cert is issued the wrong host
+2011-10-06T11:11:21  *** Yxven has joined #selenium
+2011-10-06T11:12:20  *** farlan has joined #selenium
+2011-10-06T11:13:05  *** Yxven has quit IRC
+2011-10-06T11:15:13  *** Yxven has joined #selenium
+2011-10-06T11:16:42  <farlan> hello.  Is it possible to capture the entire html of a page in selenium?  I have tried doing driver.getPageSource(), but this does not include the source for internal Iframes...
+2011-10-06T11:18:56  <Ajay> cgoldberg: is the FF Security Error : Domain Mismatch Dialog ?
+2011-10-06T11:19:55  <cgoldberg> Ajay, it's "invalid certificate" error.  but I know for a fact that the host i'm trying to access has a cert that's issued to the wrong domain
+2011-10-06T11:20:27  <Renacor_> https://gist.github.com/1268069 <-- why am I getting this timeout exception for an async script call? I am also setting the async timeout to 2500ms why is it ignoring this?
+2011-10-06T11:20:35  <barancev> cgoldberg: thank you for the honor to be mentioned in release post :)
+2011-10-06T11:22:32  <Ajay> barancev: illicit onion is dawagner
+2011-10-06T11:23:47  * cgoldberg kicks paypal for having invalid ssl certs
+2011-10-06T11:25:52  <jarib> cgoldberg: i'm pretty sure that's the same issue
+2011-10-06T11:26:38  <jarib> i don't see how it's slightly different
+2011-10-06T11:27:04  <cgoldberg> jarib, ok.. so python API only has 'accept_untrusted_certs' in FirefoxProfile.. which doesn;t seem to help
+2011-10-06T11:27:15  <jarib> you can set arbitrary preferences though?
+2011-10-06T11:27:28  <cgoldberg> jarib, right.. but which preference? :)
+2011-10-06T11:27:39  <jarib> webdriver_assume_untrusted_issuer
+2011-10-06T11:27:47  <jarib> set that to false
+2011-10-06T11:27:51  *** Fyrespray has joined #selenium
+2011-10-06T11:27:58  *** AutomatedTester has joined #selenium
+2011-10-06T11:28:08  <cgoldberg> jarib, k i'll try
+2011-10-06T11:28:15  <jarib> and complain to AutomatedTester about it not being properly exposed :)
+2011-10-06T11:28:23  <dawagner> Right, I'm heading off, thanks everyone for making 2.8 relatively smooth and pain-free!
+2011-10-06T11:29:09  <jarib> dawagner: thank you as well, nice job!
+2011-10-06T11:30:21  <dawagner> (Who's taking the bacon next week? :p)
+2011-10-06T11:30:47  <Renacor_> 11:34:16.958 INFO - Executing: [execute async script: var f = function () { document.querySelector('.sync_enabled').className = document.querySelector('.sync_enabled').className.replace(new RegExp('(\s|^)sync_enabled(\s|$)'), ''); } return f;, []] at URL: /session/13179 <-- is this the proper way to call async js through webdriver?\
+2011-10-06T11:30:48  <cgoldberg> jarib, 'webdriver_assume_untrusted_issuer' or 'webdriver.assume_untrusted_issuer'?   neither seem to help
+2011-10-06T11:31:00  <jarib> the former
+2011-10-06T11:31:03  <barancev> Ajay: dawagner: sorry, I know, it's my IRC client - I sometime click other username because it's autoscrolling chat window
+2011-10-06T11:31:19  <Ajay> dawagner:you should enjoy bacon for few more weeks :)
+2011-10-06T11:31:50  <selbot`> New news from builds: SE2-JAVA-36 has FAILED (6 tests failed) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/SE2-JAVA-36>
+2011-10-06T11:31:51  <jarib> cgoldberg: webdriver_accept_untrusted_certs=true, webdriver_assume_untrusted_issuer=false
+2011-10-06T11:32:25  <jarib> cgoldberg: assuming the certificate is valid but for another host
+2011-10-06T11:37:38  <Renacor_> is trunk on 2.8.0 now?
+2011-10-06T11:38:02  <jarib> trunk has moved past 2.8.0
+2011-10-06T11:38:35  <jarib> 2.8.0 is r14067
+2011-10-06T11:38:39  <selbot2> dawagner about 4 hours ago - DanielWagnerHall: Tagging 2.8.0 at revision 14066 - http://code.google.com/p/selenium/source/detail?r=14067
+2011-10-06T11:38:48  <cgoldberg> jarib, setting "webdriver_accept_untrusted_certs" (True or False) makes Firefox hang on opening :/
+2011-10-06T11:39:19  <jarib> :/
+2011-10-06T11:39:25  <jarib> let me try
+2011-10-06T11:39:28  *** SMaction has joined #selenium
+2011-10-06T11:40:25  <jarib> works well here
+2011-10-06T11:40:38  <jarib> it's also the default setting
+2011-10-06T11:40:42  <jarib> so that seems odd
+2011-10-06T11:42:59  <cgoldberg> jarib, got it working!!!!!
+2011-10-06T11:43:00  <cgoldberg> profile.set_preference('webdriver_accept_untrusted_certs', True)
+2011-10-06T11:43:00  <cgoldberg>             profile.set_preference('webdriver_assume_untrusted_issuer', False)
+2011-10-06T11:43:10  <cgoldberg> jarib, thanks a lot :)
+2011-10-06T11:43:38  <cgoldberg> jarib, and I will ask AutomatedTester to expose that preference :)
+2011-10-06T11:44:51  <AutomatedTester> cgoldberg: http://code.google.com/p/selenium/source/browse/trunk/py/selenium/webdriver/firefox/firefox_profile.py#143
+2011-10-06T11:45:09  <AutomatedTester> just need to do the issuer stuff
+2011-10-06T11:45:32  *** dawagner has quit IRC
+2011-10-06T11:45:50  <AutomatedTester> profile.accept_untrusted_certs = True
+2011-10-06T11:45:57  <Archdude> is there a cmd to simulate pressing the down button
+2011-10-06T11:45:57  <cgoldberg> AutomatedTester, yea.. it needs webdriver_assume_untrusted_issuer.. it was the combo of both those
+2011-10-06T11:46:21  <stackedsax> with grid, will it always default to using the webdriver RC if both webdriver and backwards-compatible RC are using the same browser?
+2011-10-06T11:47:44  <stackedsax> I had a situation where I was running a test with old DefaultSelenium hitting a grid that had both a -role rc and -role webdriver connected to it.  Both had a 'firefox' browser configured.  The tests would not run until I turned off the webdriver rc.
+2011-10-06T11:48:25  <stackedsax> shouldn't grid be aware of when I'm trying to use webdriver and only send webdriver tests to a webdriver rc?
+2011-10-06T11:50:51  <selbot2> jari.bakken less than a minute ago - Bump gem version to 2.8.1.dev - http://code.google.com/p/selenium/source/detail?r=14074
+2011-10-06T11:51:31  <barancev> a question about #2619 - is it ever possible to resize FF7 window with JS? I tried to execute window.resizeTo from the firebug console and it has no effect
+2011-10-06T11:51:32  <selbot2>  open/new JavascriptExecutor issues with 2.7.0 and FF 7.0.1 - http://code.google.com/p/selenium/issues/detail?id=2619 [Type-Defect Priority-Medium]
+2011-10-06T11:53:33  *** jleyba has quit IRC
+2011-10-06T11:57:58  <XRayCulver> dang
+2011-10-06T11:58:06  <XRayCulver> issue with nuget
+2011-10-06T11:58:11  <XRayCulver> jimevans isn't going to be happy
+2011-10-06T12:04:05  <Ajay> XRayCulver:  is it for the 2.8 ?
+2011-10-06T12:04:17  <XRayCulver> yah
+2011-10-06T12:04:29  <XRayCulver> i'm double checking to make sure its not something with me or nuget
+2011-10-06T12:04:52  <XRayCulver> i have selenium as a dependency for my framework nuget file
+2011-10-06T12:05:04  *** Binken_ has quit IRC
+2011-10-06T12:08:08  *** stockton has quit IRC
+2011-10-06T12:10:47  <Renacor_> can somebody help me with this js issue I have?
+2011-10-06T12:11:53  <stackedsax> man, are my issues just totally outside the realm of anyone else's experience?
+2011-10-06T12:13:04  <stackedsax> if I'm in the wrong place to air these questions, just let me know
+2011-10-06T12:13:21  <Renacor_> never used grid
+2011-10-06T12:13:27  <Renacor_> using the stand-alone-server
+2011-10-06T12:13:36  <lord1234> is there a way to force webdriver to reload current DOM objects?
+2011-10-06T12:14:10  <Renacor_> lord1234: it should always be up to date with the dom
+2011-10-06T12:14:26  <Renacor_> lord1234: whats the symptom?
+2011-10-06T12:14:35  <jarib> stackedsax: you generally want nirvdrum or freynaud for grid stuff
+2011-10-06T12:14:39  <stackedsax> thanks Renacor — although, stand-alone-server contains the grid code should you want to use it...
+2011-10-06T12:14:40  <XRayCulver> lord1234: you can do driver.navigate.refresh or something
+2011-10-06T12:14:41  <jarib> :seen freynaud
+2011-10-06T12:14:41  <selbot2> freynaud was last seen 1 day ago, quitting.
+2011-10-06T12:15:25  <stackedsax> thanks jarib — should I always just address my questions to those folks?
+2011-10-06T12:18:39  <stackedsax> nirvdrum, any thoughts on my grid q?
+2011-10-06T12:19:24  <farlan> hey XRaylCulver, will driver.navigate.refresh work if a page is not finished loading (ie: firefox status bar reads waiting for www.site.com)?
+2011-10-06T12:21:00  <Ajay> XRayCulver: can you report the nuget issue
+2011-10-06T12:21:09  <stackedsax> :seen nirvdrum
+2011-10-06T12:21:10  <selbot2> nirvdrum was last seen about 8 hours ago, joining.
+2011-10-06T12:21:15  <XRayCulver> yah
+2011-10-06T12:21:18  <XRayCulver> i'm trying to pin it down
+2011-10-06T12:21:36  <XRayCulver> but basically, nuget says that it should get the version >= the version listed in my nupackage
+2011-10-06T12:21:42  <XRayCulver> and its getting the exact version
+2011-10-06T12:22:01  <XRayCulver> so instead of grabbing 2.8 its still getting 2.7
+2011-10-06T12:22:08  <XRayCulver> then when i manually update it
+2011-10-06T12:22:29  <XRayCulver> it won't because of a conflict with dotnetzip
+2011-10-06T12:22:32  <jarib> stackedsax: either hang around until one of them is around or try the mailing list
+2011-10-06T12:22:46  <XRayCulver> today has been dll hell
+2011-10-06T12:24:07  *** ian_mac_ has quit IRC
+2011-10-06T12:24:55  *** SamuraiJack has quit IRC
+2011-10-06T12:24:58  <stackedsax> jarib, the users group, or the developers group?
+2011-10-06T12:26:23  <jarib> users
+2011-10-06T12:27:23  <jarib> i guess.
+2011-10-06T12:28:19  <jerware> How do I catch alert boxes, to verify the text on that?
+2011-10-06T12:28:33  <jarib> i'm not sure how anyone can keep up with that list, to be honest
+2011-10-06T12:33:16  <XRayCulver> jerware: are you using rc or webdriver?
+2011-10-06T12:33:41  <jerware> IDE
+2011-10-06T12:33:47  *** vrockai_ has quit IRC
+2011-10-06T12:34:01  <XRayCulver> i dont use the ide, sorry.
+2011-10-06T12:36:04  <Ajay> jerware: waitForAlert
+2011-10-06T12:36:13  <Ajay> i dont use IDE
+2011-10-06T12:37:40  <selbot2> jari.bakken half a minute ago - JariBakken: Add some missing error codes for Ruby. - http://code.google.com/p/selenium/source/detail?r=14075
+2011-10-06T12:38:55  <Renacor_> does anybody use webdriver to execute async js through execute_async ?
+2011-10-06T12:41:14  *** stockton has joined #selenium
+2011-10-06T12:42:05  *** ian_mac_ has joined #selenium
+2011-10-06T12:45:04  *** chson has quit IRC
+2011-10-06T12:45:58  *** mashiara has quit IRC
+2011-10-06T12:45:59  *** Ajay has quit IRC
+2011-10-06T12:46:50  *** andytinkham has quit IRC
+2011-10-06T12:47:42  <jerware> I also want to verify two patters. being the one returned from Store Alert, with a string.
+2011-10-06T12:47:52  <jerware> patterns.
+2011-10-06T12:49:21  <XRayCulver> ajay: resolved my dependency issues with nuget
+2011-10-06T12:50:03  <XRayCulver> instead of relying upon the >= for selenium.support to add everything
+2011-10-06T12:50:10  <XRayCulver> i just removed the version for it
+2011-10-06T12:50:41  <jerware> looks like storeEval is what I need.
+2011-10-06T12:52:57  *** mashiara has joined #selenium
+2011-10-06T13:00:59  <Dude-X> i just tried selenium-java-2.8 ; i get nulls when using sendkeys
+2011-10-06T13:01:01  <Dude-X> weird.
+2011-10-06T13:01:09  <Dude-X> actually null pointer exceptions
+2011-10-06T13:01:16  <jarib> :gist the stacktrace?
+2011-10-06T13:01:16  <selbot2> Please paste >3 lines of text to http://gist.github.com
+2011-10-06T13:02:53  <Dude-X> stacktrace is not informative from junit testrunner; is there a new library used? i'll paste the stacktrace
+2011-10-06T13:04:29  <Dude-X> http://gist.github.com/1268532
+2011-10-06T13:06:03  <jarib> hm.
+2011-10-06T13:06:04  *** stackedsax has quit IRC
+2011-10-06T13:06:14  <jarib> how do you instantiate the driver?
+2011-10-06T13:06:34  <Dude-X> basically new FirefoxDriver()
+2011-10-06T13:06:47  <jarib> how exactly do you instantiate the driver?
+2011-10-06T13:07:18  <Dude-X> these tests work with 2.5 pretty well
+2011-10-06T13:07:32  <Dude-X> 2.6, 2.7 worked okay but seemed to make other tests flaky
+2011-10-06T13:08:00  <jarib> yes, this was changed for 2.8
+2011-10-06T13:09:30  <Dude-X> we have a lot of elaborate code to start the driver, it checks some properties, but ultimately, we have if (isFirefox) { return new FirefoxDriver();
+2011-10-06T13:09:55  <jarib> ok, so you're using the no-arg constructor
+2011-10-06T13:09:57  <Dude-X> Webdriver driver = getWebDriverImplementationProperties()
+2011-10-06T13:09:58  <Dude-X> yeah
+2011-10-06T13:10:40  <Dude-X> i would have  loaded a custom profile but it doens't work on our build machine for reasons unknown to me; i get an error about firefox %s; but it works fine locally
+2011-10-06T13:10:41  <jarib> if you call driver.getFileDetector on the driver, what do you get back?
+2011-10-06T13:11:01  <Dude-X> hmm
+2011-10-06T13:11:11  <Dude-X> is python consistent in this behavior?
+2011-10-06T13:11:14  <Dude-X> i can probably test in python
+2011-10-06T13:11:18  <jarib> no
+2011-10-06T13:11:19  <Dude-X> okay
+2011-10-06T13:11:27  <Dude-X> this will take a few minutes
+2011-10-06T13:12:14  *** andytinkham has joined #selenium
+2011-10-06T13:12:25  <jarib> ok
+2011-10-06T13:12:48  <Dude-X> mind you firefox opens up fine...
+2011-10-06T13:12:59  <jarib> yes
+2011-10-06T13:13:14  *** stackedsax has joined #selenium
+2011-10-06T13:13:14  <jarib> the problem is that the fileDetector ivar in RemoteWebElement is null
+2011-10-06T13:13:46  <jarib> it should be set to the same fileDetector that's specified in the driver instance
+2011-10-06T13:13:59  <jarib> which by default, is a UselessFileDetector
+2011-10-06T13:14:19  <Dude-X> what does it return?
+2011-10-06T13:14:19  <jarib> if the driver is ok, but the element is bad, then we're one step further
+2011-10-06T13:14:33  <jerware> how in the IDE, can I verify if 2 variables are equal.
+2011-10-06T13:14:39  <jarib> Dude-X: what does what return?
+2011-10-06T13:14:42  *** cakehero has quit IRC
+2011-10-06T13:15:15  *** santiycr has quit IRC
+2011-10-06T13:15:36  <jarib> Dude-X: hmm.. is this the first sendKeys() being executed in your test?
+2011-10-06T13:15:42  <Dude-X> yes, it's logging into the app
+2011-10-06T13:16:06  <Dude-X> correciton, it's the first one to login into the app
+2011-10-06T13:16:31  * jarib has a suspicion
+2011-10-06T13:17:24  *** RossPatterson has quit IRC
+2011-10-06T13:19:43  *** stackedsax has quit IRC
+2011-10-06T13:21:36  <Dude-X> eclipse complains that getFileDetector doesn't exist as a method for Webdriver driver
+2011-10-06T13:21:47  <jarib> can you cast it to a RemoteWebDriver?
+2011-10-06T13:21:54  <Dude-X> sure
+2011-10-06T13:22:04  <Dude-X> yeah that worked
+2011-10-06T13:22:10  <jarib> cool
+2011-10-06T13:22:18  <jarib> just find out if that's null or not
+2011-10-06T13:22:33  <Dude-X> okay
+2011-10-06T13:22:49  <jarib> this isn't globally broken
+2011-10-06T13:24:53  <Dude-X> about to run
+2011-10-06T13:25:56  *** stackedsax has joined #selenium
+2011-10-06T13:26:16  <Dude-X> holy crap superlong stack trace
+2011-10-06T13:26:29  <Dude-X> let me see if it's related to my app or webdriver
+2011-10-06T13:27:13  <Dude-X> oh right i have to update a few files
+2011-10-06T13:28:26  <Dude-X> if the selenium jar has the latest libs in its jar
+2011-10-06T13:28:34  <Dude-X> why does it use older versions in my ivy repo
+2011-10-06T13:28:40  <jerware> verifyAlert is returning an error when it shouldnt.
+2011-10-06T13:28:42  <jerware> [error] Actual value 'The phone number is the wrong length. Make sure you included an area code. ' did not match 'The phone number is the wrong length. Make sure you included an area code.'
+2011-10-06T13:29:30  <Dude-X> jarib: it's not null
+2011-10-06T13:30:11  <jerware> nm, there's an extra white space.
+2011-10-06T13:31:01  <jarib> Dude-X: interesting
+2011-10-06T13:31:09  <jarib> Dude-X: it's a UselessFileDetector?
+2011-10-06T13:31:43  <Dude-X> i don't know. i only checked for null
+2011-10-06T13:31:45  <jarib> ok
+2011-10-06T13:31:48  <jarib> that's fine
+2011-10-06T13:32:09  <jarib> how do you find the WebElement?
+2011-10-06T13:32:14  <Dude-X> our checkstlye prohobits printing with system.err(); i can change it but it's a huge pain to change so many parts
+2011-10-06T13:32:24  <jarib> np
+2011-10-06T13:32:27  <Dude-X> we override click on remote web element
+2011-10-06T13:33:27  <Dude-X> well, in general, we try to find an element by trying a few times up until the timeout
+2011-10-06T13:33:55  <jarib> wait, you override click?
+2011-10-06T13:34:16  <Dude-X> yes
+2011-10-06T13:34:26  <jarib> how do you do that?
+2011-10-06T13:36:42  <Dude-X> we have a class called ClickableWebElement, that will take the weblemenet object, create a new firefox webelement (FirefoxWebELement ffWe = new FirefoxWebElement((FirefoxDriver)) _driver) { @Override public void click()...
+2011-10-06T13:37:10  <Dude-X> in our click we have to utlity functions that wait for the an element to become visible and then wait for a button to be enabled
+2011-10-06T13:37:30  <jarib> this is probably the cause of the problem
+2011-10-06T13:38:02  <jarib> wherever you instantiate the WebElement, you need to do element.setFileHandler(driver.getFileHandler())
+2011-10-06T13:38:11  <jarib> or it will be null
+2011-10-06T13:38:14  <Dude-X> ah
+2011-10-06T13:38:17  <Dude-X> we do get the Id
+2011-10-06T13:38:25  <Dude-X> and reset it
+2011-10-06T13:39:03  <Dude-X> so that's the workaround to fix it?
+2011-10-06T13:39:59  <jarib> well, your custom webelement is a hack
+2011-10-06T13:40:10  <jarib> you can fix it by doing that
+2011-10-06T13:40:19  <Dude-X> yes it's ugly. we've been using it since 2.0.0a1
+2011-10-06T13:40:31  <jarib> but don't be surprised if it breaks in the future
+2011-10-06T13:40:41  <Dude-X> i can take out the hack but it will be a huge pain in the ass.
+2011-10-06T13:40:59  <Dude-X> i'll have to set up a sprint to do "major refactor of webdriver core"
+2011-10-06T13:44:44  <jarib> better to do e.g. new OurElement(driver.findElement(...))
+2011-10-06T13:45:58  <Dude-X> if i can leverage the explicit wait class better
+2011-10-06T13:48:24  <Dude-X> btw you mean setFileDetector, not fileHandler right, jarib?
+2011-10-06T13:49:21  *** methods1 has joined #selenium
+2011-10-06T13:50:18  <methods1> you think browsers will ever develop something like a dbus (or whatever) api so things like webdriver can automate them without having to hack it (I'm not even really sure how web driver does it right now)
+2011-10-06T13:50:19  *** brettporter has joined #selenium
+2011-10-06T13:52:27  *** santiycr has joined #selenium
+2011-10-06T13:56:16  *** Fry33 has quit IRC
+2011-10-06T13:56:41  *** Fry33 has joined #selenium
+2011-10-06T13:57:37  <jarib> Dude-X: yes
+2011-10-06T13:57:45  *** farlan has quit IRC
+2011-10-06T13:58:04  <Dude-X> running now, let's see how it goes
+2011-10-06T13:58:23  <ian_mac_> isn't the idea behind the JSON Wires protocol to implement a control API natively?
+2011-10-06T13:58:29  <ian_mac_> as a standard?
+2011-10-06T13:58:38  <ian_mac_> am I expressing that correctly?
+2011-10-06T13:58:41  <Dude-X> jarib it worked!
+2011-10-06T13:59:14  <Dude-X> I wanted to get rid of this class that overrides click, but I'll have to fix a lot of code :/
+2011-10-06T14:00:09  <jarib> ian_mac_: the idea is to standardize the API and the SPI - not necessarily the transport (JSON/HTTP)
+2011-10-06T14:00:21  <jarib> the json wire protocol is one implementation of the SPI
+2011-10-06T14:00:41  <AutomatedTester> ian_mac: the interface is what we are doing, the JSON wire protocol automatically gives that browser multiple language support
+2011-10-06T14:00:55  <AutomatedTester> thats just a transportation layer
+2011-10-06T14:00:57  <jarib> implementors will get a lot for free if they pick that transport (e.g. multiple language clients)
+2011-10-06T14:01:38  <ian_mac_> so Webdriver is the API?
+2011-10-06T14:01:43  <AutomatedTester> yea
+2011-10-06T14:01:46  <ian_mac_> and JSON Wires is a way to commnuicate with the API
+2011-10-06T14:02:21  <AutomatedTester> for the API to communicate with the browser
+2011-10-06T14:02:30  <ian_mac_> right
+2011-10-06T14:03:01  <AutomatedTester> JSON is the simplest way that every browser supports
+2011-10-06T14:03:20  <AutomatedTester> and there is a lot of support in many languages
+2011-10-06T14:04:31  <ian_mac_> yeah
+2011-10-06T14:05:07  <ian_mac_> though it seems that the RC approach was easier to develop I guess the Webdriver approach is faster
+2011-10-06T14:05:51  *** jfunk has quit IRC
+2011-10-06T14:07:12  *** bubba42 has joined #selenium
+2011-10-06T14:11:39  *** davemiles has quit IRC
+2011-10-06T14:13:54  *** ian_mac_ has quit IRC
+2011-10-06T14:16:04  *** AutomatedTester has quit IRC
+2011-10-06T14:18:19  <Renacor_> anybody care to explain to me what I am doing wrong here: https://gist.github.com/1268069 ?
+2011-10-06T14:23:56  *** cburroughs has quit IRC
+2011-10-06T14:26:10  *** cgoldberg has quit IRC
+2011-10-06T14:31:35  <stackedsax> no idea, Renacor
+2011-10-06T14:32:05  <stackedsax> you're trying to fire an javascript event?
+2011-10-06T14:32:07  *** DustinFay has left #selenium
+2011-10-06T14:34:55  *** bubba42 has quit IRC
+2011-10-06T14:38:27  *** SMaction has quit IRC
+2011-10-06T14:40:44  *** santiycr has quit IRC
+2011-10-06T14:50:48  *** tomh has quit IRC
+2011-10-06T14:57:37  <jerware> I need a newline at the end of my string in  --> store foo myVar
+2011-10-06T14:57:50  <jerware> store "foo\n" myVar    // Doesn't work
+2011-10-06T14:59:45  *** mastert14 has joined #selenium
+2011-10-06T15:00:23  <mastert14> hello?
+2011-10-06T15:00:27  *** tomh has joined #selenium
+2011-10-06T15:12:47  <mastert14> bueno?
+2011-10-06T15:13:28  <mastert14> My Selenium Server is running on IP 0.0.0.0, is that right?
+2011-10-06T15:15:26  <stackedsax> I think I've seen that to mean it's just running locally
+2011-10-06T15:15:44  *** QAGuy has quit IRC
+2011-10-06T15:17:22  <mastert14> Okay. I'm also getting this in debug mode:
+2011-10-06T15:17:24  <mastert14> DEBUG new HttpConnection: Socket[addr=/127.0.0.1,port=36374,localport=4444] 18:02:40.991
+2011-10-06T15:17:26  <mastert14> DEBUG - EOFException()
+2011-10-06T15:17:33  *** bubba42 has joined #selenium
+2011-10-06T15:17:41  *** Yxven has quit IRC
+2011-10-06T15:17:45  *** santiycr has joined #selenium
+2011-10-06T15:18:19  <stackedsax> maybe I missed some background info.  Do you have a problem?
+2011-10-06T15:18:29  <stackedsax> :log
+2011-10-06T15:18:29  <selbot2> http://selenium.saucelabs.com/irc/logs/selenium.2011-10-06.log
+2011-10-06T15:23:19  <mastert14> Yes.
+2011-10-06T15:23:54  <mastert14> The real problem, I have not defined yet. I didn't want to get into the whole thing, just thought I'd bring up some stuff I'm looking at as potential causes.
+2011-10-06T15:25:05  <mastert14> It involves Bromine on Red Hat, running from another computer and timing out after 120 seconds. I think it's because Bromine can't open the browser, but not sure. Figured I'd start with this debug info.
+2011-10-06T15:26:28  *** esto has quit IRC
+2011-10-06T15:32:04  *** nirvdrum has quit IRC
+2011-10-06T15:34:42  *** esto has joined #selenium
+2011-10-06T15:35:10  *** stackedsax has quit IRC
+2011-10-06T15:36:52  *** RandLAT has joined #selenium
+2011-10-06T15:37:59  <selbot2> dawagner 2 minutes ago - DanielWagnerHall: Quashing a whole bunch of warnings - http://code.google.com/p/selenium/source/detail?r=14076
+2011-10-06T15:39:59  *** methods1 has quit IRC
+2011-10-06T15:47:46  *** mydog2 has joined #selenium
+2011-10-06T15:47:52  <mydog2> evening...
+2011-10-06T15:48:07  <mydog2> anyone here in the eastbay/mountain view area?
+2011-10-06T15:48:26  *** stackedsax has joined #selenium
+2011-10-06T15:49:20  *** stockton has quit IRC
+2011-10-06T15:50:00  <lukeis> mydog2: why not just include the whole bay area? ;)
+2011-10-06T15:50:30  *** stockton has joined #selenium
+2011-10-06T15:50:41  <mastert14> I'm in Texas.
+2011-10-06T15:51:20  <lukeis> i'm sorry...
+2011-10-06T15:51:27  <lukeis> :)
+2011-10-06T15:51:51  <mastert14> I used to live in Tracy, CA
+2011-10-06T15:52:01  <lukeis> well, then it's a step up ;)
+2011-10-06T15:52:13  <mastert14> Originally from Michigan though.
+2011-10-06T15:52:34  <lukeis> just can't win, can ya? ;)
+2011-10-06T15:53:01  <lukeis> hehe... i do love the u.p. it's pretty
+2011-10-06T15:53:10  <mastert14> Very much so.
+2011-10-06T15:53:50  *** evlew has joined #selenium
+2011-10-06T15:53:53  *** RandLAT has quit IRC
+2011-10-06T15:54:10  <mastert14> I grew up there and, because I moved before I could drive (17), my memories don't include the difficulties of dealing with the snow. Snow was always fun; well mostly.
+2011-10-06T15:54:38  <lukeis> can't say i've ever visited in other than summer months
+2011-10-06T15:54:59  <lukeis> i like to visit the snow ;)
+2011-10-06T15:55:13  *** stackedsax has quit IRC
+2011-10-06T15:55:22  <lukeis> not live in it... so sad summer's gone
+2011-10-06T15:57:26  <mastert14> Agreed.
+2011-10-06T15:57:44  <mastert14> Well, I'm out. It's closin' time over here. Cya Lukeis.
+2011-10-06T15:57:50  <lukeis> later
+2011-10-06T15:57:59  *** mastert14 has quit IRC
+2011-10-06T16:01:08  *** stockton has quit IRC
+2011-10-06T16:02:19  *** stackedsax has joined #selenium
+2011-10-06T16:09:33  <selbot2> dawagner half a minute ago - DanielWagnerHall: Quashing more warnings - http://code.google.com/p/selenium/source/detail?r=14077
+2011-10-06T16:09:36  *** andytinkham has quit IRC
+2011-10-06T16:15:46  <mydog2> hey lukeis !! what up stranger!
+2011-10-06T16:16:04  <lukeis> nada mucho, bout to head out of work :)
+2011-10-06T16:16:57  *** cburroughs has joined #selenium
+2011-10-06T16:17:14  <mydog2> yeah.. i'm still looking to talk face to face with someone.. for an hr or so...
+2011-10-06T16:18:54  <lukeis> didn't know you were looking for that
+2011-10-06T16:19:16  *** methods1 has joined #selenium
+2011-10-06T16:20:12  <lukeis> (just checked the email list) hacker dojo?
+2011-10-06T16:21:35  *** methods1 has left #selenium
+2011-10-06T16:21:36  <lukeis> nice... i've heard of different things like this, didn't know about that one
+2011-10-06T16:22:14  <lukeis> if you want to talk selenium, you should look for the next  bay area selenium meetup
+2011-10-06T16:24:34  *** ian_mac has quit IRC
+2011-10-06T16:25:25  *** GOM has joined #selenium
+2011-10-06T16:25:38  <mydog2> didn't think about that.. i'll check.. but i'm in need of a conversation right now.. combination java/sel.. to figure out an issue(s) i'm having..
+2011-10-06T16:25:59  <mydog2> i'm pretty sure this is a 20/30 min deal..
+2011-10-06T16:26:12  <GOM> Hey what is Selenium::WebDriver::Error::NoScriptResultError for?
+2011-10-06T16:26:34  <GOM> any documentation on it that I see is a stub
+2011-10-06T16:26:58  <GOM> what result is it expecting?
+2011-10-06T16:27:35  <lukeis> looks ruby-esque, not sure but maybe when jarib comes back (if he isn't listening now) he could answer
+2011-10-06T16:28:10  <GOM> yes, ruby, Capybara
+2011-10-06T16:28:35  <GOM> I cringe at saying Capybara, expecting an inevitable, "well it must be a problem with Capybara"
+2011-10-06T16:28:51  <jarib> no, that sounds like a problem with the driver
+2011-10-06T16:28:52  <GOM> but still have no idea what this exception is trying to say
+2011-10-06T16:28:53  <jarib> are you using IE?
+2011-10-06T16:29:01  <jarib> AFAIK that exception is only raised by IE
+2011-10-06T16:29:05  <GOM> chrome driver
+2011-10-06T16:29:09  <jarib> ah
+2011-10-06T16:29:17  <jarib> interesting
+2011-10-06T16:29:42  <jarib> can you :gist the stacktrace?
+2011-10-06T16:29:42  <selbot2> Please paste >3 lines of text to http://gist.github.com
+2011-10-06T16:31:58  *** lukeis has quit IRC
+2011-10-06T16:32:10  <GOM> https://gist.github.com/1269037
+2011-10-06T16:32:27  <GOM> I don't have output from the selenium server, unfortunately
+2011-10-06T16:32:47  <GOM> but that's from the code thats being run, not much info, just names the exception that's being raised
+2011-10-06T16:33:59  <bubba42> hi I'm trying to decide between using selenium and windmill -- my primary application is to develop web page understanding algorithms -- do you have any thoughts which one of these two platforms would be better ?
+2011-10-06T16:34:15  <jarib> GOM: does it happen every time?
+2011-10-06T16:34:36  <GOM> yeah
+2011-10-06T16:35:18  <jarib> GOM: can you run with $DEBUG = true and gist the output?
+2011-10-06T16:35:46  <GOM> I have to figure out how to do that with capybara
+2011-10-06T16:35:50  <GOM> checking
+2011-10-06T16:36:04  <jarib> GOM: just pass -d to ruby or put $DEBUG = true in e.g. env.rb
+2011-10-06T16:36:52  <GOM> ah
+2011-10-06T16:37:02  <jarib> what page are you on when the step is being executed?
+2011-10-06T16:37:02  *** ian_mac has joined #selenium
+2011-10-06T16:38:22  <GOM> should be on http://mog.com/m/login
+2011-10-06T16:38:57  <jarib> i get an exception if i execute that js on about:blank
+2011-10-06T16:39:04  <jarib> but not elsewhere
+2011-10-06T16:39:36  <jarib> also, the error message i get prints the whole script + SECURITY_ERR: DOM Exception 18
+2011-10-06T16:39:42  <jarib> which makes sense in that case
+2011-10-06T16:39:52  <GOM> ah that's a good idea
+2011-10-06T16:40:10  <GOM> hrm unless its not a noscriptresulterror
+2011-10-06T16:40:21  <GOM> but it might be possible we're on about:blank
+2011-10-06T16:41:08  <jarib> GOM: also, what's the output of   openssl md5 `which chromedriver`
+2011-10-06T16:41:40  <GOM> MD5(/Users/redacted/lib//chromedriver)= b241a37e7a382bea00f50914ed0e3afd
+2011-10-06T16:41:44  <GOM> probably old
+2011-10-06T16:42:00  <jarib> yeah, that looks outdated
+2011-10-06T16:42:01  *** bubba42 has quit IRC
+2011-10-06T16:42:20  *** simonstewart has joined #selenium
+2011-10-06T16:42:34  *** bubba42 has joined #selenium
+2011-10-06T16:42:36  <jarib> GOM: try grabbing the latest from http://code.google.com/p/chromium/downloads/list
+2011-10-06T16:42:46  <jarib> (should at least give you a better message)
+2011-10-06T16:42:48  <simonstewart> Greetings evertone
+2011-10-06T16:43:03  <GOM> yeah you know what
+2011-10-06T16:43:10  <GOM> it was on about:blank
+2011-10-06T16:43:20  <GOM> brialliant
+2011-10-06T16:43:23  <jarib> cool
+2011-10-06T16:43:23  <GOM> i mean, not for me
+2011-10-06T16:43:39  <GOM> respect :)
+2011-10-06T16:43:41  <jarib> simonstewart: good day
+2011-10-06T16:44:04  <simonstewart> Nice to be back online
+2011-10-06T16:44:29  *** cerberos has joined #selenium
+2011-10-06T16:44:37  <jarib> good to have you back online
+2011-10-06T16:45:13  *** bubba42 has quit IRC
+2011-10-06T16:49:04  *** Yxven has joined #selenium
+2011-10-06T16:50:33  <jarib> oh, there's a new chromedriver up
+2011-10-06T16:50:47  <selbot2> dawagner half a minute ago - DanielWagnerHall: Removing deprecated calls - http://code.google.com/p/selenium/source/detail?r=14078
+2011-10-06T16:54:38  <stackedsax> hey simonstewart, I missed connecting with you about grid documentation last week — I'd still like to lend a hand
+2011-10-06T16:55:02  <simonstewart> Great news :)
+2011-10-06T16:55:24  <stackedsax> just even to list some of the basic features that aren't documented yet would be useful to the community
+2011-10-06T16:55:44  *** stockton has joined #selenium
+2011-10-06T16:56:01  *** dkakkad has joined #selenium
+2011-10-06T16:56:47  <simonstewart> Sounds great.
+2011-10-06T16:57:17  <simonstewart> I think that the first thing to do would be to put up a shared document (somewhere) with a list of questions and "things" you're unsure about
+2011-10-06T16:57:28  <dkakkad> Hey all..I need to enter 100 characters in a text field and do not want to manually add a 100 character long string. Is there a way the text field can take a regex as input? ANy help is appreciated.
+2011-10-06T16:57:34  <simonstewart> We can get krosenvold, nirvdrum and francois to look at it
+2011-10-06T16:57:41  <stackedsax> kk, will do
+2011-10-06T17:00:14  *** stockton_ has joined #selenium
+2011-10-06T17:00:14  *** stockton has quit IRC
+2011-10-06T17:00:15  *** stockton_ is now known as stockton
+2011-10-06T17:02:57  *** GOM has quit IRC
+2011-10-06T17:11:11  <simonstewart> I wonder what the Grid tests are doing
+2011-10-06T17:11:22  <simonstewart> They've been running on my lappie for a long time now
+2011-10-06T17:13:18  <simonstewart> Wonder whether I should rip out the JSON library we're using and replace with jackson
+2011-10-06T17:13:34  *** Yxven has quit IRC
+2011-10-06T17:14:17  <stackedsax> my team has had some good reviews of jackson
+2011-10-06T17:14:22  <stackedsax> what library are you using?
+2011-10-06T17:14:26  *** retornam has quit IRC
+2011-10-06T17:15:34  <simonstewart> The simple json library
+2011-10-06T17:17:12  *** sfbrian_ has joined #selenium
+2011-10-06T17:20:38  *** sfbrian has quit IRC
+2011-10-06T17:20:50  *** santiycr has quit IRC
+2011-10-06T17:21:07  <jarib> simonstewart: for speed?
+2011-10-06T17:21:15  <simonstewart> Yeah
+2011-10-06T17:21:34  *** sfbrian_ has quit IRC
+2011-10-06T17:21:42  <simonstewart> But I'm first going to be playing with webbit to see if I can easily flip the relationship between the client and the server
+2011-10-06T17:21:43  *** barancev has quit IRC
+2011-10-06T17:22:21  *** dkakkad has left #selenium
+2011-10-06T17:22:33  *** ian_mac has quit IRC
+2011-10-06T17:23:42  <jarib> simonstewart: are you saying i'll have to write an evented websocket server in ruby? :)
+2011-10-06T17:23:50  <simonstewart> not yet
+2011-10-06T17:23:57  <jarib> actually, that exists already
+2011-10-06T17:24:12  <simonstewart> Yeah. There are lightweight http servers in most languages
+2011-10-06T17:24:18  <jarib> i know aslak likes webbit
+2011-10-06T17:24:23  *** stockton has quit IRC
+2011-10-06T17:24:29  <simonstewart> it's written by joe walnes
+2011-10-06T17:24:32  <simonstewart> who's a cracking chap
+2011-10-06T17:25:03  <jarib> he did a lightning talk on it at javazone
+2011-10-06T17:25:07  <jarib> (aslak did)
+2011-10-06T17:25:36  <simonstewart> I want to make this possible: https://wiki.mozilla.org/User:Automatedtester/FennecDriver
+2011-10-06T17:26:07  <simonstewart> option 2, in particular
+2011-10-06T17:26:35  <jarib> i read that
+2011-10-06T17:26:45  <jarib> i don't get why the client can't just talk the remote debugging protocol directly
+2011-10-06T17:27:16  <jarib> and by client, i mean the thing running outside the device
+2011-10-06T17:27:18  <simonstewart> Imagine you're on a mobile phone network....
+2011-10-06T17:27:43  <simonstewart> the telcos don't make it easy to connect to the device
+2011-10-06T17:28:08  <simonstewart> (proxies in the way, in determinate IP address on a private network)
+2011-10-06T17:28:12  <simonstewart> (shitty latency)
+2011-10-06T17:28:27  <simonstewart> The device, OTOH, _must_ be able to reach public addresses
+2011-10-06T17:28:43  <simonstewart> (how else are you going to be able to browse porn with your iphone?)
+2011-10-06T17:28:53  <jarib> that is true
+2011-10-06T17:29:00  <simonstewart> It might also make it easier to implement the safari driver
+2011-10-06T17:30:08  <simonstewart> And, let's not forget, it's a fun thing to play with :)
+2011-10-06T17:30:14  <jarib> hehe
+2011-10-06T17:31:19  <jarib> i don't get how you're going to get the device to initiate the connection though
+2011-10-06T17:31:29  <jarib> unless you're manually clicking the phone
+2011-10-06T17:31:32  <simonstewart> An XmlHttpRequest from an extension
+2011-10-06T17:31:47  <simonstewart> You'll probably need to manually activate the driver
+2011-10-06T17:31:57  <simonstewart> From a developer menu, I guess
+2011-10-06T17:32:04  <simonstewart> But that's a UI problem
+2011-10-06T17:32:05  <simonstewart> :)
+2011-10-06T17:32:19  *** spanky|away has quit IRC
+2011-10-06T17:34:15  <simonstewart> About to fire up the Firefox 9 nightly to see how badly webdriver breaks on it
+2011-10-06T17:34:57  <simonstewart> And tackle the thorny problem of how to make a JS XPCOM component thread safe
+2011-10-06T17:35:00  <simonstewart> How hard can it be?
+2011-10-06T17:36:17  <jarib> theoretically, it could be impossible
+2011-10-06T17:37:29  <jarib> it could also be very easy, of course
+2011-10-06T17:40:31  *** cerberos has quit IRC
+2011-10-06T17:42:00  <simonstewart> One way to find out
+2011-10-06T17:44:28  <jarib> why does it need to be thread safe?
+2011-10-06T17:46:39  <jarib> i thought it was all single-threaded
+2011-10-06T17:48:12  <simonstewart> nsIClassInfo.THREADSAFE
+2011-10-06T17:48:15  <simonstewart> that looks useful
+2011-10-06T17:49:00  <simonstewart> http://mxr.mozilla.org/mozilla-central/ident?i=THREADSAFE
+2011-10-06T18:16:04  *** anjelica has quit IRC
+2011-10-06T18:23:06  *** towski has quit IRC
+2011-10-06T18:23:25  *** cerberos has joined #selenium
+2011-10-06T18:24:21  *** cerberos has quit IRC
+2011-10-06T18:28:25  *** Renacor_ is now known as Renacor
+2011-10-06T18:32:46  *** bubba42 has joined #selenium
+2011-10-06T18:36:13  *** bubba42 has quit IRC
+2011-10-06T18:36:13  <jarib> hah, i was wondering why my test was slow
+2011-10-06T18:36:23  <jarib> then realized i had put in a 15 second sleep
+2011-10-06T18:37:47  *** Siph0n has joined #selenium
+2011-10-06T18:38:34  *** DustinFay has joined #selenium
+2011-10-06T18:39:17  *** ian_mac has joined #selenium
+2011-10-06T18:40:47  *** dmachi1 has joined #selenium
+2011-10-06T18:40:47  *** dmachi has quit IRC
+2011-10-06T18:51:08  <simonstewart> jarib: d'oh!
+2011-10-06T18:54:30  <simonstewart> Right. Time to catch a plane!
+2011-10-06T18:54:31  <simonstewart> TTFN
+2011-10-06T18:54:32  *** simonstewart has left #selenium
+2011-10-06T18:57:10  *** Renacor has left #selenium
+2011-10-06T19:18:49  *** stockton has joined #selenium
+2011-10-06T19:29:27  *** Guest31814 has joined #selenium
+2011-10-06T19:29:29  *** voodoofish1 has quit IRC
+2011-10-06T19:29:57  *** Guest31814 is now known as roltra
+2011-10-06T19:36:06  *** bubba42 has joined #selenium
+2011-10-06T19:46:57  *** stockton has quit IRC
+2011-10-06T20:02:46  *** santiycr has joined #selenium
+2011-10-06T20:11:22  *** santiycr has quit IRC
+2011-10-06T20:21:49  *** beakerman has quit IRC
+2011-10-06T20:36:49  *** roltra has quit IRC
+2011-10-06T20:50:33  *** blowery is now known as blowery_off
+2011-10-06T21:15:39  *** mattp_ has quit IRC
+2011-10-06T21:22:19  *** nitin has quit IRC
+2011-10-06T21:52:39  *** Siph0n has quit IRC
+2011-10-06T22:21:11  *** nitin has joined #selenium
+2011-10-06T22:29:29  *** Fyrespray has quit IRC
+2011-10-06T22:30:26  *** nitin has quit IRC
+2011-10-06T22:35:21  *** SamuraiJack has joined #selenium
+2011-10-06T22:36:30  *** pnitin has joined #selenium
+2011-10-06T22:43:45  *** mashiara has quit IRC
+2011-10-06T22:52:51  *** cburroughs has quit IRC
+2011-10-06T22:55:45  *** lfryc has joined #selenium
+2011-10-06T23:05:59  *** __gotcha has joined #selenium
+2011-10-06T23:06:50  *** cburroughs has joined #selenium
+2011-10-06T23:09:01  *** __gotcha has quit IRC
+2011-10-06T23:14:22  *** mattp_ has joined #selenium
+2011-10-06T23:30:23  *** sjmikem has joined #selenium
+2011-10-06T23:31:04  <sjmikem> is there a variant of findElement that doesn't throw an exception?
+2011-10-06T23:31:15  <sjmikem> i.e. query the existence of some selector
+2011-10-06T23:31:35  *** stackedsax has quit IRC
+2011-10-06T23:46:40  <krosenvold> sjmikem: findElements
+2011-10-06T23:48:14  <sjmikem> krosenvold: thanks!
+2011-10-06T23:49:05  *** csanchez has joined #selenium
+2011-10-06T23:53:30  <selbot2> ajaykemparaj@gmail.com less than a minute ago - AjayKemparaj: Bumping maven to point to 2.8 - http://code.google.com/p/selenium/source/detail?r=14079
+2011-10-06T23:57:24  *** Ajay has joined #selenium
+2011-10-06T23:57:54  *** zmijunkie_ has joined #selenium
+2011-10-06T23:59:45  *** zmijunkie_ has quit IRC

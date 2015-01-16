@@ -1,0 +1,789 @@
+[IRC logfile - Started Fri Oct 26 00:10:05 2012]
+[00:10:05] AutomatedTester has joined #selenium
+[00:19:39] aweiteka_ has joined #selenium
+[00:23:52] brettporter has joined #selenium
+[00:59:20] ner0x has joined #selenium
+[IRC logfile - Started Fri Oct 26 01:00:53 2012]
+[01:00:53] aweiteka__ has joined #selenium
+[01:11:47] aivaturi has joined #selenium
+[01:45:16] nhirata has joined #selenium
+[01:45:19] zelo1 has joined #selenium
+[01:48:28] aivaturi has joined #selenium
+[01:52:26] jleyba has joined #selenium
+[IRC logfile - Started Fri Oct 26 02:05:22 2012]
+[02:05:22] davehunt has joined #selenium
+[02:25:33] aivaturi has joined #selenium
+[02:38:08] alexglow has joined #selenium
+[02:48:46] icio has joined #selenium
+[02:52:12] DaveIngram has joined #selenium
+[IRC logfile - Started Fri Oct 26 03:32:44 2012]
+[03:32:44] Nari has joined #selenium
+[03:48:35] gabrielrotbart has joined #selenium
+[03:55:12] aivaturi has joined #selenium
+[03:56:54] aivaturi has left #selenium
+[03:57:40] JackDandy has joined #selenium
+[03:57:40] JackDandy has joined #selenium
+[IRC logfile - Started Fri Oct 26 04:11:36 2012]
+[04:11:36] pa has joined #selenium
+[04:43:48] alexluya has joined #selenium
+[04:45:53] stephend has joined #selenium
+[04:59:50] bluescreen10 has joined #selenium
+[IRC logfile - Started Fri Oct 26 05:37:13 2012]
+[05:37:13] stephend has joined #selenium
+[05:59:12] zelo has joined #selenium
+[IRC logfile - Started Fri Oct 26 06:06:39 2012]
+[06:06:39] wilhelm has joined #selenium
+[06:20:01] softmanpetro has joined #selenium
+[06:54:03] jeichar has joined #selenium
+[IRC logfile - Started Fri Oct 26 07:03:10 2012]
+[07:03:10] papegaaij has joined #selenium
+[07:48:47] jarib has joined #selenium
+[07:58:32] alexglow has joined #selenium
+[IRC logfile - Started Fri Oct 26 08:27:57 2012]
+[08:27:57] testingb0t has joined #selenium
+[08:28:32] testingb0t has joined #selenium
+[08:31:04] CarlJokl has joined #selenium
+[08:41:25] rath-work has joined #selenium
+[08:43:13] sburjan has joined #selenium
+[08:46:36] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Adding a bit more information to the test log | https://code.google.com/p/selenium/source/detail?r=18005 | http://seleniumhq.org/ci.jsp?r=18005
+[08:56:17] dekroning has joined #selenium
+[08:57:35] freynaud has joined #selenium
+[IRC logfile - Started Fri Oct 26 09:15:34 2012]
+[09:15:34] mates has joined #selenium
+[09:37:06] rbalent has joined #selenium
+[09:38:17] jamesoram has joined #selenium
+[09:39:18] jarib has joined #selenium
+[IRC logfile - Started Fri Oct 26 10:02:09 2012]
+[10:02:09] jamesoram has joined #selenium
+[10:04:01] soc42 has joined #selenium
+[10:20:52] rath-work: what about issue #4311, is there already a plan when it will be fixed?
+[10:20:54] selbot2: 03 open/new OpenQA.Selenium.WebDriverException: Unexpected error. TypeError: b is undefined - https://code.google.com/p/selenium/issues/detail?id=4311 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriverBackedSelenium Browser-Firefox]
+[10:21:51] zac_sel has joined #selenium
+[10:23:27] barancev: rath-work: WebDriverBackedSelenium is low-priority part, consider migration to WebDriver API entirely
+[10:24:09] jibay has joined #selenium
+[10:31:47] rbalent has joined #selenium
+[10:31:47] rbalent has joined #selenium
+[10:48:47] eranm has joined #selenium
+[10:50:17] eranm: barancev, yt?
+[10:50:25] barancev: eranm: yes
+[10:50:42] eranm: barancev, so I'm trying to reproduce this crash on sauce
+[10:50:57] barancev: eranm: which one?
+[10:50:58] eranm: And I've noticed we have a Java test that is identical to the one you've sent me
+[10:51:06] eranm: Your code: https://gist.github.com/3900604
+[10:51:21] barancev: eranm: yes, my script was built from this test
+[10:51:28] barancev: actually, I've "fixed" it :)
+[10:51:52] eranm: The test: http://code.google.com/p/selenium/source/browse/trunk/java/client/test/org/openqa/selenium/JavascriptEnabledDriverTest.java#299
+[10:52:04] barancev: see r17998 and r18000
+[10:52:06] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Function notifyOfSwitchToWindow is commented out (temporarily?) because it quits the browser unexpectedly. | https://code.google.com/p/selenium/source/detail?r=17998 | http://seleniumhq.org/ci.jsp?r=17998
+[10:52:09] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Commenting out notifyOfCloseWindow too. | https://code.google.com/p/selenium/source/detail?r=18000 | http://seleniumhq.org/ci.jsp?r=18000
+[10:52:20] barancev: and my message to the group: https://groups.google.com/forum/?fromgroups=#!topic/selenium-developers/bhyYdD_uVs8
+[10:52:51] barancev: eranm: you did a great thing, really
+[10:52:57] eranm: Ah. That's not quite the fix.
+[10:53:32] barancev: I know, but before r17633 native events were always off on sauce
+[10:53:34] selbot2: 03eran.mes@gmail.com 2 months ago - EranMes on behalf of EmmaSoderberg: Support for required capabilities. Required capabilities take precedence over desired capabilities. | https://code.google.com/p/selenium/source/detail?r=17633 | http://seleniumhq.org/ci.jsp?r=17633
+[10:53:41] barancev: you could not enable them
+[10:53:48] eranm: And now you could.
+[10:54:15] barancev: yes, in 17633 you've fixed it
+[10:54:35] eranm: Ok, I'm looking into that, I have to point out that disabling these two calls will make native events behave *very* erratically on Linux when you have more than one window
+[10:54:55] barancev: before this commit all our tests were running with synthetic events, no matter what capabilities you specified
+[10:56:28] rath-work: barancev: do you mean instead of using functions from WebDriverBackedSelenium, better using class "Action" with the WebDriver?!
+[10:56:29] barancev: eranm: yes, I know I've "fixed" it wrong, but at least it stops quitting browser, and all tests are green
+[10:57:07] barancev: eranm: well, not all, testChordControlCutAndPaste is failing, Ctrl-V does not work on sauce
+[10:57:16] barancev: rath-work: exactly
+[10:57:37] rath-work: thx
+[10:58:00] barancev: eranm: Ctrl-X works well, Ctrl-A works, Ctrl-V does not
+[10:58:19] jarib has joined #selenium
+[10:58:25] eranm: barancev, on sauce? I have no idea which window manager they use, so it's hard to even guess why
+[10:58:47] barancev: yes, on sauce, I can't reproduce it manually
+[10:59:30] barancev: s/manually/locally/
+[IRC logfile - Started Fri Oct 26 11:00:38 2012]
+[11:00:38] zac_sel_ has joined #selenium
+[11:01:34] barancev: eranm: do you think disabling notifications to x_ignore_nofocus is a showstopper for 2.26?
+[11:01:54] barancev: in view of the fact, that all the testas are green on sauce
+[11:02:48] eranm: barancev, I'd very much like to uncomment it. In the past danielwh pointed out the same problem, so I may have a subversion client somewhere with a partial fix
+[11:04:23] barancev: eranm: if I uncomment it, tests will fail here and there again, is it a better situation than the current one?
+[11:04:58] eranm: barancev, the fact that I've never seen it happen in a real tests hints it may not be such a big problem
+[11:06:04] barancev: I'd suggest to keep them commented unless The Proper Fix will be provided
+[11:06:26] barancev: at least it makes CI usable as a safety net to fix other parts
+[11:07:34] eranm: I'm looking into that now. Hopefully I'll have a fix today. When you've been able to reproduce it locally, was it on a 32-bit or 64-bit system? Which CPU, linux distro and window manager?
+[11:09:44] barancev: VirtualBox VM, Xubunty 11 32bit with its default windows manager (with mouse logo)
+[11:09:54] eranm: ok
+[11:09:59] barancev: Xfce, right?
+[11:10:13] eranm: Could be
+[11:10:32] eranm: Each window manager behaves differently, I've only tested on Gnome and KDE
+[11:12:00] barancev: http://www.xfce.org/ -- it seems to be KDE-based
+[11:13:13] eranm: nope, much more lightweight than KDE
+[11:14:25] barancev: it has a dependency on GTK+ and GLib
+[11:16:02] barancev: well it reproduced in my Xubuntu, and on sauce, al least two different environments, so it's not very environment-specific
+[11:18:20] rath-work has left #selenium
+[11:24:03] SamuraiJack has joined #selenium
+[11:32:04] caddoo has joined #selenium
+[11:37:12] rbalent has joined #selenium
+[11:37:12] rbalent has joined #selenium
+[11:37:32] zelo1 has joined #selenium
+[11:49:55] eranm has joined #selenium
+[11:54:19] nirvdrum has joined #selenium
+[11:55:21] dekroning has joined #selenium
+[IRC logfile - Started Fri Oct 26 12:00:37 2012]
+[12:00:37] admc has joined #selenium
+[12:04:08] skiphuffman has joined #selenium
+[12:04:18] eranm_ has joined #selenium
+[12:10:25] testingb0t has joined #selenium
+[12:12:20] barancev: :ci
+[12:12:20] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[12:12:51] barancev: :ignores
+[12:12:52] selbot2: http://ignores.ci.seleniumhq.org/
+[12:15:37] xtian_ has joined #selenium
+[12:35:35] simonstewart has joined #selenium
+[12:35:36] selbot2: simonstewart: note from andreastt 1 day ago: ping 
+[12:36:02] simonstewart: andreastt: pong
+[12:38:13] barancev: ave, simonstewart!
+[12:38:18] simonstewart: Ave!
+[12:38:28] andreastt: simonstewart: I simply haven't had time to look at the screen capture bit for the spec.
+[12:38:39] andreastt: simonstewart: Work's just too much right now.
+[12:38:51] simonstewart: OK. Got any rough notes? 
+[12:39:04] simonstewart: I can throw something together now if that helps
+[12:41:38] barancev: simonstewart: I've seen your comment to r17988. do you think it is worth to rework ~700 existing test cases to use test-specific pages?
+[12:41:41] selbot2: 03barancev 6 days ago - AlexeiBarantsev: Refactoring tests: moving hardcoded page urls to Pages class. | https://code.google.com/p/selenium/source/detail?r=17988 | http://seleniumhq.org/ci.jsp?r=17988
+[12:42:00] simonstewart: barancev: Not all at once
+[12:42:05] simonstewart: But as I add new tests
+[12:42:08] simonstewart: And edit old ones
+[12:42:13] simonstewart: I plan on slowly migrating things out
+[12:42:19] simonstewart: We need to do it for the w3c spec work
+[12:42:27] simonstewart: So it'll get done "eventually"
+[12:43:08] barancev: simonstewart: I've created a prototype implementation that automatically opens a test-specific page if there is an annotation @UseTestSpecificPage
+[12:43:19] simonstewart: ?
+[12:43:21] barancev: we can start to move into this direction, yes
+[12:43:30] simonstewart: Right
+[12:43:38] simonstewart: I don't think we need to do a massive change in the code base
+[12:43:43] simonstewart: And I think we can ease into it
+[12:44:02] simonstewart: We should also probably start reexamining our test names
+[12:44:03] barancev: yes, it's a small change in the test runner
+[12:44:12] barancev: where can I send it to review?
+[12:44:17] simonstewart: "RenderedWEbElementTest" is a daft name these days
+[12:44:18] simonstewart: Sure. 
+[12:44:24] simonstewart: I'm not sure it's necessary, but sure
+[12:48:03] barancev: simonstewart: where can I send the patch to review? I don't remember the name of that nice site...
+[12:48:31] pa has joined #selenium
+[12:48:44] simonstewart: https://codereview.appspot.com/
+[12:52:02] barancev: tnx!
+[12:53:59] simonstewart: np
+[IRC logfile - Started Fri Oct 26 13:04:37 2012]
+[13:04:37] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Unignoring some tests that pass locally | https://code.google.com/p/selenium/source/detail?r=18006 | http://seleniumhq.org/ci.jsp?r=18006
+[13:05:07] ner0x has joined #selenium
+[13:15:08] AutomatedTester has joined #selenium
+[13:15:18] eranm has joined #selenium
+[13:16:34] eranm_ has joined #selenium
+[13:22:13] farlan has joined #selenium
+[13:25:39] davehunt has joined #selenium
+[13:28:59] llaskin: simonstewart: you working on either of those 2 projects I mentioned?
+[13:29:11] simonstewart: I'm not working on anything yet
+[13:29:16] simonstewart: Still taking time off
+[13:29:22] simonstewart: Starting on the 19th Novembe
+[13:29:23] simonstewart: r
+[13:29:32] llaskin: oh hahaah ok
+[13:29:33] simonstewart: And about to sign out now, because The Boy is awake
+[13:29:34] simonstewart: :)
+[13:29:35] simonstewart: TTFN
+[13:29:36] simonstewart has left #selenium
+[13:29:38] llaskin: tah
+[13:30:04] cmcgraw has joined #selenium
+[13:34:54] mreedell has joined #selenium
+[13:36:43] jamesoram has joined #selenium
+[13:37:49] jamesoram has joined #selenium
+[13:38:14] ngriffin has joined #selenium
+[13:39:48] cgoldberg has joined #selenium
+[13:46:32] RossPatterson has joined #selenium
+[13:46:32] ChanServ has altered RossPatterson's mode: +o
+[13:55:41] barancev: :seen jleyba
+[13:55:42] selbot2: jleyba was last seen about 11 hours ago, quitting.
+[13:58:15] caddoo has joined #selenium
+[13:58:19] NeptuNooo has joined #selenium
+[IRC logfile - Started Fri Oct 26 14:10:12 2012]
+[14:10:12] ner0x: Anyone use the set_implicit_wait_timeout function for perl bindings Selenium::Remote::Driver ?
+[14:15:21] ner0x: Or possibly someone could explain to me how "09:29:40.041 INFO - Executing: [implicitly wait: 3000] at URL: /session/1351258101435/timeouts/implicit_wait)" that works?
+[14:16:29] skiphuffman: Anyone able to help me find a solution to my problem detailed on Stack Overflow?  http://stackoverflow.com/questions/13075496/trouble-getting-chrome-through-selenium-hub
+[14:16:43] skiphuffman: Basically I cannot get chrome to behave itself.
+[14:23:23] mdgreenfield has joined #selenium
+[14:26:29] mdgreenfield has joined #selenium
+[14:26:59] mdgreenfield has left #selenium
+[14:41:22] rpereira_ has joined #selenium
+[14:49:10] Automate_ has joined #selenium
+[14:57:23] dude-x has joined #selenium
+[14:57:23] jarib has joined #selenium
+[IRC logfile - Started Fri Oct 26 15:05:41 2012]
+[15:05:41] jimevans has joined #selenium
+[15:10:38] pa has joined #selenium
+[15:17:55] dekroning has joined #selenium
+[15:42:10] eranm has joined #selenium
+[15:43:26] eranm_ has joined #selenium
+[15:58:50] farlan has left #selenium
+[IRC logfile - Started Fri Oct 26 16:00:31 2012]
+[16:00:31] farlan has joined #selenium
+[16:02:04] davehunt has joined #selenium
+[16:02:53] jarib has joined #selenium
+[16:03:27] SamuraiJack_ has joined #selenium
+[16:11:41] pa has joined #selenium
+[16:20:56] smccarthy has joined #selenium
+[16:21:18] eranm has joined #selenium
+[16:22:46] jimevans: eranm: hi.\
+[16:22:55] eranm: hi jimevans 
+[16:23:38] jimevans: so thanks to barancev, it looks like the firefox woes on windows are due to sauce using windows server 2003 instead of windows xp.
+[16:24:09] eranm: yeah
+[16:24:25] eranm: The "fix" for native Firefox on linux isn't really a fix
+[16:24:43] eranm: I hope to get rid of this component once testing mode for the focus manager actually works on Firefox
+[16:24:43] barancev: I know it is not :)
+[16:24:44] jimevans: no, it's not. we need to revisit that, but i want to wait until after 2.26.
+[16:24:52] eranm: Ok
+[16:25:09] jleyba has joined #selenium
+[16:25:09] jimevans: we've lived with it for this long, one more release won't matter.
+[16:25:27] eranm: It's been working well in the real world, just causing some tests to fail
+[16:25:38] jleyba: :log
+[16:25:38] selbot2: http://illicitonion.com/selogs/selenium/2012/10/26.txt | http://illicitonion.com/selogs/search
+[16:25:47] eranm: Anyway, as long as there's a note about it in the release notes I'm ok
+[16:26:33] jimevans: so we need to manually run the firefox tests on the versions of firefox we support, or fix the native events piece for windows 2003.
+[16:26:45] jimevans: (though i can't imagine how w2k3 broke it)
+[16:26:48] eranm: something along the lines of: "With native events turned on, tests that use Firefox on Linux and have multiple windows may behave differently."
+[16:27:26] jleyba: differently how
+[16:28:27] barancev: jimevans: I've created two more jobs on CI:
+[16:28:39] barancev: Firefox 10 Vista Native Java Tests -- http://ci.seleniumhq.org:8080/job/Firefox%2010%20Vista%20Native%20Java%20Tests/
+[16:29:06] barancev: Firefox 16 XP Synthesized Java Tests - http://ci.seleniumhq.org:8080/job/Firefox%2016%20XP%20Synthesized%20Java%20Tests/
+[16:29:37] barancev: they are both work better than Server 2003 + native evewnts
+[16:30:05] barancev: (Vista == Windows Server 2008, XP == Windows Server 203)
+[16:32:34] barancev: jleyba: I have a question re: r16498 -- why @Ignore annotations were replaced with assumptions?
+[16:32:37] selbot2: 03jmleyba@gmail.com 6 months ago - JasonLeyba: Replace some @Ignores with JUnit4 assumptions. | https://code.google.com/p/selenium/source/detail?r=16498 | http://seleniumhq.org/ci.jsp?r=16498
+[16:32:41] eranm: jleyba, native input may only work on the most-recently opened window :)
+[16:33:20] jleyba: eranm: SGTM :)
+[16:34:07] jimevans: so can somebody look into why copy-paste is broken on firefox?
+[16:34:30] toabctl has joined #selenium
+[16:34:57] jleyba: barancev: idiomatic junit.  we also don't need to track @Ignores on touch interactions b/c they're not relevant to most of our drivers
+[16:35:34] jleyba: also, if someone were to implement the touch interactions for one of those browsers, they'd have to remember to update the @Ignores annotation before the tests would run
+[16:35:34] barancev: jleyba: as the result: 1) they are not present in :ignores
+[16:35:35] selbot2: http://ignores.ci.seleniumhq.org/
+[16:36:04] jleyba: barancev: doesn't matter b/c of 2)
+[16:36:35] barancev: 2) more important -- we start browser to run a test, and stop it because assumption failed
+[16:36:40] jimevans: also, is it possible to categorize the jobs in jenkins as synthetic vs. native events? we already have tabs for "javascript vs. java". it's really getting challenging to parse out the actual status of native vs synthetic events.
+[16:37:09] barancev: jleyba: e.g. for chrome these tests take 6 minutes out of total 21, just to start and stop browser
+[16:37:31] jleyba: barancev: that's a bug in our test runner then, not a fault of using assumptions
+[16:37:51] jleyba: we should be use far more assumptions (e.g. anywhere we bail out of a test with an early return; should be an assumption)
+[16:38:16] jimevans: (i'd look into the jenkins config myself, but i don't have that particular set of keys)
+[16:38:43] barancev: jleyba: ok, I see your point, will try to fix test runner
+[16:39:10] barancev: jimevans: I'll create more views
+[16:42:21] jimevans: $deity, this suuuuuuucks.
+[16:43:09] andreastt: jimevans: You haven't got access?
+[16:43:25] jimevans: andreastt: to what, the jenkins config?
+[16:43:31] jimevans: not to my knowledge.
+[16:43:37] andreastt: Config, as SSH access + sudo on the server?
+[16:44:18] andreastt: barancev: Oh awesome, you fixed the ignores for the Opera tests.
+[16:44:24] andreastt: <3 barancev
+[16:44:46] mdgreenfield has joined #selenium
+[16:45:29] jimevans: andreastt: config, as in, being able to create views.
+[16:45:55] andreastt: I can create views.
+[16:46:00] andreastt: Ping dawagner to get access.
+[16:46:06] andreastt: Actually.
+[16:46:17] andreastt: :note dawagner jimevans needs moar access to Jenkins
+[16:46:18] selbot2: ok!
+[16:46:46] jimevans: :note dawagner no, he really doesn't. with moar power comes moar responsibility. :)
+[16:46:47] selbot2: ok!
+[16:46:57] andreastt: Oops.
+[16:47:53] jimevans: andreastt: i'm just kidding. this is the last time i'm taking the damned bacon.
+[16:48:05] andreastt: That's what dawagner said last.
+[16:48:21] jimevans: i'm serious. i fucking give up.
+[16:49:24] stephend has joined #selenium
+[16:49:27] jimevans: between this and the IE driver bug that was posted to the webdriver list the other day, i'm ready to just chuck the whole enterprise and be done with ie.
+[16:49:34] jimevans: s/ie/it
+[16:50:18] barancev: jimevans: views done
+[16:50:22] jimevans: thakns
+[16:52:09] andreastt: jimevans: https://twitter.com/illicitonion/status/232368567390195714
+[16:52:16] andreastt: jimevans: Note how long ago I asked him that.
+[16:53:22] barancev: yes it took 2 months to repair CI
+[16:54:05] jimevans: i'm completely distressed that we've gone as long as we have without a release. we've managed to miss not one, but two firefox releases. i'd come to rely on our CI server, only to find out it's thoroughly unreliable due to platform issues.
+[16:54:17] alexglow has joined #selenium
+[16:54:36] andreastt: I think day job is partly to blame in my case.
+[16:54:44] andreastt: Otherwise I would've helped out more.
+[16:54:59] andreastt: I've just gotten new responsibilities.
+[16:58:10] jfunk has joined #selenium
+[16:59:18] jimevans: so again, i ask, beg, plead, even, can someone look into why copy-paste is failing for linux native events?
+[IRC logfile - Started Fri Oct 26 17:00:21 2012]
+[17:00:21] Nari has joined #selenium
+[17:00:31] jimevans: barancev: other than "it just doesn't work when running on windows 2003," do we have any sense as to what's wrong for firefox's native events tests in that scenario?
+[17:02:22] bfife: being behind a proxy, Net::HTTP in rake-tasks/downloader.rb doesnt work
+[17:02:46] bfife: i can wget the files from the Rakefile fine; is there anything particular i need to do with them?
+[17:03:32] barancev: jimevans: I watched the live session on sauce when "an alert test" failed on Server 2003 
+[17:04:37] barancev: it looks like this: click on a link that should pop up an alert, link is read (clicked), but there is no alert
+[17:04:53] barancev: 300 seconds (command timeout) - there is no alert
+[17:05:25] barancev: after that sauce stops the session and starts to convert video (in console)
+[17:05:51] barancev: and at this moment (!) behind the console the alert appears!
+[17:05:51] bluescreen10 has joined #selenium
+[17:07:46] jfunk has joined #selenium
+[17:07:47] eranm: ttyl all. barancev , I may have a reproducible local test case, will let you know when a fix is in.
+[17:08:45] jimevans: "a fix" for what, exactly?!?! dammit, i wish he'd supplied more details before he left.
+[17:09:38] barancev: jimevans: a proper fix of native events issue on linux, instead of just commenting out notifications to x_ignore_nofocus
+[17:10:13] Spanktar has joined #selenium
+[17:10:27] jimevans: and we still have a cut-paste native events issue.
+[17:10:30] jimevans: sigh
+[17:11:03] barancev: yes, copy-paste, and Windows Server 2003 issue
+[17:11:30] barancev: I'd suggest to ignore both
+[17:12:06] jimevans: i could probably be talked into the w2k3 issue. the copy-paste one is troubling.
+[17:16:01] jimevans: particularly since it happens on both linux and windows with native events (it's failing in your vista run too)
+[17:18:21] dregin has joined #selenium
+[17:21:18] Swadq has joined #selenium
+[17:22:41] JackDandy has joined #selenium
+[17:22:41] JackDandy has joined #selenium
+[17:23:28] mdgreenfield has joined #selenium
+[17:25:20] sassda has joined #selenium
+[17:26:04] barancev: to be honest, I'm not happy with w2k3 failures, will investigate it more
+[17:27:51] cori[s] has joined #selenium
+[17:28:41] cori[s] has left #selenium
+[17:29:50] cori[s] has joined #selenium
+[17:34:24] sfbrian has joined #selenium
+[17:36:37] JackDandy has joined #selenium
+[17:36:37] JackDandy has joined #selenium
+[17:37:38] CarlJokl has left #selenium
+[17:37:38] lukeis has joined #selenium
+[17:39:58] jimevans: and on top of everything else, my damned control key has stopped working in my window vm.
+[17:41:02] davehunt has joined #selenium
+[17:41:34] JackDandy has joined #selenium
+[17:43:48] adamgoucher has joined #selenium
+[17:46:21] mdgreenfield has joined #selenium
+[17:46:22] jimevans: i'd really like to try something with the javascript atoms tests for IE6, but i don't want to kick off a whole build for it, and i don't have a windows 2003 environment to test it with locally. suggestions?
+[17:47:15] mdgreenfield has left #selenium
+[17:47:37] lukeis_ has joined #selenium
+[17:48:32] lukeis_ has joined #selenium
+[17:54:29] aivaturi has joined #selenium
+[17:57:18] barancev: I bet it is r17545 that broke server 2003
+[17:57:21] selbot2: 03eran.mes@gmail.com 3 months ago - EranMes: Make mouse hovering in Windows persistent by firing WM_MOUSEMOVE from a background thread. Resolves issue 2067. | https://code.google.com/p/selenium/source/detail?r=17545 | http://seleniumhq.org/ci.jsp?r=17545
+[17:57:50] barancev: at leat it's something between 17537 and 17550
+[17:58:14] barancev: and there are no other commits in this interval that makes any changes in firefox
+[17:58:28] barancev: bisecting rulezzz
+[17:59:37] barancev: we need eranm again :)
+[17:59:47] jimevans: i wouldn't be surprised. that revision is a hack of the highest order.
+[IRC logfile - Started Fri Oct 26 18:00:32 2012]
+[18:00:32] JackDandy has joined #selenium
+[18:10:11] selbot2: 03luke.semerau@gmail.com less than 20 seconds ago - LukeIS: adding Donate buttons to SeHQ | https://code.google.com/p/selenium/source/detail?r=18007 | http://seleniumhq.org/ci.jsp?r=18007
+[18:11:07] jimevans: barancev: that change shouldn't be called unless the driver explicitly tells it to. 
+[18:12:16] jimevans: and nowhere does the firefox driver enable that code.
+[18:13:36] jeichar has joined #selenium
+[18:16:43] jimevans: barancev: so 17537 works with native events in firefox? windows or linux?
+[18:17:25] barancev: jimevans: 17537 works on sauce with FF 10 on windows server 2003 (XP)
+[18:17:37] barancev: 17550 does not
+[18:17:59] barancev: 17544 does work too
+[18:18:10] barancev: (just checked)
+[18:18:48] barancev: building 17545
+[18:19:57] payal has joined #selenium
+[18:20:21] jimevans: barancev: i'm sure you're right about the revision that causes the issue.
+[18:20:34] barancev: jimevans: why do you think the change should not be called? interactions.cpp was modified a lot
+[18:21:39] jimevans: every function called in event_firing_thread.cpp checks to see if gEnablePersistentEventFiring is true or that hConstantEventsThread != NULL before executing anything.
+[18:22:33] jimevans: and neither of those conditions are true unless specifically set by the driver somewhere.
+[18:22:34] JackDandy has joined #selenium
+[18:25:02] jcarr has joined #selenium
+[18:26:40] santiycr has joined #selenium
+[18:28:02] awilson820 has joined #selenium
+[18:30:38] awilson820 has left #selenium
+[18:34:13] skiphuffman: Gonna ask once more if anyone can give some insight here: http://stackoverflow.com/questions/13075496/trouble-getting-chrome-through-selenium-hub
+[18:34:34] skiphuffman: (And now I will stop spamming the chat room with that.)
+[18:37:10] SamuraiJack__ has joined #selenium
+[18:38:28] admc has joined #selenium
+[18:42:18] smccarthy has joined #selenium
+[18:42:36] Automate_: andreastt: yt?
+[18:49:30] lukeis has joined #selenium
+[18:50:24] jimevans: barancev: i think i may have found it. let be build this and try it out on the ci server.
+[18:52:12] stackedsax has joined #selenium
+[18:56:52] barancev: jimevans: ok, waiting for your commit
+[18:58:02] jimevans: trying something out before attempting the commit.
+[IRC logfile - Started Fri Oct 26 19:00:22 2012]
+[19:00:22] adamgoucher: anyone got xvfb working on osx?
+[19:01:54] jimevans: well, i don't think that's it.
+[19:04:53] AutomatedTester: adamgoucher: I dont think its very stable
+[19:05:39] AutomatedTester: jimevans: Do we have any hold ups at the moment? I just saw your tweet
+[19:06:27] AutomatedTester: what needs fixing?
+[19:06:37] barancev: jimevans: yes, I've got confirmation that it's 17545
+[19:06:38] adamgoucher: i just couldnt be bothered to light up the linux vm to figure out how to launch stuff
+[19:07:13] barancev: AutomatedTester: r17545 broke Firefox tests on windows server 2003 with native events
+[19:07:17] selbot2: 03eran.mes@gmail.com 3 months ago - EranMes: Make mouse hovering in Windows persistent by firing WM_MOUSEMOVE from a background thread. Resolves issue 2067. | https://code.google.com/p/selenium/source/detail?r=17545 | http://seleniumhq.org/ci.jsp?r=17545
+[19:07:32] jimevans: we're still struggling with the ci server for firefox native events on windows. barancev has narrowed it down to the specific checkin, but i don't see how that code change would affect firefox. we've also got a copy-paste issue in firefox that seems legitimate.
+[19:07:50] AutomatedTester: ok
+[19:08:01] AutomatedTester: so the email to the mailing list said we were good
+[19:08:11] barancev: jimevans: I think it is related to pausing event queue
+[19:09:44] davehunt: does setting focusmanager.testmode on Windows help?
+[19:09:49] barancev: AutomatedTester: *I* think we are good enough to ship :) it's my personal opinion -- if we can't fix listed issues it'd better to ship as is
+[19:09:52] davehunt: I know that causes issues in Linux
+[19:12:26] barancev: unless anybody have time and power to fix any of the remaining issues
+[19:13:25] AutomatedTester: is eran on holiday?
+[19:13:33] AutomatedTester: :seen eranm
+[19:13:34] selbot2: eranm was last seen about 2 hours ago, quitting.
+[19:15:43] AutomatedTester: jimevans: if Eran doesnt have time/inclination to fix wik2k3 then I say we just add a note to the release?
+[19:15:57] barancev: eranm is working on proper fix of native events on linux, but he agreed to postpone it until after 2.26
+[19:16:09] AutomatedTester: ok...
+[19:16:11] jimevans: it's not just that. it's that i lack confidence in what else may be broken.
+[19:16:41] AutomatedTester: jimevans: well there is only one way to really find out
+[19:16:59] jimevans: got a meeting. back in 15
+[19:17:01] KaibutsuX: does anyone know a reliable method for blurring the entire page?
+[19:17:17] KaibutsuX: my thought is "//body".click()
+[19:17:24] AutomatedTester: I am not being flippant but I think that might be the best way
+[19:17:59] KaibutsuX: do i run the risk of clicking on some other element that happens to be on top of the body
+[19:18:05] KaibutsuX: or will only the body receive the event?
+[19:18:35] jimevans: part of my frustration is that i've repeatedly asked for volunteers to run the firefox tests on various operating systems using native events over the last two weeks. i've had no takers.
+[19:18:54] *AutomatedTester is currently lacking the resources
+[19:19:18] *KaibutsuX is currently debugging three other people's selenium tests here
+[19:19:20] AutomatedTester: the only people who have the resources are Google
+[19:19:52] jimevans: indeed, and they've been mia for much of the week.
+[19:19:56] jimevans: (or busy)
+[19:19:59] jimevans: (or both)
+[19:23:26] barancev: jimevans: actually, it would be no help :)
+[19:24:07] barancev: we never ususally run tests on server OSes before
+[19:29:52] dude-x has joined #selenium
+[19:31:36] jeichar has joined #selenium
+[19:32:38] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Fixing data type error in event_firing_thread.cpp. | https://code.google.com/p/selenium/source/detail?r=18008 | http://seleniumhq.org/ci.jsp?r=18008
+[19:49:46] ignacio_ has joined #selenium
+[IRC logfile - Started Fri Oct 26 20:15:38 2012]
+[20:15:38] bfife: ugh
+[20:15:56] bfife: tracked down my "element is not currently visible"
+[20:16:08] bfife: to r17784 - closure update
+[20:16:11] selbot2: 03simon.m.stewart about 1 month ago - SimonStewart: Update the version of the closure library we use to r2153 | https://code.google.com/p/selenium/source/detail?r=17784 | http://seleniumhq.org/ci.jsp?r=17784
+[20:16:12] barancev: jimevans: you've fixed it!
+[20:17:01] jimevans: barancev: no, i don't think so. :)
+[20:17:42] barancev: I've checked with my script -- 18008 works as expected, no hangs
+[20:18:08] barancev: but let's wait CI results, you're right
+[20:20:16] jimevans: well, it's good to know i fixed *something* i suppose. :)
+[20:21:12] Nathans_ has joined #selenium
+[20:22:15] alexglow has joined #selenium
+[20:27:01] barancev: you really fixed it, after 39 minutes atm FF runs TouchFlick tests, that meands that other testd are done
+[20:28:31] rpereira has joined #selenium
+[20:30:35] dude-x: so i'm writing python code now at my new job… and i tend to write long names like i did in Java :/ 
+[20:31:20] bfife: coworker at my last job has perl scripts like a.pl, b.pl
+[20:31:26] bfife: only he knew what each would do..
+[20:31:30] knorrium has joined #selenium
+[20:31:35] bfife: same naming convention for variables
+[20:34:09] dude-x: well i don't write variable names like that
+[20:34:52] dude-x: but i feel that I can/should abbreviate some variable names  like registration_page can be reg_page 
+[20:35:39] AutomatedTester: dude-x: write what you want
+[20:35:52] AutomatedTester: there is nothing to suggest that it must be x length
+[20:36:25] dude-x: AutomatedTester: i will eventually enforce coding standards on new tests
+[20:37:11] AutomatedTester: dude-x: when you find what works well with your team then do it
+[20:37:36] jimevans: barancev: well, whaddayknow. the firefox native events tests on windows finished.
+[20:38:09] dude-x: yeah i'll ping my team mates
+[20:38:09] barancev: chrome -- green, opera -- green, FF on linux -- copy-paste issue, FF on windows -- two tests failed
+[20:38:43] RossPatterson: As a former development manager, my rule was always "Write what you want, but if we can't understand it when you're done, you're done." :-)
+[20:39:17] farlan has left #selenium
+[20:42:02] jimevans: alright, then. in keeping with the tradition of not pushing out a release on a friday, we'll get last looks monday morning. fair?
+[20:42:18] AutomatedTester: jimevans: tag now
+[20:42:30] AutomatedTester: so that if someone pushes over the weekend its in 2.27
+[20:42:48] jimevans: good point.
+[20:43:39] KaibutsuX: what two tests failed on windows-FF?
+[20:45:46] jimevans: 12http://ci.seleniumhq.org:8080/view/Firefox%20Windows%20Tests/job/Firefox%2010%20XP%20Native%20Java%20Tests/lastBuild/testReport/junit/org.openqa.selenium/PartialLinkTextMatchTest/testDriverCanGetLinkByLinkTestIgnoringTrailingWhitespace/ and 
+[20:45:46] jimevans: 12http://ci.seleniumhq.org:8080/view/Firefox%20Windows%20Tests/job/Firefox%2010%20XP%20Native%20Java%20Tests/lastBuild/testReport/junit/org.openqa.selenium.interactions/CombinedInputActionsTest/testHoldingDownShiftKeyWhileClicking/
+[20:46:51] KaibutsuX: those don't seem too terrible
+[20:47:29] amitev2 has joined #selenium
+[20:56:59] jimevans: i need to figure out how to update the change log for java.
+[IRC logfile - Started Fri Oct 26 21:00:24 2012]
+[21:00:24] Slurpee has joined #selenium
+[21:00:31] Nathans_ has joined #selenium
+[21:00:31] lukeis has joined #selenium
+[21:02:00] lukeis: jimevans: sounds like a monstrous task ;) (change log that is)
+[21:05:43] stephend_ has joined #selenium
+[21:07:21] barancev: this test is interesting: http://ci.seleniumhq.org:8080/view/Firefox%20Windows%20Tests/job/Firefox%2010%20Vista%20Native%20Java%20Tests/
+[21:07:42] barancev: testCanMaximizeTheWindow fails for some reason
+[21:16:00] Nathans_ has joined #selenium
+[21:18:24] aivaturi has left #selenium
+[21:19:39] selbot2: 03barancev half a minute ago - AlexeiBarantsev: Separating touch tests from basic interactions tests to run them on mobile drivers only. This should make standard test set lighter and faster. | https://code.google.com/p/selenium/source/detail?r=18009 | http://seleniumhq.org/ci.jsp?r=18009
+[21:25:42] barancev: simonstewart wants us to use test-specific pages -- a separate test page for each test method
+[21:26:04] barancev: I've created a prototype implementation -- whoever wants to review?
+[21:29:22] lukeis: i'm not sure i see a long term benefit there, other than less opportunity for an update to the test page to affect another test… but wouldn't CI catch that relatively quickly anyways?
+[21:30:20] santiycr has joined #selenium
+[21:30:35] barancev: lukeis: yes, there were precedents of broken tests because somebody changed a page in favour of another test
+[21:31:18] lukeis: yeah, i guess were not that great at watching for CI failures ;)
+[21:32:35] barancev: nobody suggests to rewrite all existing tests
+[21:32:50] barancev: it should be a rule for new tests
+[21:32:59] admc has joined #selenium
+[21:39:07] dude-x: so if you have a browser that autofills passwords
+[21:39:33] dude-x: is it possible to extract that passowrd via javascrip?
+[21:39:46] dude-x: just did a simple test for a login form and i extracted the password
+[21:40:59] admc1 has joined #selenium
+[21:42:40] selbot2: 03james.h.evans.jr@gmail.com 2 minutes ago - JimEvans: Updating prebuilts and CHANGELOG for impending 2.26.0 release | https://code.google.com/p/selenium/source/detail?r=18010 | http://seleniumhq.org/ci.jsp?r=18010
+[21:43:40] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Committing Java and .NET CHANGELOG for 2.26.0 | https://code.google.com/p/selenium/source/detail?r=18011 | http://seleniumhq.org/ci.jsp?r=18011
+[21:46:39] selbot2: 03james.h.evans.jr@gmail.com less than 20 seconds ago - JimEvans: Tagging release 2.26.0 | https://code.google.com/p/selenium/source/detail?r=18012 | http://seleniumhq.org/ci.jsp?r=18012
+[21:46:58] AutomatedTester: jimevans: what rev did you tag at?
+[21:47:15] jimevans: gah. r19011
+[21:47:18] selbot2: ["command failed: [\"svn\", \"--xml\", \"--non-interactive\", \"log\", \"-r19011\", \"http://selenium.googlecode.com/svn/\"]", "/home/jari/src/selbot2/lib/selbot2/svn_helper.rb:10:in `svn'"]
+[21:47:21] jimevans: or r18011 even
+[21:47:24] selbot2: 03james.h.evans.jr@gmail.com 4 minutes ago - JimEvans: Committing Java and .NET CHANGELOG for 2.26.0 | https://code.google.com/p/selenium/source/detail?r=18011 | http://seleniumhq.org/ci.jsp?r=18011
+[21:49:04] KaibutsuX: jimevans: when can we expect this availble for download or is that still not yet planned?
+[21:49:11] jimevans: monday.
+[21:49:15] KaibutsuX: ah cool
+[21:50:09] jimevans: in general we don't push a release on friday. if people flock to a new release on friday afternoon, and there's a problem with it, we don't want to be 48 hours before a point release.
+[21:50:23] Onack has joined #selenium
+[21:50:28] jimevans: s/before a/before starting to work on a/
+[21:51:08] lukeis: what? people aren't working on Se 24/7?? for shame...
+[21:51:31] *lukeis kicks self again
+[21:59:57] barancev: "lukeis starts working on Se 24/7..."
+[IRC logfile - Started Fri Oct 26 22:00:36 2012]
+[22:00:36] *lukeis needs to sleep at some point...
+[22:00:57] barancev: clone yourself!
+[22:01:04] stephend_:  * FIXED: 4526: elenium node stop responding when there are 2 or more tests
+[22:01:04] stephend_: 	41 	+ 	waiting for a specific node.
+[22:01:11] stephend_: typo: missing the leading s :-)
+[22:01:14] lukeis: i don't think the world wants more than one of me ;)
+[22:01:19] stephend: heh
+[22:03:12] barancev: lukeis: the world wants one of you, another one of you can sleep at this time
+[22:04:09] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: I think that these rules for the footer are ignored on every page I checked. Deleting them | https://code.google.com/p/selenium/source/detail?r=18013 | http://seleniumhq.org/ci.jsp?r=18013
+[22:04:39] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Adding a sponsorship section to the site, but not hooking it up just yet | https://code.google.com/p/selenium/source/detail?r=18014 | http://seleniumhq.org/ci.jsp?r=18014
+[22:04:51] barancev: well, yes, separating touch tests actually reduced test execution time
+[22:04:59] cgoldberg has joined #selenium
+[22:05:11] barancev: chrome linux tests 20 min -> 11 min
+[22:05:22] lukeis: uh oh… simon's messing with sehq again ;)
+[22:06:11] barancev: chrome xp tests 40 min -> 16 min
+[22:06:19] barancev: twice faster!
+[22:06:29] mdgreenfield has joined #selenium
+[22:07:10] simonstewart has joined #selenium
+[22:07:20] simonstewart: lukeis: yt?
+[22:07:27] lukeis: yes
+[22:07:44] lukeis: I'm trying to double check what you just checked in for the css ;)
+[22:07:47] barancev: lukeis: you mentioned him, and the result
+[22:08:04] lukeis: i summoned him ;)
+[22:08:16] stephend: mmm, 2.26.0
+[22:08:16] barancev: yessss
+[22:08:18] lukeis: i have powers beyond my understanding… muahahaha
+[22:08:19] stephend: can't wait.
+[22:08:29] jimevans: stephend: monday.
+[22:08:40] simonstewart: Was going to do a deploy to see if my changes worked
+[22:08:53] lukeis: ok, you should be able to
+[22:09:05] stephend: suh-weet
+[22:09:05] lukeis: i'm just checking locally first
+[22:09:12] stephend: <3 all
+[22:09:23] simonstewart: I did. Looked fine for me on the pages I looked at
+[22:09:24] jarib has joined #selenium
+[22:09:27] lukeis: ok
+[22:09:37] simonstewart: barancev: did you speak to eranm about the changes to the x ignore no focus stuff?
+[22:09:53] jimevans: simonstewart: are there instructions on deploying the maven build?
+[22:09:55] barancev: simonstewart: yes, I've answered to the group
+[22:10:02] simonstewart: Groovy
+[22:10:04] simonstewart: Thank you
+[22:10:26] *jimevans has never had to do anything with the maven build before.
+[22:10:41] lukeis: simonstewart: ok… it makes the footer bigger… but doesn't look like an issue
+[22:10:51] simonstewart: Jesus. That's horrible (barancev)
+[22:10:52] simonstewart: Oh well
+[22:11:06] simonstewart: jimevans: the releasing selenium notes are basically what I follow
+[22:11:13] simonstewart: I'd rope in krosenvold to help
+[22:11:38] jimevans: simonstewart: just making sure they were up to date. assuming i don't need any special keys to get it out in the wild.
+[22:11:41] barancev: simonstewart: what's horrible?
+[22:11:44] lukeis: jimevans: I can also do the maven deploy if you'd like… (if I'm around in the morning on monday)
+[22:12:17] simonstewart: The fact that we're leaving Linux users who use native events out to dry
+[22:12:24] simonstewart: Shitty way to treat people
+[22:12:42] jarib: :release status
+[22:12:51] jarib: that'd be nice to have
+[22:12:54] simonstewart: lukeis: the app engine java jdk is healthy and large
+[22:12:54] jarib: are we releasing?
+[22:13:03] lukeis: simonstewart: that it is...
+[22:13:15] simonstewart: Oh well. Hopefully there aren't too many people using native events on firefox on linux
+[22:13:18] simonstewart: we'll find out
+[22:13:18] jimevans: lukeis: i'll take you up on that. i don't have any of the maven plumbing installed at the moment.
+[22:13:21] jarib: :log
+[22:13:21] selbot2: http://illicitonion.com/selogs/selenium/2012/10/26.txt | http://illicitonion.com/selogs/search
+[22:13:24] simonstewart: (we should add a note to the CHANGELOG)
+[22:13:26] jimevans: jarib: monday
+[22:13:41] jimevans: simonstewart: i'll take care of that
+[22:13:53] barancev: simonstewart: unless they run several foxes they are ok
+[22:13:57] simonstewart: Thank you
+[22:13:58] jarib: jimevans: noted
+[22:14:11] simonstewart: barancev: or "any other X app", if memory serves
+[22:14:26] simonstewart: It's to do with stopping firefox from noticing that the "no focus" event has fired in X
+[22:14:32] simonstewart: So firefox always thinks it has focus
+[22:14:38] jimevans: simonstewart: i could easily be convinced to hold off, if i could be reasonably sure eranm would have a fix ready on monday.
+[22:15:01] barancev: yes, eranm told that he has a "semi-fix"
+[22:15:11] simonstewart: I doubt he'll move that fast without someone pushing
+[22:15:21] simonstewart: Things were hectic at Google before I left
+[22:15:29] simonstewart: Can't imagine it's a lot less hectic now
+[22:16:25] jimevans: well, i'm pretty fed up with the world at the moment, so my frustration level is very high.
+[22:16:47] barancev: simonstewart: can you imagine that linux with native events never worked on sauce? :)
+[22:16:49] *lukeis hugs jimevans 
+[22:17:04] simonstewart: I find it hard to believe
+[22:17:06] simonstewart: But possible
+[22:17:10] barancev: now we fixed it
+[22:17:18] barancev: eranm fixed
+[22:17:31] simonstewart: See, I'm too cynical
+[22:18:14] barancev: it was fixed by unblessed 17633, coincidentely
+[22:18:50] simonstewart: Ha!
+[22:18:54] simonstewart: r
+[22:18:55] barancev: that broke all our CI because native events *all of a sudden* starts to work!
+[22:18:59] simonstewart: r17633
+[22:19:02] selbot2: 03eran.mes@gmail.com 2 months ago - EranMes on behalf of EmmaSoderberg: Support for required capabilities. Required capabilities take precedence over desired capabilities. | https://code.google.com/p/selenium/source/detail?r=17633 | http://seleniumhq.org/ci.jsp?r=17633
+[22:19:15] AutomatedTester: oh hai simonstewart
+[22:19:15] simonstewart: Wow. That must have been fun to find out
+[22:19:50] lukeis: everyone owes barancev large amounts of alcohol of his choosing for this release
+[22:20:18] barancev: what if I don't drink?
+[22:20:26] lukeis: drug of choice?
+[22:20:27] lukeis: :)
+[22:20:34] AutomatedTester: barancev: simonstewart and I will look after them for you
+[22:20:41] AutomatedTester: the alcohol
+[22:20:45] barancev: deal
+[22:20:48] simonstewart: Aye. Booze when we see you
+[22:21:30] barancev: eranm broke windows server 2003 tests too
+[22:21:42] barancev: I think we should change :whobrokeit
+[22:21:42] selbot2: simonstewart
+[22:21:53] simonstewart: Sounds like it
+[22:21:55] simonstewart: :)
+[22:22:20] lukeis: eventually we should get that hooked up to the last build failure in ci ;)
+[22:22:22] jleyba has joined #selenium
+[22:22:53] simonstewart: Pfft.
+[22:23:12] simonstewart: So, how do people feel about starting a new habit: if a revision breaks the build, we revert it
+[22:23:31] lukeis: means we need all green builds first
+[22:23:34] simonstewart: Because this release has been a PITA partly because we let the build stay broken
+[22:23:38] lukeis: but i like it
+[22:23:51] simonstewart: lukeis: we just get more aggressive as builds go green
+[22:23:58] barancev: jleyba: I've separated touch tests from the main test set, and now all the jobs on CI are about twice fatser
+[22:23:59] simonstewart: So whatever is green now should stay that way
+[22:24:37] simonstewart: lukeis: now I need to figure out what my app engine password is
+[22:24:38] jarib: isn't the problem primarily flakiness? i.e. the revert could also break 
+[22:24:41] simonstewart: I bet there's a one time one
+[22:24:47] jimevans: alright. i've got to get out of here. we've got builds finishing on the CI server at least.
+[22:24:51] Ardesco_Home: arse you are taking out native events on *nix
+[22:25:01] simonstewart: jarib: we should really be fixing the flakiness ;)
+[22:25:02] barancev: and I have to say that it's impossible to fix test runner because your assumption in TouchTestBase check the driver object (that should be instantiated obviousely)
+[22:25:05] lukeis: Ardesco_Home: no
+[22:25:07] Ardesco_Home: (may not have read all the way yet)
+[22:25:10] jimevans: nobody. touch. anything.
+[22:25:15] simonstewart: I know that dawager has spent a huge amount of effort on it
+[22:25:55] jarib: simonstewart: right, that seems like a higher priority than "revert on red". question is how 
+[22:26:12] simonstewart: Well, if we start by reverting on two reds in a row....
+[22:26:23] simonstewart: we can separate "flaky" from "broken"
+[22:26:37] jarib: though i'm definitely +1 on a stricter policy around broken builds
+[22:26:45] Ardesco_Home: phew i don't have to fiddle to make the tests run on CI next week )
+[22:27:16] jarib: simonstewart: is there a tool that will let us separate the two easily? or can we write one?
+[22:27:27] simonstewart: No tool right now
+[22:27:46] simonstewart: lukeis: ah ha! I needed an app specific password
+[22:27:48] simonstewart: *sigh*
+[22:27:53] jarib: let's write one then.
+[22:27:54] lukeis: ha :)
+[22:28:02] jimevans: in my absence, for the love of all that's holy, can someone who knows something about the firefox driver please figure out why we have the copy-paste issue for linux native events?
+[22:28:14] lukeis: simonstewart: mine is the same as my lukeis@seleniumhq.org account
+[22:28:25] simonstewart: I have two factor auth on
+[22:28:32] barancev: the longest test job now is windows ff tests ~22 min
+[22:30:11] barancev: simonstewart: here is the prototype implementation of "separate page for each test case" idea: https://codereview.appspot.com/6789045/
+[22:31:01] AutomatedTester: simonstewart: I think we need to do like browser vendors... spot flaky tests and track them
+[22:31:07] simonstewart: Right chaps, what do we think of: http://1.sehq-docs.appspot.com/sponsor/
+[22:31:28] AutomatedTester: _1
+[22:31:29] AutomatedTester: -1
+[22:31:36] AutomatedTester: do we need money?
+[22:31:52] barancev: simonstewart: if one sets @UseTestSpecificPage annotation on a method, selenium test runner automatically opens a page <class name>/<test name>.html
+[22:31:56] simonstewart: Ahh.. barancev you're tying the page name to the test name?
+[22:32:03] jleyba: -1
+[22:32:07] simonstewart: -1
+[22:32:25] simonstewart: jleyba: -1 for barancev or sponsorship?
+[22:32:39] AutomatedTester: sponsorship == -1
+[22:32:42] jleyba: ^
+[22:32:48] simonstewart: How come?
+[22:32:54] AutomatedTester: do we need money?
+[22:33:05] simonstewart: Without the google ads, we have no income
+[22:33:22] AutomatedTester: right... but do we need money?
+[22:33:23] jleyba: The selenium-dev list has been overrun by consultants wanting to be listed on our site.  opening the project to donations will make that worse
+[22:33:24] simonstewart: so, we're okay right now, but at some stage we won't be
+[22:33:42] barancev: ok, I can wait with technical questions :)
+[22:33:52] Ardesco_Home: are you going to limit sponsors?
+[22:33:59] simonstewart: jleyba: then it's not sponsorship you're -1 to, it's that particular imll?
+[22:34:17] Ardesco_Home: otherwise you will have something looking like the �1,000,000 pixel page but arger
+[22:34:18] Ardesco_Home: :)
+[22:34:22] Ardesco_Home: *larger
+[22:34:30] simonstewart: That would be a nice problem to have
+[22:34:35] AutomatedTester: when we need money we can go ask for sponsorship money
+[22:34:50] AutomatedTester: but people will not get anything for it other than a good feeling
+[22:34:53] Ardesco_Home: in all honesty, most large companies would probably throw $50 your way for a years worth of advertising
+[22:34:53] AutomatedTester: maybe a sticker
+[22:34:56] simonstewart: As it is, companies need to pay $5k to get on the front page
+[22:35:01] Ardesco_Home: I can see that price point getting very crowded
+[22:35:18] simonstewart: OK. So, we bump up the price to $10k?
+[22:35:26] AutomatedTester: well if we are going to put their logos on cant we just put google ads back on?
+[22:35:35] jleyba: At the very least the sponsorship page needs to make it clear you're not buying influence over the project
+[22:35:49] AutomatedTester: jleyba: ++
+[22:35:50] simonstewart: The logos are for a charitble donation
+[22:36:01] simonstewart: jleyba: point taken.
+[22:36:09] simonstewart: the ads are a commercial thing
+[22:36:17] AutomatedTester: and I dont want their logos on the site
+[22:36:19] simonstewart: That has repercussions with the SFC
+[22:36:29] AutomatedTester: they get a warm fuzzy feeling
+[22:36:44] simonstewart: AutomatedTester: anyone in particular?
+[22:37:08] AutomatedTester: I wouldnt even want the Mozilla logo on the site
+[22:37:23] simonstewart: Then make the donation and ask for your logo not to go up :)
+[22:37:44] jleyba: simonstewart: what do we need this money for?
+[22:37:50] AutomatedTester: in that case its an overwhelming -1
+[22:37:53] simonstewart: Things like SeConf
+[22:38:02] simonstewart: Flying contributors there if necessary
+[22:38:07] simonstewart: (which we've done before)
+[22:38:12] simonstewart: servers
+[22:38:21] simonstewart: our own hardware
+[22:38:56] simonstewart: If we find we're sitting on way too much, we can always stop accepting sponsorship
+[22:39:04] simonstewart: But SeConf ran at a slight loss last year
+[22:39:08] simonstewart: and we didn't pay any speakers
+[22:39:16] simonstewart: Or fly committers around
+[22:39:37] AutomatedTester: and there are NPOs that would gladly give money if we ask
+[22:39:44] AutomatedTester: I know of one...
+[22:39:50] simonstewart: Heh
+[22:40:11] simonstewart: I'll send an email to a group less broad than "selenium-developers" to talk things over
+[22:40:21] jleyba: i guess i can't object to it too much
+[22:40:28] jimevans: my 2p, i see the need for generating income for the project. i also see the potential for things to get out of hand. i'm not opposed to discrete logos in return for sponsorship money. i think there's a compromise to be made there.
+[22:40:34] AutomatedTester: i can see the need for money but I dont want to make our site look awful like https://travis-ci.org which rotates companies that have donated
+[22:40:35] jleyba: working for a company that is currently contributing several full time engineers to the project...
+[22:41:09] simonstewart: jleyba: there's a section about non-monetary contributions in there :)
+[22:41:09] jimevans: right and now i really am off. later.
+[22:41:11] jimevans has left #selenium
+[22:41:48] simonstewart: Because Google, Mozilla and Sauce (and, I guess SalesForce) all make pretty large contributions
+[22:42:14] jleyba: it is possible to list sponsorship in a non-intrusive way: http://nodejs.org/
+[22:43:47] simonstewart: OK. Sending an email
+[22:43:55] *jleyba hates the java servlet API so damn much
+[22:43:57] simonstewart: And glad I didn't hook that into the main site :)
+[22:44:02] simonstewart: jleyba: it blows goats
+[22:44:51] jleyba: there is so much bloat... trying to write a simple adapter and it's the biggest pain
+[22:44:57] simonstewart: Aye
+[22:45:03] simonstewart: What have you run into?
+[22:45:07] simonstewart: in particular?
+[22:45:17] AutomatedTester: jleyba: is that the servlet API or java in general
+[22:45:24] *AutomatedTester goes trolling elsewhere now...
+[22:45:50] barancev: simonstewart: now can you explain -1 to my prototype
+[22:45:51] jleyba: AutomatedTester: java can be a perfectly fine language when you have quality libraries to work with (i.e. guava)
+[22:46:09] AutomatedTester: jleyba: I was trolling :)
+[22:46:20] simonstewart: barancev: because it means that renaming tests becomes a PITA
+[22:46:30] simonstewart: I'd prefer to just use sensible names and more folders
+[22:46:53] simonstewart: Coupling test name and page name seems like a deeply fragile thing to do
+[22:47:04] barancev: we can either specify a page name in the annotation OR use the defaul one
+[22:47:23] simonstewart: If we specify the name in the annotation, then we might as well do "driver.get()"
+[22:47:37] barancev: well, yes :)
+[22:47:46] simonstewart: And since I'd always want the page to be explicit....
+[22:48:33] barancev: I see you point, we just need a Rule
+[22:48:54] simonstewart: But the Rule only makes sense if every test in the class uses the same page
+[22:49:36] barancev: why? each test method calls driver.get(), and each one uses its own page
+[22:49:44] barancev: that's The Rule
+[22:50:04] barancev: no page sharing
+[22:50:17] simonstewart: Ahh.. not a junit rule
+[22:50:21] simonstewart: But a code style rule?
+[22:50:29] barancev: yes, code style rule
+[22:50:35] simonstewart: Ahhh… gotcha
+[22:50:44] simonstewart: We can head that way
+[22:51:05] o3u has joined #selenium
+[22:53:51] barancev: another good rule is to write a test name to the page, so that it can be seen on the screenshots that sauce makes after each step
+[22:54:02] simonstewart: Ha!
+[22:54:17] simonstewart: This goes back to a conversation I had with Paul Hammant a long time ago
+[22:54:27] simonstewart: About to head off to bed, but next time I'm online, ask me about it :)
+[22:54:52] barancev: what was the resume of the conversation?
+[22:55:02] AutomatedTester: I am going for supper now
+[22:55:07] barancev: or it is too long too?
+[22:55:10] simonstewart: People who want that sort of thing should implement it in their server
+[22:55:12] simonstewart: Sauce has
+[22:55:13] AutomatedTester: see you all later!
+[22:55:26] simonstewart: But it's trivial to do, so it's not part of the main server
+[22:56:20] simonstewart: Email sent.
+[22:56:21] simonstewart: Off to bed
+[22:56:29] simonstewart: G'night, you lovely people!
+[22:56:30] simonstewart has left #selenium
+[22:57:22] jarib: :note simonstewart what was the conversation you had with Paul Hammant?
+[22:57:23] selbot2: ok!
+[22:57:26] jarib: :)
+[IRC logfile - Started Fri Oct 26 23:00:47 2012]
+[23:00:47] *lukeis had to step away for quite a bit of that… heh simon thinks 'salesforce' is making a people contribution… when it's just jim and I on our spare time (and stolen time of course..)
+[23:02:30] jarib: :note jimevans r18011 just passed for 20 ruby builds: https://next.travis-ci.org/jarib/selenium-travis
+[23:02:30] selbot2: ok!
+[23:02:33] selbot2: 03james.h.evans.jr@gmail.com about 1 hour ago - JimEvans: Committing Java and .NET CHANGELOG for 2.26.0 | https://code.google.com/p/selenium/source/detail?r=18011 | http://seleniumhq.org/ci.jsp?r=18011
+[23:06:54] cori[s] has left #selenium
+[23:16:12] pa has joined #selenium
+[23:32:59] Ardesco has joined #selenium
+[23:43:47] sreeks has joined #selenium
+[23:51:53] sreeks has joined #selenium

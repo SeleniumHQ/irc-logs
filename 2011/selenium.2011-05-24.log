@@ -1,0 +1,753 @@
+2011-05-24T00:05:05  *** csanchez has joined #selenium
+2011-05-24T00:15:42  *** red^ is now known as reddeviL
+2011-05-24T00:17:47  *** Fyrespray has joined #selenium
+2011-05-24T00:22:29  *** sburjan has joined #selenium
+2011-05-24T00:28:57  *** Fyrespray^ has joined #selenium
+2011-05-24T00:31:12  *** Fyrespray has quit IRC
+2011-05-24T00:38:06  *** celm has joined #selenium
+2011-05-24T00:40:01  *** admc has quit IRC
+2011-05-24T00:47:24  *** Fyrespray^ has quit IRC
+2011-05-24T00:47:55  *** Fyrespray has joined #selenium
+2011-05-24T00:50:20  *** ammar01 has joined #selenium
+2011-05-24T00:51:36  *** vrockai has joined #selenium
+2011-05-24T00:55:51  *** freynaud has joined #selenium
+2011-05-24T00:55:53  *** freynaud has left #selenium
+2011-05-24T00:56:09  *** freynaud has joined #selenium
+2011-05-24T00:57:46  *** ammar01 has quit IRC
+2011-05-24T00:57:56  *** ammar01 has joined #selenium
+2011-05-24T01:03:07  *** Fyrespray^ has joined #selenium
+2011-05-24T01:05:27  *** Fyrespray has quit IRC
+2011-05-24T01:20:43  <kondal>  Hi I am using Chrome driver to test my application , .Click() method is not working to click elements but same elements are clickable mouseup and mousedown methods when I use selenium RC . Can some one help me how to simulate mouse clicks using web driver ?
+2011-05-24T01:21:50  *** secoif has quit IRC
+2011-05-24T01:21:57  <sburjan> kondal: make sure you invoke .click() on a clickable element like an <a...>
+2011-05-24T01:23:31  *** mashiara has quit IRC
+2011-05-24T01:23:38  <kondal> sburjan; yes , it is clickable element only
+2011-05-24T01:23:42  *** secoif_ has joined #selenium
+2011-05-24T01:25:17  <sburjan> kondal: have you tried another driver.. like Firefox driver ?
+2011-05-24T01:27:45  <kondal>  sburjan: example element   driver.findElement(By.xpath("//div[contains(@class, 'add')]")).click();
+2011-05-24T01:28:13  <kondal> even fire fox driver also does not recongninsing
+2011-05-24T01:28:30  *** zmijunkie has joined #selenium
+2011-05-24T01:28:30  <sburjan> ok, so it's not a driver issue
+2011-05-24T01:28:38  *** AutomatedTester has joined #selenium
+2011-05-24T01:28:50  <binken> SHOULD BE THE XPATH ISSUE
+2011-05-24T01:28:52  <sburjan> check if you xpath is correct.
+2011-05-24T01:29:01  <sburjan> afaik you are clicking on a div.
+2011-05-24T01:29:18  <sburjan> you should click on a button, link, etc
+2011-05-24T01:30:00  *** freynaud has quit IRC
+2011-05-24T01:32:21  <kondal> xpath is correct only since I was able to click using seleniumRC
+2011-05-24T01:32:30  <sburjan> something like driver.findElement(By.xpath("//div[contains(@class, 'add')]//a")).click(); should work .. you must go deeper in the dom in order to get exactly to the clickable element
+2011-05-24T01:32:43  <sburjan> kondal: seleniumRC has another mechanism of doing things
+2011-05-24T01:34:25  <kondal> ok , thank you .. will check and let you know..
+2011-05-24T01:47:06  *** reddeviL is now known as red^
+2011-05-24T01:54:44  *** miker has quit IRC
+2011-05-24T02:09:11  *** tcarpentier has joined #selenium
+2011-05-24T02:15:07  *** binken has quit IRC
+2011-05-24T02:15:13  *** Ivog has joined #selenium
+2011-05-24T02:24:06  *** freynaud has joined #selenium
+2011-05-24T02:32:34  *** Ivog has quit IRC
+2011-05-24T02:41:13  *** aquarius1973 has joined #selenium
+2011-05-24T03:01:14  <AutomatedTester> Today Mozilla is holding a Test day to increase their Selenium coverage of their sites. Come fork a project and help out!
+2011-05-24T03:04:47  *** erwan_ has quit IRC
+2011-05-24T03:10:42  *** barancev|2 has joined #selenium
+2011-05-24T03:11:32  *** barancev has quit IRC
+2011-05-24T03:19:27  *** Muz has left #selenium
+2011-05-24T03:28:16  <ato> Is Bamboo at openqa.org something we should consider for running with OperaDriver too?
+2011-05-24T03:28:40  <ato> I saw there was a Bamboo discussion on the mailing list, but I haven't really seen the conclusion.
+2011-05-24T03:45:39  *** celm has quit IRC
+2011-05-24T03:47:15  <AutomatedTester> ato: I am trying to sort a build person for the project
+2011-05-24T03:47:57  <ato> I've never used Bamboo, so I have no idea what the problems with it are.
+2011-05-24T03:48:03  <ato> But that sounds great (-:
+2011-05-24T03:48:21  <AutomatedTester> our build kills it with the number of VMs
+2011-05-24T03:49:09  <ato> I see.
+2011-05-24T03:55:58  <jarib> i've disabled all but three builds
+2011-05-24T03:56:23  <jarib> so we only run the full tests for Java with Firefox on Linux
+2011-05-24T03:57:06  <jarib> then it's the JS unit tests (which also runs in Firefox), and the Ruby unit tests (which doesn't launch a browser)
+2011-05-24T03:57:20  <jarib> that seems to have helped stability somewhat
+2011-05-24T03:58:30  <ato> So AutomatedTester is creating a new testing system?
+2011-05-24T03:58:38  *** miker2 has joined #selenium
+2011-05-24T03:59:00  <AutomatedTester> i am trying to get someone to help setup a CI for everything to help
+2011-05-24T03:59:08  <AutomatedTester> the ground work is done
+2011-05-24T03:59:12  <ato> Cool.
+2011-05-24T03:59:20  <ato> Can we tap in on it? (=
+2011-05-24T03:59:36  <AutomatedTester> and he is wanting to help, now need to sort the little bits
+2011-05-24T03:59:43  <AutomatedTester> i am sure it will be cool
+2011-05-24T04:03:03  *** celm has joined #selenium
+2011-05-24T04:06:23  *** csanchez has quit IRC
+2011-05-24T04:08:13  *** rajendrau has joined #selenium
+2011-05-24T04:09:58  *** csanchez has joined #selenium
+2011-05-24T04:10:19  *** rajendrau has quit IRC
+2011-05-24T04:12:01  *** barancev|2 has quit IRC
+2011-05-24T04:15:54  *** rkumar has joined #selenium
+2011-05-24T04:20:14  *** freynaud has quit IRC
+2011-05-24T04:23:41  *** freynaud has joined #selenium
+2011-05-24T04:23:43  <rkumar> How to identify Window objects Using Selenium IDE? Eg: Clicking on a link in a website to save the file i.e. need to identify 'Ok' & 'Cancel' buttons which are on the windows object. Is there any logic?
+2011-05-24T04:34:25  <AutomatedTester> Today WebQA is holdng a Selenium Test day to help increase our selenium test coverage. We're in irc://irc.mozilla.org/#testday for those who would like to join in!
+2011-05-24T04:47:54  *** barancev has joined #selenium
+2011-05-24T04:54:18  *** cburroughs` has joined #selenium
+2011-05-24T04:58:43  *** kondal has quit IRC
+2011-05-24T05:05:00  *** curseg has joined #selenium
+2011-05-24T05:05:40  *** RossPatterson has joined #selenium
+2011-05-24T05:14:35  *** rkumar has quit IRC
+2011-05-24T05:19:24  <selbot2> Samit.Badle@gmail.com half a minute ago - SamitBadle: Fixing Issue 1704 - Remove Firefox help menu items from Selenium IDE and add help menu to sidebar. - http://code.google.com/p/selenium/source/detail?r=12239
+2011-05-24T05:21:44  *** mbeierl has joined #selenium
+2011-05-24T05:35:23  <selbot`> New news from builds: IDE-EDITOR-116 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-116>
+2011-05-24T05:37:34  *** cgoldberg has joined #selenium
+2011-05-24T05:39:02  *** secoif_ is now known as secoif
+2011-05-24T05:41:20  <selbot`> New news from builds: IDE-IDE-94 was SUCCESSFUL : Dependant of IDE-EDITOR-116 <http://xserve.openqa.org:8085/browse/IDE-IDE-94>
+2011-05-24T05:49:59  *** SL-BWood has joined #selenium
+2011-05-24T05:51:06  *** stepheneb has joined #selenium
+2011-05-24T05:52:04  *** lfryc_afk has quit IRC
+2011-05-24T05:58:43  *** stepheneb has quit IRC
+2011-05-24T05:59:42  *** Mephian has quit IRC
+2011-05-24T06:00:55  *** mario-goulart has joined #selenium
+2011-05-24T06:02:57  *** stepheneb has joined #selenium
+2011-05-24T06:03:29  <ato> Anyone know anything about the status of the SFC individual CLA?
+2011-05-24T06:05:11  *** lfryc_afk has joined #selenium
+2011-05-24T06:07:11  *** freynaud has quit IRC
+2011-05-24T06:08:56  <mario-goulart> Anyone using selenium python bindings?
+2011-05-24T06:10:34  *** jonathanrwallace has joined #selenium
+2011-05-24T06:10:52  <mario-goulart> I'm not sure whether this is the proper channel to ask about the python bindings.
+2011-05-24T06:11:13  <ato> This is the right channel.
+2011-05-24T06:11:18  <ato> AutomatedTester is the author of the Python bindings.
+2011-05-24T06:11:25  <mario-goulart> ato: thanks.
+2011-05-24T06:11:34  <AutomatedTester> hi
+2011-05-24T06:11:43  <mario-goulart> Hi AutomatedTester
+2011-05-24T06:12:17  <mario-goulart> AutomatedTester: it seems that the example at http://pypi.python.org/pypi/selenium is missing something.
+2011-05-24T06:12:34  <mario-goulart> "from time"
+2011-05-24T06:12:43  <AutomatedTester> mario-goulart: its been updated in trunk
+2011-05-24T06:12:47  <mario-goulart> Shouldn't it be "from time import time"?
+2011-05-24T06:12:57  <AutomatedTester> mario-goulart: its correct in trunk
+2011-05-24T06:13:17  <AutomatedTester> unfortunately waiting on other people for the release
+2011-05-24T06:13:25  <mario-goulart> AutomatedTester: ah, ok.  Thanks.
+2011-05-24T06:13:37  <mario-goulart> AutomatedTester: should I use the svn sources?
+2011-05-24T06:15:26  <AutomatedTester> mario-goulart: the pypi version is fine
+2011-05-24T06:15:30  <AutomatedTester> its a docs issue
+2011-05-24T06:15:36  <AutomatedTester> unless you have a bug?
+2011-05-24T06:16:47  <mario-goulart> I'm not sure.  I installed it via easy_install and get "ImportError: No module named keys" when trying "from selenium.common.keys import Keys".
+2011-05-24T06:17:49  <mario-goulart> "from selenium import webdriver" works, though.
+2011-05-24T06:18:04  <AutomatedTester> mario-goulart: so its not in that common
+2011-05-24T06:18:17  * AutomatedTester should change that
+2011-05-24T06:18:22  <AutomatedTester> its in the webdriver common
+2011-05-24T06:18:37  <AutomatedTester> the common you are using for things that are common between Se1 and Se2
+2011-05-24T06:19:08  <mario-goulart> Ah, alright.  "from selenium.webdriver.common.keys import Keys" works, indeed.
+2011-05-24T06:19:42  <mario-goulart> Sorry, I was just copying&pasting from the example code to see what I'd get.
+2011-05-24T06:20:39  *** freyand has joined #selenium
+2011-05-24T06:24:18  <mario-goulart> Thanks, AutomatedTester.  I could get a basic code working now.
+2011-05-24T06:30:51  *** csanchez has quit IRC
+2011-05-24T06:34:15  *** andytinkham has joined #selenium
+2011-05-24T06:39:58  *** QAguy has joined #selenium
+2011-05-24T06:44:57  *** celm has quit IRC
+2011-05-24T06:47:50  *** barancev|2 has joined #selenium
+2011-05-24T06:49:47  *** barancev has quit IRC
+2011-05-24T06:49:47  *** barancev|2 has quit IRC
+2011-05-24T06:50:08  *** barancev has joined #selenium
+2011-05-24T06:51:29  *** jimevans has joined #selenium
+2011-05-24T06:51:50  *** adamgoucher has joined #selenium
+2011-05-24T06:53:48  *** jimevans has left #selenium
+2011-05-24T06:55:15  *** stoney_001 has joined #selenium
+2011-05-24T06:55:26  *** jimevans has joined #selenium
+2011-05-24T06:56:08  <stoney_001> Hi there. Am not able to get selenium IDE to follow an anchor link that executes javascript, e.g. <a href="javascript:doSomething(someParams);">some-link</a> ... any hints?
+2011-05-24T06:57:06  *** jimevans has joined #selenium
+2011-05-24T06:57:17  <freyand> jimevans: ping
+2011-05-24T06:57:32  <jimevans> freyand: Pong
+2011-05-24T06:57:53  <freyand> #1699
+2011-05-24T06:57:54  <selbot2> francois.reynaud open/new Grid 2.0 Fails launching IE9 - http://code.google.com/p/selenium/issues/detail?id=1699
+2011-05-24T06:58:10  <freyand> Can you have a look and let me know if you see an easy solution to it ?
+2011-05-24T06:58:39  <freyand> it's around auto discovering the IE and windows version
+2011-05-24T06:58:41  <freyand> i can't do that from java
+2011-05-24T06:58:53  <jimevans> Hang on a sec. Let me have a look.
+2011-05-24T07:00:28  *** csanchez has joined #selenium
+2011-05-24T07:01:57  <stoney_001> I suspect that my issue might be due to: http://webcache.googleusercontent.com/search?q=cache:Lh54f54g5qkJ:jira.openqa.org/browse/SIDE-316+side-316&cd=1&hl=en&ct=clnk&gl=au&client=firefox-a&source=www.google.com.au
+2011-05-24T07:02:08  <jimevans> freyand: You could mimic what the IE driver C++ code does to detect IE version.
+2011-05-24T07:02:27  <freyand> does that require to start IE ?
+2011-05-24T07:02:56  <freyand> ideally , I 'd like to have a driver = RemoteDriver(xxx, ie);
+2011-05-24T07:03:12  <jimevans> No. You can do it with a combination of registry calls and Windows API calls.
+2011-05-24T07:03:18  <freyand> driver.getexecutableInfo(); returning the version etc
+2011-05-24T07:03:22  <freyand> without launching IE
+2011-05-24T07:03:37  <freyand> that would save a lot of time when the node register
+2011-05-24T07:04:14  <jimevans> Check out BrowserFactory.cpp in the IEDriver directory.
+2011-05-24T07:05:55  <jimevans> Essentially, what you do is find the location of iexplore.exe using the registry,
+2011-05-24T07:07:37  <jimevans> then use the GetFileVersionInfo API (I think) to get the version from the executable resources.
+2011-05-24T07:10:17  <freyand> that's what I do in twin
+2011-05-24T07:10:18  <jimevans> Yeah, it's GetFileVersionInfo(), followed by VerQueryValue().
+2011-05-24T07:10:24  <freyand> but that 's not possinle from java
+2011-05-24T07:10:40  <jimevans> No?
+2011-05-24T07:10:41  <freyand> that's why i'm looking for having the remote driver returning what I need
+2011-05-24T07:10:46  *** jonathanrwallace has quit IRC
+2011-05-24T07:10:58  <freyand> java doesn't have any windows hook as far as i know
+2011-05-24T07:11:21  <jimevans> You can't call a native C API from java?
+2011-05-24T07:11:41  <freyand> there is always room for over engineering :)
+2011-05-24T07:12:14  <freyand> if I start calling dll via JNI from java
+2011-05-24T07:12:24  <freyand> i need to test on all version of windows
+2011-05-24T07:12:40  <freyand> i'd rather display a prompt asking the use to check by himself :)
+2011-05-24T07:12:46  <freyand> it adds a lot of complexity
+2011-05-24T07:13:20  <jimevans> Well, the IE driver already I
+2011-05-24T07:13:39  * jimevans implements the method
+2011-05-24T07:14:12  *** lfryc_afk has quit IRC
+2011-05-24T07:14:27  *** etneg has joined #selenium
+2011-05-24T07:14:44  *** etneg has left #selenium
+2011-05-24T07:14:51  <jimevans> It does (now) return the version information in the capabilities object.
+2011-05-24T07:14:56  *** Fyre has joined #selenium
+2011-05-24T07:15:21  <freyand> can I call that without starting IE ?
+2011-05-24T07:15:39  <freyand> when I register a node, I just need to know what the envt is
+2011-05-24T07:15:47  <jimevans> Alas, no.
+2011-05-24T07:15:59  <freyand> ok
+2011-05-24T07:16:21  <freyand> this is not IE specific, FF does the same
+2011-05-24T07:16:34  <freyand> it's easier with FF, the version is in a text file :)
+2011-05-24T07:16:36  *** lfryc has joined #selenium
+2011-05-24T07:16:58  <freyand> but the behavior is the same, if I want to use the existing code to get that file parsed, i need to launch FF
+2011-05-24T07:17:26  <jimevans> Right. I see.
+2011-05-24T07:18:36  *** Fyrespray^ has quit IRC
+2011-05-24T07:19:32  * stoney_001 is still struggling with trying to click an anchor tag that is supposed to href to javascript:someFunction('param%20>%20Blah%20','param');    ... am running FF3.6.3 and Selenium IDE 1.0.11
+2011-05-24T07:19:46  <selbot`> New news from builds: S2J-CHXP-129 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHXP-129>
+2011-05-24T07:23:47  *** jimevans has quit IRC
+2011-05-24T07:31:01  *** ron542 has joined #selenium
+2011-05-24T07:34:47  *** sburjan has quit IRC
+2011-05-24T07:37:08  <adamgoucher> stoney_001: 'click' might not work. could have to do mouseDown, mouseUp
+2011-05-24T07:38:14  <stoney_001> adamgoucher: thanks for responding ... i just tried fireEvent | link='some text' | click ..... no joy  ... i will try mouseDown
+2011-05-24T07:38:45  <stoney_001> adamgoucher: so would it be fireEvent | link='some text' | mouseDown   ?
+2011-05-24T07:39:50  <selbot`> New news from builds: S2J-FXXP-172 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-FXXP-172>
+2011-05-24T07:40:10  <adamgoucher> mouseDown | link='some text'
+2011-05-24T07:42:12  <stoney_001> adamgoucher: no joy with that ... also tried mouseDown | xpath=' ...' ... any other thoughts?
+2011-05-24T07:42:25  *** jxpx777 has joined #selenium
+2011-05-24T07:42:52  <adamgoucher> is the page available from the outside internets?
+2011-05-24T07:43:09  <stoney_001> it isn't unfortunately
+2011-05-24T07:43:37  <adamgoucher> you need the mouseUp as well
+2011-05-24T07:43:50  <tcarpentier> a little question about testing with selenium, some times we do the assert method to check the result in the page source. And if it's false, the traceback raises an assertion error like :  assert "Hello my name is Thomas" in self.browser.page_source AssertionError..... But there is a way to have in the assertion error, the expected result and the actual result ? e.g : here the expected result must be "Hello i'm Thomas CARPENTI
+2011-05-24T07:45:15  <adamgoucher> thats technically a runner problem, so you could create a custom assert that will respond with the message you want
+2011-05-24T07:45:38  <stoney_001> no joy with mouseDown | link='some text'    followed by mouseUp | link='some text'
+2011-05-24T07:45:40  *** jxpx777 has quit IRC
+2011-05-24T07:46:02  <stoney_001> but if I were to do a runScriptAndWait | (copy of the javascript from the a href)   it works
+2011-05-24T07:46:31  <adamgoucher> and thats not an acceptable soluon?
+2011-05-24T07:47:05  <tcarpentier> adamgoucher: ok, i will take a look for create a custom assert
+2011-05-24T07:47:10  <tcarpentier> adamgoucher: thanks
+2011-05-24T07:47:33  *** red^ is now known as reddeviL
+2011-05-24T07:47:41  *** brettporter has quit IRC
+2011-05-24T07:48:05  <stoney_001> adamgoucher: no because the javascript function parameters are dynamically created (from database / CMS etc)
+2011-05-24T07:51:27  <stoney_001> adamgoucher: on http://webcache.googleusercontent.com/search?q=cache:Lh54f54g5qkJ:jira.openqa.org/browse/SIDE-316+side-316&cd=1&hl=en&ct=clnk&gl=au&client=firefox-a&source=www.google.com.au       they talk about IDE script: storeEval / javascript{"selenium.browserbot.findElement('link=Add').setAttribute('onclick',storedVars.func)"}    ... just not sure how to achieve that, is that the user-extensions.js ?
+2011-05-24T07:52:47  <adamgoucher> i'm about to jump on a call, but send me what you are trying to do to adam@element34.ca
+2011-05-24T07:55:22  *** vrockai has quit IRC
+2011-05-24T07:55:26  <selbot`> New news from builds: S2J-FXXP-173 was SUCCESSFUL (with 643 tests) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-FXXP-173>
+2011-05-24T07:58:54  <stoney_001> adamgoucher: no probs at all ... many thanks for your pointers
+2011-05-24T08:03:39  *** zmijunkie has quit IRC
+2011-05-24T08:06:01  *** stoney_001 has left #selenium
+2011-05-24T08:06:14  *** lisak has joined #selenium
+2011-05-24T08:06:46  <lisak> hey, is it possible to utilize html5 file API with selenium 2 / webdriver drivers ?
+2011-05-24T08:07:39  <lisak> something like calling javascript with File from java test
+2011-05-24T08:08:53  <lisak> I suppose I just have to click on input field and choose file manually
+2011-05-24T08:15:44  *** ron790 has joined #selenium
+2011-05-24T08:17:59  <selbot`> New news from builds: S2J-IE7XP-150 has FAILED (2 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-IE7XP-150>
+2011-05-24T08:18:10  *** ron211 has joined #selenium
+2011-05-24T08:23:49  *** jxpx777 has joined #selenium
+2011-05-24T08:27:54  *** pngl has joined #selenium
+2011-05-24T08:27:59  <selbot`> New news from builds: S2J-CHXP-130 has FAILED (4 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHXP-130>
+2011-05-24T08:28:40  <pngl> Is there a specific css locator syntax when using the ruby library? "css=.class" does not work.
+2011-05-24T08:40:02  <selbot`> New news from builds: S2J-CHLX-5 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHLX-5>
+2011-05-24T08:40:51  <andytinkham> pngl: I don't know the answer to that yet, but I think I might be running into the same thing right now
+2011-05-24T08:48:27  *** adamgoucher has quit IRC
+2011-05-24T08:48:31  *** adamgouchertoo has joined #selenium
+2011-05-24T08:48:41  *** bebef_1987 has quit IRC
+2011-05-24T08:49:38  *** ammar01 has quit IRC
+2011-05-24T08:51:47  *** ner0x has joined #selenium
+2011-05-24T08:52:14  *** ron542 has quit IRC
+2011-05-24T08:54:44  *** ammar01 has joined #selenium
+2011-05-24T08:55:20  *** QAguy_ has joined #selenium
+2011-05-24T08:55:37  *** QAguy has quit IRC
+2011-05-24T08:55:47  *** QAguy_ is now known as QAguy
+2011-05-24T08:56:35  *** jxpx777 has quit IRC
+2011-05-24T08:57:26  *** pnitin has quit IRC
+2011-05-24T09:03:54  *** sjmikem1 has quit IRC
+2011-05-24T09:05:11  *** Frank_n_Beans has left #selenium
+2011-05-24T09:06:21  *** sjmikem has joined #selenium
+2011-05-24T09:07:15  *** tcarpentier has quit IRC
+2011-05-24T09:07:57  <pngl> andytinkham: I'm using xpath as a workaround. It might be because selenium auto-detects identifiers, xpath and dom locator syntaxes, but needs the 'css=' prefix. Sorry I don't have the time to look into it.
+2011-05-24T09:08:37  *** retornam has joined #selenium
+2011-05-24T09:11:01  *** towski has quit IRC
+2011-05-24T09:12:47  <ato> In OperaDriver you have findElementsByCss("div > p"), but I think that's unique.
+2011-05-24T09:13:38  <andytinkham> pngl: Yeah, I switched some of my problematic ones back to XPath, too. Others I fixed by putting * in front of the period
+2011-05-24T09:15:26  *** aquarius1973 has quit IRC
+2011-05-24T09:16:00  <andytinkham> ato: There is a findElementByCssSelector mentioned in the ruby docs for the remote bridge, but I've not yet tried it
+2011-05-24T09:20:19  <ato> I think that's implemented client side.  jarib?
+2011-05-24T09:20:54  <jarib> driver.findElement(By.css("...")) should work
+2011-05-24T09:21:12  <jarib> (driver.find_element(:css, '...') in ruby)
+2011-05-24T09:21:18  *** knorrium has joined #selenium
+2011-05-24T09:21:40  <jarib> ah, you were asking about ruby
+2011-05-24T09:21:48  <jarib> pngl: you're using RC / Se 1?
+2011-05-24T09:22:02  <jarib> then it should be the same as in every other language
+2011-05-24T09:22:22  <jarib> that came out wrong
+2011-05-24T09:22:26  <jarib> s/other// :P
+2011-05-24T09:23:11  *** Spanktar has joined #selenium
+2011-05-24T09:23:29  *** ron211 has quit IRC
+2011-05-24T09:25:43  *** retornam has quit IRC
+2011-05-24T09:26:02  *** retornam has joined #selenium
+2011-05-24T09:26:50  *** eranm has joined #selenium
+2011-05-24T09:27:01  <eranm> AutomatedTester: yt?
+2011-05-24T09:30:12  *** csanchez has quit IRC
+2011-05-24T09:32:26  *** pngl has quit IRC
+2011-05-24T09:33:44  *** reddeviL is now known as red^
+2011-05-24T09:35:18  *** eranm has quit IRC
+2011-05-24T09:44:46  *** towski has joined #selenium
+2011-05-24T09:45:47  *** csanchez has joined #selenium
+2011-05-24T09:45:52  *** esteele has joined #selenium
+2011-05-24T09:46:33  *** jonathanrwallace has joined #selenium
+2011-05-24T09:47:16  *** esteele has left #selenium
+2011-05-24T09:47:44  *** eranm has joined #selenium
+2011-05-24T09:47:52  *** sfbrian has joined #selenium
+2011-05-24T09:56:31  *** ron790 has quit IRC
+2011-05-24T10:00:31  *** andytinkham has quit IRC
+2011-05-24T10:00:47  *** lfryc is now known as lfryc_wfh
+2011-05-24T10:00:50  *** lfryc_wfh is now known as lfryc_away
+2011-05-24T10:02:13  *** dlam has joined #selenium
+2011-05-24T10:08:54  *** erikcw1 has joined #selenium
+2011-05-24T10:10:09  <erikcw1> I'm trying to initialize the Python webdriver, (browser = webdriver.Firefox()), and getting a traceback saying: AttributeError: 'NoneType' object has no attribute 'rfind'.  Any idea what I might be missing?
+2011-05-24T10:10:56  *** eranm has quit IRC
+2011-05-24T10:11:58  *** eranm has joined #selenium
+2011-05-24T10:14:20  *** admc has joined #selenium
+2011-05-24T10:21:41  *** admc1 has joined #selenium
+2011-05-24T10:23:39  *** admc has quit IRC
+2011-05-24T10:26:03  <AutomatedTester> eranm: be back in 1hr
+2011-05-24T10:26:12  <AutomatedTester> doing bit of a night shift today
+2011-05-24T10:28:31  *** sjmikem has quit IRC
+2011-05-24T10:31:01  *** pnitin has joined #selenium
+2011-05-24T10:36:17  *** adamgouchertoo has quit IRC
+2011-05-24T10:36:38  *** freyand has quit IRC
+2011-05-24T10:51:49  *** sjmikem has joined #selenium
+2011-05-24T10:53:24  *** adamgoucher has joined #selenium
+2011-05-24T10:56:33  *** cgoldberg has quit IRC
+2011-05-24T11:00:37  <eranm> AutomatedTester: ok, let me know when you're back
+2011-05-24T11:01:14  *** cgoldberg has joined #selenium
+2011-05-24T11:07:17  *** andytinkham has joined #selenium
+2011-05-24T11:10:48  <lisak> weird,  I'm using chrome driver to invoke click on fileInput element, and neither  click() method nor executeScript("arguments[0].click();", browseButton);   work
+2011-05-24T11:11:52  *** __mike has joined #selenium
+2011-05-24T11:12:31  <lisak> firefox-driver works
+2011-05-24T11:13:17  <lisak> the element is hidden, but it shouldn't be a reason for javascript execution to not work
+2011-05-24T11:13:46  <__mike> does anyone know why the current javadocs state that chromedriver implements takesscreenshot but the current trunk source does not ? and hence casting to takesscreenshot fails
+2011-05-24T11:13:49  *** csanchez has quit IRC
+2011-05-24T11:14:58  <AutomatedTester> __mike: we rewrote the chromedriver
+2011-05-24T11:15:09  <AutomatedTester> and javadocs are only up to date as on last release
+2011-05-24T11:15:24  <__mike> aren't these javadocs for the trunk ? http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/chrome/ChromeDriver.html
+2011-05-24T11:16:00  <__mike> i mean it has the documentation for some of the new stuff like actions
+2011-05-24T11:16:25  <lisak> wtf,  even if the fileInput is visible,  chrome driver doesn't manage to click it :-)
+2011-05-24T11:16:49  <AutomatedTester> __mike: looking at the commit date, its over a month old
+2011-05-24T11:17:47  <__mike> If I want to help update the javadocs how should I go about doing this ? For example some classes were renamed which are still not renamed in the docs
+2011-05-24T11:18:31  <mario-goulart> AutomatedTester: where can I find documentation for the python xpath selectors?
+2011-05-24T11:27:11  <__mike> btw is screenshotting code being worked on for the current chromedriver then ?
+2011-05-24T11:31:00  <barancev> what is a parameter to pass to switchTo().window(...) ?
+2011-05-24T11:31:20  <barancev> it is a handle or a name -- what is this "name" ?
+2011-05-24T11:37:17  *** |izzie has quit IRC
+2011-05-24T11:37:19  <__mike> http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html
+2011-05-24T11:37:28  <__mike> it can be either
+2011-05-24T11:37:51  <__mike> http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#window(java.lang.String) >> name is name of the window
+2011-05-24T11:39:02  <barancev> I know where is the documentation :)
+2011-05-24T11:39:42  <barancev> and I know what is a handle. what I want to get know is what "name" means
+2011-05-24T11:41:14  <barancev> is it the second parameter to window.open?
+2011-05-24T11:41:15  *** cgoldberg has quit IRC
+2011-05-24T11:42:00  *** ivog has joined #selenium
+2011-05-24T11:42:20  *** cgoldberg has joined #selenium
+2011-05-24T11:43:25  *** knorrium has quit IRC
+2011-05-24T11:48:44  *** ner0x has quit IRC
+2011-05-24T11:52:09  *** Fyrespray has joined #selenium
+2011-05-24T11:54:04  *** Fyre has quit IRC
+2011-05-24T11:55:10  <AutomatedTester> eranm: i am here
+2011-05-24T11:55:15  <AutomatedTester> in a meeting but am about
+2011-05-24T12:01:59  *** darren has quit IRC
+2011-05-24T12:03:54  *** darrenm has joined #selenium
+2011-05-24T12:04:58  *** stepheneb has quit IRC
+2011-05-24T12:06:00  *** rpk has joined #selenium
+2011-05-24T12:06:31  *** __mike has quit IRC
+2011-05-24T12:07:57  <rpk> Hello, I was wondering as to why SE grid has no (web interface / way to view results / way to easily launch tests runs / database storage for results).  Is there a particular reason why it lacks this kind of support, and is there any plan to add it in the future?
+2011-05-24T12:10:17  <AutomatedTester> rpk: because its an infrastructure tool
+2011-05-24T12:10:24  <AutomatedTester> not a testing solution
+2011-05-24T12:11:08  <rpk> Is there a testing solution I should be looking at instead then?  I haven't seen a mature product associated with selenium providing this kind of functionality?
+2011-05-24T12:12:27  <rpk> Its nice to provide the infrastructure to run tests in parallel on a cluster of machines, but I'm not really sure how tests suites are intended to be run by testers.
+2011-05-24T12:12:50  *** stepheneb has joined #selenium
+2011-05-24T12:12:57  <rpk> AutomatedTester ^^
+2011-05-24T12:13:54  *** marlena has joined #selenium
+2011-05-24T12:13:58  <AutomatedTester> rpk: not sure
+2011-05-24T12:13:59  <ivog> rpk can't u start your testsuites from a buildserver?
+2011-05-24T12:14:38  <rpk> ivog: yes, which works for our continuous integration builds, but doesn't allow testers to address issues in between builds
+2011-05-24T12:15:17  <rpk> ivog: due to the size of our builds, we can only build once during the day, and have builds before works starts, and starting at 6 when people begin to leave
+2011-05-24T12:16:06  <ivog> and in between testers need to run specific suites on existing builds?
+2011-05-24T12:17:01  <rpk> ivog: Yes, as developers fix issues they'll deploy new partial (local) builds and testers will validate fixes
+2011-05-24T12:18:09  <rpk> So if Se grid is intended to be entirely run through automation, is there an easy way to get test results out of the system?  (we anticipate a couple hundred tests that are around 20-40 steps each
+2011-05-24T12:18:49  <rpk> ) ivog^
+2011-05-24T12:19:02  <jarib> rpk: grid only takes care of the idea of "browser slaves" - it doesn't actually run your tests
+2011-05-24T12:19:03  <ivog> so i run all grid tests in a buildserver and the buildserver collects the data
+2011-05-24T12:19:53  <rpk> jarib, ivog: wouldn't distributing the tests from one central location like that slow down test execution?
+2011-05-24T12:19:54  <jarib> e.g. your tests (i.e. where results are collected) still run on on a single machine, which calls out to grid, which then calls out to the browsers
+2011-05-24T12:20:21  <jarib> maybe
+2011-05-24T12:20:29  <jarib> but the main cost is still the actual browsers
+2011-05-24T12:20:41  <ivog> if your worried about that you need to have your buildserver direct different suites to different grids
+2011-05-24T12:20:48  <jarib> not the test execution
+2011-05-24T12:21:04  <ivog> or different buildagents
+2011-05-24T12:21:08  *** ner0x has joined #selenium
+2011-05-24T12:21:20  <rpk> ivog, jarib: Ah ok, I misunderstood the execution model
+2011-05-24T12:21:22  <ivog> but a testrunner can handle alot
+2011-05-24T12:22:17  <rpk> The mailing list makes it sound like Selenium 2 RC should be available relatively soon: http://groups.google.com/group/selenium-developers/browse_thread/thread/3e2c32bd9cbd1e16/d98af77f2ded2501?lnk=gst&q=grid#d98af77f2ded2501
+2011-05-24T12:22:20  <rpk> is that accurate?
+2011-05-24T12:23:09  <rpk> (Our testing committee need to make a decision on various testing products at the end of the week)
+2011-05-24T12:23:49  *** admc1 has quit IRC
+2011-05-24T12:24:03  *** stepheneb_ has joined #selenium
+2011-05-24T12:25:06  *** Eol has joined #selenium
+2011-05-24T12:25:19  <ivog> that is probably accurate but u can allready use grid...
+2011-05-24T12:25:39  <ivog> and grid 2.0 if you build it yourself
+2011-05-24T12:25:42  <rpk> Oh, I thought that grid2 was going to become available in the beta 4 release?
+2011-05-24T12:25:52  *** stepheneb has quit IRC
+2011-05-24T12:25:52  *** stepheneb_ is now known as stepheneb
+2011-05-24T12:25:54  <rpk> oh ok
+2011-05-24T12:26:05  *** pnitin has quit IRC
+2011-05-24T12:26:09  <ivog> just get the source and build the release
+2011-05-24T12:26:18  <ivog> its not that hard
+2011-05-24T12:26:45  <Eol> Hello. I'm attempting to get selenium grid set up on multiple machines.  Right now, I've got ant-launch hub run on my main hub.   Now, on my RC on another machine, do I run "java -jar selenium-server.jar -port 3000", and then on my hub machine, have another window with "ant launch-hub ...." ?
+2011-05-24T12:27:20  <ivog> Eol: are you starting out with grid?
+2011-05-24T12:28:02  <Eol> No
+2011-05-24T12:31:53  <Eol> Just confused as to whether or not I need to install the selenium-grid.jar on each remote control, or is the selenium-server.jar good enough for my remotes
+2011-05-24T12:33:17  <ivog> i think you need a grid specific jar but im not sure
+2011-05-24T12:33:49  <ivog> i think the selenium-server.jar doesn't support the -hubUrl parameter but i can be wrong
+2011-05-24T12:34:12  <ivog> in grid 2.0 it's all in the same jar
+2011-05-24T12:35:48  <AutomatedTester> eranm: ?
+2011-05-24T12:39:07  <lisak> if I go htmlUnitDriver.get(url); and then I get to another page via clicking a link
+2011-05-24T12:39:22  <lisak> driver.findElement() is searching in the page I'm currently in, right ?
+2011-05-24T12:40:00  <lisak> then I absolutely don't understand why driver.findElement(By.id("myfile"));   fails with Unable to locate element with ID: myfile
+2011-05-24T12:40:20  <lisak> because i simply exists, but htmlunitdriver can't find it ...wtf
+2011-05-24T12:40:29  <lisak> how can one test like this
+2011-05-24T12:40:54  <lisak> it*
+2011-05-24T12:41:42  *** stepheneb has quit IRC
+2011-05-24T12:43:25  *** yairgo has joined #selenium
+2011-05-24T12:45:06  <rpk> Also, I'd appreciate if someone could clarify a few more things for me: Someone listed: "Uses DOM manipulation at execution time" as a con, is this still the case with Se 2.0 and webdriver?
+2011-05-24T12:52:55  *** csanchez has joined #selenium
+2011-05-24T12:54:37  <ivog> webdriver uses native browser apis to control the different browsers
+2011-05-24T12:55:31  <ivog> i guess you can still 'manipulate the dom at execution time' but i doubt that is much a of con
+2011-05-24T12:56:42  <Eol> I assume the "con" is that it is slow
+2011-05-24T12:56:43  <ivog> lisak: you can verify the page you're on by looking at the pagesource property of the driver
+2011-05-24T12:57:41  *** miker2 has quit IRC
+2011-05-24T13:00:42  *** sjmikem has quit IRC
+2011-05-24T13:00:49  *** celm has joined #selenium
+2011-05-24T13:04:44  <eranm> AutomatedTester: still here? I'm having difficulty reproducing the issue with Selenium RC + Firefox 4 + Win7
+2011-05-24T13:05:01  <eranm> I was hoping you could have a look at it and look into the issue, other than the native events that's the last blocker for the release.
+2011-05-24T13:06:41  <AutomatedTester> eranm: bug number?
+2011-05-24T13:07:28  <AutomatedTester> tbh my Windows VM is a little toast
+2011-05-24T13:07:36  <eranm> Issue #1438
+2011-05-24T13:07:37  <selbot2>  open/accepted WebDriver + Firefox 4: this.getWindow() is null - http://code.google.com/p/selenium/issues/detail?id=1438
+2011-05-24T13:08:36  <AutomatedTester> eranm: do you know the history behind this?
+2011-05-24T13:09:42  *** cburroughs` has quit IRC
+2011-05-24T13:10:07  <eranm> AutomatedTester: not quite. Simon claims there's a one Selenium RC test hanging on Win7 / Firefox 4, so the entire test suite hangs
+2011-05-24T13:10:21  <lisak> ivog, the url is correct, so that maybe the reason why htmlunitDriver can't find it and chromeDriver can't click is that its opacity is 0
+2011-05-24T13:10:29  <eranm> related to an alert appearing.
+2011-05-24T13:10:49  *** freynaud has joined #selenium
+2011-05-24T13:10:50  <AutomatedTester> the outer and inner window dont know anything about each other, they do get back in sync
+2011-05-24T13:11:15  <lisak> it is not hidden though ...opacity is 0 due to having an image instead of the ugly file input field ...
+2011-05-24T13:11:16  *** sjmikem has joined #selenium
+2011-05-24T13:11:52  <freynaud> ploghtbo: ping.
+2011-05-24T13:12:23  <freynaud> plightbo: ping
+2011-05-24T13:14:49  <lisak> ivog, I see, it is the opacity http://code.google.com/p/selenium/issues/detail?id=1610
+2011-05-24T13:15:34  <lisak> thanks god it is fixed, because opacity 0 is very frequently used css technique
+2011-05-24T13:16:53  <Eol> Can I make selenium choose what version of IE it's running?
+2011-05-24T13:17:44  *** stepheneb has joined #selenium
+2011-05-24T13:17:58  <lisak> omg it doesn't work even after it is fixed in r12148.
+2011-05-24T13:17:59  <selbot2> james.h.evans.jr 14 days ago - JimEvans: Fixing getCssValue in IE to use the getEffectiveStyle atom. Fixes issue 1610. - http://code.google.com/p/selenium/source/detail?r=12148
+2011-05-24T13:19:15  <freynaud> Eol: is it possible to have multiple IE verisons on the same windows ?
+2011-05-24T13:19:38  <Eol> No, but the newer versions of IE have this "developer mode" which make them emulate the older browsers
+2011-05-24T13:22:25  *** RossPatterson has quit IRC
+2011-05-24T13:23:24  <selbot2> francois.reynaud less than a minute ago - FrancoisReynaud: adding a test to check that forceRelease() actually releases the resources + make the test pass. - http://code.google.com/p/selenium/source/detail?r=12240
+2011-05-24T13:24:12  <eranm> AutomatedTester: it'd be helpful if you could start by reproducing the issue, I don't have a Win7 VM handy as well
+2011-05-24T13:24:23  <eranm> and would like to get this issue resolved before I get back to London, to my VM
+2011-05-24T13:24:51  <AutomatedTester> eranm: last release we fixed with a hack for the RC tess
+2011-05-24T13:24:56  <AutomatedTester> tests even
+2011-05-24T13:25:27  <eranm> AutomatedTester: remember which hack?
+2011-05-24T13:26:04  <AutomatedTester> eranm: lemme find the IRC logs
+2011-05-24T13:26:08  <rpk> Hey, sorry I couldn't reply above, I got called away.  But yeah, I think the con was that it was slow, but I had thought webdriver would make that point irrelevant.  Anyways, I guess my last question is, if Se 2.0 uses browser native APIs, will I not be able to write a test once, and then run it on different browsers?
+2011-05-24T13:26:50  <eranm> Thanks
+2011-05-24T13:26:54  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: adding a timeout to the matcher thread for new request. - http://code.google.com/p/selenium/source/detail?r=12241
+2011-05-24T13:28:11  *** dlam has quit IRC
+2011-05-24T13:28:36  <rpk> That would require 3x the number of tests in order to just ensure functionality on IE, FF, and Chrome.  Is there something that prevents common calls from being abstracted away, or are they already and only edge cases will require the tests to be tailored to the browser?
+2011-05-24T13:29:14  <ivog> rpk: no webdriver has a api which underneath uses different native browser apis
+2011-05-24T13:29:29  <ivog> but you only have to deal with one api for all browsers
+2011-05-24T13:30:19  <rpk> ah ok, excellent
+2011-05-24T13:30:25  <rpk> thanks!
+2011-05-24T13:30:33  <ivog> your welcome :)
+2011-05-24T13:30:43  *** rpk has left #selenium
+2011-05-24T13:33:59  *** dlam has joined #selenium
+2011-05-24T13:34:09  *** celm has quit IRC
+2011-05-24T13:34:41  <AutomatedTester> eranm: can you chuffing believe it, the tests pass
+2011-05-24T13:34:48  *** stepheneb has quit IRC
+2011-05-24T13:35:04  *** stepheneb has joined #selenium
+2011-05-24T13:35:12  <eranm> Ha, that's good news
+2011-05-24T13:35:24  *** mbeierl has quit IRC
+2011-05-24T13:36:04  <eranm> while you're at it, mind running ./go test_java test_javascript on Win7 and let me know if it all passes?
+2011-05-24T13:36:48  <AutomatedTester> sure, test_selenium is still running
+2011-05-24T13:37:32  *** yairgo has quit IRC
+2011-05-24T13:40:21  *** admc1 has joined #selenium
+2011-05-24T13:40:22  <selbot`> New news from builds: S2J-FXLX-186 was SUCCESSFUL (with 643 tests) : Updated by francois.reynaud <http://xserve.openqa.org:8085/browse/S2J-FXLX-186>
+2011-05-24T13:41:03  <lisak> how come that I could use 2.0b3 ChromeDriver without having  chromedriver binary ?
+2011-05-24T13:41:27  <lisak> now I'm using trunk and it says I don't have it on my classpath
+2011-05-24T13:41:59  *** red^ is now known as reddeviL
+2011-05-24T13:42:16  <freynaud> lisak: it has been re-written completly
+2011-05-24T13:42:25  <freynaud> way faster now
+2011-05-24T13:42:39  <lisak> so is this one chromedriver_linux64_12.0.727.0.zip    ok for trunk version of ChromeDriver ?
+2011-05-24T13:42:54  <freynaud> http://code.google.com/p/selenium/wiki/ChromeDriver
+2011-05-24T13:43:24  <freynaud> i've always downloaded the last one without having issues
+2011-05-24T13:43:36  <freynaud> i never had to do any troubleshooting
+2011-05-24T13:44:29  <AutomatedTester> eranm: btw, I am only testing on Win7 x86
+2011-05-24T13:44:35  <AutomatedTester> dont have a x64 box
+2011-05-24T13:44:41  <eranm> That's fine
+2011-05-24T13:44:42  <lisak> I suppose I need google-chrome 12 right
+2011-05-24T13:44:43  <lisak> for trunk
+2011-05-24T13:45:02  <lisak> version of chromeDriver
+2011-05-24T13:45:04  <eranm> lisak: Yes
+2011-05-24T13:45:26  <AutomatedTester> lisak: i think thats about to hit their beta channel
+2011-05-24T13:45:34  <eranm> I'm not sure what is the exact version required, but if you're using the dev channel you will definitely be able to use it
+2011-05-24T13:45:46  <AutomatedTester> eranm: its 12
+2011-05-24T13:46:03  <lisak> ouch, one of the times when it is better to not have Slackware
+2011-05-24T13:46:15  <eranm> AutomatedTester, I think everybody uses 32-bit builds of Firefox, anyway.
+2011-05-24T13:46:25  <freynaud> following the links on the wiki worked for me last friday, linux x86
+2011-05-24T13:49:54  * jarib uses 64-bit Firefox builds
+2011-05-24T13:50:22  <jarib> what will i be missing?
+2011-05-24T13:50:30  <eranm> AutomatedTester: how is the selenium_test going along?
+2011-05-24T13:50:35  <eranm> jarib: Flash and other 32-bit plugins?
+2011-05-24T13:50:59  <jarib> right
+2011-05-24T13:50:59  <AutomatedTester> eranm: sorry running around between people
+2011-05-24T13:51:07  *** freynaud has quit IRC
+2011-05-24T13:51:13  <AutomatedTester> so htmlunit tests failed for test_java
+2011-05-24T13:51:15  <jarib> we don't have flash installed on the test servers
+2011-05-24T13:53:27  <AutomatedTester> eranm: testMovingMouseByRelativeOffset failed
+2011-05-24T13:53:35  <AutomatedTester> in htmlunit tests
+2011-05-24T13:53:43  <eranm> AutomatedTester: that's ok, I've seen this failure as well
+2011-05-24T13:53:58  <AutomatedTester> tests stopped after htmlunit
+2011-05-24T13:54:07  <AutomatedTester> will run JavaScript tests separately
+2011-05-24T13:54:21  <eranm> But test_selenium passes, right?
+2011-05-24T13:54:30  <AutomatedTester> eranm: it failed in IE
+2011-05-24T13:54:34  <AutomatedTester> passed in Firefox
+2011-05-24T13:54:52  <AutomatedTester> but my IE might be slightly, a lot, broken
+2011-05-24T13:54:57  <AutomatedTester> i need to download a new VM
+2011-05-24T13:56:02  <eranm> Ok, I see
+2011-05-24T13:57:54  *** curseg has quit IRC
+2011-05-24T13:59:03  <selbot`> New news from builds: S2J-FXLX-187 was SUCCESSFUL (with 643 tests) : Updated by francois.reynaud <http://xserve.openqa.org:8085/browse/S2J-FXLX-187>
+2011-05-24T14:06:10  *** Eol has quit IRC
+2011-05-24T14:17:19  *** eranm has quit IRC
+2011-05-24T14:21:36  *** SL-BWood has quit IRC
+2011-05-24T14:38:47  <ivog> AutomatedTester: still here?
+2011-05-24T14:38:55  <AutomatedTester> ivog: heading off
+2011-05-24T14:38:58  *** eranm has joined #selenium
+2011-05-24T14:39:16  <AutomatedTester> in cockney rhyming slang I am cream crackered
+2011-05-24T14:39:27  <ivog> ok, looks like there's still 7 ff tests failing on 64 win
+2011-05-24T14:39:37  <ivog> :)
+2011-05-24T14:39:52  <AutomatedTester> ivog: i dont have a x64 environment atm
+2011-05-24T14:40:45  <ivog> but on x86 ff tests pass
+2011-05-24T14:40:46  <ivog> ?
+2011-05-24T14:41:40  <ivog> nm i'll be on tomorrow, maybe i can help fixing those tests for 64 bit although i don't really know how the ff internals work...
+2011-05-24T14:41:55  <AutomatedTester> eranm: i am heading off
+2011-05-24T14:42:04  <eranm> ok, ttyl
+2011-05-24T14:42:12  <AutomatedTester> if you need anything more from me, email me and I will look at it tomorrow
+2011-05-24T14:43:25  <ivog> eranm: are you interested in the tests which are failing on my machine?
+2011-05-24T14:45:20  *** QAguy has quit IRC
+2011-05-24T14:48:43  *** AutomatedTester has quit IRC
+2011-05-24T14:54:15  <sfbrian> does anybody know why the SSL certificate gets changed to being verified by Cybervillians?
+2011-05-24T14:55:30  <sfbrian> when testing a site using a cert
+2011-05-24T14:57:37  *** eranm has quit IRC
+2011-05-24T14:58:37  *** eranm has joined #selenium
+2011-05-24T14:59:28  *** eranm has quit IRC
+2011-05-24T15:02:01  <cgoldberg> http://www.aosabook.org/en/selenium.html
+2011-05-24T15:07:51  *** eranm has joined #selenium
+2011-05-24T15:08:08  <eranm> sfbrian: are you using the FirefoxDriver?
+2011-05-24T15:08:21  <sfbrian> using RC
+2011-05-24T15:08:55  <eranm> No idea. I know that the FirefoxDriver accepts untrusted SSL certificates by default - you can tell it otherwise by creating an instance of FirefoxProfile and setting accepting untrusted SSL certificates to false.
+2011-05-24T15:08:57  <eranm> brb
+2011-05-24T15:08:59  *** eranm has quit IRC
+2011-05-24T15:10:52  *** eranm has joined #selenium
+2011-05-24T15:11:32  <sfbrian> eranm: what's funny is that this is a valid cert that it's not liking
+2011-05-24T15:11:41  *** eranm has quit IRC
+2011-05-24T15:16:13  *** cgoldberg has quit IRC
+2011-05-24T15:21:42  *** yairgo has joined #selenium
+2011-05-24T15:22:04  <jarib> sfbrian: valid, but with a hostname mismatch maybe?
+2011-05-24T15:23:20  <jarib> it happens when people use their prod certificates in test environments
+2011-05-24T15:31:42  <sfbrian> jarib: here's something weird, it works fine in sauce but locally it doesn't
+2011-05-24T15:31:57  <sfbrian> fyi, this cert is brand new and it's a new testing env
+2011-05-24T15:32:00  <sfbrian> not sure if that matters
+2011-05-24T15:33:24  <sfbrian> I get a java.lang.RuntimeException: Couldn't establish SSL handshake.
+2011-05-24T15:33:34  *** stepheneb has quit IRC
+2011-05-24T15:34:26  *** eranm has joined #selenium
+2011-05-24T15:35:28  <sfbrian> brb
+2011-05-24T15:35:49  *** sfbrian has quit IRC
+2011-05-24T15:38:15  *** sfbrian has joined #selenium
+2011-05-24T15:39:22  *** ivog has quit IRC
+2011-05-24T15:39:34  <eranm> sfbrian: does the same page work when using the Selenium 2 API?
+2011-05-24T15:41:59  *** jksM has joined #selenium
+2011-05-24T15:43:13  *** andytinkham1 has joined #selenium
+2011-05-24T15:43:35  *** andytinkham has quit IRC
+2011-05-24T15:44:59  *** jks2 has quit IRC
+2011-05-24T15:46:37  <sfbrian> eranm: get a different error that it's an untrusted certificate
+2011-05-24T15:46:40  <sfbrian> even though it shouldn't be
+2011-05-24T15:47:21  <sfbrian> hmm, nevermind, it works in webdriver
+2011-05-24T15:52:29  <sfbrian> if I pass -trustAllSSLCertificates then it works... for some reason selenium thinks the new cert is invalid I guess
+2011-05-24T15:52:31  <sfbrian> even though it's not
+2011-05-24T15:53:41  <eranm> Perhaps one of the Selenium 1 gurus can help you with that. Unfortunately not many of them around at the moment.
+2011-05-24T15:55:19  *** curseg has joined #selenium
+2011-05-24T15:55:47  *** curseg has quit IRC
+2011-05-24T15:58:04  <lisak> guys haven't you encountered this http://pastie.org/1968674  when running the chromedriver_12.0.727.0 ?
+2011-05-24T15:58:44  <lisak> the server isn't available somehow
+2011-05-24T15:59:05  <lisak> hard to figure why
+2011-05-24T15:59:57  <lisak> or the server is, but chrome isn't ... I guess
+2011-05-24T16:03:12  *** andytinkham1 has quit IRC
+2011-05-24T16:03:29  <lisak> people have this issue
+2011-05-24T16:04:08  <lisak> but when using  < 12.0.742.30
+2011-05-24T16:04:11  *** sjmikem has quit IRC
+2011-05-24T16:04:23  <lisak> i have 12.0.742.60 and have this issue
+2011-05-24T16:05:07  <sfbrian> eranm: thanks for the help anyway
+2011-05-24T16:07:17  *** csanchez has quit IRC
+2011-05-24T16:09:40  <eranm> lisak: does that happen with older versions of chrome?
+2011-05-24T16:10:13  <lisak> I just tried 12.0.742.60
+2011-05-24T16:10:27  <lisak> switched from 10
+2011-05-24T16:10:48  <lisak> linux64
+2011-05-24T16:11:34  <lisak> chrome runs without anything suspicious in logs
+2011-05-24T16:13:50  <lisak> eranm, I have access only to .60 beta version from here http://www.google.com/chrome/intl/en/eula_beta.html?dl=beta_amd64_deb
+2011-05-24T16:14:53  <eranm> lisak: which version of the prebuilt server did you get?
+2011-05-24T16:15:05  <lisak> 12.0.727.0
+2011-05-24T16:15:25  <lisak> current downloads from the webdriver download page
+2011-05-24T16:15:38  <eranm> and that's in your PATH, right?
+2011-05-24T16:15:44  <lisak> yes
+2011-05-24T16:17:00  <lisak> chrome 10 was removed, it really has the 12 binary
+2011-05-24T16:18:51  <eranm> I meant the server, not the chrome binary
+2011-05-24T16:18:55  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: Ignoring tests for functionality that is not implemented in HtmlUnit. - http://code.google.com/p/selenium/source/detail?r=12242
+2011-05-24T16:18:56  <eranm> (both have to be in the path actually)
+2011-05-24T16:20:17  <lisak> they are
+2011-05-24T16:20:22  <lisak> really
+2011-05-24T16:21:02  <lisak> chrome on the system path,  driver as a jvm param
+2011-05-24T16:22:15  <lisak> eranm, I was told now, that chromedriver appears to use the automation framework.  i'd expect it only works if the versions match exactly
+2011-05-24T16:23:19  <eranm> Not necessarily (there's no enforcement of this matching) but generally, it's best to try with the exact same version.
+2011-05-24T16:23:36  <eranm> I'm told a new version of the chromedriver binary is supposed to be made available today
+2011-05-24T16:24:33  <lisak> eranm, is it gonna be on the webdriver's download site ?
+2011-05-24T16:24:41  <eranm> Yes
+2011-05-24T16:24:52  <lisak> great, thank you
+2011-05-24T16:25:31  <eranm> I'd appreciate if you can dig further and see if you can get any output from chromedriver, perhaps it reports anything interesting
+2011-05-24T16:25:50  <lisak> from the Java binding one ?
+2011-05-24T16:26:00  <lisak> or the native one
+2011-05-24T16:26:36  <lisak> I don't have any idea how to get anything from the chromedriver server :)
+2011-05-24T16:28:19  <eranm> That'd require digging into the ChromeDriverService.
+2011-05-24T16:29:05  <eranm> I'm asking the ChromeDriver developer about it now, let's see what he has to say.
+2011-05-24T16:30:53  <jarib> lisak: sounds like the server isn't launching successfully; you could try to launch `chromedriver` manually from the command line and use RemoteWebDriver to connect to http://localhost:9515
+2011-05-24T16:30:58  <jarib> that's basically what ChromeDriver does
+2011-05-24T16:31:18  <jarib> but if you do it manually you can easily see the output from the server, whether it crashes on launch etc.
+2011-05-24T16:34:50  <jarib> eranm: #1 feature request of you're talking to them: ability to shut down the server and but leave the browser(s) running
+2011-05-24T16:34:51  <selbot2> michael.tamm2 closed/fixed NumberFormatException inside FirefoxWebElement.getSize() - http://code.google.com/p/selenium/issues/detail?id=1
+2011-05-24T16:35:53  <jarib> (adding a command line flag to enable/disable it)
+2011-05-24T16:37:07  *** curseg has joined #selenium
+2011-05-24T16:38:01  <lisak> jarib, I see, it has a problem with libnss3
+2011-05-24T16:38:02  <eranm> jarib: is there an open issue about in in Chromium's issue tracker?
+2011-05-24T16:38:24  <lisak> error while loading shared libraries: libnss3.so.1d: cannot open shared object file: Error 40
+2011-05-24T16:38:28  <selbot`> New news from builds: S2J-FXLX-188 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-188>
+2011-05-24T16:38:56  <jarib> eranm: not that i know of. i think jason told me they were tracking most of the chromedriver stuff internally
+2011-05-24T16:39:10  <jarib> (and that he wanted to move it to the google code tracker)
+2011-05-24T16:39:35  <jarib> i'd be happy to file it if that helps
+2011-05-24T16:40:07  <lisak> any idea what to do with that ?
+2011-05-24T16:40:54  <jarib> lisak: i'd be surprised if the chromedriver server has dependencies that are not in chrome itself
+2011-05-24T16:41:04  <jarib> lisak: you can launch chrome successfully, right?
+2011-05-24T16:41:05  <lisak> jarib, it is not missing
+2011-05-24T16:41:09  <lisak> it can't be open
+2011-05-24T16:41:12  <lisak> yep
+2011-05-24T16:41:43  <jarib> ah, right
+2011-05-24T16:41:49  <lisak> don't know what is that cannot open shared object file: Error 40
+2011-05-24T16:41:57  <lisak> it has the lib from chrome
+2011-05-24T16:42:06  <jarib> not sure what Error 40 is
+2011-05-24T16:42:27  <lisak> but it should be probably something with the version difference
+2011-05-24T16:45:36  <eranm> lisak: can you paste the error?
+2011-05-24T16:47:10  <jarib> lisak: i see some people suggesting "error 40" means ELOOP, "too many symbolic links encountered"
+2011-05-24T16:48:11  <lisak> yep I see it, shit http://pastie.org/1968833
+2011-05-24T16:48:22  <lisak> first off it couldn't find it
+2011-05-24T16:48:32  <lisak> so I created a symlink to /usr/lib64
+2011-05-24T16:48:35  <lisak> then error 40
+2011-05-24T16:49:18  *** towski has quit IRC
+2011-05-24T16:50:26  <eranm> Odd
+2011-05-24T16:50:52  <lisak> it is
+2011-05-24T16:50:54  <lisak> lrwxrwxrwx 1 root root 13 May 25 01:40 /usr/lib64/libnss3.so.1d -> libnss3.so.1d
+2011-05-24T16:51:07  <lisak> there is no reason for the binary to not see ti
+2011-05-24T16:51:41  <lisak> I satisfy the other deps :)
+2011-05-24T16:53:52  *** marlena has quit IRC
+2011-05-24T16:53:54  <lisak> I should have switch to ubuntu a long time ago
+2011-05-24T16:54:50  <jarib> :)
+2011-05-24T16:58:01  <jarib> interesting, i get an ELOOP after 9 levels of symlinks
+2011-05-24T16:58:11  <jarib> never knew about that restriction.
+2011-05-24T16:58:30  <lisak> like symlink to symlink to symlink ?
+2011-05-24T16:58:50  <eranm> ok, be back later, folks. going to catch a bus.
+2011-05-24T16:58:56  <jarib> lisak: exactly
+2011-05-24T16:59:04  <jarib> eranm: have fun :)
+2011-05-24T16:59:15  *** dreuxl has quit IRC
+2011-05-24T16:59:16  *** eranm has quit IRC
+2011-05-24T16:59:57  *** larrys has quit IRC
+2011-05-24T17:00:39  *** dreuxl has joined #selenium
+2011-05-24T17:01:03  *** larrys has joined #selenium
+2011-05-24T17:01:18  <lisak> jarib, I apparently get it after 2 levels :)
+2011-05-24T17:02:10  <lisak> /usr/lib64/libnss3.so.1d -> /opt/google/chrome/libnss3.so.1d -> /usr/lib64/seamonkey/libnss3.so
+2011-05-24T17:13:12  *** sjmikem has joined #selenium
+2011-05-24T17:19:52  <jarib> lisak: if you have the includes for your kernel close by, it's set in namei.h, MAX_NESTED_LINKS
+2011-05-24T17:19:53  *** binken has joined #selenium
+2011-05-24T17:19:55  <jarib> looks like default is 8
+2011-05-24T17:21:03  <lisak> got it figured out
+2011-05-24T17:21:04  <jarib> may be an indication that "Error 40" != ELOOP in your case.
+2011-05-24T17:21:09  <jarib> ok?
+2011-05-24T17:21:18  <lisak> I forgot to use the google-chrome wrapper
+2011-05-24T17:21:33  <lisak> I just cp google-chrome google-chromedriver
+2011-05-24T17:21:45  <lisak> and all the libs where on the path
+2011-05-24T17:22:03  <lisak> now it stars
+2011-05-24T17:22:18  <jarib> cool
+2011-05-24T17:22:24  <jarib> enjoy :)
+2011-05-24T17:26:52  <lisak> thanks, it was quite a tough shit to make it work, at least I got almost 10 pageObjects done :)
+2011-05-24T17:29:24  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: In order to get native events working in Firefox 4, an offset should be added to the coordinates sent to the native mouse event generation code. In Firefox 4, the toolbar is a part of the window so the additional height should be taken into consideration. This addresses issue 1661. - http://code.google.com/p/selenium/source/detail?r=12243
+2011-05-24T17:42:37  *** curseg has quit IRC
+2011-05-24T17:43:41  *** lisak has quit IRC
+2011-05-24T17:47:53  <selbot`> New news from builds: S2J-FXLX-189 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-189>
+2011-05-24T17:51:06  *** Spanktar has quit IRC
+2011-05-24T17:54:52  *** sfbrian has quit IRC
+2011-05-24T17:59:56  <selbot`> New news from builds: S2JS-TESTS-9 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-9>
+2011-05-24T18:01:40  *** dlam has quit IRC
+2011-05-24T18:30:57  *** ben_ is now known as bkkb
+2011-05-24T18:34:26  *** ner0x has quit IRC
+2011-05-24T18:42:29  *** admc1 has quit IRC
+2011-05-24T19:10:25  *** ner0x has joined #selenium
+2011-05-24T19:15:01  *** Fyrespray^ has joined #selenium
+2011-05-24T19:19:21  *** Fyrespray has quit IRC
+2011-05-24T19:26:02  *** stepheneb has joined #selenium
+2011-05-24T19:35:38  <selbot2> eran.mes@gmail.com 12 minutes ago - EranMes: Checking in javadocs for rc1 - http://code.google.com/p/selenium/source/detail?r=12244
+2011-05-24T19:39:58  *** ner0x has quit IRC
+2011-05-24T19:47:47  *** pnitin has joined #selenium
+2011-05-24T20:14:10  *** |izzie has joined #selenium
+2011-05-24T20:29:17  *** rbalent has quit IRC
+2011-05-24T20:33:18  *** celm has joined #selenium
+2011-05-24T20:47:48  *** pnitin has quit IRC
+2011-05-24T20:56:45  *** stepheneb has quit IRC
+2011-05-24T21:04:00  *** toddnine has joined #selenium
+2011-05-24T21:04:25  <toddnine> Hi guys.  Is there any way via the ide to read a csv file?  Just trying to automate something simple for someone at work, and I don't want to use the grid
+2011-05-24T21:13:12  *** celm has quit IRC
+2011-05-24T21:45:54  *** eranm has joined #selenium
+2011-05-24T21:47:38  <binken> RC1 will be released soon?
+2011-05-24T22:00:51  *** toddnine has left #selenium
+2011-05-24T22:13:02  *** rkumar has joined #selenium
+2011-05-24T22:17:05  <eranm> binken: very!
+2011-05-24T22:17:18  <eranm> Found the last issues with native events and Firefox 4
+2011-05-24T22:17:49  <eranm> We could use some help with Selenium RC on Firefox 4 / Windows, if you want to help.
+2011-05-24T22:18:19  <binken> Very glad to help
+2011-05-24T22:20:53  <eranm> Assuming you have Firefox on your windows box in C:\Program Files\Mozilla Firefox\firefox.exe, running go.bat //java/client/test/com/thoughtworks/selenium:firefox-rc-test:run will re-create the only problem we're facing now with the release
+2011-05-24T22:21:55  <eranm> You'll see an alert popping up and blocking the rest of the test
+2011-05-24T22:25:20  <binken> I am always having issue on my localmachine when I run the go.bat
+2011-05-24T22:28:00  <binken> 'pkg-config' is not recognized as an internal or external command, operable program or batch file. No Gecko SDK detected. Install xulrunner-dev (xulrunner-devel for macports) to c ompile 64-bit Firefox extension. Compiling: //cpp:firefox_dll as build\cpp\Win32\Release\webdriver-firefox.dll VCBUILD : fatal error C1047: The object or library file 'C:\SVN\Selenium 2\selen ium-read-only\build\lib\Win32\Release\webdriver-interactions.lib
+2011-05-24T22:28:42  *** admc has joined #selenium
+2011-05-24T22:31:15  <eranm> Do you have visual studio 2008 installed?
+2011-05-24T22:33:24  <selbot2> eran.mes@gmail.com half a minute ago - EranMes: In Firefox 4, the active element returned will be wrapped so the comparison will always fail, leading to testSendingKeysToAFocusedElementShouldNotBlurThatElement failing. Unwrapping the element will ensure the comparison is between two appropriate elements. - http://code.google.com/p/selenium/source/detail?r=12245
+2011-05-24T22:33:30  <eranm> And if you do ,do you run go.bat through Visual Studio 2008 Command Prompt?
+2011-05-24T22:33:48  <binken> I both installed the 2008 and 2010
+2011-05-24T22:45:49  *** freynaud has joined #selenium
+2011-05-24T22:46:13  *** brettporter has joined #selenium
+2011-05-24T22:48:45  <selbot`> New news from builds: S2JS-TESTS-10 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-10>
+2011-05-24T22:51:52  <eranm> binken: and do you run go from the VS2008 command prompt?
+2011-05-24T22:58:39  *** Mephian has joined #selenium
+2011-05-24T23:02:57  <eranm> night all
+2011-05-24T23:02:59  *** eranm has quit IRC
+2011-05-24T23:04:29  *** sjmikem has quit IRC
+2011-05-24T23:04:30  <selbot`> New news from builds: S2J-FXLX-190 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-190>
+2011-05-24T23:25:07  *** freynaud has quit IRC
+2011-05-24T23:35:42  *** pnitin has joined #selenium
+2011-05-24T23:44:10  *** freynaud has joined #selenium
+2011-05-24T23:45:10  *** freynaud has quit IRC
+2011-05-24T23:48:56  *** koops has joined #selenium
+2011-05-24T23:54:56  <selbot`> New news from builds: S2J-FXLX-190 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-190> || S2JS-TESTS-10 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-10> || S2JS-TESTS-9 was SUCCESSFUL (with 35 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2JS-TESTS-9> || S2J-FXLX-189 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-189> || S2J-FXLX-188 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-188> || S2J-FXLX-187 was SUCCESSFUL (with 643 tests) : Updated by francois.reynaud <http://xserve.openqa.org:8085/browse/S2J-FXLX-187> || S2J-FXLX-186 was SUCCESSFUL (with 643 tests) : Updated by francois.reynaud <http://xserve.openqa.org:8085/browse/S2J-FXLX-186> || S2J-CHLX-5 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHLX-5> || S2J-CHXP-130 has FAILED (4 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHXP-130> || S2J-IE7XP-150 has FAILED (2 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-IE7XP-150> || S2J-FXXP-173 was SUCCESSFUL (with 643 tests) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-FXXP-173> || S2J-FXXP-172 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-FXXP-172> || S2J-CHXP-129 has FAILED (1 tests failed) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-CHXP-129> || IDE-IDE-94 was SUCCESSFUL : Dependant of IDE-EDITOR-116 <http://xserve.openqa.org:8085/browse/IDE-IDE-94> || IDE-EDITOR-116 was SUCCESSFUL : Updated by Samit Badle <http://xserve.openqa.org:8085/browse/IDE-EDITOR-116> || S2J-FXLX-185 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-185> || S2J-FXLX-184 was SUCCESSFUL (with 643 tests) : Manual build by Igor <http://xserve.openqa.org:8085/browse/S2J-FXLX-184> || S2RB-WDUNIT-100 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-100> || S2J-FXLX-183 was SUCCESSFUL (with 643 tests) : Updated by theautomatedtester <http://xserve.openqa.org:8085/browse/S2J-FXLX-183> || S2J-FXLX-182 was SUCCESSFUL (with 643 tests) : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-FXLX-182> || S2J-FXLX-181 was SUCCESSFUL (with 643 tests) : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-FXLX-181> || S2RB-WDUNIT-99 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-99> || S2J-FXLX-180 was SUCCESSFUL (with 643 tests) : Updated by theautomatedtester <http://xserve.openqa.org:8085/browse/S2J-FXLX-180> || S2RB-WDUNIT-98 was SUCCESSFUL (with 54 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-98> || S2J-FXLX-179 was SUCCESSFUL (with 643 tests) : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-FXLX-179> || S2J-FXLX-178 was SUCCESSFUL (with 643 tests) : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-FXLX-178> || S2J-FXLX-177 was SUCCESSFUL (with 643 tests) : Updated by michael.tamm2 <http://xserve.openqa.org:8085/browse/S2J-FXLX-177> || S2J-FXLX-176 has FAILED : Updated by michael.tamm2 <http://xserve.openqa.org:8085/browse/S2J-FXLX-176> || S2J-FXLX-175 was SUCCESSFUL (with 643 tests) : Updated by eran.mes@gmail.com <http://xserve.openqa.org:8085/browse/S2J-FXLX-175> || S2RB-WDUNIT-97 was SUCCESSFUL (with 51 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-97>
+2011-05-24T23:56:17  *** koops has left #selenium

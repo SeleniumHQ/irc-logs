@@ -1,0 +1,601 @@
+2011-04-21T00:02:26  *** amitev has joined #selenium
+2011-04-21T00:05:21  *** soc42 has joined #selenium
+2011-04-21T00:08:35  *** rbalent has joined #selenium
+2011-04-21T00:26:51  *** sburjan has joined #selenium
+2011-04-21T00:42:06  *** lfryc_away is now known as lfryc
+2011-04-21T00:44:43  *** anatoli has quit IRC
+2011-04-21T00:48:57  *** bebef_1987 has joined #selenium
+2011-04-21T01:08:15  *** ollikuhta has joined #selenium
+2011-04-21T01:12:05  <ollikuhta> I need to use Selenium::WebPage class in Ruby code. What libraries I need to include and how?
+2011-04-21T01:23:34  *** vrockai has joined #selenium
+2011-04-21T01:27:18  *** toseter has joined #selenium
+2011-04-21T01:37:20  *** freynaud has joined #selenium
+2011-04-21T01:37:22  <freynaud> nium
+2011-04-21T01:40:52  *** dereke has quit IRC
+2011-04-21T01:50:09  *** csanchez has joined #selenium
+2011-04-21T01:50:28  *** erwandf has joined #selenium
+2011-04-21T01:59:50  *** AutomatedTester has joined #selenium
+2011-04-21T02:09:01  *** gtailleb has joined #selenium
+2011-04-21T02:09:32  <gtailleb> hi everyone
+2011-04-21T02:09:54  <AutomatedTester> hey gtailleb
+2011-04-21T02:10:27  <gtailleb> hi AutomatedTester, do you know if there is a way to take a screenshot with a remote webdriver?
+2011-04-21T02:10:36  <gtailleb> should i add a capacity?
+2011-04-21T02:12:21  <gtailleb> capability* sorry
+2011-04-21T02:13:47  *** ollikuhta has quit IRC
+2011-04-21T02:13:55  <gtailleb> noone?
+2011-04-21T02:14:23  *** dave_miles has joined #selenium
+2011-04-21T02:15:40  <AutomatedTester> sorry, was afk there
+2011-04-21T02:15:48  <AutomatedTester> this in Java?
+2011-04-21T02:15:54  <AutomatedTester> brb
+2011-04-21T02:16:57  <gtailleb> yep in java
+2011-04-21T02:17:26  *** erwandf has quit IRC
+2011-04-21T02:18:35  *** csanchez has quit IRC
+2011-04-21T02:18:58  *** csanchez has joined #selenium
+2011-04-21T02:23:54  <freynaud> you need to use the augmenter
+2011-04-21T02:24:04  <AutomatedTester> back
+2011-04-21T02:24:14  <AutomatedTester> yep, exactly what freynaud said
+2011-04-21T02:24:24  <gtailleb> like desiredCapabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, true); ?
+2011-04-21T02:25:22  <gtailleb> i'm doing this :
+2011-04-21T02:25:22  <gtailleb> desiredCapabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
+2011-04-21T02:25:22  <gtailleb> driver = new RemoteWebDriver(new URL(url), desiredCapabilities);
+2011-04-21T02:25:26  * AutomatedTester finds the email quickly
+2011-04-21T02:25:40  <gtailleb> and then
+2011-04-21T02:25:40  <gtailleb> File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+2011-04-21T02:26:06  <gtailleb> but i get java.lang.ClassCastException: org.openqa.selenium.remote.RemoteWebDriver cannot be cast to org.openqa.selenium.TakesScreenshot
+2011-04-21T02:26:24  <freynaud> WebDriver screenshotDriver = new Augmenter().augment(this);
+2011-04-21T02:26:24  <freynaud> 			File tmp = ((TakesScreenshot) screenshotDriver).getScreenshotAs(OutputType.FILE);
+2011-04-21T02:26:24  <freynaud> 			tmp.renameTo(destination);
+2011-04-21T02:26:36  <freynaud> something like that
+2011-04-21T02:26:49  <freynaud> you may have to build from trunk
+2011-04-21T02:27:00  <freynaud> i think the decoding was broken in b3
+2011-04-21T02:27:21  <gtailleb> ok :/
+2011-04-21T02:27:25  <gtailleb> i'll try that thx
+2011-04-21T02:27:29  <AutomatedTester> http://pastebin.mozilla.org/1208891
+2011-04-21T02:27:36  <AutomatedTester> I *think* thats what your are supposed to do
+2011-04-21T02:28:07  <gtailleb> thx AutomatedTester!
+2011-04-21T02:28:15  <gtailleb> and thx freynaud too
+2011-04-21T02:30:10  <freynaud> I think your're right AutometedTester
+2011-04-21T02:30:18  <freynaud> and it works with grid :)
+2011-04-21T02:31:26  <AutomatedTester> not bad for someone who never does Java
+2011-04-21T02:31:53  <AutomatedTester> freynaud: have you seen issues with sending profiles over the wire?
+2011-04-21T02:39:20  *** amitev has quit IRC
+2011-04-21T02:41:37  <freynaud> no
+2011-04-21T02:41:51  <freynaud> i'm not sending complex profiles though
+2011-04-21T02:42:04  <freynaud> just a cert8 file usually
+2011-04-21T02:42:12  <AutomatedTester> not changing the perfs?
+2011-04-21T02:42:22  <freynaud> usually not
+2011-04-21T02:42:26  <freynaud> user agent sometimes
+2011-04-21T02:42:29  <freynaud> but that's it
+2011-04-21T02:42:40  <freynaud> why, have you had issues ?
+2011-04-21T02:42:57  <AutomatedTester> jimevans may have found a bug that the remotedriver doesnt do the silent start on firefox
+2011-04-21T02:43:18  <AutomatedTester> so doesnt give it a chance to clean the user,js file
+2011-04-21T02:51:14  *** ollikuhta has joined #selenium
+2011-04-21T02:52:05  <ollikuhta> Does anyone know how to take Selenium::WebPage class in use?
+2011-04-21T02:56:27  <freynaud> AutomatedTester: do you have more details on -silent not used ?
+2011-04-21T02:56:41  <freynaud> i'm debugging the launcher, i don't see how that step can be skipped
+2011-04-21T03:00:08  *** amitev has joined #selenium
+2011-04-21T03:04:48  <AutomatedTester> freynaud: only way we can skip the -silent step is to make a user.js like Firefox would
+2011-04-21T03:05:42  <freynaud> i was talking about the bug you mentioned
+2011-04-21T03:05:49  <freynaud> that jimevans found
+2011-04-21T03:05:56  <AutomatedTester> oh...
+2011-04-21T03:06:14  <freynaud> there is no condition or anything in the remotedriver
+2011-04-21T03:06:28  <AutomatedTester> he hasnt looked at the code, he just said that it appears as remotewebdriver isnt running that step
+2011-04-21T03:06:29  <freynaud> it goes through the launch with -silent first
+2011-04-21T03:06:41  <AutomatedTester> after creating the new profile?
+2011-04-21T03:07:49  <AutomatedTester> if thats the case its probably best to ask jimevans
+2011-04-21T03:10:32  <jarib> yeah, i thinks it's impossible to get firefox launched without the -silent step
+2011-04-21T03:10:52  <jarib> unless some of the Se1 launcher code is involved..
+2011-04-21T03:11:04  <freynaud> even if for some bizare reason the clean step crashes
+2011-04-21T03:11:11  <freynaud> firefox wouldn't start at all
+2011-04-21T03:11:24  <freynaud> it wouldn't start without the correct pofile
+2011-04-21T03:11:26  <jarib> right
+2011-04-21T03:11:43  *** ollikuhta has quit IRC
+2011-04-21T03:11:53  <AutomatedTester> i dont know then
+2011-04-21T03:13:37  <freynaud> for the lucky ones who have to test windows desktop application on top of web sites, you can have a look at http://code.google.com/p/twin/ and let me know what you think
+2011-04-21T03:14:07  <freynaud> it's using the web driver JSON protocol, so you can use it in grid2
+2011-04-21T03:15:38  <AutomatedTester> wow, ebay is finally joining the OSS revolution
+2011-04-21T03:16:23  <freynaud> wasn't easy :)
+2011-04-21T03:17:52  <freynaud> twin can be used in combination with webdriver to do fancy things
+2011-04-21T03:17:58  <freynaud> if you're using FF on windows
+2011-04-21T03:17:59  <AutomatedTester> from speaking to Dees, getting anything in ebay done is like drawing blood from a stone
+2011-04-21T03:18:15  <freynaud> you can launch twin and atyach to the process webdriver controls
+2011-04-21T03:18:43  <freynaud> and interact with the print menu and all that stuff for instance
+2011-04-21T03:19:23  <freynaud> you need to master ppt to have things done :)
+2011-04-21T03:19:35  <AutomatedTester> hehe
+2011-04-21T03:20:17  <jarib> sounds like twin needs a ruby client :)
+2011-04-21T03:21:19  <freynaud> it needs a .NET one
+2011-04-21T03:21:46  <freynaud> kind of hard to explain to a .NET shop they should write test in ava
+2011-04-21T03:22:19  <freynaud> but if you're up for a ruby client , plz write it  :)
+2011-04-21T03:22:50  <freynaud> the part i'm not sure about is the client interfaces
+2011-04-21T03:23:07  <freynaud> at the moment, they map to the MS UIAutomation one
+2011-04-21T03:23:43  <freynaud> the question is : should it use twin.findElement(By) instead or twin.getDescendant / child
+2011-04-21T03:24:25  <freynaud> the overall concept is similar to webdriver, so big peices could be reuse. Find stuff, click stuff
+2011-04-21T03:24:38  <freynaud> but not sure how to leverage the other MS specific parts
+2011-04-21T03:33:09  <AutomatedTester> btw, I think I found a bug in Fx5
+2011-04-21T03:33:20  <AutomatedTester> which means Selenium/Webdriver wont work
+2011-04-21T03:35:14  <freynaud> if only we knew someone @mozilla :) we could have it fixed =
+2011-04-21T03:37:22  <AutomatedTester> freynaud: just checking the expected behaviour hasnt changed before fixing/raising a bug
+2011-04-21T03:37:29  <freynaud> :p
+2011-04-21T03:48:40  *** brettporter has quit IRC
+2011-04-21T04:02:28  *** soc42 has quit IRC
+2011-04-21T04:11:50  <davehunt|away> ping adamgoucher
+2011-04-21T04:11:54  *** davehunt|away is now known as davehunt
+2011-04-21T04:11:59  <adamgoucher> pong davehunt
+2011-04-21T04:13:58  <davehunt> Who here is a moderator for the Google groups? We have 70 pending messages, and it's a similar story every time I check recently. Feels once more like I'm the only one moderating them...
+2011-04-21T04:14:43  *** skiphuffman__ has joined #selenium
+2011-04-21T04:16:36  <davehunt> Interesting.. someone else has moderated since I opened the queue in a tab this morning
+2011-04-21T04:17:33  <davehunt> well, whoever it was - thank you :)
+2011-04-21T04:29:03  <adamgoucher> youre welcome :P
+2011-04-21T04:29:41  *** RossPatterson has joined #selenium
+2011-04-21T04:31:29  <AutomatedTester> adamgoucher: TCM has a product owner in Mozilla
+2011-04-21T04:31:49  <AutomatedTester> plus what about your lofty dreams of a CTO position?
+2011-04-21T04:32:22  <adamgoucher> heh. i have too many opinions about how to run a company to go back to a non-opinion flinging role
+2011-04-21T04:33:34  *** erwandf has joined #selenium
+2011-04-21T04:41:38  *** RossPatterson has quit IRC
+2011-04-21T04:44:07  *** stepheneb has joined #selenium
+2011-04-21T04:45:59  *** RossPatterson has joined #selenium
+2011-04-21T04:46:01  <selbot> New news from builds: IDE-MOZMILL-1 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-1>
+2011-04-21T04:50:25  <selbot> New news from builds: IDE-MOZMILL-2 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-2>
+2011-04-21T04:50:50  <AutomatedTester> adamgoucher: non-opinion flinging role? I am quite happy that I dont work for a company that doesnt listen to my opinions
+2011-04-21T04:51:06  <AutomatedTester> actaully, last 2 places I worked at listened to my opinions
+2011-04-21T04:51:12  <AutomatedTester> and I wasnt a CTO
+2011-04-21T04:51:31  *** carlisia has joined #selenium
+2011-04-21T04:51:32  <selbot> New news from builds: IDE-MOZMILL-3 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-3>
+2011-04-21T04:51:50  <adamgoucher> well, there are degrees of opinons
+2011-04-21T04:52:20  *** miker2 has joined #selenium
+2011-04-21T04:56:27  <selbot> New news from builds: IDE-MOZMILL-4 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-4>
+2011-04-21T04:56:28  *** erwandf has quit IRC
+2011-04-21T04:56:40  <adamgoucher> oooo. is that really a pass?
+2011-04-21T04:57:29  <davehunt> nope
+2011-04-21T04:57:50  <davehunt> Can I turn off IRC notifications until I have something working?
+2011-04-21T04:58:13  <davehunt> More specifically, can I turn off IRC notifications just for that build?
+2011-04-21T04:58:32  *** sdf has joined #selenium
+2011-04-21T04:59:26  <sdf> happy easter everyone
+2011-04-21T04:59:28  <jarib> davehunt: it's polling the rss feed, and the bot is run by someone from sauce
+2011-04-21T05:00:37  <davehunt> arg, Firefox 3.0.4? That won't work! :P
+2011-04-21T05:00:52  <jarib> what VM?
+2011-04-21T05:00:59  <davehunt> The Bamboo host
+2011-04-21T05:01:04  <davehunt> What will be the impact of me upgrading it to at least 3.6?
+2011-04-21T05:01:21  <jarib> probably none
+2011-04-21T05:01:32  <adamgoucher> you'll want to farm it out to another vm rather than the host
+2011-04-21T05:01:48  <davehunt> okay so we run nothing on the host?
+2011-04-21T05:02:16  <adamgoucher> i think there were some headless tests at one point, but nothing else curently
+2011-04-21T05:02:38  *** nirvdrum has joined #selenium
+2011-04-21T05:02:40  <davehunt> okay
+2011-04-21T05:03:04  <davehunt> Any preference on what VM I run Mozmill on? I chose the VM because it's OSX and easy :)
+2011-04-21T05:03:22  <adamgoucher> use the osx vm them
+2011-04-21T05:04:43  <davehunt> Oh yes! I didn't realise there was one :)
+2011-04-21T05:04:49  <davehunt> Not used to seeing OSX in a VM
+2011-04-21T05:06:03  *** csanchez has quit IRC
+2011-04-21T05:06:17  <davehunt> Now I need the password for the OSX VM so I can install Mercurial again :P
+2011-04-21T05:08:06  <davehunt> adamgoucher ^^
+2011-04-21T05:08:24  <adamgoucher> passwords are all the same
+2011-04-21T05:08:39  <davehunt> thx
+2011-04-21T05:14:52  *** mbeierl has joined #selenium
+2011-04-21T05:15:20  <freynaud> how did you get OSX in a VM ?
+2011-04-21T05:15:22  <freynaud> OSX server ?
+2011-04-21T05:16:00  <davehunt> freynaud: yep
+2011-04-21T05:16:34  <freynaud> k
+2011-04-21T05:17:48  *** esteele_ has joined #selenium
+2011-04-21T05:17:56  *** esteele_ has joined #selenium
+2011-04-21T05:19:31  *** esteele has quit IRC
+2011-04-21T05:19:32  *** esteele_ is now known as esteele
+2011-04-21T05:23:36  *** stepheneb has quit IRC
+2011-04-21T05:24:31  *** rbalent has quit IRC
+2011-04-21T05:25:19  *** balooo has quit IRC
+2011-04-21T05:27:26  *** cburroughs has joined #selenium
+2011-04-21T05:31:49  <AutomatedTester> charleyb: why doesnt the WatirGrid guy join forces with the Selenium Grid team?
+2011-04-21T05:36:45  *** adamgoucher has quit IRC
+2011-04-21T05:37:13  <jarib> AutomatedTester: his stuff is all ruby. it's using the distributed object stuff in ruby's stdlib
+2011-04-21T05:38:01  <jarib> also, he's commercializing things he's already built
+2011-04-21T05:38:10  <jarib> http://gridinit.com/
+2011-04-21T05:40:12  *** AutomatedTester has left #selenium
+2011-04-21T05:40:58  *** AutomatedTester has joined #selenium
+2011-04-21T05:41:35  <freynaud> Error 501 Method {"ID":"7"}GET is not defined in RFC 2068 and is not supported by the Servlet API
+2011-04-21T05:41:40  <freynaud> has anyone seen that before ?
+2011-04-21T05:42:08  *** sdf has quit IRC
+2011-04-21T05:43:55  *** melter has quit IRC
+2011-04-21T05:46:28  *** melter has joined #selenium
+2011-04-21T05:48:11  *** SL-BWood has joined #selenium
+2011-04-21T05:48:12  <selbot> New news from builds: IDE-MOZMILL-5 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-5>
+2011-04-21T05:49:09  <AutomatedTester> freynaud: nope
+2011-04-21T05:52:44  <selbot> New news from builds: IDE-MOZMILL-6 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-6>
+2011-04-21T05:54:28  <jarib> {"ID":"7"}GET does sound like a rare http verb :P
+2011-04-21T05:58:37  <AutomatedTester> jarib: its like I am a little teapot one
+2011-04-21T05:58:38  <selbot> New news from builds: IDE-MOZMILL-7 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-7>
+2011-04-21T05:59:29  <davehunt> woo ^^ that one actually ran the tests :)
+2011-04-21T05:59:45  <AutomatedTester> hurray
+2011-04-21T06:00:21  <davehunt> now all we need is a way to get it to run using the latest artifact, and to get Mozmill to spit out JUnit style results file
+2011-04-21T06:00:50  <davehunt> I say 'all we need', but we'd probably also need some tidying up and definitely need a load more tests! :)
+2011-04-21T06:08:23  *** larrys has quit IRC
+2011-04-21T06:09:28  *** anatoli has joined #selenium
+2011-04-21T06:10:06  *** adamgoucher has joined #selenium
+2011-04-21T06:12:53  <davehunt> adamgoucher: Mozmill tests are running now
+2011-04-21T06:13:00  <adamgoucher> nice!
+2011-04-21T06:13:13  <davehunt> although they are currently running against 1.0.10 and night the latest artifacts
+2011-04-21T06:13:16  <davehunt> baby steps :)
+2011-04-21T06:14:07  *** csanchez has joined #selenium
+2011-04-21T06:14:36  *** anatoli has quit IRC
+2011-04-21T06:14:58  *** csanchez has joined #selenium
+2011-04-21T06:15:22  *** gronky has joined #selenium
+2011-04-21T06:16:36  <davehunt> and here's some info about the tests: http://blargon7.com/2011/04/testing-selenium-ide-with-mozmill/
+2011-04-21T06:18:06  *** dmachi has quit IRC
+2011-04-21T06:18:10  *** dmachi has joined #selenium
+2011-04-21T06:24:52  <selbot> New news from builds: IDE-MOZMILL-8 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-8>
+2011-04-21T06:25:27  <davehunt> ^^ now results are reported to http://mozmill-crowd.brasstacks.mozilla.com/#/addons/reports
+2011-04-21T06:26:05  <adamgoucher> ironically, se-ide isnt in amo :)
+2011-04-21T06:26:35  <adamgoucher> i think se-ide 2.0 should be a merge of se-ide and mozmill
+2011-04-21T06:26:48  <adamgoucher> and then hand it off to moz to support :P
+2011-04-21T06:26:56  <davehunt> You mean Mozmill IDE?
+2011-04-21T06:27:25  <adamgoucher> sure. that way you could control the browser, and the browser content
+2011-04-21T06:27:54  <davehunt> Mozmill can already do that
+2011-04-21T06:29:55  <adamgoucher> so other than a syntax worse than even selenium's why isn't everyone all over it?
+2011-04-21T06:34:59  <davehunt> partly people don't know about it, partly the syntax
+2011-04-21T06:35:20  <davehunt> also the general purpose isn't for testing content, even though it can
+2011-04-21T06:35:28  <davehunt> Selenium is far better suited to that
+2011-04-21T06:35:46  <davehunt> Hopefully a new FirefoxDriver will provide the best of both worlds
+2011-04-21T06:36:44  <davehunt> Another big part of it is that you can only write tests in JavaScript, and there's no ability to use xUnit type frameworks
+2011-04-21T06:43:15  *** ousado has joined #selenium
+2011-04-21T06:44:57  <ousado> hi all
+2011-04-21T06:45:08  <ousado> where's that webdriver-all.zip?
+2011-04-21T06:46:12  <AutomatedTester> ousado: in the link in the topic?
+2011-04-21T06:47:17  *** larrys has joined #selenium
+2011-04-21T06:48:13  <ousado> AutomatedTester: err, no that links to http://code.google.com/p/selenium/downloads/list
+2011-04-21T06:48:27  <ousado> there's nothing called webdriver
+2011-04-21T06:48:39  <ousado> maybe it's been renamed?
+2011-04-21T06:49:05  *** plightbo has quit IRC
+2011-04-21T06:49:26  <AutomatedTester> ousado: webdriver is now called Selenium 2
+2011-04-21T06:50:04  <ousado> ah, OK, so it's just old docs
+2011-04-21T06:50:09  <AutomatedTester> old docs?
+2011-04-21T06:52:50  <ousado> some docs are not very specific about which binaries to download, and if they actually name the files, those seem to be obsolete, webdriver-all.zip for example
+2011-04-21T06:53:00  <AutomatedTester> link?
+2011-04-21T06:55:07  <ousado> http://seleniumhq.org/docs/03_webdriver.html#getting-and-using-webdriver
+2011-04-21T06:55:25  <ousado> "Unpack the “webdriver-all.zip” you can download from the site"
+2011-04-21T06:56:21  <AutomatedTester> wow those docs are REALLY old
+2011-04-21T06:56:24  *** stepheneb has joined #selenium
+2011-04-21T06:57:23  <AutomatedTester> at the top of that page it is a lot clearer
+2011-04-21T06:57:30  <ousado> ya, looks like it, pretty hard to decide right from wrong here
+2011-04-21T06:57:43  <AutomatedTester> did you try it from the top
+2011-04-21T07:02:22  <davehunt> adamgoucher: We may need to get Bamboo to publish the latest Selenium IDE artefacts somewhere with a consistent name (like selenium-editor-snapshot.xpi) in order for the Mozmill tests to run agains it
+2011-04-21T07:02:57  <adamgoucher> isnt there a 'latest' url alias somewhere
+2011-04-21T07:03:31  <davehunt> that doesn't redirect to the artefact
+2011-04-21T07:03:50  <davehunt> unless you know of some magic URL :)
+2011-04-21T07:04:23  <ousado> heh, well now that you say those are a lot clearer (and you say that it's the selenium-XXX.jar, which is something the docs don't mention), I'll probably have no further problems.
+2011-04-21T07:04:30  *** soc42 has joined #selenium
+2011-04-21T07:04:56  *** Archdude has quit IRC
+2011-04-21T07:05:03  <davehunt> ousado: We're always looking for patches to improve our documentation :)
+2011-04-21T07:05:20  *** Archdude has joined #selenium
+2011-04-21T07:05:27  <ousado> btw, is advanced stuff like drag and drop supported (by some drivers, atleast) ?
+2011-04-21T07:05:46  <adamgoucher> davehunt: magic -> http://xserve.openqa.org:8085/browse/IDE-EDITOR/latest/artifact
+2011-04-21T07:05:49  <AutomatedTester> ousado: yup
+2011-04-21T07:05:59  <AutomatedTester> at the moment its only htmlunit driver
+2011-04-21T07:06:24  *** Archdude has quit IRC
+2011-04-21T07:06:33  <davehunt> adamgoucher: and that's not the XPI, but a page that contains a link to it ;)
+2011-04-21T07:06:49  <davehunt> and the link includes the build number
+2011-04-21T07:07:08  *** Archdude has joined #selenium
+2011-04-21T07:07:10  <ousado> is it possible to say how that works in a few words?
+2011-04-21T07:07:42  <mattp_> should webdriver 2.* be a dropin replacement for 1.* selenium rc? (ie should a perl module for selenium 1.* theoretically work with webdriver doing backward emulation?)
+2011-04-21T07:10:10  <adamgoucher> http://xserve.openqa.org:8085/browse/IDE-EDITOR/latest/artifact/Selenium-IDE-Editor/selenium-ide.xpi 'should' work -- unless that was a 3.x change
+2011-04-21T07:10:27  <davehunt> page not found :(
+2011-04-21T07:13:08  <adamgoucher> nope. that 'should' work
+2011-04-21T07:13:14  <adamgoucher> http://confluence.atlassian.com/display/BAMBOO027/Viewing+a+Build%27s+Artifacts
+2011-04-21T07:14:03  *** csanchez has quit IRC
+2011-04-21T07:15:14  <jarib> davehunt, adamgoucher: http://xserve.openqa.org:8085/browse/IDE-EDITOR-JOB1/latest/artifact/Selenium-IDE-Editor/selenium-ide.xpi
+2011-04-21T07:15:35  <davehunt> nice, thanks jarib
+2011-04-21T07:16:03  <jarib> i suspect it's changed in 3.0 though..
+2011-04-21T07:16:19  <davehunt> unfortunately there are going to be a few hurdles to get this to run
+2011-04-21T07:16:34  <davehunt> alternatively, we wait for Mozmill 2.0, and it should be simpler
+2011-04-21T07:16:46  <adamgoucher> right. ide-editor is the plan. ide-editor-job1 is the 'default job'
+2011-04-21T07:18:05  <davehunt> I'll revisit this when I'm back from vacation
+2011-04-21T07:18:44  <adamgoucher> heh. its vacation time in se land it seems
+2011-04-21T07:19:51  <AutomatedTester> yarp
+2011-04-21T07:19:57  <AutomatedTester> especially for the UK
+2011-04-21T07:20:17  <AutomatedTester> 2x 4 day weekends
+2011-04-21T07:20:22  <AutomatedTester> have to take advantage
+2011-04-21T07:24:03  <selbot2> francois.reynaud less than 10 seconds ago - FrancoisReynaud: adding a debug method to track down issue1586 - http://code.google.com/p/selenium/source/detail?r=12053
+2011-04-21T07:25:58  <davehunt> any news on the #seconf videos?
+2011-04-21T07:26:37  <freynaud> there were still working on them at the week end
+2011-04-21T07:27:05  <davehunt> I would have expected to see some online by now :/
+2011-04-21T07:28:48  *** davehunt is now known as davehunt|away
+2011-04-21T07:33:06  *** andytinkham has joined #selenium
+2011-04-21T07:33:12  *** soc42_ has joined #selenium
+2011-04-21T07:35:53  *** soc42 has quit IRC
+2011-04-21T07:35:54  *** kylls has joined #selenium
+2011-04-21T07:35:54  *** kylls has joined #selenium
+2011-04-21T07:39:02  *** antlong has joined #selenium
+2011-04-21T07:42:16  <AutomatedTester> looks like the Fx5 support could be a rabbit hole...
+2011-04-21T07:42:54  * AutomatedTester goes and play in the safe surronds of python for the rest of his day
+2011-04-21T07:44:11  <adamgoucher> with the rapid release cycles of ff now, i'm not sure even trying to keep up on a se-ide perspective
+2011-04-21T07:44:45  <AutomatedTester> adamgoucher: with davehunt|away's tests you should be ok
+2011-04-21T07:44:51  *** antlong has left #selenium
+2011-04-21T07:45:23  <davehunt|away> my tests are only the start. we will need a lot more
+2011-04-21T07:45:35  <AutomatedTester> oh most definitely
+2011-04-21T07:45:43  <AutomatedTester> but at least we have something now
+2011-04-21T07:46:03  <adamgoucher> but witness the problem davehunt|away was chasing the other day. there is a lot of deep rabbit holes there
+2011-04-21T07:46:42  <davehunt|away> adamgoucher: The one I discovered affects Firefox 3.6 too
+2011-04-21T07:47:39  <davehunt|away> If Simon has seen that his change broke IDE then I'm sure he would have fixed it or backed it out
+2011-04-21T07:48:07  <AutomatedTester> btw, I pinged Julian Simpson today, hopefully will hear from him soon
+2011-04-21T07:48:31  *** kylls1 has joined #selenium
+2011-04-21T07:48:51  *** Chaos|AFK has quit IRC
+2011-04-21T07:49:58  <AutomatedTester> anyone ever heard of Garmr in regards for security testing tools?
+2011-04-21T07:51:08  *** kylls has quit IRC
+2011-04-21T07:53:10  *** esteele is now known as esteele|away
+2011-04-21T07:55:48  *** ian_mac_ has joined #selenium
+2011-04-21T07:56:07  *** kylls has joined #selenium
+2011-04-21T07:56:28  <adamgoucher> nope. though 'blood stained watchdog' is a good name for a security tool
+2011-04-21T07:57:26  <adamgoucher> kinda fails in google though under the weight of yugi-o
+2011-04-21T07:58:03  *** kylls1 has quit IRC
+2011-04-21T08:00:12  *** Archdude has quit IRC
+2011-04-21T08:00:28  *** Archdude has joined #selenium
+2011-04-21T08:01:26  *** Archdude has quit IRC
+2011-04-21T08:02:04  <AutomatedTester> cool
+2011-04-21T08:02:09  *** Archdude has joined #selenium
+2011-04-21T08:02:10  <AutomatedTester> its mine then
+2011-04-21T08:04:46  *** pnitin has joined #selenium
+2011-04-21T08:05:30  <adamgoucher> heh. i was looking for an existing tool -- no wonder it was failing in google :)
+2011-04-21T08:07:24  <ousado> what could be reasons for selenium IDE not recording some clicks (I'm using TreeControl from google closure library)?
+2011-04-21T08:10:37  *** dave_miles has quit IRC
+2011-04-21T08:19:51  *** bebef_1987 has quit IRC
+2011-04-21T08:24:07  *** bracki has quit IRC
+2011-04-21T08:24:24  <AutomatedTester> ousado: it could be that its not noticing the click event firing
+2011-04-21T08:24:40  <AutomatedTester> The IDE tries its best to record but doesnt always do it
+2011-04-21T08:24:57  <AutomatedTester> adamgoucher: whats the URL of our bamboo?
+2011-04-21T08:25:10  <adamgoucher> xserve.openqa.org:8085
+2011-04-21T08:25:55  <AutomatedTester> Julian simpson has replied
+2011-04-21T08:26:09  <AutomatedTester> so getting the ball rolling
+2011-04-21T08:27:46  *** kylls1 has joined #selenium
+2011-04-21T08:29:53  <AutomatedTester> adamgoucher: is the bamboo stuff documented somewhere?
+2011-04-21T08:31:15  *** kylls has quit IRC
+2011-04-21T08:37:44  *** kylls has joined #selenium
+2011-04-21T08:37:44  *** kylls has joined #selenium
+2011-04-21T08:39:33  *** sburjan has quit IRC
+2011-04-21T08:40:39  *** kylls1 has quit IRC
+2011-04-21T08:42:49  *** lfryc is now known as lfryc_away
+2011-04-21T08:43:49  *** SL-BWood has quit IRC
+2011-04-21T08:44:42  *** SL-BWood has joined #selenium
+2011-04-21T08:47:28  *** kylls1 has joined #selenium
+2011-04-21T08:50:01  *** amitev has quit IRC
+2011-04-21T08:50:26  *** kylls has quit IRC
+2011-04-21T08:53:22  <ousado> hrm.. any way to easily identify if an element is currently visible? or do I have to traverse the tree and check on all ancestors for the display attribute?
+2011-04-21T08:54:16  *** kylls has joined #selenium
+2011-04-21T08:56:06  *** kylls1 has quit IRC
+2011-04-21T08:56:08  *** davehunt|away has quit IRC
+2011-04-21T08:59:14  <ousado> ah OK, have to cast it to RenderedWebElement ..
+2011-04-21T09:00:43  *** kylls1 has joined #selenium
+2011-04-21T09:01:01  <ousado> and any way to get the xpath from the webdriver API?
+2011-04-21T09:03:04  *** stepheneb has quit IRC
+2011-04-21T09:03:39  *** kylls has quit IRC
+2011-04-21T09:07:10  <adamgoucher> AutomatedTester: not really...
+2011-04-21T09:07:24  <adamgoucher> more passed through story from generation to generation
+2011-04-21T09:07:42  *** sjmikem has joined #selenium
+2011-04-21T09:10:41  *** kylls has joined #selenium
+2011-04-21T09:12:35  *** kylls1 has quit IRC
+2011-04-21T09:18:12  *** vrockai has quit IRC
+2011-04-21T09:19:46  <xirkus> anyone around who can answer Grid 2 questions?
+2011-04-21T09:32:45  *** towski has joined #selenium
+2011-04-21T09:38:54  <freynaud> xirkus: yes
+2011-04-21T09:48:40  *** ahal has joined #selenium
+2011-04-21T09:50:05  *** sfbrian has joined #selenium
+2011-04-21T09:51:32  *** csanchez has joined #selenium
+2011-04-21T09:51:38  *** csanchez has quit IRC
+2011-04-21T09:52:01  *** csanchez has joined #selenium
+2011-04-21T09:54:20  <xirkus> freynaud: to run tests concurrently in Grid, do you have to specify multiple test classes, or can you have a single test class with multiple tests?
+2011-04-21T09:55:43  <freynaud> the way you structure your test doesnt impact grid
+2011-04-21T09:56:01  <freynaud> if you have you tests running in parallel, grid will execute them in parallel
+2011-04-21T09:56:16  <freynaud> if you send them 1 after the other, grid will run them sequentially
+2011-04-21T09:56:38  <freynaud> what are you using to run your tests ?
+2011-04-21T09:57:34  *** ammar01 has quit IRC
+2011-04-21T09:57:47  <xirkus> that's good to know. I'm using the JUnit runScheduled to run tests in parallell. I was just wondering if this was OK for grid without modifications.
+2011-04-21T09:58:54  <ian_mac_> should be
+2011-04-21T10:00:24  <freynaud> as long as you make sure your tests are not sharing resources
+2011-04-21T10:00:44  <freynaud> you need to be sure that WebDriver driver is unique per test
+2011-04-21T10:03:07  <xirkus> freynaud: I created a framework that encapsulates a RemoteWebDriver instance to make it effectively thread-safe.
+2011-04-21T10:05:28  <freynaud> i don't know JUnit. If it always assign a unique thread per test method, then you're good :)
+2011-04-21T10:06:04  *** nitin_ has joined #selenium
+2011-04-21T10:06:38  <xirkus> I do have a question regarding an error message that I get when running through Grid - HTTP ERROR: 501 Method {"ID":"7"}GET is not defined in RFC 2068 and is not supported by the Servlet API
+2011-04-21T10:07:11  <xirkus> I only get these errors when I run against Grid 2 regardless of whether or not I run the tests concurrently.
+2011-04-21T10:07:25  *** pnitin has quit IRC
+2011-04-21T10:08:31  <freynaud> cool
+2011-04-21T10:08:43  <freynaud> do you have a sinmple test that reproduces it ?
+2011-04-21T10:08:44  <freynaud> http://code.google.com/p/selenium/issues/detail?id=1586
+2011-04-21T10:08:52  <freynaud>  can't reproduce it mysle
+2011-04-21T10:08:53  <freynaud> f
+2011-04-21T10:09:22  *** jganot has left #selenium
+2011-04-21T10:11:34  <xirkus> Let me see if I can create one that does not depend on the application under test. I'll append it to the 1586 when it's done.
+2011-04-21T10:12:39  <adamgoucher> RossPatterson: sounds like youre volunteering to setup and curate planet.seleniumhq.org :)
+2011-04-21T10:13:15  <xirkus> freynaud: I'll attach my stack trace to the issue ...
+2011-04-21T10:13:49  <RossPatterson> adamgoucher: Maybe.  I don't want to see the Smattering fall away - I like the idea of curated posts, not just machine-collected.  But yeah, maybe.
+2011-04-21T10:14:07  *** Archdude_ has joined #selenium
+2011-04-21T10:14:12  <adamgoucher> if anything it would make my job easuer
+2011-04-21T10:14:18  <RossPatterson> Good to know.
+2011-04-21T10:14:35  <RossPatterson> P.S. #aws #fail big time, but not totally.
+2011-04-21T10:14:47  <adamgoucher> or at least, maybe collect things that arent on twitter which is where the smattering comes from now
+2011-04-21T10:14:55  <RossPatterson> Our SVN and TeamCity system is offline :-(
+2011-04-21T10:15:06  *** Archdude_ has quit IRC
+2011-04-21T10:15:47  *** Archdude_ has joined #selenium
+2011-04-21T10:16:01  <RossPatterson> I mean, I could spit on Amazon's Northern Virginia data center on my way home.  So no SVN suxors.
+2011-04-21T10:16:20  <RossPatterson> I
+2011-04-21T10:16:22  <RossPatterson> I
+2011-04-21T10:16:23  *** Archdude has quit IRC
+2011-04-21T10:16:24  *** Archdude_ is now known as Archdude
+2011-04-21T10:16:26  <RossPatterson> AARRGGHH
+2011-04-21T10:16:49  <RossPatterson> I'll look into the exact setup for Planet in prep for someone saying "Progammator, code thyself."
+2011-04-21T10:20:31  *** Archdude has quit IRC
+2011-04-21T10:21:08  *** Archdude has joined #selenium
+2011-04-21T10:22:06  <RossPatterson> "Planet Venus" is written by a guy named Ruby.  In Python.  Huh?
+2011-04-21T10:22:24  *** adamgoucher has quit IRC
+2011-04-21T10:22:32  *** Archdude_ has joined #selenium
+2011-04-21T10:25:23  *** Archdude has quit IRC
+2011-04-21T10:25:24  *** Archdude_ is now known as Archdude
+2011-04-21T10:29:15  *** esteele|away is now known as esteele
+2011-04-21T10:30:42  *** Archdude_ has joined #selenium
+2011-04-21T10:32:08  *** zmijunkie has quit IRC
+2011-04-21T10:32:26  *** Archdude_ has joined #selenium
+2011-04-21T10:32:39  *** Archdude has quit IRC
+2011-04-21T10:32:39  *** Archdude_ is now known as Archdude
+2011-04-21T10:35:19  *** kylls1 has joined #selenium
+2011-04-21T10:38:22  *** kylls has quit IRC
+2011-04-21T10:38:45  *** zmijunkie has joined #selenium
+2011-04-21T10:38:48  *** adamgoucher has joined #selenium
+2011-04-21T11:01:37  *** kylls1 has quit IRC
+2011-04-21T11:02:21  *** toseter has quit IRC
+2011-04-21T11:03:11  *** toseter has joined #selenium
+2011-04-21T11:06:16  <AutomatedTester> RossPatterson: +1 for a planet style
+2011-04-21T11:06:27  <AutomatedTester> we do it at Mozilla
+2011-04-21T11:08:55  *** zmijunkie has quit IRC
+2011-04-21T11:12:50  <RossPatterson> AT: Yeah, Planet seems to be the way to go for anything worthwhile.  And I don't think it requires much care and feeding.  Although it appears I might find out :-)
+2011-04-21T11:32:04  *** AutomatedTester has quit IRC
+2011-04-21T11:34:18  *** anatoli has joined #selenium
+2011-04-21T11:34:42  *** anatol___ has joined #selenium
+2011-04-21T11:34:42  *** anatoli has quit IRC
+2011-04-21T11:35:22  *** Spanktar has joined #selenium
+2011-04-21T11:49:42  <miker2> Is there a straight-forward way of testing JavaScript changes to the Firefox driver?
+2011-04-21T11:51:16  <miker2> I have the source locally and have the project setup in eclipse.  I added some dummy logging to verify my setup was correct but don't see the output when I run the tests.
+2011-04-21T11:55:29  *** freynaud has left #selenium
+2011-04-21T11:57:59  *** csanchez_ has joined #selenium
+2011-04-21T12:01:13  *** frohoff has quit IRC
+2011-04-21T12:01:22  *** frohoff has joined #selenium
+2011-04-21T12:02:00  *** csanchez has quit IRC
+2011-04-21T12:02:00  *** csanchez_ is now known as csanchez
+2011-04-21T12:03:09  *** antlong has joined #selenium
+2011-04-21T12:03:26  <antlong> anyone around, whos intimately familiar with captureNetworkTraffic?
+2011-04-21T12:03:39  <antlong> will buy a beer for anyone who helps :D
+2011-04-21T12:09:05  <andytinkham> antlong: I'm around but know nothing about captureNetworkTraffic. Can I still have a beer?
+2011-04-21T12:09:16  <antlong> sadly not
+2011-04-21T12:09:26  <andytinkham> *sigh*
+2011-04-21T12:10:03  <RossPatterson> Se 1 or 2?
+2011-04-21T12:10:18  <antlong> 1
+2011-04-21T12:11:25  <RossPatterson> I'm not *cough* intimate with it, but I know a little sumpin sumpin.  Whaddaya need?
+2011-04-21T12:12:16  <antlong> ha
+2011-04-21T12:12:33  <antlong> so using 'json' its capturing quite a bit, except for what i REALLY need it to capture
+2011-04-21T12:12:53  <antlong> which are two POSTs that are made when the page loads
+2011-04-21T12:12:57  *** adamgoucher has quit IRC
+2011-04-21T12:13:25  <RossPatterson> Are you sure the POSTs go though the RC proxy?  You can find them in the Jetty log?
+2011-04-21T12:13:52  <antlong> let me check
+2011-04-21T12:19:46  <antlong> hmn
+2011-04-21T12:20:18  <antlong> im seeing rpc's now, but it doesnt seem like its updating when i change pages
+2011-04-21T12:20:27  <RossPatterson> I ask because RC starts recording during the getNewBrowserSession command, so they oughta be there.
+2011-04-21T12:20:55  <antlong> i see one from the first page i hit, i open() another page, and i should then see two
+2011-04-21T12:23:05  <antlong> it might be a timing issue
+2011-04-21T12:24:11  <RossPatterson> Anything handled by the proxy should show up in the network traffic results.  The collected traffic is only discarded by the getNewBrowserSession and captureNetworkTraffic commands.
+2011-04-21T12:24:17  *** gronky has quit IRC
+2011-04-21T12:24:27  <antlong> hmn
+2011-04-21T12:33:00  <xirkus> antlong: tried Fiddler?
+2011-04-21T12:33:45  <antlong> nah, this is a one off deal
+2011-04-21T12:34:10  <xirkus> fair enough.
+2011-04-21T12:39:48  *** gronky has joined #selenium
+2011-04-21T12:45:34  *** nirvdrum has quit IRC
+2011-04-21T12:53:53  *** miker2 has quit IRC
+2011-04-21T12:58:31  *** RossPatterson has quit IRC
+2011-04-21T13:01:56  *** skiphuffman__ has quit IRC
+2011-04-21T13:13:18  *** adamgoucher has joined #selenium
+2011-04-21T13:15:41  *** cburroughs has quit IRC
+2011-04-21T13:19:37  <adamgoucher> antlong: if you are still looking at the network stuff, plightbo had added a bunch of stuff to the browsermob proxy that might help
+2011-04-21T13:22:50  <antlong> adamgoucher: ive seen, it looks good. im actually just about done. gwt really throws you for a loop sometimes
+2011-04-21T13:23:25  *** soc42_ has quit IRC
+2011-04-21T13:28:36  *** esteele has quit IRC
+2011-04-21T13:44:31  *** ahal has quit IRC
+2011-04-21T14:13:42  *** nirvdrum has joined #selenium
+2011-04-21T14:22:21  *** ian_mac_ has quit IRC
+2011-04-21T14:29:30  <xirkus> anyone know how well Grid works against https ?
+2011-04-21T14:44:53  <nirvdrum> As well as non-grid does.
+2011-04-21T14:45:11  <nirvdrum> All grid does is delegate to the selenium driver.
+2011-04-21T14:47:43  *** mbeierl has quit IRC
+2011-04-21T14:48:12  *** toseter has quit IRC
+2011-04-21T14:49:53  *** SL-BWood has quit IRC
+2011-04-21T14:50:53  *** esteele has joined #selenium
+2011-04-21T15:13:15  *** antlong has quit IRC
+2011-04-21T15:16:47  *** sjmikem has quit IRC
+2011-04-21T15:27:19  *** frohoff has quit IRC
+2011-04-21T15:27:30  *** frohoff has joined #selenium
+2011-04-21T15:37:46  *** andytinkham has quit IRC
+2011-04-21T15:43:48  *** gronky has quit IRC
+2011-04-21T15:56:42  *** stepheneb has joined #selenium
+2011-04-21T16:01:44  *** antlong has joined #selenium
+2011-04-21T16:02:16  <antlong> there is something really funky with captureNetworkTraffic
+2011-04-21T16:12:27  *** Archdude_ has joined #selenium
+2011-04-21T16:13:27  *** Archdude_ has quit IRC
+2011-04-21T16:14:15  *** Archdude_ has joined #selenium
+2011-04-21T16:14:38  *** Archdude has quit IRC
+2011-04-21T16:14:39  *** Archdude_ is now known as Archdude
+2011-04-21T16:17:30  *** Archdude has quit IRC
+2011-04-21T16:18:16  *** Archdude has joined #selenium
+2011-04-21T16:19:37  *** Archdude has joined #selenium
+2011-04-21T16:22:15  *** antlong has quit IRC
+2011-04-21T16:24:13  *** Archdude has quit IRC
+2011-04-21T16:24:59  *** Archdude has joined #selenium
+2011-04-21T16:25:35  *** Archdude has quit IRC
+2011-04-21T16:26:23  *** Archdude has joined #selenium
+2011-04-21T16:29:22  *** Archdude has quit IRC
+2011-04-21T16:30:04  *** Archdude has joined #selenium
+2011-04-21T16:31:25  *** Archdude has joined #selenium
+2011-04-21T16:36:12  *** Archdude has quit IRC
+2011-04-21T16:36:53  *** Archdude has joined #selenium
+2011-04-21T16:37:28  *** Archdude has quit IRC
+2011-04-21T16:38:13  *** Archdude has joined #selenium
+2011-04-21T16:43:44  *** csanchez has quit IRC
+2011-04-21T16:43:55  *** antlong has joined #selenium
+2011-04-21T16:46:02  *** Archdude has quit IRC
+2011-04-21T16:46:22  *** Archdude has joined #selenium
+2011-04-21T16:46:47  <antlong> adamgoucher have you messed around with captureNetworkTraffic much?
+2011-04-21T16:46:55  <antlong> i found this bug that I can't believe i'm the only one to notice
+2011-04-21T16:47:18  *** Archdude has quit IRC
+2011-04-21T16:47:43  *** stepheneb has quit IRC
+2011-04-21T16:48:01  *** Archdude has joined #selenium
+2011-04-21T16:55:18  *** Archdude has quit IRC
+2011-04-21T16:55:39  *** Archdude has joined #selenium
+2011-04-21T16:57:24  *** Archdude has joined #selenium
+2011-04-21T16:59:35  *** stepheneb has joined #selenium
+2011-04-21T17:05:51  *** Archdude has quit IRC
+2011-04-21T17:06:04  *** charleyb has quit IRC
+2011-04-21T17:06:08  *** Archdude has joined #selenium
+2011-04-21T17:07:54  *** Archdude has joined #selenium
+2011-04-21T17:08:21  *** charleyb has joined #selenium
+2011-04-21T17:08:35  *** stepheneb has quit IRC
+2011-04-21T17:09:21  *** Spanktar has quit IRC
+2011-04-21T17:13:11  *** towski has quit IRC
+2011-04-21T17:27:02  <adamgoucher> antlong: capture network is going to be deprecated in favor of a proxy
+2011-04-21T17:49:22  *** Archdude has quit IRC
+2011-04-21T17:49:39  *** Archdude has joined #selenium
+2011-04-21T17:51:11  *** sjmikem has joined #selenium
+2011-04-21T17:51:31  *** Archdude has joined #selenium
+2011-04-21T17:56:37  *** Archdude has quit IRC
+2011-04-21T17:56:59  *** Archdude has joined #selenium
+2011-04-21T17:57:56  *** Archdude has quit IRC
+2011-04-21T17:58:30  *** miker2 has joined #selenium
+2011-04-21T17:58:42  *** Archdude has joined #selenium
+2011-04-21T17:59:16  *** stepheneb has joined #selenium
+2011-04-21T18:01:29  *** Archdude has quit IRC
+2011-04-21T18:02:13  *** Archdude has joined #selenium
+2011-04-21T18:02:20  *** sjmikem has quit IRC
+2011-04-21T18:02:47  *** Archdude has quit IRC
+2011-04-21T18:03:33  *** Archdude has joined #selenium
+2011-04-21T18:18:14  *** dmachi1 has joined #selenium
+2011-04-21T18:18:14  *** dmachi has quit IRC
+2011-04-21T18:44:49  *** Archdude has quit IRC
+2011-04-21T18:45:07  *** Archdude has joined #selenium
+2011-04-21T18:46:08  *** Archdude has quit IRC
+2011-04-21T18:46:52  *** Archdude has joined #selenium
+2011-04-21T19:03:12  *** esteele is now known as esteele|away
+2011-04-21T19:03:41  *** dhackner has joined #selenium
+2011-04-21T19:23:25  *** sfbrian has quit IRC
+2011-04-21T19:31:24  *** miker2 has quit IRC
+2011-04-21T19:55:04  *** nitin_ has quit IRC
+2011-04-21T20:11:57  *** ian_mac has quit IRC
+2011-04-21T20:40:57  *** ian_mac has joined #selenium
+2011-04-21T20:57:10  *** pnitin has joined #selenium
+2011-04-21T21:27:23  *** Fyrespray has joined #selenium
+2011-04-21T21:29:00  *** Fyrespray^ has quit IRC
+2011-04-21T21:31:48  *** Fyrespray^ has joined #selenium
+2011-04-21T21:33:21  *** Fyrespray has quit IRC
+2011-04-21T21:37:30  *** Fyrespray^ has quit IRC
+2011-04-21T21:37:56  *** Fyrespray has joined #selenium
+2011-04-21T21:43:08  *** Fyrespray has quit IRC
+2011-04-21T21:47:10  *** pnitin has quit IRC
+2011-04-21T21:47:19  *** pnitin has joined #selenium
+2011-04-21T21:48:30  <antlong> what is kevin maynards' nick?
+2011-04-21T22:14:40  *** dhackner has quit IRC
+2011-04-21T22:35:41  *** Fyrespray has joined #selenium
+2011-04-21T22:40:04  *** Fyrespray has quit IRC
+2011-04-21T23:03:22  *** stepheneb has quit IRC
+2011-04-21T23:56:39  <selbot> New news from builds: IDE-MOZMILL-8 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-8> || IDE-MOZMILL-7 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-7> || IDE-MOZMILL-6 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-6> || IDE-MOZMILL-5 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-5> || IDE-MOZMILL-4 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-4> || IDE-MOZMILL-3 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-3> || IDE-MOZMILL-2 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-2> || IDE-MOZMILL-1 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-1> || IDE-IDE-91 was SUCCESSFUL : Dependant of IDE-EDITOR-113 <http://xserve.openqa.org:8085/browse/IDE-IDE-91> || IDE-EDITOR-113 was SUCCESSFUL : Updated by adam_goucher@hotmail.com <http://xserve.openqa.org:8085/browse/IDE-EDITOR-113> || IDE-IDE-90 was SUCCESSFUL : Dependant of IDE-EDITOR-112 <http://xserve.openqa.org:8085/browse/IDE-IDE-90> || IDE-EDITOR-112 was SUCCESSFUL : Updated by adam_goucher@hotmail.com <http://xserve.openqa.org:8085/browse/IDE-EDITOR-112>

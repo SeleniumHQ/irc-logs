@@ -1,0 +1,993 @@
+2011-02-22T00:00:55  *** zmijunkie has joined #selenium
+2011-02-22T00:09:04  *** Putr is now known as Putr|Away
+2011-02-22T00:09:19  *** dmachi1 has quit IRC
+2011-02-22T00:09:34  *** dmachi has joined #selenium
+2011-02-22T00:19:56  *** simonstewart has joined #selenium
+2011-02-22T00:20:04  <simonstewart> G'day all
+2011-02-22T00:20:24  <jarib> hey
+2011-02-22T00:20:49  <simonstewart> hej, perhaps?
+2011-02-22T00:20:52  <jarib> hei
+2011-02-22T00:21:00  <simonstewart> hai!
+2011-02-22T00:21:01  <jarib> hej is swedish
+2011-02-22T00:21:16  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Fix an obvious problem with the get attribute method's fallback - http://code.google.com/p/selenium/source/detail?r=11510
+2011-02-22T00:21:21  <simonstewart> Wondered how close Norwegian and Swedish were
+2011-02-22T00:21:49  <jarib> pretty close, we can all understand each other if we talk slowly
+2011-02-22T00:22:12  <jarib> that includes danish as well, but they have to talk *really* slow for anyone to understand them
+2011-02-22T00:23:16  <jarib> danish is becoming less and less articulated - it's at a point now where speech development in children is actually proven slower in denmark than in norway/sweden
+2011-02-22T00:23:40  <simonstewart> wow
+2011-02-22T00:24:18  <jarib> yeah, pretty crazy
+2011-02-22T00:25:22  <jarib> simonstewart: do you know in what cases the reflection in CommandLine.canExecute will fail?
+2011-02-22T00:25:29  <jarib> Java 5?
+2011-02-22T00:25:47  <eranm> Yes, Java 5
+2011-02-22T00:25:56  <eranm> simonstewart, when are you back from Tokyo? Friday?
+2011-02-22T00:27:48  <jarib> eranm: it appears to fail on the  bamboo linux vm as well, which is definitely running java 6
+2011-02-22T00:28:20  <jarib> failing as in the method returning true for non-existing files, for example
+2011-02-22T00:28:40  <eranm> But the reflection itself passes, I take it?
+2011-02-22T00:29:11  <jarib> i don't know
+2011-02-22T00:30:22  <jarib> i haven't checked whether it successfully invokes the method or drops down to the last "return true"
+2011-02-22T00:30:39  <jarib> i just added the top guard there
+2011-02-22T00:31:39  <jarib> now it's able to find firefox, but i have a bunch of failing tests that are passing locally (RC-client)
+2011-02-22T00:32:36  <jarib> so wondered if it could be related
+2011-02-22T00:32:56  <eranm> Not sure. Let me check what's using this call
+2011-02-22T00:33:13  <jarib> i don't really get how they use isWritable to check if a file is executable
+2011-02-22T00:36:47  <jarib> setWritable i mean
+2011-02-22T00:37:47  <eranm> It doesn't look right, I agree
+2011-02-22T00:38:01  <jarib> i guess that implies exists() && !directory()
+2011-02-22T00:38:14  <eranm> A directory can be writable
+2011-02-22T00:43:41  <jarib> ok, so it's a permissions check
+2011-02-22T00:44:13  <simonstewart> I fly back on Friday. should be in the office on Monday
+2011-02-22T00:44:49  <simonstewart> jarib: the reflection in command line only works on Java 6 and above
+2011-02-22T00:45:17  <simonstewart> cos that's when the method got added
+2011-02-22T00:45:57  <eranm> simonstewart, the code clearly documents that. What the code doesn't document is why we call setWriteable to check if a file is executable
+2011-02-22T00:48:43  <simonstewart> Looks like the "canExecute" method was added to File in JDK6. Looks like a thinko in the command line class
+2011-02-22T00:50:13  <simonstewart> I'll fix it up now
+2011-02-22T00:50:23  <simonstewart> And by "now" I mean "once the tests are complete"
+2011-02-22T00:54:34  *** Putr|Away is now known as Putr
+2011-02-22T01:03:33  <jarib>  i'll figure out what part of canExecute fails on the VM
+2011-02-22T01:03:40  *** Snekatis has joined #selenium
+2011-02-22T01:05:55  <simonstewart> In it goes
+2011-02-22T01:06:16  <selbot2> simon.m.stewart half a minute ago - SimonStewart: The CommandLine should check canExecute rather than setWritable - http://code.google.com/p/selenium/source/detail?r=11511
+2011-02-22T01:07:03  <jarib> on the bamboo vm, JDK6_CAN_EXECUTE is null, and java -version reports Java(TM) SE Runtime Environment (build 1.6.0_24-b07)
+2011-02-22T01:07:37  <jarib> confirming my suspicion
+2011-02-22T01:10:04  <jarib> bb ~30m
+2011-02-22T01:13:30  *** sburjan has joined #selenium
+2011-02-22T01:13:31  <simonstewart> Gosh, I'm feeling grumpy about the bugs
+2011-02-22T01:17:50  *** rb2k has joined #selenium
+2011-02-22T01:18:06  <rb2k> I get a 'sessionId should not be null' error when trying to open a page... any idea what could cause that?
+2011-02-22T01:18:19  <rb2k> threre seem to be a lot of hits on google, but most of them >2 years old
+2011-02-22T01:18:29  <rb2k> (selenium b2 + stable ruby gem)
+2011-02-22T01:19:17  <simonstewart> ... that's a little out of the blue. Which command are you trying to execute?
+2011-02-22T01:19:52  <rb2k> cmd=open
+2011-02-22T01:20:06  <rb2k> The only odd thing is that I'm switching between sites
+2011-02-22T01:21:23  <rb2k> hmm
+2011-02-22T01:21:31  <rb2k> maybe I keep an old reference to the selenium object arround
+2011-02-22T01:21:43  <rb2k> *testing*
+2011-02-22T01:24:25  *** nitin has joined #selenium
+2011-02-22T01:25:00  <rb2k> yeah, that was it
+2011-02-22T01:25:00  <rb2k> :)
+2011-02-22T01:25:41  *** pnitin has quit IRC
+2011-02-22T01:25:47  <simonstewart> heh. Glad to have helped :)
+2011-02-22T01:33:12  *** nitin_ has joined #selenium
+2011-02-22T01:33:41  *** nitin has quit IRC
+2011-02-22T01:37:29  <simonstewart> toodle pip, everyone
+2011-02-22T01:37:33  *** simonstewart has left #selenium
+2011-02-22T01:40:26  *** admc has left #selenium
+2011-02-22T01:43:16  <jarib> eranm: so any idea why that getMethod call would fail? i have a feeling i'll get rid of these other test failures specific to that machine if i can figure it out
+2011-02-22T01:45:54  <eranm> jarib, Perhaps the version of java executed is not the one you get from the PATH when you run java from the command line?
+2011-02-22T01:46:34  *** AutomatedTester has joined #selenium
+2011-02-22T01:53:21  *** csanchez has quit IRC
+2011-02-22T01:56:44  <jarib> eranm: i was using the same command line to check
+2011-02-22T02:04:33  *** mayanks43 has joined #selenium
+2011-02-22T02:08:30  *** dave_miles_cf has quit IRC
+2011-02-22T02:25:17  *** nitin_ has quit IRC
+2011-02-22T02:29:52  *** nitin_ has joined #selenium
+2011-02-22T02:30:46  <eranm> Hmm. Odd.
+2011-02-22T02:31:27  <eranm> In an hour or so I'll be able to have a look. I'll write a small test to invoke this method and see what's going on
+2011-02-22T02:34:53  <jarib> eranm: that'd be awesome
+2011-02-22T02:35:58  *** nitin__ has joined #selenium
+2011-02-22T02:36:07  *** nitin_ has quit IRC
+2011-02-22T02:51:20  *** pnitin has joined #selenium
+2011-02-22T02:51:24  *** nitin__ has quit IRC
+2011-02-22T02:51:44  *** mayanks43 has quit IRC
+2011-02-22T03:04:28  *** mayanks43 has joined #selenium
+2011-02-22T03:11:00  *** mbeierl has joined #selenium
+2011-02-22T03:13:16  *** Snekatis has quit IRC
+2011-02-22T03:14:15  *** Snekatis has joined #selenium
+2011-02-22T03:27:43  *** sephinroth has quit IRC
+2011-02-22T03:32:58  *** nitin has joined #selenium
+2011-02-22T03:33:25  *** pnitin has quit IRC
+2011-02-22T03:44:33  *** AutomatedTester has quit IRC
+2011-02-22T03:45:41  *** dereke has joined #selenium
+2011-02-22T03:51:00  *** mbeierl has quit IRC
+2011-02-22T03:53:52  *** ryzer has quit IRC
+2011-02-22T04:00:24  *** ryzer has joined #selenium
+2011-02-22T04:00:47  <eranm> jarib, still there?
+2011-02-22T04:06:34  *** AutomatedTester has joined #selenium
+2011-02-22T04:14:43  *** kylls has joined #selenium
+2011-02-22T04:15:39  *** rbalent has joined #selenium
+2011-02-22T04:22:44  *** Snekatis has joined #selenium
+2011-02-22T04:31:06  *** Putr is now known as Putr|Away
+2011-02-22T04:37:03  *** mbeierl has joined #selenium
+2011-02-22T04:38:25  <eranm> jarib, well, there was no reason for this to pass - the code was all wrong.
+2011-02-22T04:43:46  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Preparing to switch all core based tests to junit - http://code.google.com/p/selenium/source/detail?r=11512
+2011-02-22T04:45:25  *** nirvdrum has joined #selenium
+2011-02-22T04:53:23  *** nirvdrum has quit IRC
+2011-02-22T04:54:00  *** nirvdrum has joined #selenium
+2011-02-22T04:57:13  <jarib> eranm: right
+2011-02-22T04:57:33  <jarib> eranm: it's just that i have some other weird test failures only happening on that machine
+2011-02-22T04:58:51  <jarib> and the rc stuff is hard to debug... just had a feeling that the reason it couldn't find the method may be the cause of other failures as well.
+2011-02-22T04:59:15  <jarib> thanks for the help though :)
+2011-02-22T05:03:58  <eranm> I'll submit a fix for this method
+2011-02-22T05:04:09  <eranm> but I can't find proper logs from this machine on bamboo
+2011-02-22T05:05:04  *** mbeierl has quit IRC
+2011-02-22T05:09:18  <jarib> eranm: i thought simon's commit fixed that particular case
+2011-02-22T05:09:24  <jarib> what logs are you looking for?
+2011-02-22T05:09:58  <eranm> The logs with the failures you described
+2011-02-22T05:11:05  <eranm> jarib, I didn't notice he fixed it.
+2011-02-22T05:12:08  *** ian_mac2 has quit IRC
+2011-02-22T05:12:09  <eranm> 都響
+2011-02-22T05:12:18  <eranm> Hmm
+2011-02-22T05:12:39  <jarib> r11511
+2011-02-22T05:12:41  <selbot2> simon.m.stewart about 4 hours ago - SimonStewart: The CommandLine should check canExecute rather than setWritable - http://code.google.com/p/selenium/source/detail?r=11511
+2011-02-22T05:14:20  <selbot2> tkumarb less than a minute ago - tkumarb: Modified Page Object Design pattern in chapter 6 as per review comments from Paul. - http://code.google.com/p/selenium/source/detail?r=11513
+2011-02-22T05:14:20  *** AutomatedTester has quit IRC
+2011-02-22T05:14:32  <jarib> eranm: the failures don't seem directly related, but since i can't get them to fail anywhere else and something is funky with the JVM in that VM: http://xserve.openqa.org:8085/browse/S2RB-RCINT-JOB1-44/log
+2011-02-22T05:16:04  <jarib> eranm: your time is probably better spent somewhere else, nevermind this :)
+2011-02-22T05:16:09  *** AutomatedTester has joined #selenium
+2011-02-22T05:16:15  <jarib> bamboo is way too shaky anyway.
+2011-02-22T05:17:38  *** mbeierl has joined #selenium
+2011-02-22T05:17:58  *** Putr|Away is now known as Putr
+2011-02-22T05:18:24  *** cburroughs has joined #selenium
+2011-02-22T05:20:27  <selbot> New news from builds: WEB-SEHQ-76 was SUCCESSFUL : Updated by tkumarb <http://xserve.openqa.org:8085/browse/WEB-SEHQ-76>
+2011-02-22T05:24:10  *** cpg is now known as cpg|away
+2011-02-22T05:25:15  <eranm> jarib, you're right, these failures are odd
+2011-02-22T05:27:57  *** mbeierl has quit IRC
+2011-02-22T05:39:53  <jarib> eranm: looks like it's using a 32-bit firefox in a 64-bit VM
+2011-02-22T05:39:56  <jarib> ?
+2011-02-22T05:40:33  <eranm> That should be fine
+2011-02-22T05:40:46  <eranm> the 32 bit firefox is the one we officially support (since that's the only one released)
+2011-02-22T05:41:48  <eranm> We launch another process, it should be fine
+2011-02-22T05:42:02  *** esteele has joined #selenium
+2011-02-22T05:42:21  *** esteele is now known as esteele|away
+2011-02-22T05:46:20  *** sburjan has quit IRC
+2011-02-22T05:55:00  *** nitin has quit IRC
+2011-02-22T05:55:12  *** gnofi has joined #selenium
+2011-02-22T05:56:15  *** RossPatterson has joined #selenium
+2011-02-22T06:01:03  <jarib> eranm: i wasn't aware a 32-bit build would run without some extra packages on 64-bit
+2011-02-22T06:01:34  <jarib> i've been using 3.7pre-something at work for that reason. which works fine.
+2011-02-22T06:01:54  *** AutomatedTester_ has joined #selenium
+2011-02-22T06:03:42  *** AutomatedTester has quit IRC
+2011-02-22T06:03:42  *** AutomatedTester_ is now known as AutomatedTester
+2011-02-22T06:10:43  <eranm> jarib, assuming you're using an Ubuntu / Debian machine you can apt-get install ia32-libs
+2011-02-22T06:10:53  <eranm> which provides a bunch of libraries for backwards compatibility with 32 bit programs
+2011-02-22T06:11:31  <eranm> The biggest hurdle is getting all of the native components on Linux to support 32 bit and 64 bit (64 bit firefox being the unofficial one shipped with Ubuntu / Debian)
+2011-02-22T06:14:02  <jarib> right
+2011-02-22T06:14:07  <jarib> i'm not using native events atm
+2011-02-22T06:14:18  <jarib> though i'd probably like to in the future
+2011-02-22T06:14:33  <eranm> There really isn't any reason not to
+2011-02-22T06:14:40  <jarib> the main issue is /tmp/switch_window
+2011-02-22T06:14:47  *** ojacobson has joined #selenium
+2011-02-22T06:15:03  <eranm> That's a tricky bit
+2011-02-22T06:15:27  <jarib> with 36 browsers on the same machine, that's asking for trouble :P
+2011-02-22T06:15:37  <eranm> I haven't yet fully thought about how to solve this - Perhaps using the process's PID to make sure the file is unique
+2011-02-22T06:16:12  <eranm> But then I'd have to add to the native events library another call, to get the process's pid
+2011-02-22T06:16:30  <eranm> since I don't believe there's any interface in xpcom that exposes that :)
+2011-02-22T06:17:48  <eranm> That's probably the best solution. I'll let you know when that is solved.
+2011-02-22T06:20:26  <jarib> yep
+2011-02-22T06:21:44  *** vrockai has joined #selenium
+2011-02-22T06:24:45  *** esteele|away has left #selenium
+2011-02-22T06:25:29  *** soc42 has joined #selenium
+2011-02-22T06:29:19  <jarib> eranm: want me to create an issue for this?
+2011-02-22T06:29:42  <eranm> There may be one. But if there isn't, it's a good idea
+2011-02-22T06:29:53  <jarib> couldn't find it
+2011-02-22T06:30:12  *** soc42 has quit IRC
+2011-02-22T06:32:14  <jarib> created #1326
+2011-02-22T06:32:14  <selbot2> eran....@gmail.com open/accepted Firefox + native evnets: /tmp/switch_window_started prevents parallel execution - http://code.google.com/p/selenium/issues/detail?id=1326
+2011-02-22T06:32:19  *** soc42 has joined #selenium
+2011-02-22T06:55:04  *** nirvdrum has quit IRC
+2011-02-22T06:56:28  *** ryzer is now known as ryzer-afk
+2011-02-22T07:05:29  *** andytinkham has joined #selenium
+2011-02-22T07:08:19  *** stlewis has quit IRC
+2011-02-22T07:11:23  *** nirvdrum has joined #selenium
+2011-02-22T07:11:28  *** andytinkham has quit IRC
+2011-02-22T07:15:09  *** andytinkham has joined #selenium
+2011-02-22T07:21:03  *** nitin has joined #selenium
+2011-02-22T07:21:18  *** mattmtl has quit IRC
+2011-02-22T07:24:10  *** csanchez has joined #selenium
+2011-02-22T07:24:31  *** santiycr has joined #selenium
+2011-02-22T07:28:34  *** antlong has joined #selenium
+2011-02-22T07:39:32  *** mattmtl has joined #selenium
+2011-02-22T07:40:18  *** aikie has joined #selenium
+2011-02-22T07:41:02  <selbot2> simon.m.stewart 8 minutes ago - SimonStewart: Move the core-based selenium rc tests to use junit instead of testng - http://code.google.com/p/selenium/source/detail?r=11514
+2011-02-22T07:41:20  <aikie> hello, as far as I can see it's only possible to create screenshots when you have the browser running locally
+2011-02-22T07:41:52  <aikie> is it also possible to do it remote? using selenium-server?
+2011-02-22T07:41:56  <AutomatedTester> aikie: if you get it to return the to_string version then you can write it anywhere
+2011-02-22T07:42:14  <AutomatedTester> it returns a base64 string you can then convert
+2011-02-22T07:43:08  <aikie> oops I'm lost already
+2011-02-22T07:43:56  <aikie> you're saying the toString of RemoteWebDriver returns the base64 encode screenshot?
+2011-02-22T07:44:20  <AutomatedTester> so you using Java?
+2011-02-22T07:44:23  <AutomatedTester> and this is Se2?
+2011-02-22T07:46:13  <aikie> yes, forgot to mention, using Java webdriver client and selenium server, both are se2b1
+2011-02-22T07:47:49  *** LRain has joined #selenium
+2011-02-22T07:47:55  <AutomatedTester> getScreenshotAs appears to return you a temp file that you can then do what you want with
+2011-02-22T07:56:11  *** JuanDaugherty has joined #selenium
+2011-02-22T07:56:50  <JuanDaugherty> on the site pages at the bottom where it gives an update date, that's just always the current date isn't it?
+2011-02-22T07:57:17  <AutomatedTester> JuanDaugherty: context?
+2011-02-22T07:58:09  <JuanDaugherty> e.g.: http://seleniumhq.org/docs/01_introducing_selenium.html#the-documentation-team-authors-past-and-present
+2011-02-22T07:59:02  <selbot> New news from builds: WEB-SEHQ-76 was SUCCESSFUL : Updated by Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-76>
+2011-02-22T07:59:03  <AutomatedTester> we are working on our docs but Google Code throwing 500 errors so cant check
+2011-02-22T07:59:12  <AutomatedTester> ahh thanks selbot
+2011-02-22T07:59:26  <AutomatedTester> JuanDaugherty: ^ that selbot message shows we just updated the site
+2011-02-22T07:59:48  <JuanDaugherty> ah, i c
+2011-02-22T08:00:54  <JuanDaugherty> don't see what google has to do though, is seleniumhq.org google hosted?
+2011-02-22T08:01:09  <AutomatedTester> our code is on Google Code
+2011-02-22T08:01:30  <JuanDaugherty> ah
+2011-02-22T08:03:20  <csgeekAlterEgo> I'm using a Grid setup for selenium and using the capture_entire_page_screenshot function, but my issue with that is that its being saved on the remote server, rather then pulling it to the hub machine
+2011-02-22T08:03:41  <csgeekAlterEgo> is there a way of pulling the screenshot over to the hub, and saving it to a particular location?
+2011-02-22T08:04:02  <AutomatedTester> csgeekAlterEgo: use the to_string method and then save it to on the hub
+2011-02-22T08:05:59  <csgeekAlterEgo> AutomatedTester: okay.. thanks AutomatedTester
+2011-02-22T08:06:55  *** brettporter has quit IRC
+2011-02-22T08:09:20  <santiycr> JuanDaugherty: that's the day of the last update in the docs
+2011-02-22T08:09:47  <JuanDaugherty> santiycr, thx
+2011-02-22T08:12:20  <santiycr> csgeekAlterEgo: http://saucelabs.com/blog/index.php/2009/10/selenium-tip-of-the-week-screenshot/
+2011-02-22T08:13:19  *** santiycr has left #selenium
+2011-02-22T08:13:32  *** santiycr has joined #selenium
+2011-02-22T08:15:00  *** santiycr has left #selenium
+2011-02-22T08:15:04  *** santiycr has joined #selenium
+2011-02-22T08:18:29  <aikie> again on the screenshot talking issue using java. It looks like you can only use the FirefoxWebDriver locally and not via Selenium server? is that correct?
+2011-02-22T08:24:48  *** kpiwko has quit IRC
+2011-02-22T08:24:57  <AutomatedTester> aikie: looks like it...
+2011-02-22T08:25:30  <AutomatedTester> it doesnt implement TakesScreenshot
+2011-02-22T08:25:49  <aikie> too bad
+2011-02-22T08:26:05  <aikie> have too look for other solutions then
+2011-02-22T08:34:11  *** skiphuffman has joined #selenium
+2011-02-22T08:37:36  *** aikie has left #selenium
+2011-02-22T08:47:12  <csgeekAlterEgo> another silly question.  Sometimes my code dies out and it leaves a Firefox open on the remote server.  Is there a command I can send via the hub to shut down all outstanding remotes?
+2011-02-22T08:47:22  <csgeekAlterEgo> Grid setup
+2011-02-22T08:48:08  *** Putr is now known as Putr|Away
+2011-02-22T08:52:11  <skiphuffman> Great question csgeekAlterEgo.  I have been wondering the same thing.
+2011-02-22T08:53:17  *** lfryc has quit IRC
+2011-02-22T08:54:01  <skiphuffman> Though for me it is mostly when I hit certificate issues and the browsers just decide to sit there stupidly instead of timing out.
+2011-02-22T08:55:20  <AutomatedTester> csgeekAlterEgo: The grid *should* kill orphaned browsers
+2011-02-22T08:55:37  <csgeekAlterEgo> I mean.. I don't mind if test code breaks.. that happens.. but I'd like the ability to just start a new test with a "re-init" basically kill all open session on hub
+2011-02-22T08:56:05  *** Deter_Dangler has joined #selenium
+2011-02-22T08:56:09  <csgeekAlterEgo> AutomatedTester: do you know if there's just a timeout that it waits before killing them?
+2011-02-22T08:56:21  <skiphuffman> And can we adjust that timeout.
+2011-02-22T08:56:40  <AutomatedTester> csgeekAlterEgo: there is a timeout and I believe you can change it in the ant script
+2011-02-22T08:56:51  <csgeekAlterEgo> AutomatedTester: okay... thanks
+2011-02-22T08:56:52  <AutomatedTester> nirvdrum would be a better person to answer these questions
+2011-02-22T08:57:29  *** jxpx777 has joined #selenium
+2011-02-22T08:57:40  <nirvdrum> csgeekAlterEgo: There's no command to send.  But there is a configuration setting that will kill idle sessions.
+2011-02-22T08:58:06  <csgeekAlterEgo> nirvdrum: okay.. thank you
+2011-02-22T08:59:09  <nirvdrum> http://selenium-grid.seleniumhq.org/configuring-and-tuning.html
+2011-02-22T08:59:44  <skiphuffman> Ah!  those look useful!@
+2011-02-22T09:02:16  *** jxpx777 has quit IRC
+2011-02-22T09:02:29  *** jxpx777 has joined #selenium
+2011-02-22T09:04:46  <selbot2> jari.bakken less than 20 seconds ago - Edited wiki page ScalingWebDriver through web user interface. - http://code.google.com/p/selenium/source/detail?r=11515
+2011-02-22T09:06:43  *** j2_xiplink has joined #selenium
+2011-02-22T09:06:49  *** j2_xiplink has left #selenium
+2011-02-22T09:07:39  *** sfbrian has joined #selenium
+2011-02-22T09:08:47  <selbot2> tkumarb half a minute ago - tkumarb: Hid "Bit Map Comparison" section and added head content to "Data Driven Testing" topic. - http://code.google.com/p/selenium/source/detail?r=11516
+2011-02-22T09:10:42  *** Snekatis has quit IRC
+2011-02-22T09:11:35  *** balou has quit IRC
+2011-02-22T09:13:16  <selbot> New news from builds: WEB-SEHQ-77 was SUCCESSFUL : Updated by Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-77>
+2011-02-22T09:20:09  *** Spanktar has joined #selenium
+2011-02-22T09:20:14  *** stlewis has joined #selenium
+2011-02-22T09:27:40  *** lamdk has joined #selenium
+2011-02-22T09:28:58  <JuanDaugherty> anybody used Se with Rspec?
+2011-02-22T09:33:48  *** Archdude has quit IRC
+2011-02-22T09:34:15  *** retornam has joined #selenium
+2011-02-22T09:38:02  *** j0eS has joined #selenium
+2011-02-22T09:38:27  *** reddevil is now known as reddeviL
+2011-02-22T09:43:09  *** stlewis has quit IRC
+2011-02-22T09:45:46  *** stlewis has joined #selenium
+2011-02-22T09:47:37  *** Pablerkas has joined #selenium
+2011-02-22T09:48:17  <Pablerkas> hi there. i'm trying to setup watir-webdriver + selenium 2. I installed the firs but the second doesn't seem to work
+2011-02-22T09:48:42  <Pablerkas> i followed this instructions: http://www.danstraw.com/installing-selenium-2-as-a-service-on-mac-os-x/2010/09/20/
+2011-02-22T09:49:15  <Pablerkas> but wen greping selenium from ps auxwww nothing shows but the grep itself
+2011-02-22T09:49:37  *** rbalent has quit IRC
+2011-02-22T09:50:01  *** j0eS is now known as balou
+2011-02-22T09:50:08  <Pablerkas> is it grave doctor?
+2011-02-22T09:50:53  <Pablerkas> mmm… wait i think i didn't follow them exactly
+2011-02-22T09:53:10  *** jxpx777 has quit IRC
+2011-02-22T09:54:25  *** admc has joined #selenium
+2011-02-22T09:58:05  *** KirillJacobson has joined #selenium
+2011-02-22T09:58:29  *** jimevans has joined #selenium
+2011-02-22T09:58:40  *** rb2k has quit IRC
+2011-02-22T10:02:21  *** rb2k has joined #selenium
+2011-02-22T10:02:25  *** ian_mac has joined #selenium
+2011-02-22T10:04:19  *** Deter_Dangler has left #selenium
+2011-02-22T10:05:29  *** Pablerkas has left #selenium
+2011-02-22T10:05:37  *** kylls has quit IRC
+2011-02-22T10:08:20  *** stephendonner has joined #selenium
+2011-02-22T10:09:14  <KirillJacobson> To jimevans: what version of ie do you have? I am gettiing consistent get_parent failures on IE8. It always works for the first time and never works for the second. I have noticed that LunchBrowserProcess starts two instances of iexplorer. The closest on the internet is a comment on the msdn site for the IELunchURL function. It says that returned PID can be wrong. Any thoughts?
+2011-02-22T10:11:54  <jimevans> KirillJacobson: I'm using IE8. I've read the comment on the documentation page, and EricLaw's response indicates exactly wich PID is returned.
+2011-02-22T10:12:12  <jimevans> The PID returned by IELaunchURL is the one we want.
+2011-02-22T10:12:41  <jimevans> How does LaunchBrowserProcess start two instances of Internet Explorer? Do you see two windows launch, or are you looking at the process list?
+2011-02-22T10:18:50  *** kylls has joined #selenium
+2011-02-22T10:22:38  *** fission6 has joined #selenium
+2011-02-22T10:22:44  <fission6> AutomatedTester: hey there
+2011-02-22T10:22:52  <AutomatedTester> hey
+2011-02-22T10:22:59  <AutomatedTester> only around for 1 more min
+2011-02-22T10:23:04  <fission6> how are you doing?
+2011-02-22T10:23:13  <AutomatedTester> very good thanks, you?
+2011-02-22T10:23:23  *** zmijunkie has quit IRC
+2011-02-22T10:23:57  <fission6> i am hanging in there
+2011-02-22T10:24:38  <fission6> ive established some tests in selenium for my web app which seem to run fine and all pass, however when i use the RC and try htmlunit i get a few errors around finding elements which i think is odd, curious if you had inishgt
+2011-02-22T10:25:06  <AutomatedTester> fission6: I would ask a java person for more insight into that
+2011-02-22T10:25:31  <AutomatedTester> sorry for the flaky answer but never really used it
+2011-02-22T10:25:38  <AutomatedTester> anyway gtg
+2011-02-22T10:25:41  <AutomatedTester> bbiab
+2011-02-22T10:25:42  <fission6> a java person in this channel?
+2011-02-22T10:25:45  <fission6> ok
+2011-02-22T10:25:59  <AutomatedTester> eranm: can you help fission6 with htmlunit questions?
+2011-02-22T10:26:18  *** retornam has quit IRC
+2011-02-22T10:26:26  <eranm> Generally speaking, yes
+2011-02-22T10:26:31  *** dhackner has joined #selenium
+2011-02-22T10:27:00  *** retornam has joined #selenium
+2011-02-22T10:27:13  <eranm> Except I'm on my way out. fission6 : try specifying DesiredCapabilities.htmlUnitWithJavascript() when creating it through the remote server.
+2011-02-22T10:27:41  <fission6> ill try though by default i think that happens
+2011-02-22T10:27:44  <eranm> (I assume RC means the remote server containing Selenium 2 and no Selenium 1 is involved)
+2011-02-22T10:27:47  <fission6> ill review when you and Auto are back online
+2011-02-22T10:27:50  <fission6> right
+2011-02-22T10:28:03  <eranm> fission6, can you quickly put your initialization code in pastebin?
+2011-02-22T10:28:09  <KirillJacobson> To jimevans: I am printing out a process list before and after starting the browser process. I see only one browser window. The hwnd handle found by enum function is the one that belongs to the visible browser but get parent fails. Two iexplore processes and single browser window hang around even after i i kill the test process after the GPE
+2011-02-22T10:28:28  <fission6> i can wait until you get back no rush
+2011-02-22T10:28:38  <eranm> That will be tomorrow :)
+2011-02-22T10:28:42  <fission6> oh
+2011-02-22T10:28:46  <fission6> wellhere is th emain line
+2011-02-22T10:28:54  <fission6> webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.HTMLUNIT)
+2011-02-22T10:29:05  <eranm> Right
+2011-02-22T10:29:20  <fission6> i can wait until otmorrow i need to gather my thoughts
+2011-02-22T10:29:34  <jimevans> KirillJacobson: That's a consequence of "loosely-coupled IE". In IE7, you had a broker process ieuser.exe that would be launched in addition to iexplore.exe.
+2011-02-22T10:29:35  <eranm> Which language binding is that?
+2011-02-22T10:30:25  <jimevans> KirillJacobson: In IE8, those capabilities were folded into iexplore.exe. So when you launch IE8, you *always* have at least two iexplore.exe processes.
+2011-02-22T10:30:38  <jimevans> Try it manually, and you'll see the same thing.
+2011-02-22T10:30:55  <eranm> Gotta go - but the reason I found for different behaviour  of WebDriver with HtmlUnit on remote / locally is the browser type - findElementByPartialLinkText, for example, would fail.
+2011-02-22T10:31:14  <eranm> Have a look at the DesiredCapabilities in Java and send the exact same thing - and it should work.
+2011-02-22T10:31:15  <eranm> Cheers.
+2011-02-22T10:32:02  *** fuzzygroove has joined #selenium
+2011-02-22T10:33:34  <KirillJacobson> To jimevans: you are right there are always at leat two instances. Now i am stuck :(
+2011-02-22T10:33:35  <fission6> ok thats godo advice
+2011-02-22T10:34:36  <jimevans> KirillJacobson: Welcome to the wonderful world of IE native code development.
+2011-02-22T10:34:56  *** zmijunkie has joined #selenium
+2011-02-22T10:35:41  <fission6> eranm: what do you mean by browser type? findElementByPartialLinkText
+2011-02-22T10:36:28  <jimevans> If I have any followers on twitter that are also here in the channel, I'd love for you to retweet my comment about Microsoft not caring about web application testers.
+2011-02-22T10:38:34  <KirillJacobson> To jimevans: have another question. How to tell the build to build iedriver instead of picking it up from prebuilt folder? Now I build from vs, custom build step copies the file to prebuilt, i run go selenium-java and then ie:test:run. I wonder if there is an wasier way
+2011-02-22T10:40:22  <jimevans> KirillJacobson: I know very little about building the Java language bindings. The .NET bindings are constructed such that we look first for IEDriver.dll in the same directory as WebDriver.IE.dll, and if it's there, we use it.
+2011-02-22T10:42:25  <JuanDaugherty> [error] Element gwt-debug-phoneinput not found
+2011-02-22T10:42:37  <AutomatedTester> fission6: I see the difference between withJS and the normal one
+2011-02-22T10:42:44  <AutomatedTester> lemme update it
+2011-02-22T10:42:53  <JuanDaugherty> assume that's a newbie error commonly known which I've gotten on my first serious attempt to run a test case
+2011-02-22T10:42:55  <fission6> hey AutomatedTester whats up now? what di dyou find
+2011-02-22T10:43:17  <AutomatedTester> i was using the .NET bindings as my point of reference
+2011-02-22T10:43:26  <AutomatedTester> i never saw htmlunitwithjs
+2011-02-22T10:43:42  <KirillJacobson> To jimevans: yes, i saw it in the code. Who would be the person to ask about the java build?
+2011-02-22T10:43:52  <fission6> ok so you will update? then what do i need to do, svn up and then ./go
+2011-02-22T10:44:06  <AutomatedTester> hopefully
+2011-02-22T10:44:36  <jimevans> KirillJacobson: Simon (simonstewart) would be the first, best choice, but he's not around at the moment.
+2011-02-22T10:44:41  <fission6> dman ./go takes a long time
+2011-02-22T10:45:55  <fission6> AutomatedTester: do i need to do anything more to install the python modules when the ./go build is done?
+2011-02-22T10:45:57  <AutomatedTester> fission6: wait till you see the commit go in
+2011-02-22T10:46:04  <fission6> ok i will
+2011-02-22T10:46:14  <fission6> but does ./go install the python modules?
+2011-02-22T10:46:21  <AutomatedTester> fission6: ./go py_install is all you need to install it
+2011-02-22T10:46:26  <fission6> ok
+2011-02-22T10:46:32  <AutomatedTester> that builds and installs
+2011-02-22T10:46:36  <fission6> good cause ./go is slowww
+2011-02-22T10:46:40  <fission6> for everything
+2011-02-22T10:46:57  <AutomatedTester> ./go py_install builds what you need for python
+2011-02-22T10:47:01  <fission6> ok
+2011-02-22T10:47:09  <fission6> doe it build the server to when there are changes?
+2011-02-22T10:47:30  <fission6> where does the server.jar get built to when i do ./go? do you know of the top of your head?
+2011-02-22T10:48:17  <selbot2> theautomatedtester less than 10 seconds ago - DavidBurns added HtmlUnitWithJs to DesiredCapabilities - http://code.google.com/p/selenium/source/detail?r=11517
+2011-02-22T10:48:30  <AutomatedTester> you dont need to rebuild that
+2011-02-22T10:48:39  <AutomatedTester> thats still separate
+2011-02-22T10:48:55  <fission6> ok cool
+2011-02-22T10:50:34  <fission6> AutomatedTester: pulling code now
+2011-02-22T10:52:36  *** KirillJacobson has quit IRC
+2011-02-22T10:52:51  *** esteele_ has joined #selenium
+2011-02-22T10:53:51  *** esteele_ has left #selenium
+2011-02-22T10:56:25  <fission6> AutomatedTester: still get the same error that it can not find an element, NoSuchElementException: Unable to locate element with ID: login-button
+2011-02-22T10:56:46  <AutomatedTester> fission6: well I have ported it as is
+2011-02-22T10:56:53  <fission6> right
+2011-02-22T10:57:05  <fission6> ill sae this question for someone on that side
+2011-02-22T10:57:10  <fission6> is there an htmlunit channel
+2011-02-22T10:57:16  <AutomatedTester> dunno
+2011-02-22T10:57:23  <JuanDaugherty> I love it when when people say "I'd love it if ..."
+2011-02-22T10:58:21  <JuanDaugherty> or maybe it's hate, I dunno, emotions are confusing
+2011-02-22T10:59:28  *** dereke has quit IRC
+2011-02-22T11:02:16  <AutomatedTester> btw, fission6 did you use the new dictionary for your test?
+2011-02-22T11:03:39  *** LRain1 has joined #selenium
+2011-02-22T11:05:24  *** LRain has quit IRC
+2011-02-22T11:05:31  *** reddeviL is now known as reddevil
+2011-02-22T11:06:47  <fission6> hmm no..
+2011-02-22T11:07:02  <fission6> drivers.driver = webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.HTMLUNIT)
+2011-02-22T11:07:40  <AutomatedTester> s/HTMLUNIT/HTMLUNITWITHJS
+2011-02-22T11:07:45  <JuanDaugherty> can controls/fields be referenced by something other than name?
+2011-02-22T11:08:05  <AutomatedTester> JuanDaugherty: id, xpath, css selector
+2011-02-22T11:08:15  <JuanDaugherty> AutomatedTester, thx
+2011-02-22T11:08:27  <JuanDaugherty> (except id is name innit?)
+2011-02-22T11:09:27  <JuanDaugherty> in fact not clear that any of those aren't essentially a name (as opposed to like a field ordinal or sumthin)
+2011-02-22T11:10:23  <JuanDaugherty> implicit locators mayhaps
+2011-02-22T11:11:01  <JuanDaugherty> yes that's it dom ordinal
+2011-02-22T11:11:29  <fission6> AutomatedTester:  i think that make have worked!
+2011-02-22T11:11:45  *** j2_xiplink has joined #selenium
+2011-02-22T11:11:46  <AutomatedTester> JuanDaugherty: name == id only in InternetExplorer
+2011-02-22T11:11:54  <AutomatedTester> real browsers see them differently
+2011-02-22T11:11:58  <AutomatedTester> fission6: sweet
+2011-02-22T11:12:04  <fission6> very sweet very sweet
+2011-02-22T11:12:05  <AutomatedTester> i will update the .NET code too
+2011-02-22T11:12:19  <fission6> thank you for your guidance and assitance, i am sure ill be back in two min with a follow up
+2011-02-22T11:12:52  <JuanDaugherty> AT: I wish IE was somebody (else's) nightmare. Fortunately I seldom have to use it.
+2011-02-22T11:13:31  <jimevans> JuanDaugherty: I wish IE was somebody else's nightmare too.
+2011-02-22T11:13:43  <JuanDaugherty> maybe in another 30 years MS will be outta biz like IBM ... oh wait
+2011-02-22T11:14:24  <JuanDaugherty> (meant "nightmare" as opposed to "real browser")
+2011-02-22T11:15:49  <JuanDaugherty> IBM is doing OK but if they had maintained their stature relative to the industry they'd be lika half trillion plus per year biz now
+2011-02-22T11:17:17  <jimevans> JuanDaugherty: I wouldn't wish Microsoft away; the company has been very good to me. I'd just like a little support and the occasional code review or contribution from the IE team.
+2011-02-22T11:17:47  <JuanDaugherty> I feel the same about IBM, but I think it's more justified in my case.
+2011-02-22T11:18:16  <jimevans> how so?
+2011-02-22T11:18:41  <JuanDaugherty> their both standard form capital enterprises though, and what made IBM IBM (i.e. the ethos T.J. Watson created ceased to operate a long time ago
+2011-02-22T11:18:45  <JuanDaugherty> *they're
+2011-02-22T11:19:19  <JuanDaugherty> when Gerstner came in just about
+2011-02-22T11:19:59  <JuanDaugherty> *created)
+2011-02-22T11:21:52  <JuanDaugherty> T.J Watson Sr. that is. Reportedly he established the respect for the IBMer as the hallmark of the company as a result of his treatment at NCR
+2011-02-22T11:27:42  *** esteele has joined #selenium
+2011-02-22T11:29:05  *** esteele has joined #selenium
+2011-02-22T11:40:05  *** zmijunkie has quit IRC
+2011-02-22T11:42:16  <selbot2> theautomatedtester less than a minute ago - DavidBurns adding HtmlUnit With Js to .NET - http://code.google.com/p/selenium/source/detail?r=11518
+2011-02-22T11:44:37  *** esteele has left #selenium
+2011-02-22T11:44:51  *** nitin has quit IRC
+2011-02-22T11:45:06  <JuanDaugherty> how does Se handled frames?
+2011-02-22T11:45:11  <JuanDaugherty> *handle
+2011-02-22T11:45:33  <JuanDaugherty> guess you have to use dom in that case?
+2011-02-22T11:45:34  *** jimevans has quit IRC
+2011-02-22T11:47:02  <JuanDaugherty> ah selectFrame
+2011-02-22T11:47:18  *** dave_miles has joined #selenium
+2011-02-22T11:49:57  *** olleolleolle has quit IRC
+2011-02-22T11:50:03  *** olleolleolle has joined #selenium
+2011-02-22T11:51:00  *** karlwett1n has quit IRC
+2011-02-22T11:51:04  *** karlwettin has joined #selenium
+2011-02-22T11:57:01  *** ner0x has joined #selenium
+2011-02-22T12:09:24  *** dmachi has quit IRC
+2011-02-22T12:14:01  *** dmachi has joined #selenium
+2011-02-22T12:19:08  *** AutomatedTester has quit IRC
+2011-02-22T12:19:21  *** txwikinger2 has quit IRC
+2011-02-22T12:19:48  *** KirillJacobson has joined #selenium
+2011-02-22T12:19:56  *** txwikinger2 has joined #selenium
+2011-02-22T12:21:12  *** soc42 has quit IRC
+2011-02-22T12:23:33  *** txwikinger2 has quit IRC
+2011-02-22T12:27:19  *** esteele_ has joined #selenium
+2011-02-22T12:27:22  *** txwikinger2 has joined #selenium
+2011-02-22T12:27:22  *** txwikinger2 has joined #selenium
+2011-02-22T12:34:10  *** esteele_ has left #selenium
+2011-02-22T12:34:19  *** txwikinger2 has quit IRC
+2011-02-22T12:34:20  *** txwikinger2 has joined #selenium
+2011-02-22T12:34:21  *** nirvdrum has quit IRC
+2011-02-22T12:34:21  *** j2_xiplink has left #selenium
+2011-02-22T12:36:03  *** MadMerlin|work has quit IRC
+2011-02-22T12:36:09  *** fission6 has quit IRC
+2011-02-22T12:36:09  *** karlwettin has quit IRC
+2011-02-22T12:36:10  *** mattmtl has quit IRC
+2011-02-22T12:36:10  *** gnofi has quit IRC
+2011-02-22T12:36:13  *** txwikinger2 has quit IRC
+2011-02-22T12:36:14  *** mayanks43 has quit IRC
+2011-02-22T12:36:14  *** Yossi has quit IRC
+2011-02-22T12:36:16  *** vrockai has quit IRC
+2011-02-22T12:36:17  *** eghm has quit IRC
+2011-02-22T12:36:18  *** RossPatterson has quit IRC
+2011-02-22T12:36:20  *** csanchez has quit IRC
+2011-02-22T12:36:21  *** andytinkham has quit IRC
+2011-02-22T12:36:21  *** reddevil has quit IRC
+2011-02-22T12:36:22  *** cpg|away has quit IRC
+2011-02-22T12:36:23  *** ma10s has quit IRC
+2011-02-22T12:36:24  *** darrenm_ has quit IRC
+2011-02-22T12:36:24  *** charleyb has quit IRC
+2011-02-22T12:36:25  *** keturn has quit IRC
+2011-02-22T12:36:26  *** dmachi has quit IRC
+2011-02-22T12:36:27  *** ner0x has quit IRC
+2011-02-22T12:36:27  *** balou has quit IRC
+2011-02-22T12:36:27  *** skiphuffman has quit IRC
+2011-02-22T12:36:27  *** ojacobson has quit IRC
+2011-02-22T12:36:27  *** cburroughs has quit IRC
+2011-02-22T12:36:28  *** eranm has quit IRC
+2011-02-22T12:36:28  *** Putr|Away has quit IRC
+2011-02-22T12:36:29  *** Undisclosedpower has quit IRC
+2011-02-22T12:36:29  *** hrubi has quit IRC
+2011-02-22T12:36:29  *** melter has quit IRC
+2011-02-22T12:36:31  *** denizt has quit IRC
+2011-02-22T12:36:33  *** Muz has quit IRC
+2011-02-22T12:36:34  *** nsnellma has quit IRC
+2011-02-22T12:36:35  *** andialbrecht_ has quit IRC
+2011-02-22T12:36:35  *** AaronBarr has quit IRC
+2011-02-22T12:36:36  *** olleolleolle has quit IRC
+2011-02-22T12:36:37  *** santiycr has quit IRC
+2011-02-22T12:36:39  *** fuzzygroove has quit IRC
+2011-02-22T12:36:39  *** ian_mac has quit IRC
+2011-02-22T12:36:40  *** kpowell has quit IRC
+2011-02-22T12:36:41  *** ato has quit IRC
+2011-02-22T12:36:42  *** Spanktar has quit IRC
+2011-02-22T12:36:42  *** sfbrian has quit IRC
+2011-02-22T12:36:43  *** carlisia has quit IRC
+2011-02-22T12:36:44  *** webben has quit IRC
+2011-02-22T12:36:45  *** KirillJacobson has quit IRC
+2011-02-22T12:36:45  *** dave_miles has quit IRC
+2011-02-22T12:36:46  *** LRain1 has quit IRC
+2011-02-22T12:36:46  *** kylls has quit IRC
+2011-02-22T12:36:46  *** lamdk has quit IRC
+2011-02-22T12:36:47  *** JuanDaugherty has quit IRC
+2011-02-22T12:36:47  *** antlong has quit IRC
+2011-02-22T12:36:48  *** ryzer-afk has quit IRC
+2011-02-22T12:36:49  *** jarib has quit IRC
+2011-02-22T12:36:51  *** aculich has quit IRC
+2011-02-22T12:36:52  *** retornam has quit IRC
+2011-02-22T12:36:54  *** selbot2 has quit IRC
+2011-02-22T12:36:54  *** Fyrespray has quit IRC
+2011-02-22T12:36:55  *** strtok has quit IRC
+2011-02-22T12:36:55  *** Gregor has quit IRC
+2011-02-22T12:36:56  *** stephendonner has quit IRC
+2011-02-22T12:36:56  *** admc has quit IRC
+2011-02-22T12:36:57  *** jledbetter has quit IRC
+2011-02-22T12:36:57  *** plightbo has quit IRC
+2011-02-22T12:47:35  *** MadMerlin|work has joined #selenium
+2011-02-22T12:47:35  *** txwikinger2 has joined #selenium
+2011-02-22T12:47:35  *** KirillJacobson has joined #selenium
+2011-02-22T12:47:35  *** dmachi has joined #selenium
+2011-02-22T12:47:35  *** ner0x has joined #selenium
+2011-02-22T12:47:35  *** karlwettin has joined #selenium
+2011-02-22T12:47:35  *** olleolleolle has joined #selenium
+2011-02-22T12:47:35  *** dave_miles has joined #selenium
+2011-02-22T12:47:35  *** LRain1 has joined #selenium
+2011-02-22T12:47:35  *** fuzzygroove has joined #selenium
+2011-02-22T12:47:35  *** retornam has joined #selenium
+2011-02-22T12:47:35  *** fission6 has joined #selenium
+2011-02-22T12:47:35  *** kylls has joined #selenium
+2011-02-22T12:47:35  *** stephendonner has joined #selenium
+2011-02-22T12:47:35  *** ian_mac has joined #selenium
+2011-02-22T12:47:35  *** admc has joined #selenium
+2011-02-22T12:47:35  *** balou has joined #selenium
+2011-02-22T12:47:35  *** lamdk has joined #selenium
+2011-02-22T12:47:35  *** Spanktar has joined #selenium
+2011-02-22T12:47:35  *** sfbrian has joined #selenium
+2011-02-22T12:47:35  *** skiphuffman has joined #selenium
+2011-02-22T12:47:35  *** santiycr has joined #selenium
+2011-02-22T12:47:35  *** JuanDaugherty has joined #selenium
+2011-02-22T12:47:35  *** mattmtl has joined #selenium
+2011-02-22T12:47:35  *** antlong has joined #selenium
+2011-02-22T12:47:35  *** csanchez has joined #selenium
+2011-02-22T12:47:35  *** andytinkham has joined #selenium
+2011-02-22T12:47:35  *** vrockai has joined #selenium
+2011-02-22T12:47:35  *** ojacobson has joined #selenium
+2011-02-22T12:47:35  *** gnofi has joined #selenium
+2011-02-22T12:47:35  *** cburroughs has joined #selenium
+2011-02-22T12:47:35  *** ryzer-afk has joined #selenium
+2011-02-22T12:47:35  *** mayanks43 has joined #selenium
+2011-02-22T12:47:35  *** jledbetter has joined #selenium
+2011-02-22T12:47:35  *** carlisia has joined #selenium
+2011-02-22T12:47:35  *** eranm has joined #selenium
+2011-02-22T12:47:35  *** Putr|Away has joined #selenium
+2011-02-22T12:47:35  *** Yossi has joined #selenium
+2011-02-22T12:47:35  *** selbot2 has joined #selenium
+2011-02-22T12:47:35  *** jarib has joined #selenium
+2011-02-22T12:47:35  *** reddevil has joined #selenium
+2011-02-22T12:47:35  *** plightbo has joined #selenium
+2011-02-22T12:47:35  *** Muz has joined #selenium
+2011-02-22T12:47:35  *** kpowell has joined #selenium
+2011-02-22T12:47:35  *** darrenm_ has joined #selenium
+2011-02-22T12:47:35  *** eghm has joined #selenium
+2011-02-22T12:47:35  *** charleyb has joined #selenium
+2011-02-22T12:47:35  *** Fyrespray has joined #selenium
+2011-02-22T12:47:35  *** Undisclosedpower has joined #selenium
+2011-02-22T12:47:35  *** hrubi has joined #selenium
+2011-02-22T12:47:36  *** melter has joined #selenium
+2011-02-22T12:47:36  *** nsnellma has joined #selenium
+2011-02-22T12:47:36  *** cpg|away has joined #selenium
+2011-02-22T12:47:36  *** keturn has joined #selenium
+2011-02-22T12:47:36  *** ma10s has joined #selenium
+2011-02-22T12:47:36  *** strtok has joined #selenium
+2011-02-22T12:47:36  *** aculich has joined #selenium
+2011-02-22T12:47:36  *** Gregor has joined #selenium
+2011-02-22T12:47:36  *** ato has joined #selenium
+2011-02-22T12:47:36  *** denizt has joined #selenium
+2011-02-22T12:47:36  *** andialbrecht_ has joined #selenium
+2011-02-22T12:47:36  *** AaronBarr has joined #selenium
+2011-02-22T12:47:36  *** webben has joined #selenium
+2011-02-22T12:48:33  *** fission6 has quit IRC
+2011-02-22T12:48:34  *** karlwettin has quit IRC
+2011-02-22T12:48:34  *** mattmtl has quit IRC
+2011-02-22T12:48:34  *** gnofi has quit IRC
+2011-02-22T12:48:36  *** MadMerlin|work has quit IRC
+2011-02-22T12:48:37  *** txwikinger2 has quit IRC
+2011-02-22T12:48:37  *** mayanks43 has quit IRC
+2011-02-22T12:48:38  *** Yossi has quit IRC
+2011-02-22T12:48:39  *** vrockai has quit IRC
+2011-02-22T12:48:40  *** eghm has quit IRC
+2011-02-22T12:48:43  *** csanchez has quit IRC
+2011-02-22T12:48:43  *** andytinkham has quit IRC
+2011-02-22T12:48:43  *** reddevil has quit IRC
+2011-02-22T12:48:44  *** cpg|away has quit IRC
+2011-02-22T12:48:45  *** ma10s has quit IRC
+2011-02-22T12:48:45  *** darrenm_ has quit IRC
+2011-02-22T12:48:45  *** charleyb has quit IRC
+2011-02-22T12:48:46  *** keturn has quit IRC
+2011-02-22T12:48:48  *** dmachi has quit IRC
+2011-02-22T12:48:48  *** ner0x has quit IRC
+2011-02-22T12:48:48  *** balou has quit IRC
+2011-02-22T12:48:48  *** skiphuffman has quit IRC
+2011-02-22T12:48:48  *** ojacobson has quit IRC
+2011-02-22T12:48:48  *** cburroughs has quit IRC
+2011-02-22T12:48:49  *** eranm has quit IRC
+2011-02-22T12:48:49  *** Putr|Away has quit IRC
+2011-02-22T12:48:50  *** Undisclosedpower has quit IRC
+2011-02-22T12:48:50  *** hrubi has quit IRC
+2011-02-22T12:48:50  *** melter has quit IRC
+2011-02-22T12:48:51  *** denizt has quit IRC
+2011-02-22T12:48:53  *** Muz has quit IRC
+2011-02-22T12:48:54  *** nsnellma has quit IRC
+2011-02-22T12:48:54  *** andialbrecht_ has quit IRC
+2011-02-22T12:48:54  *** AaronBarr has quit IRC
+2011-02-22T12:48:56  *** olleolleolle has quit IRC
+2011-02-22T12:48:56  *** santiycr has quit IRC
+2011-02-22T12:48:57  *** fuzzygroove has quit IRC
+2011-02-22T12:48:58  *** ian_mac has quit IRC
+2011-02-22T12:48:59  *** kpowell has quit IRC
+2011-02-22T12:48:59  *** ato has quit IRC
+2011-02-22T12:49:00  *** Spanktar has quit IRC
+2011-02-22T12:49:01  *** sfbrian has quit IRC
+2011-02-22T12:49:01  *** carlisia has quit IRC
+2011-02-22T12:49:02  *** webben has quit IRC
+2011-02-22T12:49:03  *** KirillJacobson has quit IRC
+2011-02-22T12:49:03  *** dave_miles has quit IRC
+2011-02-22T12:49:03  *** LRain1 has quit IRC
+2011-02-22T12:49:04  *** kylls has quit IRC
+2011-02-22T12:49:04  *** lamdk has quit IRC
+2011-02-22T12:49:04  *** JuanDaugherty has quit IRC
+2011-02-22T12:49:04  *** antlong has quit IRC
+2011-02-22T12:49:05  *** ryzer-afk has quit IRC
+2011-02-22T12:49:06  *** jarib has quit IRC
+2011-02-22T12:49:07  *** aculich has quit IRC
+2011-02-22T12:49:09  *** retornam has quit IRC
+2011-02-22T12:49:10  *** selbot2 has quit IRC
+2011-02-22T12:49:10  *** Fyrespray has quit IRC
+2011-02-22T12:49:11  *** strtok has quit IRC
+2011-02-22T12:49:11  *** Gregor has quit IRC
+2011-02-22T12:49:12  *** stephendonner has quit IRC
+2011-02-22T12:49:12  *** admc has quit IRC
+2011-02-22T12:49:12  *** jledbetter has quit IRC
+2011-02-22T12:49:13  *** plightbo has quit IRC
+2011-02-22T12:49:45  *** MadMerlin|work has joined #selenium
+2011-02-22T12:49:45  *** txwikinger2 has joined #selenium
+2011-02-22T12:49:45  *** KirillJacobson has joined #selenium
+2011-02-22T12:49:45  *** dmachi has joined #selenium
+2011-02-22T12:49:45  *** ner0x has joined #selenium
+2011-02-22T12:49:45  *** karlwettin has joined #selenium
+2011-02-22T12:49:45  *** olleolleolle has joined #selenium
+2011-02-22T12:49:45  *** dave_miles has joined #selenium
+2011-02-22T12:49:45  *** LRain1 has joined #selenium
+2011-02-22T12:49:45  *** fuzzygroove has joined #selenium
+2011-02-22T12:49:45  *** retornam has joined #selenium
+2011-02-22T12:49:45  *** fission6 has joined #selenium
+2011-02-22T12:49:45  *** kylls has joined #selenium
+2011-02-22T12:49:45  *** stephendonner has joined #selenium
+2011-02-22T12:49:45  *** ian_mac has joined #selenium
+2011-02-22T12:49:45  *** admc has joined #selenium
+2011-02-22T12:49:45  *** balou has joined #selenium
+2011-02-22T12:49:45  *** lamdk has joined #selenium
+2011-02-22T12:49:45  *** Spanktar has joined #selenium
+2011-02-22T12:49:45  *** sfbrian has joined #selenium
+2011-02-22T12:49:45  *** skiphuffman has joined #selenium
+2011-02-22T12:49:45  *** santiycr has joined #selenium
+2011-02-22T12:49:45  *** JuanDaugherty has joined #selenium
+2011-02-22T12:49:45  *** mattmtl has joined #selenium
+2011-02-22T12:49:45  *** antlong has joined #selenium
+2011-02-22T12:49:45  *** csanchez has joined #selenium
+2011-02-22T12:49:45  *** andytinkham has joined #selenium
+2011-02-22T12:49:45  *** vrockai has joined #selenium
+2011-02-22T12:49:45  *** ojacobson has joined #selenium
+2011-02-22T12:49:45  *** gnofi has joined #selenium
+2011-02-22T12:49:45  *** cburroughs has joined #selenium
+2011-02-22T12:49:45  *** ryzer-afk has joined #selenium
+2011-02-22T12:49:45  *** mayanks43 has joined #selenium
+2011-02-22T12:49:45  *** jledbetter has joined #selenium
+2011-02-22T12:49:45  *** carlisia has joined #selenium
+2011-02-22T12:49:45  *** eranm has joined #selenium
+2011-02-22T12:49:45  *** Putr|Away has joined #selenium
+2011-02-22T12:49:45  *** Yossi has joined #selenium
+2011-02-22T12:49:45  *** selbot2 has joined #selenium
+2011-02-22T12:49:45  *** jarib has joined #selenium
+2011-02-22T12:49:45  *** reddevil has joined #selenium
+2011-02-22T12:49:45  *** plightbo has joined #selenium
+2011-02-22T12:49:45  *** Muz has joined #selenium
+2011-02-22T12:49:45  *** webben has joined #selenium
+2011-02-22T12:49:45  *** AaronBarr has joined #selenium
+2011-02-22T12:49:45  *** andialbrecht_ has joined #selenium
+2011-02-22T12:49:45  *** denizt has joined #selenium
+2011-02-22T12:49:45  *** ato has joined #selenium
+2011-02-22T12:49:46  *** Gregor has joined #selenium
+2011-02-22T12:49:46  *** aculich has joined #selenium
+2011-02-22T12:49:46  *** strtok has joined #selenium
+2011-02-22T12:49:46  *** ma10s has joined #selenium
+2011-02-22T12:49:46  *** keturn has joined #selenium
+2011-02-22T12:49:46  *** cpg|away has joined #selenium
+2011-02-22T12:49:46  *** nsnellma has joined #selenium
+2011-02-22T12:49:46  *** melter has joined #selenium
+2011-02-22T12:49:46  *** hrubi has joined #selenium
+2011-02-22T12:49:46  *** Undisclosedpower has joined #selenium
+2011-02-22T12:49:46  *** Fyrespray has joined #selenium
+2011-02-22T12:49:46  *** charleyb has joined #selenium
+2011-02-22T12:49:46  *** eghm has joined #selenium
+2011-02-22T12:49:46  *** darrenm_ has joined #selenium
+2011-02-22T12:49:46  *** kpowell has joined #selenium
+2011-02-22T12:54:19  *** csanchez has quit IRC
+2011-02-22T12:54:36  *** ma10s has quit IRC
+2011-02-22T12:55:18  *** mattisfreenode has joined #selenium
+2011-02-22T12:59:06  *** kylls has quit IRC
+2011-02-22T12:59:39  *** mattisfreenode has quit IRC
+2011-02-22T12:59:39  *** MadMerlin|work has quit IRC
+2011-02-22T12:59:39  *** txwikinger2 has quit IRC
+2011-02-22T12:59:40  *** mayanks43 has quit IRC
+2011-02-22T12:59:41  *** Yossi has quit IRC
+2011-02-22T12:59:42  *** vrockai has quit IRC
+2011-02-22T12:59:43  *** eghm has quit IRC
+2011-02-22T12:59:47  *** andytinkham has quit IRC
+2011-02-22T12:59:48  *** reddevil has quit IRC
+2011-02-22T12:59:49  *** cpg|away has quit IRC
+2011-02-22T12:59:50  *** darrenm_ has quit IRC
+2011-02-22T12:59:50  *** charleyb has quit IRC
+2011-02-22T12:59:51  *** keturn has quit IRC
+2011-02-22T13:00:43  *** mattisfreenode has joined #selenium
+2011-02-22T13:00:43  *** MadMerlin|work has joined #selenium
+2011-02-22T13:00:43  *** txwikinger2 has joined #selenium
+2011-02-22T13:00:43  *** vrockai has joined #selenium
+2011-02-22T13:00:43  *** mayanks43 has joined #selenium
+2011-02-22T13:00:43  *** Yossi has joined #selenium
+2011-02-22T13:00:43  *** eghm has joined #selenium
+2011-02-22T13:01:14  *** darrenm_ has joined #selenium
+2011-02-22T13:01:14  *** charleyb has joined #selenium
+2011-02-22T13:01:14  *** keturn has joined #selenium
+2011-02-22T13:02:04  *** andytinkham has joined #selenium
+2011-02-22T13:02:04  *** reddevil has joined #selenium
+2011-02-22T13:02:04  *** cpg|away has joined #selenium
+2011-02-22T13:04:05  *** santiycr has quit IRC
+2011-02-22T13:04:09  *** niloc132 has joined #selenium
+2011-02-22T13:05:32  *** skiphuffman has quit IRC
+2011-02-22T13:14:03  *** carlisia has quit IRC
+2011-02-22T13:14:23  *** cburroughs has quit IRC
+2011-02-22T13:15:17  *** vrockai has quit IRC
+2011-02-22T13:16:27  *** mayanks43 has left #selenium
+2011-02-22T13:19:20  *** brettporter has joined #selenium
+2011-02-22T13:32:53  *** admc has quit IRC
+2011-02-22T13:41:09  *** andytinkham has quit IRC
+2011-02-22T13:41:10  *** reddevil has quit IRC
+2011-02-22T13:41:11  *** cpg|away has quit IRC
+2011-02-22T13:41:12  *** darrenm_ has quit IRC
+2011-02-22T13:41:12  *** charleyb has quit IRC
+2011-02-22T13:41:13  *** keturn has quit IRC
+2011-02-22T13:41:15  *** mattisfreenode has quit IRC
+2011-02-22T13:41:15  *** MadMerlin|work has quit IRC
+2011-02-22T13:41:15  *** txwikinger2 has quit IRC
+2011-02-22T13:41:16  *** Yossi has quit IRC
+2011-02-22T13:41:16  *** niloc132 has quit IRC
+2011-02-22T13:41:18  *** eghm has quit IRC
+2011-02-22T13:41:21  *** fission6 has quit IRC
+2011-02-22T13:41:22  *** dmachi has quit IRC
+2011-02-22T13:41:23  *** ner0x has quit IRC
+2011-02-22T13:41:23  *** balou has quit IRC
+2011-02-22T13:41:23  *** ojacobson has quit IRC
+2011-02-22T13:41:24  *** eranm has quit IRC
+2011-02-22T13:41:24  *** Putr|Away has quit IRC
+2011-02-22T13:41:25  *** Undisclosedpower has quit IRC
+2011-02-22T13:41:25  *** hrubi has quit IRC
+2011-02-22T13:41:25  *** melter has quit IRC
+2011-02-22T13:41:27  *** denizt has quit IRC
+2011-02-22T13:41:29  *** Muz has quit IRC
+2011-02-22T13:41:30  *** nsnellma has quit IRC
+2011-02-22T13:41:30  *** andialbrecht_ has quit IRC
+2011-02-22T13:41:31  *** AaronBarr has quit IRC
+2011-02-22T13:41:32  *** olleolleolle has quit IRC
+2011-02-22T13:41:34  *** fuzzygroove has quit IRC
+2011-02-22T13:41:35  *** ian_mac has quit IRC
+2011-02-22T13:41:36  *** kpowell has quit IRC
+2011-02-22T13:41:37  *** ato has quit IRC
+2011-02-22T13:41:38  *** Spanktar has quit IRC
+2011-02-22T13:41:38  *** sfbrian has quit IRC
+2011-02-22T13:41:40  *** webben has quit IRC
+2011-02-22T13:41:41  *** KirillJacobson has quit IRC
+2011-02-22T13:41:41  *** dave_miles has quit IRC
+2011-02-22T13:41:41  *** LRain1 has quit IRC
+2011-02-22T13:41:42  *** lamdk has quit IRC
+2011-02-22T13:41:42  *** JuanDaugherty has quit IRC
+2011-02-22T13:41:42  *** antlong has quit IRC
+2011-02-22T13:41:43  *** ryzer-afk has quit IRC
+2011-02-22T13:41:44  *** jarib has quit IRC
+2011-02-22T13:41:46  *** aculich has quit IRC
+2011-02-22T13:41:48  *** retornam has quit IRC
+2011-02-22T13:41:49  *** selbot2 has quit IRC
+2011-02-22T13:41:49  *** Fyrespray has quit IRC
+2011-02-22T13:41:50  *** strtok has quit IRC
+2011-02-22T13:41:50  *** Gregor has quit IRC
+2011-02-22T13:41:51  *** brettporter has quit IRC
+2011-02-22T13:41:52  *** stephendonner has quit IRC
+2011-02-22T13:41:52  *** jledbetter has quit IRC
+2011-02-22T13:41:53  *** plightbo has quit IRC
+2011-02-22T13:44:39  *** brettporter has joined #selenium
+2011-02-22T13:44:39  *** niloc132 has joined #selenium
+2011-02-22T13:44:39  *** cpg|away has joined #selenium
+2011-02-22T13:44:39  *** reddevil has joined #selenium
+2011-02-22T13:44:39  *** andytinkham has joined #selenium
+2011-02-22T13:44:39  *** keturn has joined #selenium
+2011-02-22T13:44:39  *** charleyb has joined #selenium
+2011-02-22T13:44:39  *** darrenm_ has joined #selenium
+2011-02-22T13:44:39  *** eghm has joined #selenium
+2011-02-22T13:44:39  *** Yossi has joined #selenium
+2011-02-22T13:44:39  *** txwikinger2 has joined #selenium
+2011-02-22T13:44:39  *** MadMerlin|work has joined #selenium
+2011-02-22T13:44:39  *** mattisfreenode has joined #selenium
+2011-02-22T13:44:39  *** KirillJacobson has joined #selenium
+2011-02-22T13:44:39  *** dmachi has joined #selenium
+2011-02-22T13:44:39  *** ner0x has joined #selenium
+2011-02-22T13:44:39  *** olleolleolle has joined #selenium
+2011-02-22T13:44:39  *** dave_miles has joined #selenium
+2011-02-22T13:44:39  *** LRain1 has joined #selenium
+2011-02-22T13:44:39  *** fuzzygroove has joined #selenium
+2011-02-22T13:44:39  *** retornam has joined #selenium
+2011-02-22T13:44:39  *** fission6 has joined #selenium
+2011-02-22T13:44:39  *** stephendonner has joined #selenium
+2011-02-22T13:44:39  *** ian_mac has joined #selenium
+2011-02-22T13:44:39  *** balou has joined #selenium
+2011-02-22T13:44:39  *** lamdk has joined #selenium
+2011-02-22T13:44:39  *** Spanktar has joined #selenium
+2011-02-22T13:44:39  *** sfbrian has joined #selenium
+2011-02-22T13:44:39  *** JuanDaugherty has joined #selenium
+2011-02-22T13:44:39  *** antlong has joined #selenium
+2011-02-22T13:44:39  *** ojacobson has joined #selenium
+2011-02-22T13:44:39  *** ryzer-afk has joined #selenium
+2011-02-22T13:44:39  *** jledbetter has joined #selenium
+2011-02-22T13:44:39  *** eranm has joined #selenium
+2011-02-22T13:44:39  *** Putr|Away has joined #selenium
+2011-02-22T13:44:39  *** selbot2 has joined #selenium
+2011-02-22T13:44:39  *** jarib has joined #selenium
+2011-02-22T13:44:39  *** plightbo has joined #selenium
+2011-02-22T13:44:39  *** Muz has joined #selenium
+2011-02-22T13:44:39  *** kpowell has joined #selenium
+2011-02-22T13:44:39  *** Fyrespray has joined #selenium
+2011-02-22T13:44:39  *** Undisclosedpower has joined #selenium
+2011-02-22T13:44:39  *** hrubi has joined #selenium
+2011-02-22T13:44:39  *** melter has joined #selenium
+2011-02-22T13:44:39  *** nsnellma has joined #selenium
+2011-02-22T13:44:39  *** strtok has joined #selenium
+2011-02-22T13:44:39  *** aculich has joined #selenium
+2011-02-22T13:44:39  *** Gregor has joined #selenium
+2011-02-22T13:44:39  *** ato has joined #selenium
+2011-02-22T13:44:39  *** denizt has joined #selenium
+2011-02-22T13:44:39  *** andialbrecht_ has joined #selenium
+2011-02-22T13:44:39  *** AaronBarr has joined #selenium
+2011-02-22T13:44:39  *** webben has joined #selenium
+2011-02-22T13:45:07  *** AutomatedTester has joined #selenium
+2011-02-22T13:51:16  <selbot2> james.h.evans.jr less than 10 seconds ago - JimEvans: Updating .NET tests to be more in sync with Java tests. - http://code.google.com/p/selenium/source/detail?r=11519
+2011-02-22T13:52:29  *** dave_miles_cf has joined #selenium
+2011-02-22T13:54:11  *** dave_miles has quit IRC
+2011-02-22T13:56:44  *** rb2k has quit IRC
+2011-02-22T13:57:51  <selbot2> james.h.evans.jr less than 10 seconds ago - JimEvans: Removing commented code. - http://code.google.com/p/selenium/source/detail?r=11520
+2011-02-22T13:59:59  *** kylls has joined #selenium
+2011-02-22T14:00:19  <selbot2> james.h.evans.jr half a minute ago - JimEvans: Fixing warnings raised by static code analysis of IE driver native code. - http://code.google.com/p/selenium/source/detail?r=11521
+2011-02-22T14:00:42  *** csanchez has joined #selenium
+2011-02-22T14:07:56  *** admc has joined #selenium
+2011-02-22T14:12:33  *** nirvdrum has joined #selenium
+2011-02-22T14:15:41  *** santiycr has joined #selenium
+2011-02-22T14:16:26  *** reddevil is now known as reddeviL
+2011-02-22T14:23:09  *** ojacobson has quit IRC
+2011-02-22T14:23:10  *** Putr|Away is now known as Putr
+2011-02-22T14:25:54  *** cpg|away is now known as cpg
+2011-02-22T14:28:59  *** mbeierl has joined #selenium
+2011-02-22T14:33:17  *** Spanktar has quit IRC
+2011-02-22T14:35:49  *** cpg is now known as cpg|brb
+2011-02-22T14:40:23  *** LRain1 has quit IRC
+2011-02-22T14:42:39  *** stephendonner has quit IRC
+2011-02-22T14:49:21  *** Putr is now known as Putr|Away
+2011-02-22T14:56:22  *** fission6 has quit IRC
+2011-02-22T14:57:06  *** admc1 has joined #selenium
+2011-02-22T15:00:12  *** admc has quit IRC
+2011-02-22T15:04:16  *** mbeierl has quit IRC
+2011-02-22T15:14:22  *** andytinkham has quit IRC
+2011-02-22T15:18:11  *** aculich has quit IRC
+2011-02-22T15:20:36  *** antlong has quit IRC
+2011-02-22T16:01:23  *** KirillJacobson has quit IRC
+2011-02-22T16:21:07  *** cpg|brb is now known as cpg
+2011-02-22T16:23:52  *** cburroughs has joined #selenium
+2011-02-22T16:35:15  *** AutomatedTester has quit IRC
+2011-02-22T16:39:29  *** cburroughs has quit IRC
+2011-02-22T17:17:42  *** lamdk has quit IRC
+2011-02-22T17:31:55  *** Putr|Away has quit IRC
+2011-02-22T17:32:09  *** melter has quit IRC
+2011-02-22T17:33:29  *** melter has joined #selenium
+2011-02-22T17:44:05  *** dhackner has quit IRC
+2011-02-22T17:49:53  *** ner0x has quit IRC
+2011-02-22T17:51:48  *** retornam has quit IRC
+2011-02-22T18:03:14  *** ner0x has joined #selenium
+2011-02-22T18:03:37  *** TTilus has joined #selenium
+2011-02-22T18:11:53  *** esteele has joined #selenium
+2011-02-22T18:12:54  *** mbeierl has joined #selenium
+2011-02-22T18:18:07  *** mbeierl has quit IRC
+2011-02-22T18:21:30  *** stlewis has quit IRC
+2011-02-22T18:28:37  *** Putr has joined #selenium
+2011-02-22T18:37:41  *** nitin has joined #selenium
+2011-02-22T18:38:36  *** kpowell has left #selenium
+2011-02-22T18:39:05  *** sephinroth has joined #selenium
+2011-02-22T18:40:59  *** kylls has quit IRC
+2011-02-22T18:42:20  *** mbeierl has joined #selenium
+2011-02-22T18:50:53  *** mbeierl has quit IRC
+2011-02-22T19:00:17  <selbot2> jmleyba less than 20 seconds ago - JasonLeyba on behalf of KenKania: Creating a new atom to retrieve the location of an element, relative to the client viewport, once it has been scrolled into view. - http://code.google.com/p/selenium/source/detail?r=11522
+2011-02-22T19:01:44  *** esteele has joined #selenium
+2011-02-22T19:04:11  *** sfbrian has quit IRC
+2011-02-22T19:07:07  *** admc1 has quit IRC
+2011-02-22T19:09:47  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Enable logging in the IE driver (at least to the console) - http://code.google.com/p/selenium/source/detail?r=11523
+2011-02-22T19:23:15  *** ian_mac2 has joined #selenium
+2011-02-22T19:31:47  <selbot2> simon.m.stewart less than 20 seconds ago - SimonStewart: Set up a branch to do native events on OS X work - http://code.google.com/p/selenium/source/detail?r=11524
+2011-02-22T19:31:58  *** esteele has quit IRC
+2011-02-22T20:15:08  *** antlong has joined #selenium
+2011-02-22T20:21:14  *** nirvdrum has quit IRC
+2011-02-22T20:36:31  *** nitin has quit IRC
+2011-02-22T20:40:29  *** antlong has quit IRC
+2011-02-22T20:43:17  <selbot2> simon.m.stewart half a minute ago - SimonStewart: The aftermath of the Great Renaming continues. Fixing up the atoms wiki page to point to targets that actually exist - http://code.google.com/p/selenium/source/detail?r=11525
+2011-02-22T20:43:47  <selbot2> simon.m.stewart half a minute ago - SimonStewart: Another path correction. - http://code.google.com/p/selenium/source/detail?r=11526
+2011-02-22T20:50:17  <selbot2> simon.m.stewart less than a minute ago - SimonStewart: The interactions and firefox driver code compiles. Checking it in as a start, even if it is a little premature - http://code.google.com/p/selenium/source/detail?r=11527
+2011-02-22T21:09:43  *** rslifka has joined #selenium
+2011-02-22T21:10:49  *** rslifka has quit IRC
+2011-02-22T21:14:14  *** fuzzygroove has quit IRC
+2011-02-22T21:17:56  *** cpg is now known as cpg|away
+2011-02-22T21:25:27  *** santiycr has quit IRC
+2011-02-22T21:39:11  *** fuzzygroove has joined #selenium
+2011-02-22T21:39:27  *** fuzzygroove has left #selenium
+2011-02-22T21:49:17  *** cpg|away is now known as cpg
+2011-02-22T22:00:00  *** davemiles has joined #selenium
+2011-02-22T22:01:34  *** brettporter has quit IRC
+2011-02-22T22:04:00  *** dave_miles_cf has quit IRC
+2011-02-22T22:08:00  *** mayanks43 has joined #selenium
+2011-02-22T22:12:12  *** nitin has joined #selenium
+2011-02-22T22:19:02  *** nitin has quit IRC
+2011-02-22T22:19:26  *** nitin has joined #selenium
+2011-02-22T22:25:50  *** sephinroth has quit IRC
+2011-02-22T22:27:05  *** davemiles has quit IRC
+2011-02-22T22:27:30  *** davemiles has joined #selenium
+2011-02-22T22:33:55  *** mayanks43 has left #selenium
+2011-02-22T22:34:26  *** plightbo_ has joined #selenium
+2011-02-22T22:36:09  *** AaronBarr is now known as fam1bot
+2011-02-22T22:36:27  *** fam1bot is now known as AaronBarr
+2011-02-22T22:36:43  *** sephinroth has joined #selenium
+2011-02-22T22:39:21  *** nitin has quit IRC
+2011-02-22T22:39:48  *** nitin has joined #selenium
+2011-02-22T22:41:42  *** nitin has joined #selenium
+2011-02-22T22:48:44  *** nitin has quit IRC
+2011-02-22T22:49:42  *** nitin has joined #selenium
+2011-02-22T22:58:54  *** nitin has quit IRC
+2011-02-22T23:01:33  *** nitin has joined #selenium
+2011-02-22T23:09:10  *** nitin has quit IRC
+2011-02-22T23:11:49  *** nitin has joined #selenium
+2011-02-22T23:17:55  *** tessier has joined #selenium
+2011-02-22T23:17:58  <tessier> Hello all!
+2011-02-22T23:19:26  *** nitin has quit IRC
+2011-02-22T23:20:49  <tessier> Is there any way to time how long a test takes to run using selenium IDE?
+2011-02-22T23:21:26  *** nitin has joined #selenium
+2011-02-22T23:23:03  *** zmijunkie has joined #selenium
+2011-02-22T23:27:16  <tessier> timer extension...sweet
+2011-02-22T23:31:54  *** davemiles has quit IRC
+2011-02-22T23:36:41  *** reddeviL is now known as reddevil
+2011-02-22T23:41:39  *** Muz has quit IRC
+2011-02-22T23:41:40  *** nsnellma has quit IRC
+2011-02-22T23:41:40  *** andialbrecht_ has quit IRC
+2011-02-22T23:41:40  *** AaronBarr has quit IRC
+2011-02-22T23:43:38  *** kpiwko has joined #selenium
+2011-02-22T23:44:57  *** lfryc has joined #selenium
+2011-02-22T23:47:54  *** Muz has joined #selenium
+2011-02-22T23:47:54  *** nsnellma has joined #selenium
+2011-02-22T23:47:54  *** andialbrecht_ has joined #selenium
+2011-02-22T23:47:54  *** AaronBarr has joined #selenium
+2011-02-22T23:47:59  *** rb2k has joined #selenium
+2011-02-22T23:53:10  *** nitin has quit IRC
+2011-02-22T23:53:25  *** soc42 has joined #selenium
+2011-02-22T23:55:49  *** nitin has joined #selenium
+2011-02-22T23:55:55  <selbot> New news from builds: WEB-SEHQ-77 was SUCCESSFUL : Updated by Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-77> || WEB-SEHQ-76 was SUCCESSFUL : Updated by Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-76> || IDE-EDITOR-98 has FAILED : Updated by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/IDE-EDITOR-98> || S2RB-GEM-54 was SUCCESSFUL : Dependant of S2RB-FXLX-66 <http://xserve.openqa.org:8085/browse/S2RB-GEM-54> || S2RB-RCINT-44 has FAILED (16 tests failed) : Dependant of S2RB-RCUNIT-63 <http://xserve.openqa.org:8085/browse/S2RB-RCINT-44> || WEB-SEHQ-75 was SUCCESSFUL : Updated by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/WEB-SEHQ-75> || S2RB-FXLX-66 was SUCCESSFUL (with 95 tests) : Dependant of S2RB-WDUNIT-80 <http://xserve.openqa.org:8085/browse/S2RB-FXLX-66> || S2RB-REMLX-56 was SUCCESSFUL (with 79 tests) : Dependant of S2RB-WDUNIT-80 <http://xserve.openqa.org:8085/browse/S2RB-REMLX-56> || S2RB-RCUNIT-63 was SUCCESSFUL (with 187 tests) : Dependant of S2RB-WDUNIT-80 <http://xserve.openqa.org:8085/browse/S2RB-RCUNIT-63> || S2RB-WDUNIT-80 was SUCCESSFUL (with 44 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-80> || S2RB-RCINT-43 has FAILED (16 tests failed) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-RCINT-43> || S2RB-RCINT-42 has FAILED (37 tests failed) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-RCINT-42> || S2RB-IE-46 has FAILED (61 tests failed) : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-IE-46> || S2RB-GEM-53 was SUCCESSFUL : Dependant of S2RB-FXLX-65 <http://xserve.openqa.org:8085/browse/S2RB-GEM-53> || S2J-FXXP-151 has FAILED : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-FXXP-151> || S2J-IE7XP-132 has FAILED : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/S2J-IE7XP-132> || S2RB-REMWIN-43 was SUCCESSFUL : Dependant of S2RB-WDUNIT-76 <http://xserve.openqa.org:8085/browse/S2RB-REMWIN-43> || S2RB-FXLX-65 was SUCCESSFUL (with 95 tests) : Dependant of S2RB-WDUNIT-79 <http://xserve.openqa.org:8085/browse/S2RB-FXLX-65> || S2RB-REMLX-55 was SUCCESSFUL (with 79 tests) : Dependant of S2RB-WDUNIT-79 <http://xserve.openqa.org:8085/browse/S2RB-REMLX-55> || WEB-SEHQ-74 was SUCCESSFUL : Updated by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/WEB-SEHQ-74> || S2RB-IE-45 has FAILED (71 tests failed) : Dependant of S2RB-WDUNIT-76 <http://xserve.openqa.org:8085/browse/S2RB-IE-45> || S2RB-RCUNIT-62 was SUCCESSFUL (with 187 tests) : Dependant of S2RB-WDUNIT-79 <http://xserve.openqa.org:8085/browse/S2RB-RCUNIT-62> || S2RB-WDUNIT-79 was SUCCESSFUL (with 44 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-79> || S2RB-FXLX-64 has FAILED (1 tests failed) : Dependant of S2RB-WDUNIT-78 <http://xserve.openqa.org:8085/browse/S2RB-FXLX-64> || S2RB-REMLX-54 has FAILED (1 tests failed) : Dependant of S2RB-WDUNIT-78 <http://xserve.openqa.org:8085/browse/S2RB-REMLX-54> || S2RB-RCUNIT-61 was SUCCESSFUL (with 187 tests) : Dependant of S2RB-WDUNIT-78 <http://xserve.openqa.org:8085/browse/S2RB-RCUNIT-61> || S2RB-WDUNIT-78 was SUCCESSFUL (with 44 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-78> || S2RB-WDUNIT-77 has FAILED : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-77> || WEB-SEHQ-73 was SUCCESSFUL : Updated by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/WEB-SEHQ-73> || WEB-SEHQ-72 was SUCCESSFUL : Updated by Santiago Suarez Ordonez <http://xserve.openqa.org:8085/browse/WEB-SEHQ-72>
+2011-02-22T23:58:26  *** rb2k has quit IRC
+2011-02-22T23:58:37  *** rb2k has joined #selenium
+2011-02-22T23:59:23  *** ryzer-afk is now known as ryzer

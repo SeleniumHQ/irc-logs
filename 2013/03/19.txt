@@ -1,0 +1,1047 @@
+[IRC logfile - Started Tue Mar 19 00:11:06 2013]
+[00:11:06] awilson820 has joined #selenium
+[00:20:01] mreedell-work has joined #selenium
+[00:22:55] totic: How do I close popups that my page launches in selenium, I tried driver.quit(), driver.close(), switching to them and trying to close them etc.. and no luck
+[00:23:54] slex has joined #selenium
+[00:24:04] jarib: depends on what you mean by "popup"
+[00:24:16] jarib: driver.switchTo().alert().close() of it's a javascript alert/confirm/prompt
+[00:25:12] totic: jarib: its an html window
+[00:25:12] jarib: actually it's driver.switchTo().alert().accept() or .dismiss()
+[00:25:18] totic: tried that
+[00:25:35] jarib: then you want to switch to the window and call driver.close
+[00:25:48] totic: shouldnt driver.quit() kill all of them?
+[00:25:56] jarib: yeah
+[00:26:00] totic: It works for every other browser but ie10
+[00:26:22] totic: the "new window" refuses to close
+[00:26:55] jarib: hm
+[00:27:54] jarib: :seen jimevans
+[00:27:55] selbot2: jimevans was last seen about 3 hours ago, leaving.
+[00:27:58] totic: I can't even switch to it
+[00:28:07] jarib: totic: you should wait for jim to show up and help you debug that one
+[00:28:43] totic: ok switch_to_frame takes an index
+[00:28:59] totic: how do I know what each index is assigned to?
+[00:29:15] jarib: i always switch by webelement
+[00:29:27] jarib: when it comes to frames
+[00:29:37] totic: that one is switch_to_window?
+[00:29:46] farlan has joined #selenium
+[00:29:51] jarib: huh? not sure what you're asking about know
+[00:30:12] totic: http://selenium-python.readthedocs.org/en/latest/api.html
+[00:30:21] totic: there is one called driver.switch_to_window('main')
+[00:30:30] totic: window_name is what?
+[00:30:45] totic: is it an "id" a class name?
+[00:31:14] Keavon has joined #selenium
+[00:32:03] jarib: it takes a window handle, there should be driver.get_window_handles or similar (not sure what the exact py api is)
+[00:33:41] ryanpetrello has joined #selenium
+[00:34:21] fatguylaughing has joined #selenium
+[00:35:38] totic: fudge, only one handle appears
+[00:36:49] totic: but launching it in chrome finds two
+[00:38:58] totic: … well I should have accepted that it would fail
+[00:39:04] totic: there is no official support for ie10
+[00:43:43] FluffyDragon2 has joined #selenium
+[00:48:37] jarib: totic: you may have to poll for the handle to appear (try a short sleep to test if that's the case)
+[00:50:35] totic: jarib: will do
+[IRC logfile - Started Tue Mar 19 01:01:41 2013]
+[01:01:41] intchanter has joined #selenium
+[01:02:59] ShawnM has joined #selenium
+[01:14:08] Turzai2 has joined #selenium
+[01:29:08] seleniumuser has joined #selenium
+[01:29:13] seleniumuser: Hello, 
+[01:30:11] seleniumuser: I got the latest Selenium stand alone server 2.31.1 today, and am trying to run tests on IE (grid setup) got the latest IEDeiver and have it in PATH but my code is still not finiding it.. please adivce what i might be missing
+[01:30:46] seleniumuser: IEDriver 2.31.-0 
+[01:31:25] seleniumuser: the documentation says that as long as my path has it ... it should be dine
+[01:31:26] seleniumuser: fine*
+[01:31:34] seleniumuser: but not the case.. 
+[01:50:14] totic has joined #selenium
+[01:51:45] morteh has joined #selenium
+[01:52:30] morteh: supsup
+[IRC logfile - Started Tue Mar 19 02:09:11 2013]
+[02:09:11] llaskin has left #selenium
+[02:19:21] phishy has joined #selenium
+[02:28:28] lukeis has joined #selenium
+[02:28:45] mmarziani has joined #selenium
+[02:42:44] Selenium-Git has joined #selenium
+[02:42:44] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/yCWnWw
+[02:42:44] Selenium-Git: 13selenium/06master 1409be978 15Luke Inman-Semerau: ignore timestamp part of date (or any extra cruft sent)
+[02:42:44] Selenium-Git has left #selenium
+[02:43:30] morteh: anyone around? keep getting errors about @SESSION_ID@ in some selenium tests ive been given
+[02:43:52] lukeis: what's your error? :gist
+[02:43:52] selbot2: Please paste >3 lines of text to https://gist.github.com
+[02:45:59] morteh: https://gist.github.com/anonymous/5193379
+[02:46:00] morteh: thanks
+[02:48:41] lukeis: morteh: looks like a problem with the tests themselves that you are running (the htmlSuite) of course you are running in a configuration i'm not too familiar with (php + RC + htmlSuite)
+[02:49:24] lukeis: key is to look at whatever "$seleniumDir . $test"  is
+[02:49:44] morteh: its a test suite i have been provided with
+[02:49:56] lukeis: ok
+[02:50:09] lukeis: does it work for them?
+[02:50:20] morteh: seems to work okay apart from the errors
+[02:50:28] morteh: i see no mention of sessions in the files
+[02:50:38] lukeis: you wouldn't...
+[02:51:17] morteh: well i dont understand how these files would cause such an error
+[02:52:59] lukeis: not certain, i'd need to know what version of the server you are running and the test suite itself
+[02:53:25] lukeis: (and maybe the custom firefox profile you are providing, but i doubt i need that…)
+[02:54:21] morteh: im using the latest server, how do i find out the version info for the test suite?
+[02:54:23] zeljkof has joined #selenium
+[02:54:53] lukeis: i'm not sure if you can… likely they are using Se IDE to create it
+[02:55:11] lukeis: that format (selenese) hasn't change in a long time
+[02:55:28] lukeis: you're using a deprecated stack btw
+[02:55:43] morteh: which stack?
+[02:55:52] lukeis: by stack, i mean technology stack (RC + htmlSuite)
+[02:56:16] lukeis: test cases can (should) be exported to WebDriver
+[02:56:52] morteh: i dont know if i will have time to do that in this project
+[02:57:14] lukeis: it's a migration thing, and yeah, don't boil the ocean :)
+[02:58:02] lukeis: if you can start, that would be good, but there are very very very few people who are likely to solve your problem (if there's a problem in the selenium project itself)
+[02:58:49] lukeis: current selenium code base I can't see where that error could be coming from
+[02:59:08] morteh: hmm :(
+[IRC logfile - Started Tue Mar 19 03:00:23 2013]
+[03:00:23] lukeis: i lie ;) I found it
+[03:00:33] lukeis: but i don't know why you are getting it
+[03:02:07] lukeis: https://github.com/SeleniumHQ/selenium/blob/master/java/server/src/org/openqa/selenium/server/InjectionHelper.java#L343  and then look at line 246
+[03:02:32] lukeis: so, requests are being made to the server… but a session id isn't being passed in
+[03:03:47] lukeis: dang it… barancev don't worry, i know i broke it ;)
+[03:05:07] morteh: was going to try using  -browserSessionReuse to see if it made a difference
+[03:05:19] morteh: but browser session / session id are different i guess
+[03:05:41] lukeis: same thing
+[03:05:57] morteh: hm
+[03:06:32] lukeis: session id is selenium's session id… not your web application's session id cookie
+[03:06:43] lukeis: so, session id == browser session
+[03:07:22] morteh: i see
+[03:25:18] smccarthy has joined #selenium
+[03:27:58] nirvdrum has joined #selenium
+[03:30:27] rananda has joined #selenium
+[03:31:31] rananda has joined #selenium
+[03:41:45] Selenium-Git has joined #selenium
+[03:41:45] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/roHu2w
+[03:41:45] Selenium-Git: 13selenium/06master 1475e2910 15Luke Inman-Semerau: fixing expectations for non-webkit browsers for date inputs
+[03:41:45] Selenium-Git has left #selenium
+[03:44:25] akhet has joined #selenium
+[03:46:52] susi has joined #selenium
+[IRC logfile - Started Tue Mar 19 04:02:08 2013]
+[04:02:08] lukeis: yay ;)
+[04:03:35] intchanter: lukeis++
+[04:04:11] lukeis: thx ;) I always love fixing tests (especially right after i break them!)
+[04:05:14] intchanter: Someone at work made the mistake of introducing me to http://onegameamonth.com/
+[04:05:17] intchanter: It may be fatal.
+[04:05:34] intchanter: Oops, and I just made the mistake of passing on the infection.  :-)
+[04:05:45] lukeis: heh, i'm not a gamer ;)
+[04:05:58] intchanter: Ah, immunity must be nice.
+[04:06:08] intchanter: This is about writing games, but that may not make a difference.
+[04:06:35] lukeis: after having kids i've lost all time for games
+[04:06:44] lukeis: self imposed i guess...
+[04:07:03] lukeis: all my spare time (like these precious few hours i have this evening) are going to open source
+[04:07:10] intchanter: I struggle to find time to log into Minecraft between kids, wife, and trying to demonstrate coding skill.
+[04:07:18] lukeis: :)
+[04:07:38] intchanter: I've been averaging something like 30 minutes a week.
+[04:09:01] intchanter: Hrm.  Why didn't that one work?
+[04:09:10] intchanter: All the other ones loved you.
+[04:09:22] lukeis: different test failure
+[04:09:29] intchanter: Oh, good.
+[04:10:15] lukeis: not so good in one respect… it just happened… unless this is a flaky test
+[04:10:50] intchanter: Some seemed to be when I was running tests repeatedly for patches.
+[04:11:01] lukeis: ahh, sauce timeout
+[04:11:12] totic has joined #selenium
+[04:11:25] lukeis: not my fault ;)
+[04:11:45] intchanter: Are you sure you didn't swap it with Heinz?
+[04:11:53] lukeis: heh
+[04:13:12] lukeis: a local place here has 'special' ketchup… "Heinz 57 in a Huntz bottle"  (well, they used to do that at least, before heinz started making their own plastic squeeze bottles)
+[04:13:52] intchanter: Squeeze bottles make life so much better.
+[04:14:10] intchanter: Especially if the spout is just the right size for the viscosity of the sauce inside.
+[04:14:43] intchanter: Remember life before squeeze bottles?  It was always a mess.
+[04:14:59] lukeis: yup
+[04:15:05] intchanter: Though I think I have to be careful who I say that to.  Lots of kids have no idea.
+[04:15:21] intchanter: "There was a time before squeeze bottles?!"
+[04:15:26] lukeis: ;)
+[04:15:30] intchanter: That sort of thing just might make me feel old.
+[04:16:05] intchanter: "You've held a punch card?!"
+[04:16:19] lukeis: felt old the other day when i saw someone mention the phase "don't trust anyone over 30" … stopped for a second, man, i'm over 30 now
+[04:16:38] Hammertime38 has joined #selenium
+[04:16:52] intchanter: Yeah, I'm 6^2 this year, so I know the feeling.
+[04:18:55] lukeis: had to think longer than i'd like to admit to figure out a decent square of my 'young' age ;)  2^5
+[04:19:13] lukeis: so, i went exponential :)
+[04:19:23] *lukeis losing it...
+[04:19:34] intchanter: I won't be another power of two for a while.  Enjoy it while it lasts.
+[04:20:26] intchanter: If I'm really lucky and technology keeps advancing, maybe I'll stand a tiny chance of seeing the one after that too.
+[04:20:52] lukeis: heh, i wouldn't want to 2^6 is enough for me
+[04:21:20] intchanter: I'm still learning too fast and falling behind anyway to think I'll run out of excitement.
+[04:21:24] lukeis: after that I'll just be hoping my body doesn't decay too fast
+[04:22:48] intchanter: Fast or slow, I won't be using it.
+[04:22:55] intchanter: So I'm not sure I care.
+[04:23:16] lukeis: plug in to the collective? :)
+[04:23:36] intchanter: Oh, I thought you meant after.
+[04:23:48] intchanter: Decay while alive is a very different question.
+[04:23:56] phishy has joined #selenium
+[04:23:59] lukeis: you're already decaying ;)
+[04:24:28] lukeis: thankfully you're replenishing faster still
+[04:24:33] intchanter: Yes, but I've managed to reverse a bit of it.  Felt like I was 90 for several years there due to an undiagnosed food allergy.
+[04:24:47] lukeis: ahh
+[04:24:50] lukeis: that's good
+[04:25:33] intchanter: Gluten isn't nice to me.
+[04:25:55] intchanter: But now I'm able to exercise again, and am trying to reclaim my knees, shoulders, and spine.
+[04:25:56] lukeis: i have a friend like that too… gluten isn't nice to most people
+[04:26:35] intchanter: I'm also able to get through an entire day of work without meds and without wondering how hard I'll crash when I get home.
+[04:27:33] stephend has joined #selenium
+[04:29:18] intchanter: Thankfully, we now live in a time where a lot more people are aware of food allergies, and restaurant staff are starting to get training in how to avoid cross-contamination.
+[04:30:16] intchanter: I think I know how I want to decorate my office now.
+[04:30:43] lukeis: with pictures of wheat fields? :)
+[04:31:07] intchanter: I'll frame and hang some old computer items, like punch cards, paper tapes, pictures of ancient computers and their predecessors, etc.
+[04:31:24] intchanter: Anything about the history of data storage and processing.
+[04:31:35] intchanter: Including old manual method.
+[04:31:37] intchanter: s
+[04:31:52] lukeis: don't forget to get some classic floppy disks :)
+[04:32:03] intchanter: All the way back to 8".
+[04:33:55] intchanter: Oh, and I can throw in any related memorabilia.  For example, I found a boxed set of the Zork trilogy at a yard sale for $1.
+[04:34:18] lukeis: nice
+[04:39:43] lukeis: watching tests run on actual mobileSafari (ios) is still so cool to me… looking forward to axing iphoneDriver from the source tree ;)
+[04:41:26] intchanter: I love seeing progress too.
+[04:41:57] intchanter: We've come so far, and I have trouble imagining what the next 30 years will bring.
+[04:42:34] lukeis: i honestly can't imagine :) 
+[04:42:41] intchanter: The past 30 took us from the first Apple, Commodore, and TRS computers all the way to now.
+[04:43:26] intchanter: Now there's talk of cars made on 3D printers traveling from LA to NY on 10 gallons of diesel.
+[04:43:44] intchanter: And I'm sure we're only scratching the surface.
+[04:44:18] lukeis: 3D printing is to me like an iphone is to our grandparents ;)
+[04:44:45] intchanter: It seems foreign, alien, futuristic.
+[04:45:25] lukeis: yep, i should spend some time looking at how it *really* works
+[04:45:31] intchanter: Especially when they start talking about using high resolution 3D printers to print the extracellular matrix that makes up an organ and then populate it with your own cells.
+[04:46:20] intchanter: At its core, 3D printing is pretty simple.  Picture a glue gun attached to an old plotter or a CNC.
+[04:46:23] lukeis: high rez 3D printahs of teh futur3… print urself!
+[04:46:39] intchanter: It lays down one layer of material at a time, which then cools and hardens.
+[04:47:12] girija_ has joined #selenium
+[04:47:14] Pavan has joined #selenium
+[04:47:39] intchanter: There are other processes that differ slightly, but that's the basics.
+[04:48:16] intchanter: Once you have a printer, you just need the raw material and a design to make just about anything.
+[04:48:57] intchanter: Assuming, for now, that it can be made from mostly a single material (usually plastic at this point, but there are processes for metal and other materials).
+[04:51:42] bujji has joined #selenium
+[04:51:47] lukeis: in my mind it won't actually breakthrough as a viable tech until the cost to manufacture/ship is lower or equivalent to the cost to make it 'for real'
+[04:52:22] intchanter: It's approaching from a different angle.
+[04:52:50] intchanter: There are online shops now where you can buy designs to print yourself, and usually for less cost that you can get them pre-made.
+[04:53:12] lukeis: there ya go ;) costs less there
+[04:53:39] intchanter: And manufacturers are starting to use the flexibility of being able to print one-off designs without having to re-tool for each changeover to offer custom designs, styles, and colors to their customers.
+[04:54:21] intchanter: So you can customize your item before you purchase it, see how it will look, and then get it shipped within a couple of days.
+[04:54:56] xiaoli has left #selenium
+[04:55:17] intchanter: On a similar direction, there's a group working on creating a set of open source homesteading and farming tools.
+[04:55:44] intchanter: The plan is to have them complement each other and be able to be used to replicate themselves.
+[04:56:31] intchanter: They'll still need a human operator at this point, but you can then add some raw materials and some personal time to make a copy for your neighbor.
+[04:56:38] intchanter: Or make spare parts for your own.
+[04:58:01] intchanter: The creation story goes that the originator decided to try his hand at farming, but found he was spending all his money on tractor repairs.
+[04:58:23] intchanter: So he figured there should be a less expensive way to run a farm.
+[IRC logfile - Started Tue Mar 19 05:01:20 2013]
+[05:01:20] intchanter: So yeah, way too much exciting stuff happening.  I can't imagine leaving between 2^6 and 2^7.
+[05:17:00] rananda has joined #selenium
+[05:20:11] fatguylaughing has joined #selenium
+[05:23:02] markalanevans has joined #selenium
+[05:27:49] seleniumuser has joined #selenium
+[05:28:08] seleniumuser: need help with the latest selenium 2.31.2 
+[05:28:17] seleniumuser: standalone server
+[05:28:22] seleniumuser: anyone? 
+[05:29:40] intchanter: :ask
+[05:29:41] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[05:30:29] seleniumuser: well i did earlier.. type the whole question.. without any luck.. so checking this time.. 
+[05:31:02] seleniumuser: anyways.. here goes. I got the latest build and not seeing the 3 dlls that were present before.. 
+[05:31:40] seleniumuser: for C# driver: Castle.Core.dll, Ionic.Zip.dll and Newtonsoft.Json.dll
+[05:31:52] seleniumuser: any reason why they are missing? 
+[05:32:02] seleniumuser: my project does not compile with the latest dll's 
+[05:32:05] lukeis: just read your old query too… are you running on Windows 8?
+[05:32:25] seleniumuser: and also IEDriverSEtup.exe is not being picked up 
+[05:32:29] seleniumuser: from the PATH
+[05:32:31] seleniumuser: no win7
+[05:32:38] lukeis: those files are needed
+[05:32:56] lukeis: 2.31.2 was made because i think there were some pacakaging issues
+[05:33:04] seleniumuser: yes they are.. but they are not present in the latest package
+[05:33:49] lukeis: kindly send an email to the selenium-developers mailing list about that… responsible parties read that :)
+[05:34:04] seleniumuser: hmm ok
+[05:34:14] *lukeis doesn't work on .NET 
+[05:34:28] seleniumuser: also anyone know why IEDriverSetup.exe wont be read from the PATH variable? 
+[05:34:35] seleniumuser: i am runnig grid setup
+[05:34:35] lukeis: it does
+[05:34:50] seleniumuser: hmm its not for me.. i got the 2.31 IEDriver
+[05:34:54] intchanter: Paste the value of the PATH variable?
+[05:35:00] seleniumuser: sure
+[05:35:03] bujji has joined #selenium
+[05:35:15] seleniumuser: %SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files\Java\jdk1.7.0_06\bin;C:\Automation\Windiff\WinDiff.Exe;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files (x86)\Microsoft
+[05:35:25] seleniumuser: %SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;C:\Program Files\Java\jdk1.7.0_06\bin;C:\Automation\Windiff\WinDiff.Exe;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files (x86)\Microsoft
+[05:35:28] seleniumuser: thats the tail end of it
+[05:35:29] intchanter: Bummer, too long for one line.
+[05:35:33] seleniumuser: yes
+[05:35:36] intchanter: :gist
+[05:35:37] selbot2: Please paste >3 lines of text to https://gist.github.com
+[05:35:45] intchanter: Try that, even though it's really one line.
+[05:36:37] seleniumuser: https://gist.github.com/anonymous/5193956
+[05:37:16] intchanter: Two things...
+[05:37:34] intchanter: 1. PATH expects directory names, and the OS searches those directories for executables.
+[05:38:07] intchanter: 2. I'm not sure the executable it's looking for is IEDriverSetup.exe.  I'd expect to see one without "Setup" in its name... maybe.
+[05:40:22] seleniumuser: not sure what you mean by your second
+[05:41:09] intchanter: I'd expect it to be called IEDriver.exe rather than IEDriverSetup.exe.  What happens if you run the one that's there?
+[05:41:19] intchanter: Manually, that is.
+[05:41:20] seleniumuser: it runs just fine
+[05:41:25] seleniumuser: shows up in the taskmanage
+[05:41:27] seleniumuser: r*
+[05:42:15] intchanter: Okay, so it doesn't open up dialogs for installing something?
+[05:42:30] seleniumuser: nope
+[05:42:55] intchanter: I may be mistaken on that point, then.  Just remove the IEDriverServer.exe part from the PATH, and you may be set.
+[05:42:58] seleniumuser: it never did.. even prevously.. its not an install able.. its an exe thats needed by your webdriver
+[05:43:14] *intchanter laughs.
+[05:43:32] intchanter: Awesome!  I hang out here for a couple of weeks, and I suddenly own the place.  :-p
+[05:43:49] lukeis: you're doing a great job intchanter ;)
+[05:44:15] intchanter: I should really get a broom, and maybe some furniture so people can be comfortable.
+[05:44:19] SamuraiJack has joined #selenium
+[05:44:23] seleniumuser: no that does not help
+[05:44:38] intchanter: Does it do anything differently?
+[05:45:19] lukeis: easiest way to solve some of the IE server path problems, put the IEDriverServer.exe in the same folder as the standalone-server jar
+[05:45:32] lukeis: doesn't need to be on the PATH
+[05:46:17] intchanter: Oh "Server", not "Setup".  My mistake.
+[05:47:08] Manoj_ has joined #selenium
+[05:47:14] seleniumuser: ok am gonna try that
+[05:50:46] intchanter: :wiki history
+[05:50:46] selbot2: 1: 03History: History, anecdotes, and memories of how Selenium got to be what it is - https://code.google.com/p/selenium/wiki/History
+[05:52:09] intchanter: Yes, I remembered correctly.  if anyone can be "blamed" for webdriver, it's simonstewart.
+[05:52:22] intchanter: seleniumuser: How's that going for you now?
+[05:52:22] lukeis: :whobrokeit
+[05:52:23] selbot2: simonstewart
+[05:52:25] lukeis: :)
+[05:52:33] Manoj_: hey... good day all.
+[05:52:43] intchanter: Greetz.
+[05:52:48] lukeis: hiya Manoj_
+[05:53:07] Manoj_: hey.. lukeis
+[05:53:13] Manoj_: havent slept yet ? ;)
+[05:53:30] lukeis: will be soon
+[05:53:43] Manoj_: cool :)
+[05:54:17] lukeis: i'm more curious why intchanter is still awake ;)
+[05:54:18] Manoj_: lukeis: so the santiycr was mentioning that there will be a call before the SeConf about the work shop..
+[05:54:39] Manoj_: intchanter: is very dedicated ;)
+[05:54:47] lukeis: yes, i have a meeting with him tomorrow (err, in 16 hours) about it
+[05:54:58] intchanter: It's just midnight here.  Don't have to get up until 06:30.
+[05:55:14] intchanter: Which probably does mean I should stop trying to make a game and get some rest.
+[05:55:18] lukeis: ah, i thought you were on the east coast for some reason
+[05:55:24] Manoj_: Oh ok, so only with Santiycr ?
+[05:55:27] intchanter: Well, "game" is probably closer to the truth.
+[05:55:42] Manoj_: if its a online call conference, I may join :)
+[05:55:46] lukeis: Manoj_: with another selenium commiter (dave hunt) too
+[05:55:58] Manoj_: yeah Dave Hunt... 
+[05:56:34] intchanter: Have a good night guys, and thanks for the reminder, Manoj_.
+[05:56:40] lukeis: Manoj_: we'll probably open up later meetings, right now we want to figure out even what we should even start to think about doing
+[05:57:00] Manoj_: lol, have a good night intchanter 
+[05:57:17] Manoj_: lukeis: Alright, I understand.
+[05:57:44] Manoj_: by any chance, if there is a MOM  i will take a look on that.
+[05:57:46] Manoj_: :)
+[05:58:24] lukeis: not likely… but remind me and I'll give you a run-down :)
+[IRC logfile - Started Tue Mar 19 06:09:52 2013]
+[06:09:52] liberus has joined #selenium
+[06:11:32] Manoj_: sure lukeis
+[06:26:28] zeljkof has joined #selenium
+[06:40:53] intchanter has joined #selenium
+[06:42:46] Ravindra has joined #selenium
+[06:46:55] rdk has joined #selenium
+[06:59:03] Lalit has joined #selenium
+[06:59:12] papegaaij has joined #selenium
+[IRC logfile - Started Tue Mar 19 07:12:33 2013]
+[07:12:33] Turzai has joined #selenium
+[07:16:55] zeljkof has joined #selenium
+[07:36:12] liberus has joined #selenium
+[07:40:30] ShawnM has joined #selenium
+[07:46:24] vila has joined #selenium
+[07:47:17] rbalent has joined #selenium
+[07:47:17] rbalent has joined #selenium
+[IRC logfile - Started Tue Mar 19 08:07:09 2013]
+[08:07:09] Swadq has joined #selenium
+[08:19:03] stackedsax1 has joined #selenium
+[08:21:52] stan has joined #selenium
+[08:22:15] samphippen has joined #selenium
+[08:25:11] admc has joined #selenium
+[08:30:25] testingb0t has joined #selenium
+[08:34:49] tobie has joined #selenium
+[08:38:13] rbalent has joined #selenium
+[08:49:23] zac_sel has joined #selenium
+[08:53:24] stan has joined #selenium
+[IRC logfile - Started Tue Mar 19 09:07:38 2013]
+[09:07:38] seesusi has joined #selenium
+[09:10:57] rananda has joined #selenium
+[09:14:10] Domml has joined #selenium
+[09:14:29] Domml: hey guys
+[09:15:44] liberus has joined #selenium
+[09:20:30] zeljkof has joined #selenium
+[09:22:49] samphippen has joined #selenium
+[09:23:50] Hronom has joined #selenium
+[09:28:22] sawoy has joined #selenium
+[09:28:36] intchanter has joined #selenium
+[09:32:31] Administrator has joined #selenium
+[09:32:36] samphippen has joined #selenium
+[09:33:08] sburjan has joined #selenium
+[09:39:01] Bebe_sel has joined #selenium
+[09:49:26] davehunt has joined #selenium
+[09:50:37] Bebe_sel has joined #selenium
+[09:50:43] jamesoram has joined #selenium
+[09:52:24] Manoj_: Domm1: Hi just :ask
+[09:52:25] selbot2: If you have a question, please just ask it. Don't look for topic experts. Don't ask to ask. Don't PM. Don't ask if people are awake, or in the mood to help. Just ask the question straight out, and stick around. We'll get to it eventually :)
+[09:54:27] susi has joined #selenium
+[09:57:07] annette has joined #selenium
+[09:57:13] annette has left #selenium
+[IRC logfile - Started Tue Mar 19 10:03:36 2013]
+[10:03:36] SUman has joined #selenium
+[10:05:48] SUman: Hello
+[10:10:43] eghm_ has joined #selenium
+[10:13:01] SUman: selenium has driver to support native app testing
+[10:13:01] SUman: ?
+[10:13:01] seesusi has joined #selenium
+[10:13:03] housewifehacker1 has joined #selenium
+[10:13:07] p_l_ has joined #selenium
+[10:13:37] james_o has joined #selenium
+[10:14:06] rdk1 has joined #selenium
+[10:14:15] stan_ has joined #selenium
+[10:14:38] zeljkof has joined #selenium
+[10:15:57] Hronom has joined #selenium
+[10:16:37] riotz has joined #selenium
+[10:21:56] annette has joined #selenium
+[10:22:59] annette has left #selenium
+[10:28:51] suman has joined #selenium
+[10:29:01] suman: Hi
+[10:29:39] suman: selenium has any tools for native app testing in mobiles?
+[10:29:53] suman: automation testin
+[10:43:00] Phil37 has joined #selenium
+[10:47:12] jimevans has joined #selenium
+[10:47:46] jimevans: g'day everybody
+[10:54:12] Phil37: hey
+[10:58:16] Phil37: when something has "unattached from the DOM" does this mean the dom has given it a new ID and the driver is still referencing the old one?
+[IRC logfile - Started Tue Mar 19 11:06:48 2013]
+[11:06:48] zac_sel_ has joined #selenium
+[11:07:15] zeljkof has joined #selenium
+[11:08:57] freynaud has joined #selenium
+[11:09:00] Phil37: i'll check the bbs
+[11:11:01] zeljkof has joined #selenium
+[11:11:22] zeljkof_ has joined #selenium
+[11:13:14] NReijmersdal has joined #selenium
+[11:13:14] samphippen has joined #selenium
+[11:13:55] annette has joined #selenium
+[11:14:38] jibay has joined #selenium
+[11:17:05] Turzai: Phil37: that means that the element you tried to selected before with a locator is not there anymore
+[11:17:56] Turzai: possible the tag structure changed beacuse of an action
+[11:18:15] samphippen has joined #selenium
+[11:26:47] annette has left #selenium
+[11:31:18] liberus has joined #selenium
+[11:31:25] Guest97169 has joined #selenium
+[11:33:46] itatitat has joined #selenium
+[11:36:23] davehunt has joined #selenium
+[11:46:39] jimevans: holy hell. i don't believe that actually worked.
+[11:50:00] samphippen has joined #selenium
+[11:50:38] jimevans: right. back in an hour or so.
+[11:54:09] Selenium-Git has joined #selenium
+[11:54:09] Selenium-Git: [13selenium] 15flyte opened pull request #33: Changed 'false' to 'False' to be in compliance with Python syntax in IDE webdriver export (06master...06master)  02http://git.io/QZjWrA
+[11:54:09] Selenium-Git has left #selenium
+[11:55:49] zeljkof has joined #selenium
+[11:57:04] RossPatterson has joined #selenium
+[11:57:04] ChanServ has altered RossPatterson's mode: +o
+[IRC logfile - Started Tue Mar 19 12:11:05 2013]
+[12:11:05] intchanter has joined #selenium
+[12:19:18] llaskin has joined #selenium
+[12:19:41] Selenium-Git has joined #selenium
+[12:19:41] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06jruby-update at 14ecb6aa3: 02http://git.io/tqbnfQ
+[12:19:41] Selenium-Git has left #selenium
+[12:20:56] mreedell-work has joined #selenium
+[12:24:16] totic has joined #selenium
+[12:31:03] mreedell has joined #selenium
+[12:32:58] farlan has joined #selenium
+[12:33:06] farlan has left #selenium
+[12:37:55] Phil37 has joined #selenium
+[12:40:16] jimevans has joined #selenium
+[12:46:02] rananda has joined #selenium
+[IRC logfile - Started Tue Mar 19 13:03:30 2013]
+[13:03:30] freynaud has joined #selenium
+[13:11:20] bluescreen10 has joined #selenium
+[13:12:49] nirvdrum has joined #selenium
+[13:14:57] llaskin: nothign better then every QA server being down on release day...woops
+[13:15:13] andreastt: jimevans, AutomatedTester: When should one be in town for GTAC if there will be W3C related things going on?  Or did we decide to do the W3C stuff at SeConf?
+[13:15:27] jimevans: andreastt: no idea. i'm not going to gtac.
+[13:15:54] jimevans: (which is why i was pushing for seconf for w3c stuff)
+[13:16:04] andreastt: Right, did we decide on that?
+[13:16:13] jimevans: i'm pretty sure we did.
+[13:16:18] *andreastt needs to book flight and hotel
+[13:16:30] andreastt: Got you!
+[13:16:43] andreastt: I'm not intending to stay longer than I have to in NYC.
+[13:18:22] AutomatedTester: andreastt: Simon said he wouldnt be able to discuss anything unless it was in the middle of the conf
+[13:18:34] AutomatedTester: andreastt: that is on the w3 mailing list
+[13:19:18] Edline has joined #selenium
+[13:19:53] andreastt: What do you mean by in the middle of the conf?
+[13:30:31] jimevans: funny how rebooting your machine can make all the difference in the world.
+[13:37:57] ryanpetrello has joined #selenium
+[13:39:22] annette has joined #selenium
+[13:45:16] AutomatedTester: andreastt: as in lunch
+[13:45:36] andreastt: Okay.
+[13:45:50] andreastt: Asked our travel agency to book me something between 22 and 25/26.
+[13:45:58] f4c3p4lm has joined #selenium
+[13:46:00] andreastt: Let's see what they come up with.  I'm waiting in anticipation for them to fuck up.
+[13:46:24] *andreastt is expecting a day's layover in Istanbul or some other desolate location
+[13:47:04] cgoldberg has joined #selenium
+[13:47:30] AutomatedTester: andreastt: http://lists.w3.org/Archives/Public/public-browser-tools-testing/2013JanMar/0025.html
+[13:48:10] andreastt: Cool, thanks!
+[13:49:07] riv_ has joined #selenium
+[13:51:29] davehunt has joined #selenium
+[13:55:20] rdk1 has left #selenium
+[IRC logfile - Started Tue Mar 19 14:00:21 2013]
+[14:00:21] fatguylaughing has joined #selenium
+[14:01:30] brokenthumbs has joined #selenium
+[14:10:55] Bebe_sel has joined #selenium
+[14:18:24] awilson820 has joined #selenium
+[14:23:49] liberus has joined #selenium
+[14:24:23] Revery1 has joined #selenium
+[14:25:39] jimevans: well, that's removal of ATL from the IE driver for everything except the IECommandExecutor class
+[14:26:03] Revery1 has joined #selenium
+[14:26:07] jimevans: i have absolutely no confidence in this code whatsoever.
+[14:26:50] dawagner has joined #selenium
+[14:26:57] farlan has joined #selenium
+[14:27:12] jimevans: i suppose i could push my branch up to googlecode so everyone could look at it.
+[14:28:50] Revery1 has joined #selenium
+[14:31:18] phishy has joined #selenium
+[14:32:01] Revery1 has joined #selenium
+[14:33:39] stackedsax has joined #selenium
+[14:34:53] intchanter-work has joined #selenium
+[14:35:17] Revery1 has joined #selenium
+[14:38:12] *AutomatedTester is having roast pork for dinner if anyone fancies coming round
+[14:39:42] *Phil37 prepares his good corset
+[14:40:24] vila has joined #selenium
+[14:43:11] girija_ has joined #selenium
+[14:44:02] Revery1 has joined #selenium
+[14:45:26] AutomatedTester: brb... rebooting my VPS
+[14:49:05] stackedsax has joined #selenium
+[14:49:35] AutomatedTester has joined #selenium
+[14:50:45] zeljkof has joined #selenium
+[14:51:17] Revery1 has joined #selenium
+[14:51:58] AutomatedTester: cgoldberg: did you see py3 landed?
+[14:52:39] cgoldberg: AutomatedTester, heh?  py3 webdriver??
+[14:53:12] AutomatedTester: cgoldberg: 5cc5085692c6784aefd3f63da85f0c0cb629714a
+[14:53:14] selbot2: 03intchanter 3 days ago - Adding Python3 support, work from Isaul Vargas included in this patch | https://code.google.com/p/selenium/source/detail?r=5cc5085 | http://dashboard.ci.seleniumhq.org/#/revision/5cc5085692c6784aefd3f63da85f0c0cb629714a
+[14:54:08] cgoldberg: AutomatedTester, sweet.. looking now.  I don't usually follow trunk... I just wait downstream :)  will this be in 2.32?
+[14:54:52] AutomatedTester: cgoldberg: yup
+[14:54:56] AutomatedTester: need to test packaging
+[14:55:02] AutomatedTester: but for the most part works
+[14:55:12] cgoldberg: AutomatedTester, awesome!
+[14:55:48] dawagner: What a lovely API.  On one object, setInputStream and getInputStream deal with different underlying streams.
+[14:56:14] AutomatedTester: dawagner: and you're complaining why?
+[14:56:49] dawagner: Because I long for sensible APIs :)
+[14:57:03] AutomatedTester: ah bless
+[14:57:07] *AutomatedTester pat pats dawagner
+[14:59:44] intchanter has joined #selenium
+[IRC logfile - Started Tue Mar 19 15:00:47 2013]
+[15:00:47] Guest27953 has joined #selenium
+[15:01:30] Revery1 has joined #selenium
+[15:03:26] cgoldberg: AutomatedTester, i'm looking at this code... so it doesn't use 2to3 for translation anymore?  it just runs under 2 and 3?
+[15:03:38] AutomatedTester: cgoldberg: yup
+[15:03:39] Guest27953: Hello everyone
+[15:03:47] Guest27953: er
+[15:03:51] AutomatedTester: cgoldberg: tested it will 2.6 up
+[15:03:57] cgoldberg: AutomatedTester, cool.. that's great.
+[15:04:11] Stephen: There we are
+[15:04:21] AutomatedTester: cgoldberg: intchanter and Dude-X_ did all the work and I just cleaned up a few things
+[15:04:38] cgoldberg: AutomatedTester, although now I have no excuse to not port my framework to py3 :)
+[15:04:39] plightbo_work has joined #selenium
+[15:04:57] *intchanter-work smiles.
+[15:04:57] AutomatedTester: cgoldberg: I have to do that for browsermob proxy too
+[15:05:04] intchanter-work: I love killing excuses.
+[15:05:14] Stephen: I've been tasked with implementing a Microsoft Test Lab, and I understand that Selenium integrates nicely with it. Is there anyone familiar with this sort of setup than can offer advice? I'm not looking for full implementation details, just experience.
+[15:05:48] intchanter-work: (Which should not be parsed to identical meaning as "excuses to kill", at least in this case)
+[15:05:55] cgoldberg: AutomatedTester, intchanter, Dude-X_, well nice work... py3 support is huge.  we're just at the inflection point (IMO) of the real py3 wave... good to see this project keeping up
+[15:05:59] AutomatedTester: jimevans: ^ re:s Stephen
+[15:06:06] davehunt has joined #selenium
+[15:06:39] jimevans: AutomatedTester, Stephen: i have no experience with that whatsoever.
+[15:06:56] AutomatedTester: intchanter-work: we're in european time, we liberal types wouldnt confuse that
+[15:07:08] jimevans: i recently ran across the fact that you can use selenium for cross-browser playback of "coded ui tests"
+[15:07:26] intchanter-work: cgoldberg: I got a new project and decided I wanted to start with py3, and Dude-X_ had some work lying around so I could use it for reference to apply to the current trunk.
+[15:07:29] jimevans: but i've never used the MSFT test runner beyond unit tests.
+[15:08:15] intchanter-work: AutomatedTester made sure it got some more polish and made sure tests were passing or removed for being irrelevant.
+[15:08:21] cgoldberg: sweet
+[15:08:56] _Getty has joined #selenium
+[15:09:20] cgoldberg: I'm sorta in py2/py3 limbo...  all my personal open source projects are on py3... but a lot of work stuff still running 2.7.
+[15:09:31] cgoldberg: hopefully this will change some of that
+[15:09:40] AutomatedTester: cgoldberg: come work at Mozilla, we still have some projects on 2.4
+[15:09:44] AutomatedTester: FML
+[15:09:49] Stephen: jimevans: Yeah, I've got Test Manager up and going, waiting for some updates to run so I can get VS Test Professional up next. The idea being that I'll add the UI Tests to the TFS Build process in some instances
+[15:10:13] Stephen: jimevans: I've yet to fully delve into understanding Selenium's capabilities
+[15:10:27] cgoldberg: AutomatedTester, we have a lot of 2.6 laying around tbh... but most stuff still used has been upgraded/ported along the way
+[15:14:43] samphippen has joined #selenium
+[15:14:49] ryanpetrello has joined #selenium
+[15:15:23] smccarthy has joined #selenium
+[15:17:10] samphippen has joined #selenium
+[15:17:40] Revery1 has joined #selenium
+[15:18:34] annette has joined #selenium
+[15:20:18] AutomatedTester: oh look, and yes its obvious, we also support pypy
+[15:20:25] Revery1 has joined #selenium
+[15:20:47] riv_ has joined #selenium
+[15:23:45] annette has left #selenium
+[15:29:39] Revery1 has joined #selenium
+[15:31:27] stephend has joined #selenium
+[15:31:37] lukeis has joined #selenium
+[15:33:09] lukeis has joined #selenium
+[15:38:14] qaguy has joined #selenium
+[15:38:59] freynaud_ has joined #selenium
+[15:42:58] itatitat has joined #selenium
+[15:51:34] Dude-X_ has joined #selenium
+[15:51:54] Revery1 has joined #selenium
+[15:53:18] nhirata has joined #selenium
+[IRC logfile - Started Tue Mar 19 16:02:05 2013]
+[16:02:05] zeljkof has joined #selenium
+[16:02:54] ShawnM has joined #selenium
+[16:13:27] riv_ has joined #selenium
+[16:13:28] h8R has joined #selenium
+[16:14:05] Revery1 has joined #selenium
+[16:16:35] stackedsax1 has joined #selenium
+[16:17:16] Revery1 has joined #selenium
+[16:20:28] Revery1 has joined #selenium
+[16:22:13] Revery1 has joined #selenium
+[16:22:25] jcarr has joined #selenium
+[16:22:45] richkazin has joined #selenium
+[16:23:01] admc has joined #selenium
+[16:25:30] Getty has joined #selenium
+[16:28:56] susi has joined #selenium
+[16:29:26] Revery1 has joined #selenium
+[16:31:41] tinygeo has joined #selenium
+[16:32:20] tinygeo has joined #selenium
+[16:32:29] tinygeo has left #selenium
+[16:34:49] jleyba has joined #selenium
+[16:35:36] AutomatedTester_ has joined #selenium
+[16:36:26] ryanpetr_ has joined #selenium
+[16:41:17] ShawnM has joined #selenium
+[16:44:22] sfbrian has joined #selenium
+[16:48:08] riv_ has joined #selenium
+[16:57:40] santiycr has joined #selenium
+[16:57:45] santiycr: :log
+[16:57:46] selbot2: http://illicitonion.com/selogs/selenium/2013/03/19.txt | http://illicitonion.com/selogs/search
+[IRC logfile - Started Tue Mar 19 17:01:37 2013]
+[17:01:37] riv_ has joined #selenium
+[17:02:09] Revery1 has joined #selenium
+[17:04:29] qaguy has joined #selenium
+[17:07:22] vila has joined #selenium
+[17:08:50] girija has joined #selenium
+[17:09:09] ryanpetrello has joined #selenium
+[17:11:17] phishy has joined #selenium
+[17:12:16] riv_ has joined #selenium
+[17:19:51] Revery1 has joined #selenium
+[17:20:54] barancev has joined #selenium
+[17:21:03] Selenium-Git has joined #selenium
+[17:21:03] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 3 new commits to 06master: 02http://git.io/g9Oeuw
+[17:21:03] Selenium-Git: 13selenium/06master 140488980 15Jim Evans: Updating logic in IE driver to correctly wait for the document....
+[17:21:03] Selenium-Git: 13selenium/06master 14a5b05f0 15Jim Evans: Adding ability to get current URL from IWebBrowser2 if IHTMLDocument2...
+[17:21:03] Selenium-Git: 13selenium/06master 141e27bd9 15Jim Evans: Updating IEDriverServer prebuilts
+[17:21:03] Selenium-Git has left #selenium
+[17:21:09] barancev has joined #selenium
+[17:21:34] Revery1 has joined #selenium
+[17:26:26] Bebe_sel has joined #selenium
+[17:27:17] liberus has joined #selenium
+[17:30:47] Revery1 has joined #selenium
+[17:38:42] Selenium-Git has joined #selenium
+[17:38:42] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/6LDYAQ
+[17:38:42] Selenium-Git: 13selenium/06master 1444cead4 15Jason Leyba: WebDriver-backed Selenium tries to emulate Selenium Core's alert handling by...
+[17:38:42] Selenium-Git has left #selenium
+[17:40:55] barancev: jimevans: very interesting fix of #5326
+[17:40:55] selbot2: 03 closed/fixed Logic error in Browser.cpp for IEDriverServer.exe cause assert failure in ATL - https://code.google.com/p/selenium/issues/detail?id=5326 [Type-Defect Priority-Medium Status-Untriaged Browser-IE]
+[17:41:11] mreedell has joined #selenium
+[17:41:31] jimevans: barancev: well, the logic has been broken for a long time.
+[17:42:07] jimevans: it's almost impossible that you'd get all three conditions true at the same time, when we really want to fail out if any one of them is true.
+[17:42:14] barancev: how was not it found? can we add a test for this case?
+[17:42:27] jimevans: it's nearly impossible to reproduce.
+[17:43:15] jcarr has joined #selenium
+[17:43:28] cmcgraw has joined #selenium
+[17:44:01] jimevans: you have to catch the browser in a place where calling IWebBrowser2::get_Document returns an invalid pointer, which will only happen for minute fractions of a second while the document may be navigating.
+[17:44:58] knorrium has joined #selenium
+[17:46:20] itatitat has joined #selenium
+[17:48:03] Revery1 has joined #selenium
+[17:49:11] leonardoro has joined #selenium
+[17:49:46] Revery1 has joined #selenium
+[17:52:02] Swadq has joined #selenium
+[17:56:01] Revery1 has joined #selenium
+[17:57:37] ryanpetr_ has joined #selenium
+[17:58:48] santiycr has joined #selenium
+[17:59:12] Revery1 has joined #selenium
+[17:59:13] manoj_ has joined #selenium
+[IRC logfile - Started Tue Mar 19 18:01:05 2013]
+[18:01:05] qaguy has joined #selenium
+[18:03:30] santiycr has joined #selenium
+[18:03:57] Revery1 has joined #selenium
+[18:08:44] mreedell has joined #selenium
+[18:09:08] Revery1 has joined #selenium
+[18:11:28] slex has joined #selenium
+[18:13:22] Revery1 has joined #selenium
+[18:18:59] ryanpetrello has joined #selenium
+[18:25:45] FullTiltProspect has joined #selenium
+[18:34:37] Revery1 has joined #selenium
+[18:38:50] knorrium has joined #selenium
+[18:39:20] Revery1 has joined #selenium
+[18:46:28] ShawnM has joined #selenium
+[18:47:08] garndt has joined #selenium
+[18:47:32] ShawnM has joined #selenium
+[18:59:19] awilson820 has joined #selenium
+[IRC logfile - Started Tue Mar 19 19:09:11 2013]
+[19:09:11] davehunt has joined #selenium
+[19:10:56] santiycr has joined #selenium
+[19:11:42] santiycr: jimevans:  I'm having the weirdest issues with iedriver today
+[19:12:06] jimevans: santiycr: speak to me.
+[19:12:13] lukeis: (my son)
+[19:12:18] santiycr: :)
+[19:12:41] santiycr: I'm running a vary simple test, trying to pull something out of window via execute script
+[19:12:43] santiycr: check this out:
+[19:12:57] santiycr: https://saucelabs.com/tests/f75052ab5d394841a3830dcd597bbd49
+[19:13:27] santiycr: seems like it crashes IEDriver
+[19:13:28] jimevans: window.inpsector is probably way too complex
+[19:13:36] jimevans: and it probably does crash the IE driver.
+[19:13:42] santiycr: at first I thought that
+[19:13:56] santiycr: though I then started pulling just simple strings out of its attributes 
+[19:13:58] jimevans: i hear a "but" coming.
+[19:14:21] jimevans: hang on a second. lemme look at something.
+[19:15:09] santiycr: oh, I may have pulled the wrong attr and it was actually an object
+[19:15:12] santiycr: let me try again
+[19:15:42] jimevans: i look at window.inspector in IE and i'm getting "undefined"
+[19:15:53] jimevans: (though that still shouldn't crash the driver)
+[19:16:19] santiycr: yeah, it's defined by a script injected in the page
+[19:16:38] santiycr: https://ie.microsoft.com/testdrive/HTML5/CompatInspector/inspector.js
+[19:17:02] santiycr: the test is extremely simple: open a page with that script, pull something out of window.inspector
+[19:17:25] jimevans: oh, holy hell, yeah. i'd expect that to blow up all over the place.
+[19:17:35] jimevans: "return window.inspector"
+[19:17:54] santiycr: hm, tell me more
+[19:18:16] santiycr: "return window.navigator.userAgent" works well
+[19:18:37] jimevans: the IE driver just can't handle returning complex objects. the "inspector" object, as defined in the javascript file is a complex object.
+[19:18:51] jimevans: simple object, yes. complex ones, no.
+[19:19:10] jimevans: (and i'm deliberately hand-waving on what determines "complex")
+[19:19:31] santiycr: rofl
+[19:19:43] santiycr: ok, so getting a string out of it should be possible
+[19:19:51] jimevans: i should think so.
+[19:19:53] santiycr: can it even navigate complex objects to get simple ones out of them?
+[19:20:11] jimevans: that shouldn't be a problem at all. it handles jquery just fine.
+[19:20:25] santiycr: I see
+[19:20:46] santiycr: could we just call JSON.stringify on anything that gets returned?
+[19:20:50] santiycr: so that we don't crash iedriver?
+[19:21:05] jimevans: theoretically, yes. it's worth a shot.
+[19:21:31] santiycr: fun times
+[19:21:47] jimevans: though if the object you're returning contains element references, i don't know how stringify will handle that.
+[19:22:01] santiycr: hm, let me see
+[19:22:51] jcarr has left #selenium
+[19:26:16] santiycr: jimevans:  thanks for the help, I think I can figure out how to avoid getting complex objects
+[19:26:45] jimevans: glad to help. fwiw, IE isn't the only driver to have trouble returning objects from javascript if they're too complex.
+[19:26:58] santiycr: good to know
+[19:27:07] santiycr: I'll investigate for a bit
+[19:27:23] santiycr: if we could just check and jsonify, maybe the fix is super simple
+[19:28:21] santiycr: jimevans:  \o/  https://saucelabs.com/tests/f075210e0b594548af94d3aa1f2c7f66
+[19:28:37] santiycr: thanks!
+[19:28:41] jimevans: santiycr: o/
+[19:29:30] jleyba: jimevans: stringify has no recursion guards
+[19:29:46] jleyba: so element references will trigger a stack overflow
+[19:29:55] jimevans: aha!
+[19:30:21] *jimevans knew there was *something* about it that was worth remembering
+[19:31:42] jleyba: for bot.inject.executeScript, we walk an object graph and convert all DOM elements to {ELEMENT: id} literals
+[19:32:00] freynaud has joined #selenium
+[19:32:01] Revery1 has joined #selenium
+[19:32:30] jleyba: for browsers that can't return object literals (android, ios), we run stringify over the converted object
+[19:37:42] freynaud has joined #selenium
+[19:44:42] freynaud has joined #selenium
+[19:46:38] jimevans: nirvdrum: yt?
+[19:46:44] lukeis: today must be same problem day… just helped a colleague deal with returning a large object with JS
+[19:47:33] riv_ has joined #selenium
+[19:48:13] nirvdrum: What's up?
+[19:48:33] jimevans: did you happen to get a chance to test out that bootleg IEDriverServer?
+[19:50:28] nirvdrum: Sorry, I didn't.  I forgot I had a baby shower this weekend.  Kinda messed things up.
+[19:50:43] jimevans: no worries.
+[19:52:09] lukeis: nirvdrum: for your own offspring or others?
+[19:52:23] nirvdrum: My own, I hope.
+[19:52:31] lukeis: heh ;) congrats then!
+[19:52:41] nirvdrum: Thanks.
+[19:52:42] jimevans: nirvdrum: hey! mazeltov!
+[19:52:55] soonick has joined #selenium
+[19:53:23] nirvdrum: Thanks.
+[19:53:43] soonick: Hello everyone. I am trying to use WebDriverJs but I get an error when I do:
+[19:53:43] soonick: driver.manage().deleteAllCookies()
+[19:53:43] soonick: Does any one know why?
+[19:53:45] nirvdrum: A little under 2 months to go.
+[19:54:52] lukeis: ah, so are we going to even see you at SeConf? :)
+[19:55:32] Dude-X_: cgoldberg, thanks for the comment. I am starting a new job in April where my coworkers used your SST framework. I hope to see that ported to Python 3.
+[19:55:57] santiycr has joined #selenium
+[19:55:57] jibay has joined #selenium
+[19:56:26] cgoldberg: Dude-X_, yup.  I'm starting to port it very soon.  It's also some cool new features 
+[19:56:27] freynaud: nirvdrum: congratz
+[19:57:33] nirvdrum: lukeis: Yeah.  SeConf is about a month after the due date.
+[19:57:41] lukeis: there is a significant amount of selenium committers with (or soon to be) very little ones
+[19:57:46] nirvdrum: If Simon could handle basically the week of, I can do a month after :-P
+[19:57:55] Dude-X_: cgoldberg, i am going to review SST this week so that I can get up to speed. does it use py.test/nose/unittest behind the scenes?
+[19:58:03] santiycr has joined #selenium
+[19:58:18] nirvdrum: Are there?  I thought I missed the train.  A couple years back it seemed everyone was spitting these things out.
+[19:58:24] lukeis: nirvdrum: it's not you who needs to do the handling :)
+[19:58:32] cgoldberg: Dude-X_,  it uses unittest2 and testtools internally
+[19:58:33] santiycr: jleyba: oh cool!
+[19:58:39] santiycr: so we just need to do that on IE?
+[19:58:58] riv_ has joined #selenium
+[19:59:12] lukeis: nirvdrum: little ones < ~3  so, there's plenty
+[IRC logfile - Started Tue Mar 19 20:00:00 2013]
+[20:00:00] jimevans: nirvdrum: looking at IE10 screenshots, what did we figure out with full vs. partial?
+[20:00:07] cgoldberg: Dude-X_, the docs are good for what's released on PyPI... but we have some interesting new features in trunk that I'd love to get some feedback on.  It makes it extensible to use alternate runners (like nose or whatever)
+[20:00:10] jleyba: santiycr: well, bot.inject.executeScript doesn't have cycle detection either, so it could blow up too (executeScript("return window")).  It just handles the common case of DOM elements
+[20:00:37] santiycr: jleyba: interesting
+[20:00:55] jleyba: Also, jimevans and I have talked several times about using bot.inject.executeScript for IE, and it's not a straight forward change
+[20:01:06] Dude-X_: cgoldberg, from what i understand what my soon-to-be boss told me, it can randomize tests, and you can apply tags/labels to the tests as well
+[20:01:22] jimevans: yeah, i wish it were that simple.
+[20:01:26] Dude-X_: so i think for now i am pretty satisfied with what SST provides
+[20:01:57] jleyba: jimevans: random question - does the IEDriverServer support keep-alive?
+[20:02:01] nirvdrum: jimevans: Need to check the logs.  But there was a difference between Win 7 and Win 8.  I don't think it worked at all on Win 7.  Win 8 only 32-bit worked.
+[20:02:08] santiycr: jleyba: JSON.stringifying throws a TypeError when passed a cyclic object
+[20:02:15] jimevans: jleyba: emphatically not.
+[20:02:30] santiycr: maybe we can just try to stringify, then return exception if it fails
+[20:02:44] jimevans: jleyba: actually, i was just never able to get mongoose to behave properly with keep-alive enabled.
+[20:03:24] jleyba: jimevans: I don't think the java server supports keep-alive either
+[20:03:47] jimevans: nirvdrum: thanks for that. i couldn't remember either. in my atl-removal branch, i wanted to make sure my "get the current module handle" code wasn't breaking things.
+[20:03:58] jleyba: I'm just poking around looking for low hanging fruit that might help us speed up some tests
+[20:04:33] nirvdrum: jimevans: IIRC, the issue with Win 7 was even when running a 64-bit IE, it spawned a 32-bit broker (or vice versa) and that messed some things up.  If sebot has logs, that would be best.
+[20:04:43] nirvdrum: Because I foolishly didn't write it down anywhere other than here :-(
+[20:05:03] jimevans: nirvdrum: didn't think to check the channel logs! <blush>
+[20:05:18] nirvdrum: The date would be whatever day MS announced IE 10 for Win 7.
+[20:05:55] lukeis: there is a search ability with the logs too :log
+[20:05:56] selbot2: http://illicitonion.com/selogs/selenium/2013/03/19.txt | http://illicitonion.com/selogs/search
+[20:06:40] cgoldberg: Dude-X_, so the docs explain the script-based paradigm we originally built.  It's very simple, and makes getting started very trivial.  However, we ran into issues where devs are already used to the regular xUnit pattern and object oriented approach (like unittest)... which offers a lot (in terms of flexibility and standardization).  So we now expose an `SSTTestCase` class you can extend and use with regular unittest-style sui
+[20:06:40] cgoldberg: tes.  so both script-based and test-class styles are supported.  The docs don't reflect that yet.
+[20:07:02] soonick has left #selenium
+[20:10:13] Revery1 has joined #selenium
+[20:11:21] qaguy has joined #selenium
+[20:11:56] Revery1 has joined #selenium
+[20:12:38] itatitat has joined #selenium
+[20:19:24] stackedsax has joined #selenium
+[20:19:59] stackedsax has joined #selenium
+[20:20:08] Revery1 has joined #selenium
+[20:20:10] tobie has joined #selenium
+[20:20:53] Stephen has joined #selenium
+[20:21:20] stackedsax1 has joined #selenium
+[20:21:48] AutomatedTester: oh hai everybody
+[20:21:57] Dude-X_: hai
+[20:21:57] manoj_: hiya...
+[20:23:18] llaskin: hello
+[20:23:39] stackedsax has joined #selenium
+[20:23:57] AutomatedTester: Long GSoC forms are long
+[20:24:37] Stephen: ??
+[20:25:29] lukeis: someone should make a GSoC project to make the GSoC process easier ;)
+[20:25:37] AutomatedTester: lukeis: if only
+[20:25:46] AutomatedTester: lukeis: you would think they would sort their site out
+[20:25:58] lukeis: it was probably made by interns ;)
+[20:26:06] AutomatedTester: and never fixed...
+[20:26:11] lukeis: and maintained by them...
+[20:26:18] AutomatedTester: also, Google must get bad interns
+[20:26:29] AutomatedTester: none of my interns do things like that...
+[20:29:32] llaskin: use selenium to automation submission?
+[20:29:57] lukeis: must have had an intern pm ;)
+[20:31:41] manoj_: i actually followed the long thread on having selenium builder to be Up and deprecating Selenium IDE. 
+[20:32:01] manoj_: if any one remembers, how soon it might happen ?
+[20:32:11] manoj_: i remember Samit was asking for 2 years..?
+[20:32:19] lukeis: 2+ years ;)
+[20:32:48] manoj_: 2+ is it.. :-O
+[20:32:50] manoj_: ok....
+[20:32:59] AutomatedTester: right kids, I have a GSoC application in 
+[20:33:25] manoj_: So, until selenium iDE is deprecated - Selenium Buiilder will not be out ? or That doesn't matter.
+[20:34:00] lukeis: doesn't matter… Se Builder should get folded in sooner than later, but that doesn't mean IDE is removed
+[20:34:11] manoj_: yeah.
+[20:34:49] lukeis: i think iphone will be replaced before someone gets off their (umm… booty?) and actually does some leg-work to include builder
+[20:35:04] manoj_: So when shall we see Some docs regarding Selenium builder in SeHq ? (i know we will have to work on that :) )
+[20:35:11] manoj_: officially out.
+[20:35:12] manoj_: :)
+[20:35:19] manoj_: lol..
+[20:35:23] lukeis: yep, those docs would need to get made
+[20:35:28] lukeis: or folded in
+[20:35:34] lukeis: there's already docs for builder
+[20:35:53] manoj_: oh :-O
+[20:36:24] manoj_: Selenium Builder is officially released ?
+[20:36:38] manoj_:  i still remember its in beta… :P
+[20:38:16] admc has joined #selenium
+[20:38:18] Revery1 has joined #selenium
+[20:40:24] lukeis: manoj_: builder has it's own docs and it's own release 'Selenium' hasn't done any of it ;)
+[20:40:51] manoj_: ok… 
+[20:41:15] qaguy has joined #selenium
+[20:43:13] AutomatedTester: jarib: yt?
+[20:43:21] jarib: yes
+[20:43:40] AutomatedTester: jarib: now that we mirror to github, thought about doing a travis ci setup?
+[20:43:45] admc has joined #selenium
+[20:44:22] jarib: hm, i guess that'd be possible
+[20:44:47] AutomatedTester: the only potential problem would be the download of the repo
+[20:44:53] AutomatedTester: from what I can see
+[20:44:58] jarib: i don't think they do a full clone
+[20:45:06] AutomatedTester: they do a depth 1 clone
+[20:45:08] jarib: right
+[20:45:11] AutomatedTester: but its still A LOT 
+[20:45:20] *AutomatedTester might play with it 
+[20:49:45] santiycr has joined #selenium
+[20:50:37] jarib: yeah, could be nice for py/rb since jenkins only does java builds atm
+[20:50:49] AutomatedTester: jarib: and .NET
+[20:50:53] AutomatedTester: via Mono
+[20:50:58] jarib: although we might change that when dawagner hands out the keys to the castle
+[20:51:01] jarib: right, Mono
+[20:51:16] jarib: i forget Mono exists
+[20:51:51] detroniz_ has joined #selenium
+[20:51:53] AutomatedTester: mono is awesome
+[20:51:58] AutomatedTester: detroniz_: yt?
+[20:54:38] manoj_: alright see ya tomorrow...
+[20:54:47] manoj_: have a good day ahead.
+[IRC logfile - Started Tue Mar 19 21:02:54 2013]
+[21:02:54] selenium095 has joined #selenium
+[21:04:04] santiycr1 has joined #selenium
+[21:04:29] Revery1 has joined #selenium
+[21:09:34] markalanevans has joined #selenium
+[21:11:38] selenium095: how do I use Chrome service with python on windows?
+[21:12:32] selenium095: browser = service.Service('C:\Program Files\Google\Chrome', 0)
+[21:12:43] selenium095: it says it cant find the chromedriver
+[21:12:57] selenium095: browser = webdriver.Chrome() works though
+[21:19:31] Hammertime38 has joined #selenium
+[21:22:21] Turzai has joined #selenium
+[21:22:45] Revery1 has joined #selenium
+[21:22:47] AutomatedTester: :apidocs
+[21:22:48] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[21:23:02] AutomatedTester: selenium095: you wont get a browser object from the service
+[21:23:05] regex has joined #selenium
+[21:23:17] regex: jimevans: I've got a prollem.
+[21:23:28] AutomatedTester: selenium095: http://selenium.googlecode.com/git/docs/api/py/webdriver_chrome/selenium.webdriver.chrome.webdriver.html
+[21:23:36] jimevans: regex: s'up?
+[21:24:36] wolcanus has joined #selenium
+[21:29:11] regex: jimevans: When I start my test sequence, I get a null reference for an object that's like 10 steps down in a test routine.  Why does Selenium check all hydrated models at the start rather than when it's needed?
+[21:30:45] jimevans: regex: once again, i need context. i don't know what you mean by "check all hydrated models". that sounds like an artifact of your test framework, but i'd be hard-pressed to be able to say for sure.
+[21:34:04] barancev: detroniz_: hi! your recent update of ghostdriver.jar broke the tests -- phantomjs 1.8 does not understand --webdriver-logfile option
+[21:36:07] selenium095: is AutomatedTester a bot?
+[21:36:17] AutomatedTester: selenium095: are you a bot
+[21:37:48] selenium095: no :P
+[21:37:49] regex: jimevans:  http://picpaste.com/jimmy-gbNTiMrP.jpg
+[21:38:18] AutomatedTester: :google AutomatedTester Selenium
+[21:38:19] selbot2: AutomatedTester/Selenium-Proxy � GitHub: https://github.com/AutomatedTester/Selenium-Proxy
+[21:38:35] AutomatedTester: well that is one valid result...
+[21:40:31] jimevans: regex: so without knowing what the "Pages()" method does, i couldn't say for sure, but it sounds like your PageCMSModel object does all of its FindElement() calls when it's created. either that, or the Pages() method doesn't call FindElement() before attempting to click.
+[21:41:00] Revery1 has joined #selenium
+[21:41:20] jimevans: regex: however, this is a complete wild-ass guess. i don't know what object down in the call stack is actually null.
+[21:41:55] jimevans: could be the cms object (doubtful), could be anything instantiated inside the Pages() method. you've not shown that, so i can't say.
+[21:42:52] regex: jimevans: Here's the pages method: http://picpaste.com/pages-dWuKZLsK.jpg
+[21:44:49] jimevans: regex: okay, so what object is null? i can't answer that question for you; you'll need to get into the debugger and figure it out. incidentally, this is exactly why i don't care for so-called "fluent" apis ("x.y().z().a()"). makes debugging a pain in the ass.
+[21:45:03] AutomatedTester: jimevans: ++
+[21:45:22] AutomatedTester: fluent APIs look nice but are a bitch to maintain...
+[21:46:05] regex: jimevans: I have debugged it.  I know hwat's null here.  But my question is why it's null.  It hsouldn't be.  The object works and it's the right selector.  It only happens on initializaiton.
+[21:46:36] jimevans: okay, what's null? and why do you think it shouldn't be.
+[21:46:37] jimevans: ?
+[21:47:48] regex: The IwebElement is null.  However the right selector is chosen, the element is on the screen, and it works in other situations.  It's not on active/etc.  It just happens when I use that element on initialization within a test method. 
+[21:48:14] Revery1 has joined #selenium
+[21:48:35] AutomatedTester: regex: is the element valid of initialisation?
+[21:49:25] jimevans: regex: i'm sure that's what seems to be happening, but i'm not so sure. here's why i say that. FindElements() returns a collection. if the collection is empty, your attempt to access the element with the 0th index would yield a "argument out of range" exception, not a null reference exception.
+[21:49:32] regex: AutomatedTester: Yes. 
+[21:49:45] jimevans: just glancing at the code, i'd guess that your *driver* variable is what's null.
+[21:50:15] jimevans: unless you have some exception handling that you've not shown.
+[21:51:03] lukeis: santiycr1 / davehunt: do we have a means of communication we're going to use?
+[21:51:27] jimevans: when you step into the Pages() method, and set your breakpoint at the "driver.FindElements…" line, what's the state of the "driver" variable?
+[21:51:31] davehunt: lukeis: I was just going to start shouting
+[21:51:36] lukeis: heh
+[21:51:44] lukeis: i can't hear you! shout louder!
+[21:51:51] davehunt: I might wake the baby
+[21:51:56] lukeis: meh
+[21:52:41] freynaud_ has joined #selenium
+[21:53:13] davehunt: lukeis: do you have suggestions? Google Hangout?
+[21:54:00] lukeis: i can start a goto meeting too (if we want to screen share...)
+[21:54:42] santiycr1: davehunt|mtg, lukeis, I just added a hangout to the cal invite 
+[21:54:45] jimevans: regex: btw, i'm not seeing where any of these pieces are initialized, because i can't see your base class, nor your support classes. also, realize that the method you've called "TestSetup()" at the top of your Test1 class won't necessarily be run before the other methods of that class, based solely on the attributes ("[Test]") you've used on the methods.
+[21:54:47] santiycr1: sounds like it'd be easy
+[21:55:31] jimevans: regex: so if you're expecting a bunch of stuff to be set up in the "TestSetup" method, it's not necessarily going to work.
+[21:57:02] regex: jimevans:  Right.  
+[21:57:22] regex: jimevans: Do you have your frameowrk still available online?
+[21:57:41] santiycr has joined #selenium
+[21:57:59] jimevans: i don't use a .NET framework, at least not anymore. and the one i used was custom-developed in house for my former employer.
+[21:59:13] regex: jimevans: Where you working now?
+[21:59:22] jimevans: salesforce.com. we're a java shop.
+[21:59:28] lukeis: AutomatedTester: I just got an email! ;)  "Senior Quality Assurance Engineer for Web -- Mozilla Firefox"
+[21:59:34] lukeis: recruitment ;)
+[21:59:48] morteh: nice
+[21:59:49] AutomatedTester: lukeis: you would do a good job...
+[21:59:55] lukeis: doubtful
+[IRC logfile - Started Tue Mar 19 22:00:48 2013]
+[22:00:48] soonick has joined #selenium
+[22:01:56] soonick: Hello,
+[22:01:56] soonick: I'm trying to set a cookie using WebDriverJs: driver.manage().addCookie('name', 'value');
+[22:01:56] soonick: But it is failing. Does anyone know why?
+[22:03:12] AutomatedTester: soonick: have you navigated to the URL before setting it
+[22:03:53] soonick: I have tried that and it didn't work. Let me try again.
+[22:04:40] AutomatedTester: anyway must dash
+[22:04:48] AutomatedTester: but that tends to be the normal issue
+[22:06:27] soonick: AutomatedTester: I get the same error
+[22:06:52] AutomatedTester: soonick: since you never mentioned you get an error before I had to make an assumption
+[22:07:00] Revery1 has joined #selenium
+[22:07:17] AutomatedTester: night all
+[22:07:50] soonick: Sorry, I do get an error and a stack trace, but it doesn't tell me much
+[22:08:03] soonick: Thanks
+[22:09:45] Revery1 has joined #selenium
+[22:11:28] Revery1 has joined #selenium
+[22:11:49] soonick: Does anybody know how often the npm package gets updated?
+[22:12:03] soonick: selenium-webdriver package
+[22:16:51] qaguy has joined #selenium
+[22:17:15] detroniz_: barancev: AutomatedTester: what tests?
+[22:17:39] detroniz_: I ain't set up no test :)
+[22:17:47] barancev: detroniz_: go test_phantomjs
+[22:18:15] detroniz_: someone added tests of phantomjs driver in selenium?
+[22:18:40] barancev: we just run usual tests with PhantomJSDriver
+[22:19:06] detroniz_: well, the new phantomjsdriver 1.0.3 requires the new phantomjs
+[22:19:23] detroniz_: I could revert the push of 1.0.3 for now
+[22:19:36] detroniz_: and repush once we have the official build of 1.9.0 phantomsj
+[22:19:55] barancev: yes, let's wait for the phantomjs release to be compatible
+[22:20:20] barancev: when this should happen?
+[22:20:21] detroniz_: would be great if you tell me where the binary of phantomjs lives
+[22:21:11] detroniz_: so that I can update that too
+[22:21:14] detroniz_: once it's all ready
+[22:22:21] barancev: we don't bindle binary of phantomjs 
+[22:22:30] barancev: s/bindle/bundle/
+[22:22:42] Revery1 has joined #selenium
+[22:23:30] detroniz_: so, where does the test get phantomjs from?
+[22:23:41] detroniz_: anyway, I reverted the commit and pushed to master
+[22:24:15] detroniz_: barancev: btw, where can I see the tests running results?
+[22:24:27] detroniz_: I had the link but it's a while I don't go there
+[22:25:46] santiycr: davehunt, lukeis I think our hangout crashed
+[22:25:51] barancev: PhantomJSDriverService attempts to find the executable
+[22:25:54] santiycr: oh dear
+[22:25:57] lukeis: santiycr:  you crashed ;)
+[22:26:01] santiycr: damn
+[22:26:02] davehunt: santiycr: try Firefox
+[22:26:08] lukeis: we're still on it
+[22:26:13] barancev: either in the path, or using system properties
+[22:26:16] *santiycr switches to chrome
+[22:26:17] Selenium-Git has joined #selenium
+[22:26:18] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 14 new commits to 06master: 02http://git.io/dc-DWA
+[22:26:18] Selenium-Git: 13selenium/06master 14ac94098 15Nick Schonning: Add basic contributor guideline pointing to HQ URL...
+[22:26:18] Selenium-Git: 13selenium/06master 1462eec51 15Alexei Barantsev: Unifying use of hamcrest matcher methods
+[22:26:18] Selenium-Git: 13selenium/06master 14c857966 15Alexei Barantsev: Unifying use of waiting conditions
+[22:26:18] Selenium-Git has left #selenium
+[22:26:28] santiycr: damn you google making your tools crash on firefox
+[22:27:10] regex: jimevans: Salesforce has a shop? 
+[22:27:24] detroniz_: :tests
+[22:27:27] detroniz_: :test
+[22:27:27] jimevans: regex: figuratively speaking. :)
+[22:27:29] barancev: detroniz_: we don't run phantomjs on CI server yet, no link to the results
+[22:27:48] barancev: :ci
+[22:27:48] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[22:27:51] detroniz_: :ci
+[22:27:51] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[22:27:59] barancev: but it's the plan
+[22:28:08] regex: jimevans: They sell figurines there?  Interesting 
+[22:28:29] detroniz_: barancev: so I reverted for no real reason. The tests could have stayed broken for a little while, given that the CI is not wired up!
+[22:28:42] detroniz_: it will require, anyway, to update the phantomjs executable installed on the CI server
+[22:29:06] detroniz_: who I contact to get that done? Daniel Wagner?
+[22:30:40] barancev: atm I'm trying to run the tests locally, before setting a CI job up
+[22:30:54] jimevans: regex: did you figure out where the null was coming from?
+[22:31:13] barancev: and then, yes, we have to ask dawagner to install phantomjs binary to the CI server
+[22:31:20] detroniz_: AutomatedTester: dude, I like the idea of a proxy that translates Selenium Wire Protocol to MArionette Protocol
+[22:31:41] detroniz_: BUT the name ... I think it confuses people. At least, it's a bit confusing to an idiot like me.
+[22:32:59] mreedell has joined #selenium
+[22:33:27] Revery1 has joined #selenium
+[22:33:59] mreedell-work has joined #selenium
+[22:36:13] regex: jimevans: No.  Can't figure it out.  Really ***** me off. 
+[22:36:41] regex: jimevans: I'll have to sleep on it.  Usually I figure something new out with time off.  
+[22:37:18] admc has joined #selenium
+[22:37:27] regex: Speaking of emails for job offers.  I got one with 'stock options' for a start-up in Toronto.
+[22:37:52] jimevans: regex: i'd be willing to bet that the problem isn't directly in your selenium code, but either in the assumptions you're making about MbUnit running the test methods, or in the framework code where something's not getting initialized properly.
+[22:39:26] regex: jimevans:  You may be right. 
+[22:43:30] sfbrian_ has joined #selenium
+[22:44:11] Revery1 has joined #selenium
+[22:47:26] Revery1 has joined #selenium
+[22:50:12] Revery1 has joined #selenium
+[22:56:57] Revery1 has joined #selenium
+[IRC logfile - Started Tue Mar 19 23:02:24 2013]
+[23:02:24] freynaud has left #selenium
+[23:22:02] ryanpetr_ has joined #selenium
+[23:23:47] llaskin has joined #selenium
+[23:31:00] itatitat has joined #selenium
+[23:31:41] Revery1 has joined #selenium
+[23:39:17] jimevans has left #selenium
+[23:42:45] soonick has left #selenium
+[23:48:58] llaskin has joined #selenium
+[23:49:27] Revery1 has joined #selenium
+[23:51:17] phishy has joined #selenium
+[23:52:13] ShawnM has joined #selenium
+[23:52:50] FullTiltProspect has joined #selenium
+[23:53:42] FullTiltProspect has joined #selenium
+[23:57:07] Revery1 has joined #selenium

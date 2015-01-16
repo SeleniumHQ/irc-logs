@@ -1,0 +1,661 @@
+2011-09-30T00:00:09  <barancev> don't you use rspec?
+2011-09-30T00:01:09  <rtyler> I'm more of a Test::Unit fan :)
+2011-09-30T00:01:18  <stephend> xpath? :-(
+2011-09-30T00:01:34  <stephend> nice, all the same
+2011-09-30T00:02:04  <rtyler> xpath is still pretty invaluable, especially with a project that isn't properly "prepared" for browser testing <_<
+2011-09-30T00:02:54  <stephend> yeah, true.  That's just my first instinct, sorry :-)
+2011-09-30T00:02:59  <stephend> I've been trained by Santi :-)
+2011-09-30T00:03:26  <rtyler> which santi o_O
+2011-09-30T00:03:30  * rtyler wonders if we know the same guy
+2011-09-30T00:03:37  <stephend> http://maryannmp.wordpress.com/2011/05/12/good-bye-xpath-hello-css/
+2011-09-30T00:03:40  <stephend> sauce
+2011-09-30T00:03:56  <rtyler> ah
+2011-09-30T00:04:03  * rtyler works two floors up from Sauce
+2011-09-30T00:04:06  <stephend> I don't mean personally trained; not that famous
+2011-09-30T00:04:12  *** ner0x has quit IRC
+2011-09-30T00:05:10  <stephend> finally figured out Yet Another Cause of our Grid 500 errors
+2011-09-30T00:05:22  <stephend> stupid Firefox slow-script dialogs from long-running JS
+2011-09-30T00:05:47  <stephend> and here I was blaming it on 2.6.0
+2011-09-30T00:11:13  <rtyler> stephend: are you coming to JUC?
+2011-09-30T00:11:50  <stephend> rtyler: I wish
+2011-09-30T00:12:05  <stephend> made the mistake of signing up for the Rock 'n Roll 1/2 marathon in SJ
+2011-09-30T00:12:06  <stephend> :-(
+2011-09-30T00:12:21  <rtyler> BORING
+2011-09-30T00:12:39  <stephend> now I know why hugs is in town :-)
+2011-09-30T00:12:43  <stephend> rtyler: tell me about it
+2011-09-30T00:16:45  <stackedsax> any suggestions for the evil "firefox is already running" problem?
+2011-09-30T00:16:55  <rtyler> killall firefox
+2011-09-30T00:16:56  <rtyler> xD
+2011-09-30T00:17:05  <stackedsax> that's not a scalable solution
+2011-09-30T00:17:17  <barancev> stephend: #2035 - is't it about long-running script too?
+2011-09-30T00:17:18  <selbot2>  open/needsclarification selenium.openWindow() gets stuck when working with WebDriverBackedSelenium - http://code.google.com/p/selenium/issues/detail?id=2035 [Type-Defect Priority-Medium]
+2011-09-30T00:17:26  <stackedsax> let's pretend I have several hundred VMs that this could happen on
+2011-09-30T00:18:02  <stackedsax> how should I best avoid this error from ever happening ever again?
+2011-09-30T00:20:13  <barancev> though... it is RC-related issue
+2011-09-30T00:20:57  <stephend> barancev: we're using RC
+2011-09-30T00:21:05  <stephend> we're on 2.6.0, with py.test, with concurrency
+2011-09-30T00:21:22  <stephend> we do have 3 suites that use webdriver, but it's our RC ones that hit the 500 so far
+2011-09-30T00:21:48  <stephend> before 2.6.0 hit, simonstewart sat with me and we looked at our Grid
+2011-09-30T00:22:00  *** kkrao has left #selenium
+2011-09-30T00:25:47  *** stephend has quit IRC
+2011-09-30T00:26:07  *** stephend has joined #selenium
+2011-09-30T00:26:33  <stephend> #2037 was our original issue
+2011-09-30T00:26:34  <selbot2> dave.h...@gmail.com open/accepted Session not available when running tests with Selenium Grid 2.0.0 - http://code.google.com/p/selenium/issues/detail?id=2037 [Type-Defect Priority-High Component-Grid]
+2011-09-30T00:26:36  <stephend> it's much better
+2011-09-30T00:28:17  *** ammar01 has joined #selenium
+2011-09-30T00:30:25  <barancev> yes, that's about grid. but what caused "long-running script" warning?
+2011-09-30T00:31:19  <stephend> barancev: oh, our app
+2011-09-30T00:31:21  <stephend> socorro
+2011-09-30T00:31:35  <stephend> https://crash-stats.mozilla.com/products/Firefox
+2011-09-30T00:31:41  <stephend> really data-intensive
+2011-09-30T00:32:02  <stackedsax> so, now that I"m using a custom profile, I'm getting this firefox is already running error all the time
+2011-09-30T00:32:33  <stephend> http://imgur.com/I7laV
+2011-09-30T00:32:41  <stephend> stackedsax: how are you invoking it?
+2011-09-30T00:32:50  <stephend> stackedsax: also, which language/test-runner?
+2011-09-30T00:37:53  <stackedsax> java -jar selenium-server-standalone.jar -firefoxProfileTemplate "C:\Documents and Settings\xxxx\Application Data\Mozilla\Firefox\Profiles\SeleniumRC" -role rc -hub http://xx.xx.xx.xx:80
+2011-09-30T00:38:03  <stackedsax> java/testng
+2011-09-30T00:44:54  <stephend> ah
+2011-09-30T00:46:44  <stackedsax> oh?
+2011-09-30T00:47:06  <stephend> well, was trying to find our old problem
+2011-09-30T00:47:07  *** cerberos has quit IRC
+2011-09-30T00:47:10  <stephend> haven't seen that in a while
+2011-09-30T00:47:17  *** lfryc has joined #selenium
+2011-09-30T00:47:18  <stephend> wish I could remember the cause/fix
+2011-09-30T00:47:43  <stephend> windows path, iirc
+2011-09-30T00:47:51  <stephend> though it looks fine
+2011-09-30T00:47:58  <stackedsax> I mean, I could take out the -firefoxProfileTemplate again
+2011-09-30T00:47:59  <stephend> the docs warned, but didn't explain
+2011-09-30T00:48:27  <stackedsax> it's not an issue of Firefox not starting with the right template — that happens fine
+2011-09-30T00:48:31  *** cerberos has joined #selenium
+2011-09-30T00:48:40  <stackedsax> are you talking about the binary path?
+2011-09-30T00:49:50  <stackedsax> I saw some posts that suggested explicitly setting the location of firefox.exe, but that makes zero sense to me.  It finds firefox.exe just fine right now...
+2011-09-30T00:50:08  <stackedsax> The one thing I couldn't quite tell:
+2011-09-30T00:50:38  <stackedsax> by default Selenium will create a profile and then use that profile to start up, and does so with -no-remote on
+2011-09-30T00:50:51  <stackedsax> when I use a custom profile, is -no-remote being used?
+2011-09-30T00:51:31  <stackedsax> it looks like it will use the custom profile I set and create new instances of that profile and then start up firefox using those new profiles it just created
+2011-09-30T00:51:33  <stephend> I think they've changed the docs a bit
+2011-09-30T00:51:35  <stackedsax> but I could be wrong
+2011-09-30T00:51:44  <stackedsax> I was looking at the code
+2011-09-30T00:52:06  <stephend> stackedsax: oh, could be (binary path)
+2011-09-30T00:52:10  <stephend> it's literally been a year
+2011-09-30T00:54:33  <stephend> if the profile's in use (as you suspect, it could be that), then that message correlates
+2011-09-30T00:54:49  <stackedsax> it only happens some of the time
+2011-09-30T00:54:53  <stephend> hrm
+2011-09-30T00:55:04  <stackedsax> there's some timing issue that has been worsened by my new profile
+2011-09-30T00:55:11  <stephend> in the actual tests?
+2011-09-30T00:55:18  <stackedsax> possibly because I made firefox much faster...
+2011-09-30T00:55:26  <stackedsax> just in starting up
+2011-09-30T00:55:28  <stephend> heh
+2011-09-30T00:55:30  <timc3> Have WebDriver working locally, the docs don't seem clear on how I can test remote machine?
+2011-09-30T00:55:54  <timc3> Do I have to distribute my code to the remote machines?
+2011-09-30T00:56:29  <stephend> we didn't have to, with RC
+2011-09-30T00:56:39  <stephend> it would send it and report back the results, iirc
+2011-09-30T00:57:22  *** rbalent has joined #selenium
+2011-09-30T01:09:48  *** selbot` has joined #selenium
+2011-09-30T01:10:04  *** andreast1 has joined #selenium
+2011-09-30T01:10:44  *** blowery_ has joined #selenium
+2011-09-30T01:12:37  *** jarib- has joined #selenium
+2011-09-30T01:16:48  *** dmachi1 has joined #selenium
+2011-09-30T01:17:09  *** aquarius1973 has quit IRC
+2011-09-30T01:17:09  *** silastic has quit IRC
+2011-09-30T01:17:09  *** moo-_- has quit IRC
+2011-09-30T01:17:09  *** mattp_ has quit IRC
+2011-09-30T01:17:09  *** wilhelm has quit IRC
+2011-09-30T01:17:09  *** eghm has quit IRC
+2011-09-30T01:17:09  *** a7p has quit IRC
+2011-09-30T01:17:09  *** rbalent has quit IRC
+2011-09-30T01:17:09  *** mattimus has quit IRC
+2011-09-30T01:17:09  *** davehunt|away has quit IRC
+2011-09-30T01:17:09  *** ZinovaS has quit IRC
+2011-09-30T01:17:09  *** soc42 has quit IRC
+2011-09-30T01:17:09  *** timc3 has quit IRC
+2011-09-30T01:17:09  *** adamgoucher has quit IRC
+2011-09-30T01:17:10  *** arnlaugsson has quit IRC
+2011-09-30T01:17:10  *** jmathes has quit IRC
+2011-09-30T01:17:10  *** selbot2 has quit IRC
+2011-09-30T01:17:10  *** Ajay has quit IRC
+2011-09-30T01:17:10  *** lfryc has quit IRC
+2011-09-30T01:17:10  *** anjelica has quit IRC
+2011-09-30T01:17:10  *** stealthii has quit IRC
+2011-09-30T01:17:10  *** ideaz has quit IRC
+2011-09-30T01:17:10  *** Stuk has quit IRC
+2011-09-30T01:17:10  *** selbot has quit IRC
+2011-09-30T01:17:10  *** stephend has quit IRC
+2011-09-30T01:17:10  *** amitev has quit IRC
+2011-09-30T01:17:10  *** Epeli has quit IRC
+2011-09-30T01:17:10  *** mario-goulart has quit IRC
+2011-09-30T01:17:10  *** Mooose has quit IRC
+2011-09-30T01:17:10  *** ahfeel has quit IRC
+2011-09-30T01:17:10  *** Mox[NL] has quit IRC
+2011-09-30T01:17:10  *** zamolxes has quit IRC
+2011-09-30T01:17:10  *** jarib has quit IRC
+2011-09-30T01:17:11  *** dmachi has quit IRC
+2011-09-30T01:17:11  *** andreastt has quit IRC
+2011-09-30T01:17:11  *** xirkus has quit IRC
+2011-09-30T01:17:11  *** mrchrisadams has quit IRC
+2011-09-30T01:17:11  *** Dude-X has quit IRC
+2011-09-30T01:17:11  *** jyrkip has quit IRC
+2011-09-30T01:17:11  *** MadMerlin|work has quit IRC
+2011-09-30T01:17:11  *** bracki has quit IRC
+2011-09-30T01:17:11  *** jarib_ has quit IRC
+2011-09-30T01:17:11  *** blowery has quit IRC
+2011-09-30T01:17:11  *** mick_laptop has quit IRC
+2011-09-30T01:17:11  *** rtyler has quit IRC
+2011-09-30T01:17:24  *** blowery_ is now known as blowery
+2011-09-30T01:18:24  *** Stuk has joined #selenium
+2011-09-30T01:20:22  *** stealthii has joined #selenium
+2011-09-30T01:20:59  *** aquarius1973 has joined #selenium
+2011-09-30T01:20:59  *** silastic has joined #selenium
+2011-09-30T01:20:59  *** moo-_- has joined #selenium
+2011-09-30T01:20:59  *** mattp_ has joined #selenium
+2011-09-30T01:20:59  *** wilhelm has joined #selenium
+2011-09-30T01:20:59  *** eghm has joined #selenium
+2011-09-30T01:20:59  *** a7p has joined #selenium
+2011-09-30T01:22:05  *** lfryc has joined #selenium
+2011-09-30T01:23:23  *** aquarius1973 has quit IRC
+2011-09-30T01:23:23  *** silastic has quit IRC
+2011-09-30T01:23:23  *** moo-_- has quit IRC
+2011-09-30T01:23:23  *** mattp_ has quit IRC
+2011-09-30T01:23:23  *** wilhelm has quit IRC
+2011-09-30T01:23:23  *** eghm has quit IRC
+2011-09-30T01:23:24  *** a7p has quit IRC
+2011-09-30T01:26:58  *** stephend has joined #selenium
+2011-09-30T01:26:58  *** Ajay has joined #selenium
+2011-09-30T01:26:58  *** anjelica has joined #selenium
+2011-09-30T01:26:58  *** amitev has joined #selenium
+2011-09-30T01:26:58  *** xirkus has joined #selenium
+2011-09-30T01:26:58  *** Epeli has joined #selenium
+2011-09-30T01:26:58  *** mrchrisadams has joined #selenium
+2011-09-30T01:26:58  *** mario-goulart has joined #selenium
+2011-09-30T01:26:58  *** ideaz has joined #selenium
+2011-09-30T01:26:58  *** jyrkip has joined #selenium
+2011-09-30T01:26:58  *** Mooose has joined #selenium
+2011-09-30T01:26:58  *** bracki has joined #selenium
+2011-09-30T01:26:58  *** ahfeel has joined #selenium
+2011-09-30T01:26:58  *** Mox[NL] has joined #selenium
+2011-09-30T01:26:58  *** zamolxes has joined #selenium
+2011-09-30T01:26:58  *** mick_laptop has joined #selenium
+2011-09-30T01:26:58  *** jarib has joined #selenium
+2011-09-30T01:27:14  *** aquarius1973 has joined #selenium
+2011-09-30T01:27:14  *** silastic has joined #selenium
+2011-09-30T01:27:14  *** moo-_- has joined #selenium
+2011-09-30T01:27:14  *** mattp_ has joined #selenium
+2011-09-30T01:27:14  *** wilhelm has joined #selenium
+2011-09-30T01:27:14  *** eghm has joined #selenium
+2011-09-30T01:27:14  *** a7p has joined #selenium
+2011-09-30T01:27:49  *** lfryc has quit IRC
+2011-09-30T01:27:49  *** lfryc has joined #selenium
+2011-09-30T01:28:05  *** timc3 has joined #selenium
+2011-09-30T01:28:05  *** adamgoucher has joined #selenium
+2011-09-30T01:28:05  *** arnlaugsson has joined #selenium
+2011-09-30T01:28:05  *** jmathes has joined #selenium
+2011-09-30T01:28:05  *** selbot2 has joined #selenium
+2011-09-30T01:28:14  *** rbalent has joined #selenium
+2011-09-30T01:28:14  *** mattimus has joined #selenium
+2011-09-30T01:28:14  *** davehunt|away has joined #selenium
+2011-09-30T01:28:14  *** ZinovaS has joined #selenium
+2011-09-30T01:30:49  *** Ajay has quit IRC
+2011-09-30T01:34:57  *** Ajay has joined #selenium
+2011-09-30T01:38:48  *** andreashaas has joined #selenium
+2011-09-30T01:40:53  <Ajay> :seen eranm
+2011-09-30T01:40:53  <selbot2> eranm was last seen 1 day ago, quitting.
+2011-09-30T01:41:25  <andreashaas> eranm is on vacation, until mid of next week
+2011-09-30T01:43:38  *** brettporter has quit IRC
+2011-09-30T01:44:35  <Ajay> andreashaas: Thanks :)
+2011-09-30T01:44:40  <stackedsax> actually, I'm getting lots of these org.openqa.grid.internal.GridException: Session [null] not available errors as well
+2011-09-30T01:44:55  <Ajay> Stuk: hey
+2011-09-30T01:47:09  <stackedsax> not sure whether it's related to the "firefox already running" error, but both started happening when I started using a custom profile
+2011-09-30T01:47:29  <stackedsax> anyone else here starting their grid RC's using a custom profile?
+2011-09-30T01:53:29  <stackedsax> shucks, I guess I'm unique in my problems
+2011-09-30T01:56:12  <Stuk> Ajay: yo
+2011-09-30T01:57:55  <Ajay> Should we Assert. or continue with static imports
+2011-09-30T01:58:31  <Ajay> i think test cases should have a uniform standards , i can work on that if you can confirm
+2011-09-30T02:01:47  <stackedsax> here is what I'm seeing in my output: http://pastebin.com/R6SGcUyB
+2011-09-30T02:02:15  <stackedsax> which answers a couple of my questions about how selenium is working
+2011-09-30T02:02:58  <stackedsax> at least it's copying out my custom profile to temporary profiles and it must be starting firefox with -no-remote for that to work.  So what I was figuring the code was dong is true
+2011-09-30T02:04:01  <darius_w> how do you kill the browser?
+2011-09-30T02:04:12  <stackedsax> the question remains, why exactly does "FirefoxChromeLauncher$FileLockRemainedException: Lock file still present!" get thrown
+2011-09-30T02:04:29  <stackedsax> I'll check
+2011-09-30T02:05:34  *** jds has quit IRC
+2011-09-30T02:08:44  *** brettporter has joined #selenium
+2011-09-30T02:09:03  <stackedsax> .quit() I think
+2011-09-30T02:09:51  <darius_w> and what exactly quit() does?
+2011-09-30T02:10:35  *** jds has joined #selenium
+2011-09-30T02:10:57  <Stuk> Ajay: I've got tired of typing Assert every time, so would be good to transition to statically importing it
+2011-09-30T02:12:05  <stackedsax> it's a selenium method, not mine
+2011-09-30T02:12:13  <Ajay> Stuk: Cool , will be working for it
+2011-09-30T02:12:32  <darius_w> stackedsax: is there method stop() ?
+2011-09-30T02:14:01  <stackedsax> yeah, the .quit() is for webdriver, I think.  non-webdriver is:
+2011-09-30T02:14:02  <stackedsax>                 server.stop();
+2011-09-30T02:14:03  <stackedsax>                 server = null;
+2011-09-30T02:14:50  <darius_w> citation: "At the end of the test, stop() should be called instead of the Driver's quit() method."
+2011-09-30T02:14:56  *** mcr_mfc has joined #selenium
+2011-09-30T02:15:42  <darius_w> to be honest, I have no idea what I'm talking about :)
+2011-09-30T02:15:51  <stackedsax> where are you citing from?
+2011-09-30T02:16:07  <darius_w> http://code.google.com/p/selenium/wiki/SeleniumEmulation
+2011-09-30T02:16:32  <stackedsax> thanks, although we do just that
+2011-09-30T02:17:15  <darius_w> well lock file thing happens then you kill browser without cleanup, dont know other reasons for that error...
+2011-09-30T02:17:25  <stackedsax> and just to note, these aren't being executed via the WebDriverBackedSelenium
+2011-09-30T02:26:42  *** ThePeach has joined #selenium
+2011-09-30T02:29:08  <stackedsax> hmm, perhaps I need to issue a close() and then the stop().  Is that how others do it?  Are you guys just calling .stop() as I do?
+2011-09-30T02:37:11  <stackedsax> of the 85 users here, who calls close() before they call stop()?
+2011-09-30T02:37:29  <stackedsax> who just calls stop()?
+2011-09-30T02:41:19  *** jds has quit IRC
+2011-09-30T02:46:36  *** jds has joined #selenium
+2011-09-30T02:50:00  <stackedsax> man, tough crowd.
+2011-09-30T02:51:35  *** marri has joined #selenium
+2011-09-30T02:53:46  *** Glynnis has quit IRC
+2011-09-30T02:53:55  *** OperaDriver has joined #selenium
+2011-09-30T02:53:56  <OperaDriver> [operadriver] Stuk pushed 8 new commits to master: https://github.com/operasoftware/operadriver/compare/a9a126d...385b7bb
+2011-09-30T02:53:56  <OperaDriver> [operadriver/master] Remove invalid test - Stuart Knightley
+2011-09-30T02:53:56  <OperaDriver> [operadriver/master] Merge branch 'stuartk/fix_tests' - Stuart Knightley
+2011-09-30T02:53:56  <OperaDriver> [operadriver/master] Fix indentation - Stuart Knightley
+2011-09-30T02:53:56  *** OperaDriver has left #selenium
+2011-09-30T02:54:04  <marri> Does webdriver supported  touch API?
+2011-09-30T02:57:39  <stackedsax> do you mean Apple Touch, or gestures?
+2011-09-30T02:59:01  <barancev> stackedsax: I do call close() before stop(), otherwise some IE versions don't close window
+2011-09-30T02:59:14  <stackedsax> if the second, there are all sorts of touch-related actions you can do: http://selenium.googlecode.com/svn/trunk/docs/api/java/index-all.html
+2011-09-30T03:00:35  <stackedsax> barancev: thanks for your input.  your side is now winning 1-0.
+2011-09-30T03:02:27  *** krosenvold has quit IRC
+2011-09-30T03:04:53  *** darius_w has quit IRC
+2011-09-30T03:05:02  *** Ajay has quit IRC
+2011-09-30T03:06:07  *** zmijunkie has quit IRC
+2011-09-30T03:06:32  *** zmijunkie has joined #selenium
+2011-09-30T03:07:12  *** darius_w has joined #selenium
+2011-09-30T03:07:36  *** zmijunkie has quit IRC
+2011-09-30T03:07:56  *** barancev|2 has joined #selenium
+2011-09-30T03:09:32  *** barancev has quit IRC
+2011-09-30T03:12:07  *** barancev|2 is now known as barancev
+2011-09-30T03:18:31  *** stackedsax has quit IRC
+2011-09-30T03:23:25  *** dawagner has joined #selenium
+2011-09-30T03:24:30  *** cerber0s has joined #selenium
+2011-09-30T03:24:35  <barancev> dawagner: howdy!
+2011-09-30T03:24:49  *** cerber0s has quit IRC
+2011-09-30T03:24:51  <dawagner> Hi barancev
+2011-09-30T03:25:06  <barancev> please look at #292 -- is it still actual?
+2011-09-30T03:25:07  <selbot2>  open/accepted Quotes aren't escaped properly using WebDriverBackedSelenium with IEDriver - http://code.google.com/p/selenium/issues/detail?id=292 [Type-Defect Priority-Medium NextRelease Browser-IE]
+2011-09-30T03:26:46  <dawagner> I can believe it would be... There's an example test in the linked-to thread, if that passes, it's not a problem any more, I guess
+2011-09-30T03:27:39  <barancev> I've checked it does work in IE9, FF6 and Chrome 14
+2011-09-30T03:28:04  <barancev> but! it returns empty string
+2011-09-30T03:28:15  *** cerberos has quit IRC
+2011-09-30T03:28:35  <dawagner> Curious
+2011-09-30T03:29:59  <barancev> oh, I'm sorry, mixed with another issue
+2011-09-30T03:30:12  <barancev> this one returns INPUT for all three browssers
+2011-09-30T03:30:19  <dawagner> Close the issue :)
+2011-09-30T03:30:24  <barancev> ok
+2011-09-30T03:35:02  <barancev> when I told about empty string I meant #293
+2011-09-30T03:35:03  <selbot2>  open/new Different result while using getEval on IE & FF - http://code.google.com/p/selenium/issues/detail?id=293 [Type-Defect Priority-Medium]
+2011-09-30T03:35:28  <barancev> System.out.println("\n Result is " + selenium.getEval("window.document.getElementById(\"q\")"));
+2011-09-30T03:35:49  <barancev> it prints "Result is "
+2011-09-30T03:36:41  <barancev> what is the return value of getEval?
+2011-09-30T03:37:04  <barancev> what should it be in this case?
+2011-09-30T03:37:53  <dawagner> I don't know, and the documentation doesn't really say... Doubt anyone is around at the moment who knows the 1.x API that well...
+2011-09-30T03:38:05  <dawagner> AutomatedTester probably would... Maybe adamgoucher?
+2011-09-30T03:39:09  *** thisandthat has joined #selenium
+2011-09-30T03:40:07  *** AJay has joined #selenium
+2011-09-30T03:43:58  <AJay> Any intelliJ users
+2011-09-30T03:48:01  <barancev> install the eclipse, man :)
+2011-09-30T03:48:21  *** GitHub102 has joined #selenium
+2011-09-30T03:48:22  <GitHub102> [selenium-ci] jarib pushed 1 new commit to master: http://git.io/kEcviw
+2011-09-30T03:48:22  <GitHub102> [selenium-ci/master] Time out if the VM isn't destroyed in a reasonable time. - Jari Bakken
+2011-09-30T03:48:22  *** GitHub102 has left #selenium
+2011-09-30T03:50:56  <barancev> woot... I can't build binary FF components
+2011-09-30T03:51:11  <barancev> native_events.cpp(7): fatal error C1083: Cannot open include file: 'mozilla-config.h': No such file or directory [C:\Tools\FuncTesting\selenium2\cpp\webdriver-firefox\webdriver-firefox.vcxproj]
+2011-09-30T03:51:30  <barancev> what's with my gecko?
+2011-09-30T03:52:56  <barancev> I've yesterday installed FF7, and then reinstalled back FF6
+2011-09-30T03:52:57  <selbot`> New news from builds: SE2-JAVA-12 has FAILED (32 tests failed) : Updated by Alexei Barantsev <http://xserve.openqa.org:8085/browse/SE2-JAVA-12>
+2011-09-30T03:53:41  <AJay> barancev: i am hardcore eclipse user/fan/plugin developer
+2011-09-30T03:54:14  <AJay> but wanted to try out intellij
+2011-09-30T03:55:03  <AJay> as most of the team is using it :)
+2011-09-30T03:56:31  *** misterncw has joined #selenium
+2011-09-30T03:57:49  <AJay> barancev:i am waiting for eranm , he is on vacation for FF7
+2011-09-30T03:58:46  <AJay> did you change all the necessary things fo FF7
+2011-09-30T03:58:50  <darius_w> so, does webdriver still injects javascript via proxy?
+2011-09-30T04:01:03  <barancev> I want to go back to FF6, because FF7 doen dot support native events yet
+2011-09-30T04:01:39  <barancev> but atm I can't build selenium :(
+2011-09-30T04:02:30  <AJay> there specific .vcxproj files , i think u should build one with new gecko-7
+2011-09-30T04:02:36  <AJay> i am not sure ,
+2011-09-30T04:03:22  *** lord1234 has joined #selenium
+2011-09-30T04:04:16  <barancev> what? I've broken the build? ^^
+2011-09-30T04:06:29  *** andialbrecht is now known as andialbrecht_
+2011-09-30T04:09:52  <jarib> barancev: no no
+2011-09-30T04:10:00  <jarib> i'm just messing around with the xserve
+2011-09-30T04:10:43  <barancev> that would be amazing as I've only made some refactoring in RC :)
+2011-09-30T04:12:20  <barancev> btw, in SeleneseTestBase we have assertEquals methods that use Junit-style parameter order: (expected, actual)
+2011-09-30T04:12:35  <barancev> but al most all the tests for RC misuse them
+2011-09-30T04:12:43  <jarib> and there the xserve died again
+2011-09-30T04:13:11  <barancev> all the people write actual value first, then expected
+2011-09-30T04:13:12  *** mcr_mfc has quit IRC
+2011-09-30T04:13:37  *** mcr_mfc has joined #selenium
+2011-09-30T04:13:55  <barancev> wouldn't it better change all our assertEquals methods to more organic parameter order?
+2011-09-30T04:14:51  <barancev> assertThat(actual, expected)
+2011-09-30T04:15:01  <barancev> sorry, assertEquals(actual, expected)
+2011-09-30T04:19:58  * barancev is uninstalling FF at all
+2011-09-30T04:22:11  <barancev> no help
+2011-09-30T04:22:42  <barancev> $(ProjectDir)..\..\third_party\gecko-2\win32\include;$(ProjectDir)..\webdriver-interactions;$(ProjectDir)..\imehandler\common  -- is it right dependency on gecko?
+2011-09-30T04:23:22  <barancev> on my machine it is empty
+2011-09-30T04:23:22  *** mcr_mfc has quit IRC
+2011-09-30T04:23:36  *** mcr_mfc has joined #selenium
+2011-09-30T04:23:36  <barancev> only gecko-6 is not empty
+2011-09-30T04:24:02  <barancev> should I manually download gecko-2?
+2011-09-30T04:25:17  * barancev undersdood that FF was innocent and I've removed it unfairly..
+2011-09-30T04:28:24  *** csanchez has joined #selenium
+2011-09-30T04:32:36  *** lord1234 has quit IRC
+2011-09-30T04:32:36  *** mcr_mfc has quit IRC
+2011-09-30T04:33:05  *** mcr_mfc has joined #selenium
+2011-09-30T04:35:02  *** jimevans has joined #selenium
+2011-09-30T04:35:26  *** jimevans has left #selenium
+2011-09-30T04:39:05  *** ian_mac has joined #selenium
+2011-09-30T04:43:05  *** mcr_mfc1 has joined #selenium
+2011-09-30T04:43:05  *** mcr_mfc has quit IRC
+2011-09-30T04:48:38  *** cburroughs has joined #selenium
+2011-09-30T04:51:44  *** thisandthat has quit IRC
+2011-09-30T04:53:03  *** MattR__ has joined #selenium
+2011-09-30T04:53:03  *** mcr_mfc1 has quit IRC
+2011-09-30T04:54:08  *** marri has quit IRC
+2011-09-30T04:59:45  *** jds has quit IRC
+2011-09-30T05:03:35  *** mcr_mfc1 has joined #selenium
+2011-09-30T05:03:35  *** MattR__ has quit IRC
+2011-09-30T05:06:08  *** ner0x has joined #selenium
+2011-09-30T05:06:36  *** ner0x has joined #selenium
+2011-09-30T05:09:46  <timc3> What are the plans with the documentation for Selenium?
+2011-09-30T05:12:05  *** MattR__ has joined #selenium
+2011-09-30T05:12:05  *** mcr_mfc1 has quit IRC
+2011-09-30T05:19:18  *** rbalent has quit IRC
+2011-09-30T05:19:56  *** rbalent has joined #selenium
+2011-09-30T05:19:57  *** rbalent has joined #selenium
+2011-09-30T05:20:16  *** lord1234 has joined #selenium
+2011-09-30T05:24:58  *** Xtree has joined #selenium
+2011-09-30T05:32:28  *** cburroughs has quit IRC
+2011-09-30T05:33:33  <arnlaugsson> Using selenium 2.2.0 and using the python bindings; is there an easy way to resize the browser window and place it a given location? Similar to "selenium.getEval("window.resizeTo(X,Y); window,moveTo(0,0);")" in java?
+2011-09-30T05:34:12  <arnlaugsson> browser.window_maximize() doesn't seem to work..
+2011-09-30T05:35:55  <arnlaugsson> sorry window_maximize() works.
+2011-09-30T05:39:34  *** bpmp has joined #selenium
+2011-09-30T05:39:46  <bpmp> I get a [error] There was an unexpected Alert! [Please validate INPUTNAME # before submitting]
+2011-09-30T05:39:55  <bpmp> how to get rid of it in IDE please ?
+2011-09-30T05:40:48  *** lord1234 has quit IRC
+2011-09-30T05:45:51  <bpmp> anu hint ?
+2011-09-30T05:45:58  <bpmp> any*
+2011-09-30T05:48:04  *** brettporter has quit IRC
+2011-09-30T05:50:03  <AJay> timc3: we have a fair documentation
+2011-09-30T05:50:37  <AJay> barancev: any luck ?
+2011-09-30T05:53:31  <bpmp>  //div[contains(@id,'loading') and contains(@class,'display: none')]
+2011-09-30T05:53:36  <bpmp> not ok too
+2011-09-30T05:54:45  *** stepheneb has joined #selenium
+2011-09-30T05:55:16  *** jimevans has joined #selenium
+2011-09-30T05:57:14  *** stepheneb has quit IRC
+2011-09-30T05:58:19  <bpmp>  //div[id='loading'] and //div[contains(@class,'display: none')]
+2011-09-30T05:58:34  <bpmp> in firepath got true for .//div[@id='loading'] and .//div[contains(@style,'display')]
+2011-09-30T05:59:57  *** stepheneb has joined #selenium
+2011-09-30T06:03:39  <timc3> AJay: I don't usually gripe about documentation on such projects, but this is a mess. Is there a good place where I could put some recommendations. As a newcomer to WebDriver the learning curve is steep because documentation is in two places, and you have to work out what old documentation to ignore.
+2011-09-30T06:04:05  <timc3> AJay: I actually find what I was looking for on SauceLabs
+2011-09-30T06:05:16  *** AutomatedTester has joined #selenium
+2011-09-30T06:05:31  <AutomatedTester> jimevans: ping
+2011-09-30T06:05:32  <AJay> timc3: you can create a :newissue  and put in your recommendations
+2011-09-30T06:05:33  <selbot2> http://code.google.com/p/selenium/issues/entry
+2011-09-30T06:05:34  <timc3> AJay: Like I said, I would rather help so if there is a good place to start a constructive dialog with the maintainers of the documentation that would help
+2011-09-30T06:05:59  <timc3> AJay: Thanks.
+2011-09-30T06:06:17  <AJay> timc3: it would be great if you can submit few patches on documentation
+2011-09-30T06:06:44  <barancev> AJay: nope. waiting for gurus
+2011-09-30T06:07:05  <barancev> continue with prebuilds
+2011-09-30T06:07:47  <AJay> yeah i am too waiting to understand how to build the DLL
+2011-09-30T06:10:14  <barancev> AutomatedTester: I have a question about RC API, may be you can help
+2011-09-30T06:10:18  <barancev> selenium.getEval("window.document.getElementById(\"q\")")
+2011-09-30T06:10:36  <barancev> what shuld be the rerurn value? ^^^
+2011-09-30T06:11:15  <AutomatedTester> nothing
+2011-09-30T06:11:38  <AutomatedTester> you need to go through Selenium first, this is one the downsides to the RC architecture
+2011-09-30T06:12:22  <AutomatedTester> you need to do selenium.getEval("this.browserbot.getUserWindow().document.getElementById('q')");
+2011-09-30T06:12:25  <AutomatedTester> barancev: ^
+2011-09-30T06:15:17  *** jds has joined #selenium
+2011-09-30T06:18:59  *** ian_mac_ has joined #selenium
+2011-09-30T06:19:37  <barancev> AutomatedTester: are you sure? selenium.getEval("window.document.getElementsByName('q')[0].tagName") returns "INPUT" on the google.com page
+2011-09-30T06:19:48  <AutomatedTester> oh thats changed then
+2011-09-30T06:20:08  <AutomatedTester> you had to go through browserbot before
+2011-09-30T06:20:35  *** lord1234 has joined #selenium
+2011-09-30T06:24:28  <barancev> well, I know that it returns empty string if there is no such element
+2011-09-30T06:24:40  <barancev> and org.openqa.selenium.firefox.FirefoxWebElement@d230c38c if there is an element
+2011-09-30T06:24:43  <selbot2> dawagner half a minute ago - DanielWagnerHall for AndreasHaas adding test for moving mouse past viewport.  Passes in Firefox.  Test doesn't seem to run in any of the other browsers at the moment, so that works for now. - http://code.google.com/p/selenium/source/detail?r=13993
+2011-09-30T06:25:00  <barancev> is it right? (i mean empty string as the result)
+2011-09-30T06:25:00  *** MattR__ has quit IRC
+2011-09-30T06:25:11  *** MattR__ has joined #selenium
+2011-09-30T06:25:25  <barancev> I'd expect null
+2011-09-30T06:31:16  *** cakehero has joined #selenium
+2011-09-30T06:34:35  *** mcr_mfc1 has joined #selenium
+2011-09-30T06:34:35  *** MattR__ has quit IRC
+2011-09-30T06:34:40  <barancev> we are at 800-level again
+2011-09-30T06:35:05  *** nirvdrum has joined #selenium
+2011-09-30T06:39:56  *** dmachi1 has quit IRC
+2011-09-30T06:40:08  *** dmachi has joined #selenium
+2011-09-30T06:41:52  *** dave_miles has quit IRC
+2011-09-30T06:54:06  <jimevans> msg AutomatedTester got your internet sussed out for the moment i see.
+2011-09-30T06:55:11  <arnlaugsson> No ideas on window resizing?
+2011-09-30T06:55:28  <arnlaugsson> for selenium 2.2.0, windows 7 & firefox 6
+2011-09-30T06:59:49  *** iivvoo has joined #selenium
+2011-09-30T06:59:56  *** andialbrecht_ is now known as andialbrecht
+2011-09-30T07:00:43  *** DustinFay has joined #selenium
+2011-09-30T07:04:01  *** jfunk has joined #selenium
+2011-09-30T07:06:20  *** krosenvold has joined #selenium
+2011-09-30T07:09:36  *** andialbrecht is now known as andialbrecht_
+2011-09-30T07:11:25  *** AutomatedTester has quit IRC
+2011-09-30T07:11:39  <AJay> Stuk: sent a  pull request
+2011-09-30T07:16:12  *** AJay has quit IRC
+2011-09-30T07:17:36  *** vrockai has joined #selenium
+2011-09-30T07:18:33  <andreast1> Stuk's leaving Opera today. )-:
+2011-09-30T07:18:45  *** andreast1 is now known as andreastt
+2011-09-30T07:18:57  <andreastt> I'll take care of the request though.
+2011-09-30T07:20:07  *** jds has quit IRC
+2011-09-30T07:20:56  *** vrockai has quit IRC
+2011-09-30T07:24:44  *** stockton has joined #selenium
+2011-09-30T07:25:16  *** jds has joined #selenium
+2011-09-30T07:29:08  *** Stuk has quit IRC
+2011-09-30T07:29:33  *** QAGuy has joined #selenium
+2011-09-30T07:42:19  *** stepheneb has quit IRC
+2011-09-30T07:43:01  *** Ajay has joined #selenium
+2011-09-30T07:43:23  *** barancev has quit IRC
+2011-09-30T07:43:45  *** cburroughs has joined #selenium
+2011-09-30T07:43:48  *** stepheneb has joined #selenium
+2011-09-30T07:43:58  *** barancev has joined #selenium
+2011-09-30T07:45:01  *** stockton has quit IRC
+2011-09-30T07:45:20  *** csanchez has quit IRC
+2011-09-30T07:47:07  *** bpmp has quit IRC
+2011-09-30T07:51:29  *** jds_ has joined #selenium
+2011-09-30T07:51:46  *** Ajay has quit IRC
+2011-09-30T07:52:08  *** csanchez has joined #selenium
+2011-09-30T07:52:48  *** DustinFay has left #selenium
+2011-09-30T07:54:21  *** jds has quit IRC
+2011-09-30T07:58:51  *** cburroughs has quit IRC
+2011-09-30T08:06:33  *** Ajay has joined #selenium
+2011-09-30T08:06:59  *** mashiara has joined #selenium
+2011-09-30T08:08:59  *** csanchez has quit IRC
+2011-09-30T08:25:34  *** mates has quit IRC
+2011-09-30T08:28:08  *** stephend has quit IRC
+2011-09-30T08:28:24  *** stockton has joined #selenium
+2011-09-30T08:36:08  *** Ajay has quit IRC
+2011-09-30T08:36:58  *** rbalent has quit IRC
+2011-09-30T08:41:40  <lord1234> dead in here today
+2011-09-30T08:42:20  *** lord1234 has quit IRC
+2011-09-30T08:42:20  *** lord1234 has joined #selenium
+2011-09-30T08:45:35  *** ammar01 has quit IRC
+2011-09-30T08:52:47  *** mcr_mfc1 has quit IRC
+2011-09-30T08:53:21  *** stackedsax has joined #selenium
+2011-09-30T08:55:38  *** misterncw has quit IRC
+2011-09-30T08:56:34  *** ner0x has quit IRC
+2011-09-30T08:57:39  *** cgoldberg has joined #selenium
+2011-09-30T08:57:58  *** stackedsax has quit IRC
+2011-09-30T09:03:37  *** stackedsax has joined #selenium
+2011-09-30T09:09:43  *** cgoldberg has quit IRC
+2011-09-30T09:09:51  *** Ari-Ugwu has joined #selenium
+2011-09-30T09:09:54  *** kennethkoontz has joined #selenium
+2011-09-30T09:12:29  *** soc42 has joined #selenium
+2011-09-30T09:17:50  *** nirvdrum_ has joined #selenium
+2011-09-30T09:21:31  *** nirvdrum has quit IRC
+2011-09-30T09:25:58  *** stockton has quit IRC
+2011-09-30T09:26:06  *** iivvoo has quit IRC
+2011-09-30T09:26:39  *** iivvoo has joined #selenium
+2011-09-30T09:27:19  *** sfbrian has joined #selenium
+2011-09-30T09:28:01  *** lfryc has quit IRC
+2011-09-30T09:29:53  *** rtyler_ is now known as rtyler
+2011-09-30T09:34:09  *** nirvdrum_ is now known as nirvdrum
+2011-09-30T09:36:35  *** cburroughs has joined #selenium
+2011-09-30T09:41:26  *** stepheneb has quit IRC
+2011-09-30T09:42:27  <jimevans> hey, it's friday, and there's been no youtube today...
+2011-09-30T09:42:33  *** jfunk has quit IRC
+2011-09-30T09:42:33  <jimevans> :yt jim evans better every day
+2011-09-30T09:42:34  <selbot2> Jim Evans - Better Angels - 01 Better Every Day - http://www.youtube.com/watch?v=ptn9d61e3ZI&feature=youtube_gdata
+2011-09-30T09:42:54  *** jfunk has joined #selenium
+2011-09-30T09:47:25  <stackedsax> I was asking a q last night about close() and stop()
+2011-09-30T09:47:40  <stackedsax> is it necessary/recommended to call close() before stop()?
+2011-09-30T09:49:17  <stackedsax> it seems like stop() should do the trick, but given that I have race conditions reopening Firefox before the previous process has stopped and that barancev noted that some IE's preferred a close() beforehand, it seems that both are actually necessary.
+2011-09-30T09:49:30  <lord1234> ...ur using SE1?
+2011-09-30T09:49:35  <stackedsax> yes
+2011-09-30T09:49:40  <lord1234> thats ur first mistake
+2011-09-30T09:49:47  <lord1234> paging jimevans
+2011-09-30T09:49:56  <lord1234> diatribe about why u should switch to webdriver incoming
+2011-09-30T09:50:17  <stackedsax> we are switching, but this stuff needs to run in the meantime
+2011-09-30T09:50:20  <jimevans> heh. i'm staying out of it today.
+2011-09-30T09:50:22  <stackedsax> cancel the diatribe please
+2011-09-30T09:50:31  <lord1234> :0 jim
+2011-09-30T09:50:40  *** krosenvold has quit IRC
+2011-09-30T09:51:11  *** krosenvold has joined #selenium
+2011-09-30T09:52:14  *** cgp_ has joined #selenium
+2011-09-30T09:52:19  *** cgp__ has joined #selenium
+2011-09-30T09:52:28  *** cgp_ has quit IRC
+2011-09-30T09:52:32  *** stockton has joined #selenium
+2011-09-30T09:53:44  <stackedsax> but I would still like to know for our, old, decrepit, archaic, legacy sel1 purposes
+2011-09-30T10:00:08  *** cburroughs has quit IRC
+2011-09-30T10:00:40  *** jfunk has quit IRC
+2011-09-30T10:03:08  *** jfunk has joined #selenium
+2011-09-30T10:04:45  *** ThePeach has quit IRC
+2011-09-30T10:12:58  *** ner0x has joined #selenium
+2011-09-30T10:15:08  *** Ajay has joined #selenium
+2011-09-30T10:20:06  *** voodoofish1 has joined #selenium
+2011-09-30T10:20:18  <ZinovaS> do I need to add some parameter to selenium-server-standalone-2.7.0.jar in order to use it with WebDriver ?
+2011-09-30T10:28:38  *** cakehero has quit IRC
+2011-09-30T10:33:12  <Ajay> ZinoVas: no
+2011-09-30T10:33:23  <Ajay> Zinovas: No
+2011-09-30T10:34:01  <ZinovaS> something not working, trying to rip of PHPUnit stuff from WebDriver-PHP
+2011-09-30T10:36:07  <Ajay> i dont have any idea on PHP , btb r u using this  https://github.com/facebook/php-webdriver  ?
+2011-09-30T10:37:15  <ZinovaS> Im using this: https://github.com/chibimagic/WebDriver-PHP
+2011-09-30T10:39:44  *** thegbatman has joined #selenium
+2011-09-30T10:50:56  *** Spanktar has joined #selenium
+2011-09-30T10:57:59  *** cburroughs has joined #selenium
+2011-09-30T10:58:35  *** jimevans has left #selenium
+2011-09-30T10:59:30  *** davehunt|away has quit IRC
+2011-09-30T11:02:26  *** Ajay has quit IRC
+2011-09-30T11:05:34  *** dawagner has quit IRC
+2011-09-30T11:12:19  *** andreashaas has left #selenium
+2011-09-30T11:15:16  *** davehunt has joined #selenium
+2011-09-30T11:20:52  <lord1234> adamgoucher: with the bitch slap on SE-dev list
+2011-09-30T11:21:08  <lord1234> ZinovaS: you don't even need to run the jar to use it with webdriver....
+2011-09-30T11:21:24  <adamgoucher> not really. more of a gentle shooting down.
+2011-09-30T11:21:37  <lord1234> ZinovaS: selenium no longer supports php webdriver, as such, you wil have problems probably
+2011-09-30T11:21:58  <adamgoucher> there was never 'official' support for webdriver in php
+2011-09-30T11:22:00  <lord1234> when i saw the initial email adam, i was like "not going to happen"
+2011-09-30T11:22:03  <lord1234> correct.
+2011-09-30T11:22:08  <lord1234> my point exactly
+2011-09-30T11:22:10  *** cburroughs has quit IRC
+2011-09-30T11:23:06  *** csanchez has joined #selenium
+2011-09-30T11:25:21  *** soc42 has quit IRC
+2011-09-30T11:30:08  <kennethkoontz> Anyone familiar with handling ajax in selenium 2? I am testing a page that has an RTE field that I'd like to perform some asserts on. However, my problem is that the python test code will execute async with the ajax calls. One way of solving this would be to assert that the dom has changed. But I'm not sure if this is the most efficient way. Any ideas?
+2011-09-30T11:37:50  *** davehunt has quit IRC
+2011-09-30T11:38:10  *** beakerman has joined #selenium
+2011-09-30T11:40:05  <ZinovaS> where can i find list of webdriver api calls ?
+2011-09-30T11:41:54  *** Renacor has quit IRC
+2011-09-30T11:44:29  <stackedsax> Is this that: http://selenium.googlecode.com/svn/trunk/docs/api/java/index-all.html ?
+2011-09-30T11:45:06  <stackedsax> might be more than you're looking for...
+2011-09-30T11:47:56  <ZinovaS> amm.. I mean list of all "/session/:sessionId/execute"
+2011-09-30T11:48:26  <ZinovaS> WebDriver suports screenshots, i hope ;)
+2011-09-30T11:49:17  <stackedsax> I think that depends on the driver, doesn't it?
+2011-09-30T11:50:17  <ZinovaS> Im n ot quite get the driver stuff... i entered 'firefox' in param
+2011-09-30T11:52:26  <ZinovaS> I was looking for /session/:sessionId/screenshot
+2011-09-30T11:52:51  *** Fyrespray has joined #selenium
+2011-09-30T12:08:46  *** Ari-Ugwu has quit IRC
+2011-09-30T12:15:31  *** Binken_ has joined #selenium
+2011-09-30T12:24:10  *** davehunt has joined #selenium
+2011-09-30T12:33:02  *** lord1234 has quit IRC
+2011-09-30T12:36:18  *** davehunt has quit IRC
+2011-09-30T12:38:28  *** davehunt has joined #selenium
+2011-09-30T12:49:48  <ZinovaS> screenshot sometimes timeouts and returns 'messagc=' what could be reason for that? (timeout is set for 25 sec, also timeouts on 60sec implict wait)
+2011-09-30T12:53:23  <ZinovaS> server log looks like that: http://pastebin.com/gPz3HiRy
+2011-09-30T12:53:53  <ZinovaS> just says "INFO - Done: /session/1317412644526/screenshot" after timeout...
+2011-09-30T12:57:27  <ZinovaS> am I using it incorrectly? what could be the reason for the screenshot to timeout?
+2011-09-30T12:58:55  *** davehunt has quit IRC
+2011-09-30T12:59:19  *** davehunt has joined #selenium
+2011-09-30T13:09:40  <ZinovaS> is there a problem with firefox and screenshots? on google.com screenshot takes 1-2 sec, on seleniumhq.org it takes ~8sec or fail. on sidereel.com ir allways fail...
+2011-09-30T13:13:12  <ZinovaS> and in the process of takink screenshot Xorg takes a lot of CPU time...
+2011-09-30T13:25:27  *** Binken_ has quit IRC
+2011-09-30T13:27:30  *** retornam has joined #selenium
+2011-09-30T13:32:27  *** Xtree has quit IRC
+2011-09-30T13:33:30  *** cakehero has joined #selenium
+2011-09-30T13:33:39  *** cakehero is now known as savant
+2011-09-30T13:33:43  *** cburroughs has joined #selenium
+2011-09-30T13:35:01  *** smax has quit IRC
+2011-09-30T13:50:23  *** cgp__ has quit IRC
+2011-09-30T13:50:24  *** cburroughs has quit IRC
+2011-09-30T13:53:20  *** ian_mac_ has quit IRC
+2011-09-30T14:12:12  *** lfryc has joined #selenium
+2011-09-30T14:34:47  *** savant has quit IRC
+2011-09-30T14:36:49  *** Renacor has joined #selenium
+2011-09-30T14:36:57  <Renacor> http://pastebin.ca/2085947 <-- anybody familiar with that?
+2011-09-30T14:37:23  <stackedsax> still after it, eh?
+2011-09-30T14:37:26  <stackedsax> I'm not, unfortunately
+2011-09-30T14:38:01  <Renacor> yeah tried increasing heap size but it still occurs
+2011-09-30T14:42:09  *** retornam has quit IRC
+2011-09-30T14:45:43  *** QAGuy has quit IRC
+2011-09-30T14:50:40  <ZinovaS> ok, found it ;) it was 'script stack space quota is exhausted'
+2011-09-30T14:55:04  <ZinovaS> is there something besides firefox supported directly by server 2.7 ?
+2011-09-30T14:58:55  *** nirvdrum has quit IRC
+2011-09-30T15:04:47  *** lfryc has quit IRC
+2011-09-30T15:09:11  *** DustinFay has joined #selenium
+2011-09-30T15:09:37  *** DustinFay has left #selenium
+2011-09-30T15:12:42  *** csanchez has quit IRC
+2011-09-30T15:36:42  <selbot2> jari.bakken half a minute ago - JariBakken: Avoid telemetry prompt on Firefox 7. - http://code.google.com/p/selenium/source/detail?r=13994
+2011-09-30T15:42:28  *** jfunk has quit IRC
+2011-09-30T15:44:14  <selbot2> jari.bakken half a minute ago - JariBakken: Remove empty test target from test_remote: //java/client/test/org/openqa/selenium/remote:common-tests:run - http://code.google.com/p/selenium/source/detail?r=13995
+2011-09-30T15:44:17  *** retornam has joined #selenium
+2011-09-30T15:47:00  *** cakehero has joined #selenium
+2011-09-30T16:04:16  *** ian_mac has quit IRC
+2011-09-30T16:04:54  *** evlew has joined #selenium
+2011-09-30T16:18:10  *** Cairn has joined #selenium
+2011-09-30T16:18:56  <Cairn> This isn't a selenium question directly... but I need to set up an environment that's day-old data.  I can't call it UAT/QA/Dev/Prod.  What's the next logical name for something like that which is used in the industry?
+2011-09-30T16:19:11  <Cairn> Wanted to have some tests running against an environment like that
+2011-09-30T16:21:00  <Cairn> "sandbox" ?
+2011-09-30T16:23:58  *** cakehero has quit IRC
+2011-09-30T16:27:13  *** Cairn has quit IRC
+2011-09-30T16:29:01  *** stackedsax has quit IRC
+2011-09-30T16:39:23  *** Spanktar has quit IRC
+2011-09-30T16:41:50  *** sfbrian_ has joined #selenium
+2011-09-30T16:45:46  *** sfbrian has quit IRC
+2011-09-30T16:46:08  *** sfbrian_ has quit IRC
+2011-09-30T16:47:50  *** ian_mac has joined #selenium
+2011-09-30T17:05:11  <Parabola> wait
+2011-09-30T17:05:19  <Parabola> you want an environment to run tests against all of that?
+2011-09-30T17:05:35  <Parabola> sounds like your current environment "roles" arent defined correctly, or you wouldnt have that requirement
+2011-09-30T17:24:53  *** cakehero has joined #selenium
+2011-09-30T17:26:32  *** kennethkoontz has quit IRC
+2011-09-30T17:36:46  *** brettporter has joined #selenium
+2011-09-30T17:40:19  *** cakehero has quit IRC
+2011-09-30T17:42:10  *** brettporter has quit IRC
+2011-09-30T17:42:31  *** brettporter has joined #selenium
+2011-09-30T17:46:18  *** retornam has quit IRC
+2011-09-30T17:54:39  *** Siph0n has joined #selenium
+2011-09-30T18:35:13  *** stockton has quit IRC
+2011-09-30T18:35:49  *** retornam has joined #selenium
+2011-09-30T18:40:09  *** dmachi has quit IRC
+2011-09-30T18:40:15  *** dmachi has joined #selenium
+2011-09-30T19:03:27  *** ian_mac has quit IRC
+2011-09-30T19:05:03  *** ian_mac has joined #selenium
+2011-09-30T19:06:55  *** stepheneb has joined #selenium
+2011-09-30T19:22:38  *** voodoofish1 has quit IRC
+2011-09-30T19:22:46  *** Dude-X1 has quit IRC
+2011-09-30T20:09:44  *** nirvdrum has joined #selenium
+2011-09-30T21:00:35  *** nirvdrum has quit IRC
+2011-09-30T21:09:49  *** beakerman has quit IRC
+2011-09-30T21:29:30  *** ner0x has quit IRC
+2011-09-30T21:30:37  *** Siph0n has quit IRC
+2011-09-30T21:44:14  *** krosenvold has quit IRC
+2011-09-30T21:55:40  *** stepheneb has quit IRC
+2011-09-30T22:05:05  *** iivvoo has quit IRC
+2011-09-30T22:05:38  *** iivvoo has joined #selenium
+2011-09-30T23:38:02  *** timc3 has quit IRC
+2011-09-30T23:59:27  *** cerberos has joined #selenium

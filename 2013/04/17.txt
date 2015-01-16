@@ -1,0 +1,1145 @@
+[2013-04-17 00:00:30] davehunt, quitting. (Remote host closed the connection)
+[2013-04-17 00:04:11] asavchuk: :ci
+[2013-04-17 00:04:12] selbot2: Jenkins: http://ci.seleniumhq.org:8080/ | Dashboard: http://dashboard.ci.seleniumhq.org/
+[2013-04-17 00:07:22] ShawnM, joining. (#selenium)
+[2013-04-17 00:12:12] ShawnM, quitting. (Ping timeout: 276 seconds)
+[2013-04-17 00:15:14] barancev: munderwo-work: which test framework do you use?
+[2013-04-17 00:15:38] testingb0t1, joining. (#selenium)
+[2013-04-17 00:24:06] Ardesco, joining. (#selenium)
+[2013-04-17 00:34:46] Hronom, joining. (#selenium)
+[2013-04-17 00:41:26] tinygeo, quitting. (Quit: Leaving.)
+[2013-04-17 00:51:59] stan, joining. (#selenium)
+[2013-04-17 00:57:39] zac_sel, joining. (#selenium)
+[2013-04-17 01:00:10] stackedsax, quitting. (Quit: Leaving.)
+[2013-04-17 01:01:34] vila, quitting. (Quit: Leaving)
+[2013-04-17 01:02:14] Mkop, quitting. (Remote host closed the connection)
+[2013-04-17 01:02:51] Mkop, joining. (#selenium)
+[2013-04-17 01:04:38] vila, joining. (#selenium)
+[2013-04-17 01:06:04] h8R: guys, how do you check http response codes with Selenium ?
+[2013-04-17 01:08:21] barancev: asavchuk: hi! I have a question regarding PR50
+[2013-04-17 01:09:14] asavchuk: barancev: hi! which?
+[2013-04-17 01:09:19] barancev: what's the purpose of a new setupProxy method?
+[2013-04-17 01:09:48] barancev: (I'm not familiar with windows proxy configuring mechanics)
+[2013-04-17 01:11:48] d0x, joining. (#selenium)
+[2013-04-17 01:11:55] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 01:12:21] barancev: ah, I see, it's just refactoring if proxyManager initialization code
+[2013-04-17 01:12:24] ddary, leaving. (#selenium)
+[2013-04-17 01:12:31] barancev: s/if/of/
+[2013-04-17 01:12:38] asavchuk: there is selenium issue #4525 which, as i understand, is that proxy is not set up when some constructor is used
+[2013-04-17 01:12:39] selbot2: 03 open/new Proxy setting does not applied to InternetExplorerDriver - https://code.google.com/p/selenium/issues/detail?id=4525 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Browser-IE]
+[2013-04-17 01:12:58] asavchuk: for this and code unification it was moved into special method
+[2013-04-17 01:13:19] barancev: yes, I see, but why it's guarder by if(caps == null || caps.getCapability(PROXY) == null) ?
+[2013-04-17 01:13:37] barancev: *guarded
+[2013-04-17 01:15:20] barancev: we need this guard in prepareProxy, it's correct
+[2013-04-17 01:15:51] barancev: but why initialization is guarded?
+[2013-04-17 01:15:53] jualam, quitting. (Ping timeout: 240 seconds)
+[2013-04-17 01:18:23] asavchuk: hm. is such case possible to init proxy but not setup it? if it's true need to remove this guard, of course.
+[2013-04-17 01:19:05] asavchuk: please, make comments to code, i'll do it
+[2013-04-17 01:20:53] d0x: Hi, my ChromeDriverService gets stucked right after calling: service.start(); I see that one ChromeBrowser instance opens but the java process gets stuckt. After some time I see this exception: org.openqa.selenium.net.UrlChecker$TimeoutException: Timed out waiting for [http://localhost:3177/status] to be available after 20002 ms
+[2013-04-17 01:20:54] selbot2: 03jarib about 1 year ago - JariBakken: Make Platform.bitsize to use the right constant from FFI. | https://code.google.com/p/selenium/source/detail?r=200027e | http://dashboard.ci.seleniumhq.org/#/revision/200027e2f7c12fcfd206c663ebf11eadd9da9952
+[2013-04-17 01:21:16] d0x: Driver Version 2.32.0
+[2013-04-17 01:21:55] d0x: Google Chrome: 26.0.1410.63
+[2013-04-17 01:22:34] asavchuk: barancev: also it's not guarded in case when WindowsProxyManager is directly passed.
+[2013-04-17 01:23:54] barancev: where it should be guarded with non-null check
+[2013-04-17 01:31:30] zeljkof, joining. (#selenium)
+[2013-04-17 01:32:53] asavchuk: it's true. i miss this check. what's about guard in setupProxy - is it needed or not?
+[2013-04-17 01:34:09] Bebe_sel, joining. (#selenium)
+[2013-04-17 01:36:09] noahsussman, joining. (#selenium)
+[2013-04-17 01:39:07] d0x: o, i solved my problem... i need to give the path of the chromedriver, not the path of the google-chrome binary....
+[2013-04-17 01:39:10] d0x: <(
+[2013-04-17 01:39:12] d0x: :)
+[2013-04-17 01:39:59] Wessix, joining. (#selenium)
+[2013-04-17 01:40:19] barancev: asavchuk: I'm for no guard. no matter what's in capabilities, proxyManager can be initialized even if we are not going to use it
+[2013-04-17 01:41:40] asavchuk: barancev: ok. so 2 guards are needed to add. something else? :)
+[2013-04-17 01:43:15] barancev: I was thinking about better reuse -- e.g InternetExplorerDriver() constructor can just delegate to this(DesiredCapabilities.internetExplorer()) etc.
+[2013-04-17 01:44:34] barancev: not much to win here, though
+[2013-04-17 01:46:46] sburjan, joining. (#selenium)
+[2013-04-17 01:47:08] asavchuk: yes, i can try to do this during guards add.
+[2013-04-17 01:47:50] asavchuk: what's about capability/property naming - is it correct?
+[2013-04-17 01:54:28] jibay, joining. (#selenium)
+[2013-04-17 01:54:30] barancev: aha, names!
+[2013-04-17 01:55:00] barancev: _CAPABILITY postfix -- no one other capability has it
+[2013-04-17 01:55:14] barancev: let's avoid it here too
+[2013-04-17 01:57:15] jamesoram, joining. (#selenium)
+[2013-04-17 02:03:14] barancev, quitting. (Quit: KVIrc 4.0.2 Insomnia http://www.kvirc.net/)
+[2013-04-17 02:04:20] munderwo-work: barancev: unittest in python 2.7...
+[2013-04-17 02:07:48] asavchuk: barancev: ok
+[2013-04-17 02:07:49] zac_sel, quitting. (Read error: Connection reset by peer)
+[2013-04-17 02:10:12] jualam, joining. (#selenium)
+[2013-04-17 02:10:38] munderwo-work, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 02:12:15] zac_sel, joining. (#selenium)
+[2013-04-17 02:13:31] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 02:13:44] admc, quitting. (Quit: Leaving.)
+[2013-04-17 02:18:01] zac_sel_, joining. (#selenium)
+[2013-04-17 02:20:40] zac_sel, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 02:21:04] davehunt, joining. (#selenium)
+[2013-04-17 02:21:45] Zac__, joining. (#selenium)
+[2013-04-17 02:23:13] davehunt, quitting. (Remote host closed the connection)
+[2013-04-17 02:25:06] zac_sel_, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 02:28:55] freynaud, joining. (#selenium)
+[2013-04-17 02:39:08] noahsussman, joining. (#selenium)
+[2013-04-17 02:54:31] zac_sel_, joining. (#selenium)
+[2013-04-17 02:55:55] smt, joining. (#selenium)
+[2013-04-17 02:56:35] Zac__, quitting. (Ping timeout: 255 seconds)
+[2013-04-17 02:58:21] Turzai, joining. (#selenium)
+[2013-04-17 03:00:05] Bebe_sel, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 03:09:09] barancev, joining. (#selenium)
+[2013-04-17 03:12:05] vila, quitting. (Remote host closed the connection)
+[2013-04-17 03:12:45] Bebe_sel, joining. (#selenium)
+[2013-04-17 03:13:26] barancev|2, joining. (#selenium)
+[2013-04-17 03:14:23] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 03:15:08] vila, joining. (#selenium)
+[2013-04-17 03:17:01] d0x, quitting. (Quit: leaving)
+[2013-04-17 03:26:25] asavchuk: barancev: is something to update in InternetExplorerDriver changes from PR 50?
+[2013-04-17 03:26:46] barancev|2, quitting. (Quit: KVIrc 4.0.2 Insomnia http://www.kvirc.net/)
+[2013-04-17 03:27:40] barancev: asavchuk: other than discussed earlier today?
+[2013-04-17 03:28:08] barancev: or do you mean InternetExplorerDriverService?
+[2013-04-17 03:29:26] asavchuk: sorry, i'm about InternetExplorerDriverService
+[2013-04-17 03:29:35] barancev: I'm not sure about single quotes in --log-file='%s' -- does this work?
+[2013-04-17 03:30:07] Turzai, quitting. (Read error: Connection reset by peer)
+[2013-04-17 03:31:09] asavchuk: yes, i implemented this at iedriver cpp. or java maybe correctly pass arguments like --ie-switches=-private -noframemerging without quoting ?
+[2013-04-17 03:31:45] barancev: they should be quoted
+[2013-04-17 03:31:59] barancev: I'm not sure windows can understand single quotes
+[2013-04-17 03:33:01] asavchuk: also do selenium have tests which verify usage of folders/paths with spaces as log destination etc?
+[2013-04-17 03:33:20] barancev: no, iirc
+[2013-04-17 03:33:27] asavchuk: oh, i can change it to double - both single and double are supported at cpp.
+[2013-04-17 03:34:08] Phil37, joining. (#selenium)
+[2013-04-17 03:34:35] barancev: e.g. try to run dir "." and dir '.' from the windows console -- the result is different
+[2013-04-17 03:36:06] asavchuk: do selenium need such tests? i think i can write it, at least for ie driver log path
+[2013-04-17 03:37:18] asavchuk: yes, i see - so i'll switch to using double. ok.
+[2013-04-17 03:38:43] amitev2, joining. (#selenium)
+[2013-04-17 03:39:51] amitev, quitting. (Read error: Connection reset by peer)
+[2013-04-17 03:40:22] noahsussman, joining. (#selenium)
+[2013-04-17 03:45:30] dregin, quitting. (Ping timeout: 258 seconds)
+[2013-04-17 03:45:31] asavchuk: oh, stop. if tests are ran at remote server i can't check file existence easily.
+[2013-04-17 03:45:31] asavchuk: also is something about naming properties in service code?
+[2013-04-17 03:46:08] dregin, joining. (#selenium)
+[2013-04-17 03:47:55] barancev: they look good, like other properties
+[2013-04-17 03:48:36] barancev: is --force-createprocess a new feature of the driver server?
+[2013-04-17 03:52:24] asavchuk: yes, it allows to use CreateProcess() API
+[2013-04-17 03:58:25] amitev2, changing nick to amitev.
+[2013-04-17 04:10:42] Mkop, quitting. (Remote host closed the connection)
+[2013-04-17 04:17:49] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 04:20:22] zac_sel_, quitting. (Read error: Connection reset by peer)
+[2013-04-17 04:23:45] zac_sel, joining. (#selenium)
+[2013-04-17 04:25:52] ddary, joining. (#selenium)
+[2013-04-17 04:27:15] smt, leaving. ("Konversation terminated!")
+[2013-04-17 04:30:34] jibay, quitting. (Quit: Leaving)
+[2013-04-17 04:31:31] jimevans, joining. (#selenium)
+[2013-04-17 04:32:39] AutomatedTester: good arvo everybody
+[2013-04-17 04:33:15] jimevans: AutomatedTester: G'day mate
+[2013-04-17 04:34:43] AutomatedTester: jimevans: how did you get on with EventUtils?
+[2013-04-17 04:35:45] jimevans: I had a POC completed for mouse events.
+[2013-04-17 04:36:59] jimevans: Essentially, I subbed the EventUtils implementation for the synthetic mouse implementation because that was easier.
+[2013-04-17 04:37:40] barancev: good arvo? hmm... australian spy in GB detected!
+[2013-04-17 04:38:05] AutomatedTester: barancev: I am antepidian so perfectly acceptable to use
+[2013-04-17 04:38:58] jimevans: It was a copy-paste implementation, and not one that was clean enough to commit. I just wanted to see what would be involved.
+[2013-04-17 04:40:28] jimevans: I had a few issues with coordinate miscalculations which I didn't bother to iron out.
+[2013-04-17 04:40:44] jimevans: Why do you ask?
+[2013-04-17 04:41:17] barancev: because it's a chance to get rid of gecko SDK
+[2013-04-17 04:41:30] barancev: though, m-day would be a better change :)
+[2013-04-17 04:41:31] selbot2: M-Day: day in the future when Marionette is made available for non-debug builds
+[2013-04-17 04:41:36] barancev: *chance
+[2013-04-17 04:42:36] jimevans: I'm all for that. It's feasible, without question.
+[2013-04-17 04:42:50] noahsussman, joining. (#selenium)
+[2013-04-17 04:43:10] AutomatedTester: jimevans: curiousity more than anything else
+[2013-04-17 04:44:34] jimevans: AutomatedTester: Somewhere along the line, somebody already changed keystrokes to use IDOMWindowUtils.
+[2013-04-17 04:47:47] jimevans: Which surprised me, because simonstewart seemed skeptical about the quality of the implementation of the interface in legacy versions of Firefox.
+[2013-04-17 04:50:01] AutomatedTester: jimevans: simonstewart wont listen on this matter because there isnt "native" in the method name
+[2013-04-17 04:50:08] AutomatedTester: even though the actual events are native
+[2013-04-17 04:50:18] jimevans: Anyway, I was successful enough to encourage someone else to follow up with a real implementation.
+[2013-04-17 04:50:42] AutomatedTester: jimevans: click in marionette already uses this methodology
+[2013-04-17 04:51:18] jimevans: Hey, I figure if it's good enough for marionette, it ought to be good enough for us.
+[2013-04-17 04:51:25] eanxgeek|log, changing nick to eanxgeek.
+[2013-04-17 04:51:52] jimevans: At least until we get marionette on the desktop.
+[2013-04-17 04:52:43] Bebe_sel, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 04:52:51] zac_sel_, joining. (#selenium)
+[2013-04-17 04:53:27] SamuraiJack, joining. (#selenium)
+[2013-04-17 04:54:41] barancev: jimevans: can you share your drafts? a fork on github may be?
+[2013-04-17 04:56:33] zac_sel, quitting. (Ping timeout: 240 seconds)
+[2013-04-17 04:58:00] jimevans: If I were going to implement it for realsies, I'd change the Firefox driver's synthetic events to use it, then start a discussion about migrating the existing "native" implementation with this one.
+[2013-04-17 05:00:10] AutomatedTester: thats the right approach
+[2013-04-17 05:00:32] mreedell-work, joining. (#selenium)
+[2013-04-17 05:04:47] barancev: right, it's "synthetic" in essence
+[2013-04-17 05:04:52] jimevans: barancev: I'll see what I can do, but I don't have time to correct the coordinate calculation issue. The drag and drop tests in particular fail, not because we don't drag and drop, but because the drop happens in the wrong place.
+[2013-04-17 05:04:59] barancev: but if it works do we need "native" at all?
+[2013-04-17 05:05:37] AutomatedTester: barancev: we shouldnt
+[2013-04-17 05:05:53] AutomatedTester: is there any reason why we dont ignore .idea in our tree?
+[2013-04-17 05:08:15] jimevans: There's definite upside to removing the C++ code from the Firefox driver.
+[2013-04-17 05:08:31] AutomatedTester: not requiring the gecko SDK is an upside
+[2013-04-17 05:08:52] AutomatedTester: and surprised the Googlers arent all over this like a rash to save their test infrastructure some cycles
+[2013-04-17 05:08:59] AutomatedTester: but hey ho
+[2013-04-17 05:09:00] Bebe_sel, joining. (#selenium)
+[2013-04-17 05:09:43] AutomatedTester: we should think about giving alex the commit bit
+[2013-04-17 05:10:21] jimevans: Savchuk? Yeah I was going to propose it soon.
+[2013-04-17 05:11:09] AutomatedTester: yea
+[2013-04-17 05:11:18] *AutomatedTester goes off to land 2 of his patches'
+[2013-04-17 05:11:23] AutomatedTester: well, at least one
+[2013-04-17 05:12:03] transactis, joining. (#selenium)
+[2013-04-17 05:12:13] transactis: hey up
+[2013-04-17 05:12:28] AutomatedTester: hey up chuck
+[2013-04-17 05:12:44] transactis: Got a problem with testing in IE
+[2013-04-17 05:13:04] *jimevans runs and hides'
+[2013-04-17 05:13:05] transactis: Clicking a input submit button does nothing, yet when running in firefox / chrome it does
+[2013-04-17 05:13:08] transactis: anyone know why?
+[2013-04-17 05:13:23] AutomatedTester: transactis: zoom set to 100%?
+[2013-04-17 05:13:44] jimevans: transactis: Window focus?
+[2013-04-17 05:14:24] transactis: Its inputting data into the form inputs
+[2013-04-17 05:14:36] transactis: but doesn't seem to click the submit button
+[2013-04-17 05:14:38] AutomatedTester: cant remember if mouse needs to be out of the window or in the window
+[2013-04-17 05:14:38] jimevans: transactis: Protected mode?
+[2013-04-17 05:14:57] AutomatedTester: transactis: mouse != keyboard
+[2013-04-17 05:15:00] transactis: I also manually click the submit button and nothing happens when the browser has been loaded from selenium webdriver
+[2013-04-17 05:15:00] jimevans: AutomatedTester: Not for that.
+[2013-04-17 05:15:27] AutomatedTester: transactis: thats interesting
+[2013-04-17 05:15:38] AutomatedTester: transactis: got jquery all over that bad boy?
+[2013-04-17 05:15:56] transactis: So it is like IE has disabled clicking of submit input when IE is launched from the jar
+[2013-04-17 05:16:17] transactis: Its just a normal <input submit>
+[2013-04-17 05:16:28] AutomatedTester: hmmm
+[2013-04-17 05:16:51] jimevans: transactis: Well we know it's not globally broken.
+[2013-04-17 05:16:51] transactis: Its quite strange
+[2013-04-17 05:17:00] Selenium-Git, joining. (#selenium)
+[2013-04-17 05:17:00] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/5o30TA
+[2013-04-17 05:17:00] Selenium-Git: 13selenium/06master 14e9d4590 15Alex Savchuk: Attach to raised exception all possible stacktrace info...
+[2013-04-17 05:17:00] Selenium-Git, leaving. (#selenium)
+[2013-04-17 05:17:31] transactis: Is it going to be my IE settings or something?
+[2013-04-17 05:17:49] jimevans: Possible workaround, try submit()
+[2013-04-17 05:18:08] jimevans: Instead of click()
+[2013-04-17 05:18:18] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 05:18:25] transactis: So have a completly different file just for IE?
+[2013-04-17 05:18:32] transactis: That seems silly
+[2013-04-17 05:18:55] transactis: Im using it with phpunit aswell btw
+[2013-04-17 05:19:04] AutomatedTester: transactis: all browsers understand submit()
+[2013-04-17 05:19:40] aweiteka, joining. (#selenium)
+[2013-04-17 05:20:05] transactis: Okay, i will submit() but i guess it won't work as when I manually click the <input submit> in the browser, nothing happens
+[2013-04-17 05:20:20] AutomatedTester: transactis: are there any errors in the dev tools?
+[2013-04-17 05:20:47] transactis: Can't remember, and can't check right now, waiting for code update and database changes
+[2013-04-17 05:22:14] AutomatedTester: running tests bbiam
+[2013-04-17 05:25:41] jimevans: transactis: You could check your IE settings. Those are what AutomatedTester and I were asking about when you joined the channel. Zoom level. Protected mode settings.
+[2013-04-17 05:26:29] transactis: Yeah I did see that posted on stack overflow, about protected mode
+[2013-04-17 05:26:47] transactis: But I'm waiting for code update to environment before i can test again
+[2013-04-17 05:29:34] transactis: Cheers for help,
+[2013-04-17 05:29:47] jimevans: I've seen more people than I care to count bitten by blindly setting the capability to ignore protected mode settings rather than taking the time to actually set protected mode correctly.
+[2013-04-17 05:29:47] transactis: I'll report back with updates soon I guess
+[2013-04-17 05:30:39] transactis: Considering I havn't used IE for years, only use it at work for this. I know nothing about the settings and what they effect
+[2013-04-17 05:31:58] barancev: jimevans: many selenium-based frameworks set "ignore protected mode settings" by default. as if burying the head in the sand helps to avoid a danger
+[2013-04-17 05:32:41] RossPatterson, joining. (#selenium)
+[2013-04-17 05:39:04] Selenium-Git, joining. (#selenium)
+[2013-04-17 05:39:04] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 2 new commits to 06master: 02http://git.io/HvyK6Q
+[2013-04-17 05:39:04] Selenium-Git: 13selenium/06master 1402183f7 15Alex Savchuk: Fixed issue #4390 for FF...
+[2013-04-17 05:39:04] Selenium-Git: 13selenium/06master 142b6b0d1 15AutomatedTester: Merge branch 'upstream4' of https://github.com/alex-savchuk/selenium into upstream4
+[2013-04-17 05:39:04] Selenium-Git, leaving. (#selenium)
+[2013-04-17 05:42:48] barancev: AutomatedTester: a test for the last commit?
+[2013-04-17 05:43:04] AutomatedTester: barancev: the test was updated
+[2013-04-17 05:43:10] AutomatedTester: and not tests fail
+[2013-04-17 05:43:14] noahsussman, joining. (#selenium)
+[2013-04-17 05:43:20] barancev: sorry, what is a test?
+[2013-04-17 05:43:30] AutomatedTester: the test file that is
+[2013-04-17 05:44:04] barancev: was there a failing test? what to unignore?
+[2013-04-17 05:44:25] AutomatedTester: nothing to unignore
+[2013-04-17 05:44:41] AutomatedTester: if you look at the code, its just scoping things better
+[2013-04-17 05:44:43] noahsussman, quitting. (Read error: Connection reset by peer)
+[2013-04-17 05:44:52] nirvdrum, joining. (#selenium)
+[2013-04-17 05:44:54] AutomatedTester: but if its an issue please revert and take it up with alex
+[2013-04-17 05:45:17] noahsussman, joining. (#selenium)
+[2013-04-17 05:45:50] barancev: you closed my issue #4390 as fixed
+[2013-04-17 05:45:51] selbot2: 03 closed/fixed Element cannot be scrolled into view: [object HTMLBodyElement] - https://code.google.com/p/selenium/issues/detail?id=4390 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox Browser-IE]
+[2013-04-17 05:46:09] barancev: I need to check it is really fixed
+[2013-04-17 05:46:39] barancev: but I don't remember whether I created a test for it or not
+[2013-04-17 05:47:52] dawagner, joining. (#selenium)
+[2013-04-17 05:48:06] jimevans, quitting. (Quit: Colloquy for iPhone - http://colloquy.mobi)
+[2013-04-17 05:48:40] AutomatedTester: why cant I log into my tmobile account???
+[2013-04-17 05:53:43] AutomatedTester: ok, my account is still active just not connecting overseas
+[2013-04-17 05:56:51] vila, quitting. (Remote host closed the connection)
+[2013-04-17 06:00:43] ddary, leaving. (#selenium)
+[2013-04-17 06:04:58] jimevans, joining. (#selenium)
+[2013-04-17 06:06:19] dimacus, joining. (#selenium)
+[2013-04-17 06:08:10] seljenkinsbot: Project Firefox 20 XP Synthesized Java Tests build #574: FIXED in 11 min: http://ci.seleniumhq.org:8080/job/Firefox%2020%20XP%20Synthesized%20Java%20Tests/574/
+[2013-04-17 06:09:27] jimevans, leaving. (#selenium)
+[2013-04-17 06:09:57] vila, joining. (#selenium)
+[2013-04-17 06:10:42] jimevans, joining. (#selenium)
+[2013-04-17 06:11:07] vila, quitting. (Remote host closed the connection)
+[2013-04-17 06:11:26] vila, joining. (#selenium)
+[2013-04-17 06:14:02] SamuraiJack, quitting. (Read error: Operation timed out)
+[2013-04-17 06:16:55] cgoldberg, joining. (#selenium)
+[2013-04-17 06:17:41] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 06:18:17] Manoj_: Bangalore, India - Bomb blast..
+[2013-04-17 06:20:29] Revery, joining. (#selenium)
+[2013-04-17 06:21:32] jimevans: :log
+[2013-04-17 06:21:32] selbot2: https://github.com/SeleniumHQ/irc-logs/blob/master/2013/04/17.txt | http://illicitonion.com/selogs/search
+[2013-04-17 06:25:03] cmcgraw, joining. (#selenium)
+[2013-04-17 06:26:24] Bebe_sel, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 06:27:14] qaguy, joining. (#selenium)
+[2013-04-17 06:27:49] akhet, joining. (#selenium)
+[2013-04-17 06:27:49] akhet, quitting. (Changing host)
+[2013-04-17 06:27:49] akhet, joining. (#selenium)
+[2013-04-17 06:29:22] rbalent, joining. (#selenium)
+[2013-04-17 06:30:06] rbalent, quitting. (Client Quit)
+[2013-04-17 06:32:55] vila, quitting. (Quit: Leaving)
+[2013-04-17 06:33:02] vila, joining. (#selenium)
+[2013-04-17 06:33:16] vila, quitting. (Read error: Connection reset by peer)
+[2013-04-17 06:33:20] ryanpetrello, joining. (#selenium)
+[2013-04-17 06:33:36] vila, joining. (#selenium)
+[2013-04-17 06:38:26] stackedsax, joining. (#selenium)
+[2013-04-17 06:38:54] Bebe_sel, joining. (#selenium)
+[2013-04-17 06:39:04] vila, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 06:41:30] girija, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 06:41:36] vila, joining. (#selenium)
+[2013-04-17 06:42:06] noahsussman, joining. (#selenium)
+[2013-04-17 06:42:10] dimacus: AutomatedTester: ping
+[2013-04-17 06:42:18] AutomatedTester: dimacus: pong
+[2013-04-17 06:42:46] *AutomatedTester wonders if he can get a US sim at Heathrow'
+[2013-04-17 06:42:55] dimacus: so finally following up on the spedy gonzales proxy… you sent me 2 links https://github.com/AutomatedTester/speedy-gonzales-proxy
+[2013-04-17 06:42:58] dimacus: https://github.com/AutomatedTester/speedy-gonzales-servlette
+[2013-04-17 06:43:00] Selenium-Git, joining. (#selenium)
+[2013-04-17 06:43:01] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06issue-5237 at 14299ec61: 02http://git.io/77wBzw
+[2013-04-17 06:43:01] Selenium-Git, leaving. (#selenium)
+[2013-04-17 06:43:23] noahsussman, quitting. (Read error: Connection reset by peer)
+[2013-04-17 06:43:24] dimacus: both of them are look similar, are they both needed to move the mouse, or is one depricated version of another?
+[2013-04-17 06:43:38] dimacus: AutomatedTester:  ^^
+[2013-04-17 06:43:56] noahsussman, joining. (#selenium)
+[2013-04-17 06:43:58] AutomatedTester: dimacus: one is grid plugin
+[2013-04-17 06:44:09] AutomatedTester: dimacus: the other is a servelette that the plugin speaks to
+[2013-04-17 06:45:30] dimacus: ahhh cool that makes perfect sense!
+[2013-04-17 06:48:42] zeljkof, quitting. (Quit: zeljkof)
+[2013-04-17 06:48:46] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 06:48:47] AutomatedTester: Dude-X_: do you know where I can buy a US sim at Newark airport?
+[2013-04-17 06:50:12] ryanpetrello, quitting. (Remote host closed the connection)
+[2013-04-17 06:50:45] ryanpetrello, joining. (#selenium)
+[2013-04-17 06:50:45] zac_sel_, quitting. (Read error: Connection reset by peer)
+[2013-04-17 06:51:51] dimacus: AutomatedTester:  there will probably be a t-mobile kiosk or something
+[2013-04-17 06:52:03] *AutomatedTester hopes so'
+[2013-04-17 06:52:12] dimacus: you might be better off getting a burner phone, us contracts are such a… well yes
+[2013-04-17 06:52:26] AutomatedTester: the "shops available" on the site doesnt suggest there is one
+[2013-04-17 06:52:30] AutomatedTester: "burner phone"
+[2013-04-17 06:52:33] AutomatedTester: I just want a sim
+[2013-04-17 06:52:38] AutomatedTester: a PAYG sim
+[2013-04-17 06:52:41] AutomatedTester: with data
+[2013-04-17 06:53:23] dimacus: yeah… i honestly don't know… but i'd assume there must be some sort of a kiosk or a vending machine
+[2013-04-17 06:54:41] riv_, joining. (#selenium)
+[2013-04-17 06:54:45] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-04-17 06:54:48] riv_, quitting. (Remote host closed the connection)
+[2013-04-17 06:55:05] riv_, joining. (#selenium)
+[2013-04-17 06:56:40] zac_sel, joining. (#selenium)
+[2013-04-17 07:00:04] zeljkof, joining. (#selenium)
+[2013-04-17 07:01:36] alexglow, joining. (#selenium)
+[2013-04-17 07:08:13] Dude-X_: AutomatedTester, either from AT&T or T-Mobile
+[2013-04-17 07:08:30] gdennis, joining. (#selenium)
+[2013-04-17 07:08:36] AutomatedTester: Dude-X_: they in the airport?
+[2013-04-17 07:08:59] Dude-X_: AutomatedTester, don't know, but i'll do a quick check; any airport you're flying to in particular?
+[2013-04-17 07:10:28] Dude-X_: AutomatedTester, there's also virgin mobile, but i haven't seen too many of those
+[2013-04-17 07:10:41] brokenthumbs, joining. (#selenium)
+[2013-04-17 07:10:43] AutomatedTester: Dude-X_: newark
+[2013-04-17 07:13:03] noahsussman, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 07:13:12] fatguylaughing, joining. (#selenium)
+[2013-04-17 07:14:05] Dude-X_: AutomatedTester, the best i can come up with is that terminal C will have a kiosk for getting SIMs/ phone cards
+[2013-04-17 07:14:18] AutomatedTester: ok
+[2013-04-17 07:14:28] AutomatedTester: is Terminal C far from Terminal B
+[2013-04-17 07:14:30] Dude-X_: also the second best bet is going to an official T-Mobile or AT&T store and they will help you get on loine
+[2013-04-17 07:14:32] AutomatedTester: I land at B
+[2013-04-17 07:14:54] dawagner: AutomatedTester: Whenare you arriving? I have a spare kicking about...
+[2013-04-17 07:15:01] dawagner: $3/day unlimited calls, text and data
+[2013-04-17 07:15:10] AutomatedTester: dawagner: Monday
+[2013-04-17 07:15:21] AutomatedTester: dawagner: got it in the UK?
+[2013-04-17 07:15:24] Dude-X_: terminal C is about 2 minutes away when you reach the connecting tunnel
+[2013-04-17 07:15:35] dawagner: Yeah, in the UK
+[2013-04-17 07:15:52] dimacus: AutomatedTester: so now that i got the mouse mover working on my machine, i'm wondering, why did you go with setting up a seperate proxy server to sit on top of the grid instead of extending the JsonWire and adding the moveMouse endpoint there?
+[2013-04-17 07:15:57] AutomatedTester: dawagner: possible to stick ye olde Royal Mail?
+[2013-04-17 07:16:01] dawagner: Definitely :)
+[2013-04-17 07:16:26] dawagner: Email me an address, I'll pop in on its way tonight :)
+[2013-04-17 07:16:48] AutomatedTester: dimacus: because that would mean having to change the client code, the server code, recompiling and then putting it on all my nodes
+[2013-04-17 07:16:50] ddary, joining. (#selenium)
+[2013-04-17 07:16:55] AutomatedTester: dimacus: and having to do with with each release
+[2013-04-17 07:17:08] Dude-X_: AutomatedTester, how do you plan to get to NYC?
+[2013-04-17 07:17:16] AutomatedTester: Dude-X_: train
+[2013-04-17 07:17:18] Dude-X_: NJ Transit Rail is cheap and fast at about 8 bucks
+[2013-04-17 07:17:21] Dude-X_: don't take Amtrak
+[2013-04-17 07:17:35] Dude-X_: Amtrack is 50 dollars or so
+[2013-04-17 07:18:01] dimacus: AutomatedTester: so this way you are no longer attached to a version of of the driver… but isn't there a way to just attach a couple of methods to a class by adding it to the class path?
+[2013-04-17 07:18:05] AutomatedTester: dawagner: I was going to do what https://developers.google.com/google-test-automation-conference/travel suggested
+[2013-04-17 07:18:23] transactis, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 07:18:29] AutomatedTester: Dude-X_: even ^
+[2013-04-17 07:18:47] AutomatedTester: dimacus: possibly
+[2013-04-17 07:18:51] Dude-X_: i wonder where they get 12.50 from...
+[2013-04-17 07:19:04] Dude-X_: i guess NJT North line has less stops?
+[2013-04-17 07:19:06] AutomatedTester: dimacus: but the minute you add to the wire protocol you need to do things on the client side
+[2013-04-17 07:19:23] AutomatedTester: dimacus: doing it as a grid plugin you dont
+[2013-04-17 07:20:08] AutomatedTester: dawagner: which email address is best
+[2013-04-17 07:20:18] dawagner: dawagner at gee mail dot com
+[2013-04-17 07:20:43] jimevans: gee em ay eye ell :)
+[2013-04-17 07:21:25] Dude-X_: AutomatedTester, weird they actually charge 12.50…. NJ transit charges by distance
+[2013-04-17 07:21:34] Dude-X_: but they make an exception for the airport :/
+[2013-04-17 07:22:06] Dude-X_: it's 8 dollars to Newark, and 9 to the town west of newark
+[2013-04-17 07:22:35] AutomatedTester: Dude-X_: its not going to break the bank
+[2013-04-17 07:22:35] Dude-X_: afk
+[2013-04-17 07:22:42] AutomatedTester: especially since I will expense
+[2013-04-17 07:22:45] Dude-X_: i'm just surprised that's all
+[2013-04-17 07:22:50] AutomatedTester: dawagner: you should have mail
+[2013-04-17 07:24:44] *AutomatedTester and my co-speaker need a sim in our devices for our talk'
+[2013-04-17 07:24:50] AutomatedTester: if we can pull off this one demo
+[2013-04-17 07:24:51] papegaaij, quitting. (Remote host closed the connection)
+[2013-04-17 07:24:56] AutomatedTester: its going to be hawt
+[2013-04-17 07:24:57] dawagner: I do! Will send a thing tonight :)
+[2013-04-17 07:25:55] Manoj_, quitting. (Quit: Page closed)
+[2013-04-17 07:29:07] Selenium-Git, joining. (#selenium)
+[2013-04-17 07:29:07] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 2 new commits to 06master: 02http://git.io/CqDt4g
+[2013-04-17 07:29:07] Selenium-Git: 13selenium/06master 14a6861f9 15Jim Evans: Correcting logic error in IE driver alert handling....
+[2013-04-17 07:29:07] Selenium-Git: 13selenium/06master 142f6e67d 15Jim Evans: Updating .NET Alerts tests....
+[2013-04-17 07:29:07] Selenium-Git, leaving. (#selenium)
+[2013-04-17 07:31:31] ryanpetr_, joining. (#selenium)
+[2013-04-17 07:33:56] Dude-X_, quitting. (Read error: Connection reset by peer)
+[2013-04-17 07:34:09] Dude-X_, joining. (#selenium)
+[2013-04-17 07:34:37] elopio, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 07:35:26] ryanpetrello, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 07:35:27] elopio, joining. (#selenium)
+[2013-04-17 07:37:26] stephend, joining. (#selenium)
+[2013-04-17 07:38:11] zac_sel_, joining. (#selenium)
+[2013-04-17 07:38:22] noahsussman, joining. (#selenium)
+[2013-04-17 07:41:44] stackedsax, quitting. (Quit: Leaving.)
+[2013-04-17 07:41:46] qaguy, joining. (#selenium)
+[2013-04-17 07:42:24] zac_sel, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 07:46:45] stephend, quitting. (Read error: Connection reset by peer)
+[2013-04-17 07:47:03] brokenthumbs: Hi all: Has anybody ever run into "Session was terminated due to CLIENT_STOPPED_SESSION"? It's happening intermittently on my Grid nodes, and I'm not too sure what's causing it.
+[2013-04-17 07:47:10] brokenthumbs: Would appreciate any insight, comments, anything really
+[2013-04-17 07:47:37] brokenthumbs: Stuck on the first steps of how to tackle this bug
+[2013-04-17 07:48:03] stephend, joining. (#selenium)
+[2013-04-17 07:50:26] nhirata, joining. (#selenium)
+[2013-04-17 07:53:48] freynaud, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 07:53:57] stephend, quitting. (Remote host closed the connection)
+[2013-04-17 07:54:30] stephend, joining. (#selenium)
+[2013-04-17 07:56:19] ryanpetr_, quitting. (Remote host closed the connection)
+[2013-04-17 07:56:51] ryanpetrello, joining. (#selenium)
+[2013-04-17 07:59:30] stephend, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 07:59:49] Wessix, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 07:59:51] intchanter-work, joining. (#selenium)
+[2013-04-17 08:01:23] stackedsax, joining. (#selenium)
+[2013-04-17 08:02:03] AutomatedTester: brokenthumbs: sorry, not seen that
+[2013-04-17 08:02:12] AutomatedTester: hmmm roast potatoes are in the oven
+[2013-04-17 08:03:01] noahsussman, quitting. (Read error: Connection reset by peer)
+[2013-04-17 08:03:32] noahsussman, joining. (#selenium)
+[2013-04-17 08:09:05] Synck, joining. (#selenium)
+[2013-04-17 08:12:01] Synck: in the node configuration file for selenium grid I can specify the firefox binary that has to be used
+[2013-04-17 08:12:15] nirvdrum: brokenthumbs: Sounds like you need to configure the timeouts on your hub.
+[2013-04-17 08:12:53] Synck: but this doesn't work for chrome, tried with ("chromeOptions": {"binary": "C:\\Chrome\\27.0.1453.47\\chrome.exe"})
+[2013-04-17 08:13:18] ddary, leaving. (#selenium)
+[2013-04-17 08:13:20] nirvdrum: In all likelihood, the hub thought the client timed out and then killed the session on your behalf.  Your client then tried to use it and it no longer existed.
+[2013-04-17 08:13:40] stackedsax, quitting. (Quit: Leaving.)
+[2013-04-17 08:14:04] nirvdrum: Synck: There's nothing special in grid about that.  You'd need to see how chromedriver allows config.
+[2013-04-17 08:14:37] nirvdrum: Or rather, if chromedriver allows you to do it and if so, what the config looks like.
+[2013-04-17 08:15:38] Synck: it works when I specify it in the desired_capabilities
+[2013-04-17 08:16:32] gdennis, leaving. (#selenium)
+[2013-04-17 08:17:30] kkania, joining. (#selenium)
+[2013-04-17 08:17:31] selbot2: kkania: note from andreastt 8 days ago: ping
+[2013-04-17 08:17:31] selbot2: kkania: note from jarib 5 days ago: chromedriver2 uses a 200 response code for some errors, which isn't compliant with https://code.google.com/p/selenium/wiki/JsonWireProtocol#Error_Handling
+[2013-04-17 08:17:31] selbot2: kkania: note from jarib 5 days ago: example request/response https://gist.github.com/jarib/5372459
+[2013-04-17 08:18:43] brokenthumbs: nirvdrum: hmmm.... that sounds possible.
+[2013-04-17 08:18:57] Mkop, joining. (#selenium)
+[2013-04-17 08:19:15] brokenthumbs: nirvdrum: let me try to set timeouts on hub, thanks for the suggestion
+[2013-04-17 08:19:24] brokenthumbs: nirvdrum: will report back with results
+[2013-04-17 08:20:45] nirvdrum: :wiki timeouts
+[2013-04-17 08:20:49] selbot2: 1: 03Grid2: gridseleniumwebdriver - https://code.google.com/p/selenium/wiki/Grid2
+[2013-04-17 08:20:49] selbot2: 2: 03RubyBindings: Ruby bindings - https://code.google.com/p/selenium/wiki/RubyBindings
+[2013-04-17 08:20:49] selbot2: 3: 03SafariDriverInternals: Details on the inner workings of the SafariDriver - https://code.google.com/p/selenium/wiki/SafariDriverInternals
+[2013-04-17 08:21:20] nirvdrum: #1 should have the info you need.
+[2013-04-17 08:21:26] selbot2: 03michael.tamm2 closed/fixed NumberFormatException inside FirefoxWebElement.getSize() - https://code.google.com/p/selenium/issues/detail?id=1 [Type-Defect Priority-Medium]
+[2013-04-17 08:24:13] Synck, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 08:24:33] millenium, quitting. (Quit: ~ Trillian - www.trillian.im ~)
+[2013-04-17 08:25:45] lukeis, joining. (#selenium)
+[2013-04-17 08:29:53] girija, joining. (#selenium)
+[2013-04-17 08:32:01] zeljkof, quitting. (Quit: zeljkof)
+[2013-04-17 08:33:50] dawagner: AutomatedTester: The top two emails in my inbox are one inviting me to Explore Bournemouth and one from you.  Weird :P
+[2013-04-17 08:35:53] jimevans: dawagner: so AutomatedTester, barancev, and I were talking this morning about synthetic events in the firefox driver, and why keyboard events use nsIDOMWindowUtils, but mouse events don't.
+[2013-04-17 08:36:04] jimevans: or, rather, were wondering why that is.
+[2013-04-17 08:36:44] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 08:37:08] testingb0t1, quitting. (Quit: Leaving.)
+[2013-04-17 08:37:08] brokenthumbs: nirvdrum: boosted my timeouts on hub, gonna try and run some tests and see what happens
+[2013-04-17 08:37:43] dawagner: I can't remember what bugs there were when using nsIDOMWindowUtils, but there were definitely some
+[2013-04-17 08:38:43] Dude-X, joining. (#selenium)
+[2013-04-17 08:39:20] testingb0t1, joining. (#selenium)
+[2013-04-17 08:39:26] jimevans: interesting. i bring it up, because using that that interface's sendMouseEvent() method is how marionette implements mouse events.
+[2013-04-17 08:39:54] jimevans: and if it's good enough for marionette, surely that's an approach we should at least consider, no?
+[2013-04-17 08:39:57] markalanevans, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 08:40:05] AutomatedTester: dawagner: the only one I remember was people wanted to use methods with native in the name
+[2013-04-17 08:40:16] AutomatedTester: dawagner: and that relies on widgets which arent cross platform
+[2013-04-17 08:40:32] AutomatedTester: however, there are other mechanisms for getting trusted events into the browser
+[2013-04-17 08:43:33] testingb0t1, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 08:44:10] dawagner: eranm or simonstewart would know which bugs there were much better than I would
+[2013-04-17 08:44:20] wolcanus, joining. (#selenium)
+[2013-04-17 08:44:24] dawagner: But if there's a marionette build feature-complete enough that I can test out, I'd love to
+[2013-04-17 08:44:55] AutomatedTester: current debug nightlies have it
+[2013-04-17 08:45:08] jimevans: simonstewart didn't have exact recollection last time we discussed it, but had vague "yeah, there were bugs" remembrances too
+[2013-04-17 08:45:33] dawagner: So if I grab head, compile it in debug mode, what do I do from there?
+[2013-04-17 08:47:09] AutomatedTester: dawagner: have you got a copy of m-c?
+[2013-04-17 08:47:22] AutomatedTester: mozilla central
+[2013-04-17 08:47:29] dawagner: I can get one pretty quickly
+[2013-04-17 08:47:53] stackedsax, joining. (#selenium)
+[2013-04-17 08:48:17] *lukeis just officially deprecated iPhoneDriver at least on the :wiki iPhoneDriver'
+[2013-04-17 08:48:17] selbot2: 1: 03IPhoneDriver: Information about the iPhone Driver - https://code.google.com/p/selenium/wiki/IPhoneDriver
+[2013-04-17 08:48:47] AutomatedTester: dawagner: get that, put https://gist.github.com/AutomatedTester/5405396 somewhere
+[2013-04-17 08:49:11] AutomatedTester: export MOZCONFIG=/place/where/gist/is/including/filename
+[2013-04-17 08:49:21] AutomatedTester: then "./mach build"
+[2013-04-17 08:49:34] AutomatedTester: wait >20 mins
+[2013-04-17 08:49:48] AutomatedTester: then "cd test/marionette/client/marionette"
+[2013-04-17 08:50:00] Hronom, quitting. (Quit: Instantbird 1.3 -- http://www.instantbird.com)
+[2013-04-17 08:50:16] AutomatedTester: then "venv_test.sh"
+[2013-04-17 08:50:25] AutomatedTester: cd ../marionette_venv
+[2013-04-17 08:50:31] AutomatedTester: . bin/activate
+[2013-04-17 08:50:35] AutomatedTester: cd ../marionette
+[2013-04-17 08:51:04] AutomatedTester: python runtests.py tests/unit/test_clicking.py --binary ../../../../obj-ff-dbg/dist/Nightly.app/Contents/MacOS/firefox-bin
+[2013-04-17 08:51:08] AutomatedTester: dawagner: and that is it
+[2013-04-17 08:51:11] AutomatedTester: that will run click tests
+[2013-04-17 08:51:14] stackedsax, quitting. (Client Quit)
+[2013-04-17 08:51:46] AutomatedTester: one thing to note, the config doesnt have it in debug mode, which makes my life easier
+[2013-04-17 08:51:49] dawagner: So if I want to run my own tests, using a selenium server, what do I set?
+[2013-04-17 08:52:05] AutomatedTester: dawagner: thats a totally different kettle of fish
+[2013-04-17 08:52:14] AutomatedTester: the shim isnt production ready
+[2013-04-17 08:52:41] Dude-X: lukeis: what's the official version now, ios-driver?
+[2013-04-17 08:53:00] lukeis: i'm shying away from saying anything there
+[2013-04-17 08:53:07] lukeis: I use ios-driver
+[2013-04-17 08:54:02] dawagner: How much work would it be to get it in place?
+[2013-04-17 08:54:27] AutomatedTester: at the moment it hardcodes where the binary is
+[2013-04-17 08:54:34] AutomatedTester: and I dont know if I have updated for all the commands
+[2013-04-17 08:54:56] AutomatedTester: maybe a task for the plane to NYC
+[2013-04-17 08:55:16] *jimevans is reminded that he really should update his marionette driver implementation sometime.'
+[2013-04-17 08:55:16] AutomatedTester: dawagner: when are you getting into NYC?
+[2013-04-17 08:55:23] dawagner: I'll get a compile sitting on my disk, and let's sit down together at some point and try and get a thing working :)
+[2013-04-17 08:55:31] dawagner: Arriving Sunday evening, and around for two weeks
+[2013-04-17 08:55:31] riv_, quitting. (Remote host closed the connection)
+[2013-04-17 08:56:12] lukeis: dawagner: do you sublet your flat when you are gone? cause you seem to travel quite a bit ;)
+[2013-04-17 08:56:51] dawagner: No? tbh it would probably be cheaper for me to live in a hotel in London, but I live a fun person, and soon another fun person
+[2013-04-17 08:57:24] AutomatedTester: we should organise supper for Monday
+[2013-04-17 08:57:33] AutomatedTester: since Google is being cheap and not doing a speakers meal
+[2013-04-17 08:58:14] dawagner: Sounds good to me! Got anywhere in mind?
+[2013-04-17 08:58:23] AutomatedTester: its my first time to NYC so no
+[2013-04-17 08:58:34] dawagner: How do you feel about Japanese Mexican food? :p
+[2013-04-17 08:58:44] AutomatedTester: sounds interesting...
+[2013-04-17 08:58:52] AutomatedTester: we should get others involved
+[2013-04-17 08:58:54] lukeis: sounds horrible ;)
+[2013-04-17 08:59:00] dawagner: http://www.takataka.mx
+[2013-04-17 08:59:01] AutomatedTester: e.g. beardy
+[2013-04-17 08:59:04] dawagner: Honestly some of the best food I've eaten
+[2013-04-17 08:59:10] dawagner: And I love food
+[2013-04-17 08:59:41] Ardesco, quitting. (Quit: Ardesco)
+[2013-04-17 09:00:03] Phil37, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 09:00:25] Dude-X: dawagner: that's sort of close to where i work!
+[2013-04-17 09:00:54] Dude-X: that's a 15 minute walk from the google office though
+[2013-04-17 09:00:57] dawagner: Sounds like we should definitely go, then!
+[2013-04-17 09:01:14] stan, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 09:01:40] davehunt, joining. (#selenium)
+[2013-04-17 09:01:44] Dude-X: if you guys are here next monday, then we should meet up in the evening
+[2013-04-17 09:01:56] lukeis: s/love food/love steak/  <- more of an accurate representation of dawagner ;)
+[2013-04-17 09:02:24] jimevans: an excellent representation of jimevans too :)
+[2013-04-17 09:02:33] jimevans: only not today. :(
+[2013-04-17 09:02:46] dawagner: lukeis: I have been mostly a vegetarian for the last two weeks!
+[2013-04-17 09:02:48] lukeis: your umm, how should I call it, binge? on steak that last dinner in SF is going to be remembered for a while ;)
+[2013-04-17 09:03:17] dawagner: And I have a great eating-fortnight planned for New York :)
+[2013-04-17 09:03:40] admc, joining. (#selenium)
+[2013-04-17 09:03:41] lukeis: sounds excellent…
+[2013-04-17 09:03:48] *lukeis wishes I was going :)'
+[2013-04-17 09:03:58] admc, quitting. (Client Quit)
+[2013-04-17 09:04:03] qaguy, joining. (#selenium)
+[2013-04-17 09:04:42] dawagner: Eight restaurants, average Zagat rating of 27, three Michelin stars? Not just steak ;)
+[2013-04-17 09:05:26] *lukeis imagines dawagner gaining 20 lbs'
+[2013-04-17 09:05:31] markalanevans, joining. (#selenium)
+[2013-04-17 09:05:35] *jimevans is sick today, and the thought of food is just awful...'
+[2013-04-17 09:05:52] *dawagner is ok with gaining 20 lbs'
+[2013-04-17 09:05:55] dawagner: Sorry jimevans :(
+[2013-04-17 09:06:11] jimevans: no worries. i'm a big boy. i can take it.
+[2013-04-17 09:06:12] jimevans: :)
+[2013-04-17 09:11:28] botton, joining. (#selenium)
+[2013-04-17 09:11:28] botton, leaving. (#selenium)
+[2013-04-17 09:11:30] jimevans: barancev: yt?
+[2013-04-17 09:13:30] ryanpetr_, joining. (#selenium)
+[2013-04-17 09:13:31] jimevans: AutomatedTester, barancev: since y'all were curious, i've shared a bare-bones, POC for using nsIDOMWindowUtils for synthetic events in Firefox in a branch on my personal fork over on github. https://github.com/jimevans/selenium/compare/ff_eventutils
+[2013-04-17 09:14:36] jimevans: coordinate calculation is broken for anything more complicated than "click in the center of the element", but i'd guess that could be fixed with the right attention to detail.
+[2013-04-17 09:17:01] jimevans: so fi you were interested in trying it out, that'd be the place to get the changes from. the changes are localized to javascript/firefox-driver/js/syntheticMouse.js.
+[2013-04-17 09:17:30] ryanpetrello, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 09:17:51] jost, joining. (#selenium)
+[2013-04-17 09:18:42] asavchuk, quitting. (Quit: ChatZilla 0.9.90-rdmsoft [XULRunner 18.0.2/20130201065344])
+[2013-04-17 09:19:20] vazakl: ahh it's a wonderful day
+[2013-04-17 09:22:35] markalanevans, quitting. (Quit: markalanevans)
+[2013-04-17 09:23:06] markalanevans, joining. (#selenium)
+[2013-04-17 09:23:31] markalanevans, quitting. (Remote host closed the connection)
+[2013-04-17 09:23:44] markalanevans, joining. (#selenium)
+[2013-04-17 09:24:49] markalanevans, quitting. (Client Quit)
+[2013-04-17 09:26:18] dawagner: vazakl: Why such a wonderful day?
+[2013-04-17 09:27:49] *dawagner brings down jenkins'
+[2013-04-17 09:28:24] lukeis: there goes the neighborhood
+[2013-04-17 09:29:14] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 09:32:22] smccarthy, joining. (#selenium)
+[2013-04-17 09:34:28] tinygeo, joining. (#selenium)
+[2013-04-17 09:35:07] stephend, joining. (#selenium)
+[2013-04-17 09:35:45] tinygeo, leaving. (#selenium)
+[2013-04-17 09:37:54] jacksoncage, joining. (#selenium)
+[2013-04-17 09:38:28] ryanpetr_, quitting. (Remote host closed the connection)
+[2013-04-17 09:39:04] ryanpetrello, joining. (#selenium)
+[2013-04-17 09:39:43] llaskin, joining. (#selenium)
+[2013-04-17 09:40:39] *lukeis loves when stacktraces give painfully obvious feedback and i don't even need to see the code to respond with what the issue is'
+[2013-04-17 09:42:02] jacksoncage, quitting. (Remote host closed the connection)
+[2013-04-17 09:43:17] Hz0, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 09:44:30] dawagner: :D
+[2013-04-17 09:45:32] zac_sel_, quitting. (Quit: Leaving)
+[2013-04-17 09:45:55] jacksoncage, joining. (#selenium)
+[2013-04-17 09:47:02] jacksoncage, quitting. (Remote host closed the connection)
+[2013-04-17 09:48:39] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 09:51:33] jleyba, joining. (#selenium)
+[2013-04-17 09:51:43] sfbrian, joining. (#selenium)
+[2013-04-17 09:52:21] Hz0, joining. (#selenium)
+[2013-04-17 09:53:39] riv_, joining. (#selenium)
+[2013-04-17 09:53:44] ShawnM, joining. (#selenium)
+[2013-04-17 09:54:37] leonardoro, joining. (#selenium)
+[2013-04-17 09:55:51] girija, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 09:56:01] ShawnM, quitting. (Read error: Connection reset by peer)
+[2013-04-17 09:56:13] ShawnM_, joining. (#selenium)
+[2013-04-17 09:57:15] lukeis1, joining. (#selenium)
+[2013-04-17 09:57:22] lukeis, quitting. (Read error: Connection reset by peer)
+[2013-04-17 09:57:58] lukeis1, quitting. (Client Quit)
+[2013-04-17 10:02:44] qaguy, joining. (#selenium)
+[2013-04-17 10:04:09] ShawnM, joining. (#selenium)
+[2013-04-17 10:05:09] ShawnM, quitting. (Read error: Connection reset by peer)
+[2013-04-17 10:05:17] ShawnM, joining. (#selenium)
+[2013-04-17 10:05:46] ShawnM_, quitting. (Read error: Connection reset by peer)
+[2013-04-17 10:06:15] SamuraiJack, joining. (#selenium)
+[2013-04-17 10:12:09] stackedsax, joining. (#selenium)
+[2013-04-17 10:14:31] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:16:37] dimacus, quitting. (Quit: Leaving.)
+[2013-04-17 10:16:52] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 10:17:57] asavchuk, joining. (#selenium)
+[2013-04-17 10:18:08] asavchuk: hi all!
+[2013-04-17 10:18:11] asavchuk: :log
+[2013-04-17 10:18:11] selbot2: https://github.com/SeleniumHQ/irc-logs/blob/master/2013/04/17.txt | http://illicitonion.com/selogs/search
+[2013-04-17 10:19:25] dawagner: Jesus our Jenkins's startup is slow :(
+[2013-04-17 10:20:03] jimevans: dawagner: if you wanted to look at that nsIDOMWindowUtils change for mouse events, you're welcome to do so too. :)
+[2013-04-17 10:20:24] dawagner: jimevans: I happily will do when I have a moment :) Maybe even tomorrow
+[2013-04-17 10:20:40] jimevans: smashing!
+[2013-04-17 10:21:27] llaskin: if driver = Selenium::WebDriver.for :firefox, :profile => profile, :http_client=> client  and client.timeout = 20  at this point, is there anyway to modify that timeout value?
+[2013-04-17 10:24:23] barancev: jimevans: thank you! I'll try to tune coordinates calculation
+[2013-04-17 10:24:55] Hz0, quitting. (Quit: ?)
+[2013-04-17 10:24:57] barancev: kkania: hi! would you please look at https://groups.google.com/forum/?fromgroups=#!topic/selenium-developers/Ts445qjGgmQ
+[2013-04-17 10:25:13] barancev: why chromedriver2 0.7 is the recommended download?
+[2013-04-17 10:25:35] dawagner: Wow.  Our jenkins now pages in ~100G over a network before it can start
+[2013-04-17 10:25:52] sfbrian, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 10:26:35] kkania: barancev: i see, i didn't mean to imply that it's recommended download, although it is listed first because of date
+[2013-04-17 10:27:20] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:27:36] kkania: although I am hoping to make it recommended download once we fix the remaining big issues
+[2013-04-17 10:28:11] kkania: even though it might not be as fast or stable as the old one; we want to start transitioning people off the old one, as it will likely stop working soon with chrome 28
+[2013-04-17 10:28:26] barancev: kkania: thank you for excellent work, yes, each chromedriver2 release shows better results
+[2013-04-17 10:28:46] jimevans: kkania: what are you tracking as the "big issues" left?
+[2013-04-17 10:28:51] barancev: but it wants newer chrome versions, that's worrying me too
+[2013-04-17 10:29:11] jleyba: barancev: you know chromedriver1 has a limited range of support right?
+[2013-04-17 10:29:27] jleyba: cd1 vN only works with chrome vN - (N-2)
+[2013-04-17 10:29:56] kkania: it should work with 26, although a few things (file uploads, set alert text, and i think something else) are only in 27
+[2013-04-17 10:30:21] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:30:25] lukeis, joining. (#selenium)
+[2013-04-17 10:30:30] kkania: i've to to run, be back soon
+[2013-04-17 10:30:38] barancev: yes, to run tests in cd2 one needs a beta chrome
+[2013-04-17 10:31:23] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:31:35] brettporter, joining. (#selenium)
+[2013-04-17 10:32:02] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:32:29] sfbrian, joining. (#selenium)
+[2013-04-17 10:34:11] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:34:16] mreedell-work, quitting. (Quit: Computer has gone to sleep.)
+[2013-04-17 10:34:48] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:35:13] ShawnM, quitting. (Remote host closed the connection)
+[2013-04-17 10:35:15] seljenkinsbot, quitting. (Client Quit)
+[2013-04-17 10:35:48] ShawnM, joining. (#selenium)
+[2013-04-17 10:35:51] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:41:02] jimevans: barancev: that's no longer the case.
+[2013-04-17 10:41:20] jimevans: barancev: i'm running release channel chrome and chromedriver2 runs fine.
+[2013-04-17 10:42:20] seljenkinsbot, quitting. ()
+[2013-04-17 10:43:14] bluescreen10, joining. (#selenium)
+[2013-04-17 10:43:18] barancev: jimevans: see kkania comment above: "a few things (file uploads, set alert text, and i think something else) are only in 27"
+[2013-04-17 10:43:29] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:43:51] elro, joining. (#selenium)
+[2013-04-17 10:44:05] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:44:18] jimevans: barancev: well, yeah, but with chromedriver2, one "doesn't [need] a beta chrome", which was my point.
+[2013-04-17 10:44:41] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:44:48] barancev: 27 is beta channel
+[2013-04-17 10:45:29] jimevans: yes, it is. but it used to be that chromedriver2 wouldn't even launch chrome with the release channel. now it will, so you can at least do partial work with it.
+[2013-04-17 10:45:42] tinygeo, joining. (#selenium)
+[2013-04-17 10:46:08] tinygeo, leaving. (#selenium)
+[2013-04-17 10:46:21] barancev: ah, yes, correct
+[2013-04-17 10:46:49] dimacus, joining. (#selenium)
+[2013-04-17 10:47:05] qaguy, joining. (#selenium)
+[2013-04-17 10:48:10] dimacus, quitting. (Client Quit)
+[2013-04-17 10:48:17] jamesoram, quitting. (Quit: This computer has gone to sleep)
+[2013-04-17 10:49:51] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:50:40] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:51:07] seljenkinsbot, quitting. (Client Quit)
+[2013-04-17 10:51:43] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:52:26] seljenkinsbot, quitting. (Client Quit)
+[2013-04-17 10:53:55] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:55:23] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:55:53] qaguy, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 10:55:58] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:56:21] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 10:56:57] seljenkinsbot, joining. (#selenium)
+[2013-04-17 10:58:05] mreedell-work, joining. (#selenium)
+[2013-04-17 10:59:59] phishy, joining. (#selenium)
+[2013-04-17 11:00:00] phishy, quitting. (Max SendQ exceeded)
+[2013-04-17 11:00:37] phishy, joining. (#selenium)
+[2013-04-17 11:03:05] dawagner: Ok, I'm about to turn on a new mode for our CI
+[2013-04-17 11:03:17] dawagner: It will spin up and kill VMs as it needs them, rather than always having a pool running
+[2013-04-17 11:03:28] dawagner: I'll publish my jenkins plugin on github when I've cleaned it up a bit
+[2013-04-17 11:04:01] dawagner: Right now there's a known issue: If the jenkins server restarts (which it occasionally does), I will need to set a setting before it will spin up any VMs
+[2013-04-17 11:04:12] dawagner: I will fix this some time soon (when I learn how jenkins settings should *actually* be done)
+[2013-04-17 11:04:31] dawagner: But in the mean time, if you see a job queue, and no executors running, please poke me and I'll work some magic
+[2013-04-17 11:04:47] dawagner: Hopefully soon you guys can also be admins, and I'll also have the bug fixed
+[2013-04-17 11:04:55] dawagner: barancev: that was mostly for you :)
+[2013-04-17 11:06:44] Wessix, joining. (#selenium)
+[2013-04-17 11:09:12] qaguy, joining. (#selenium)
+[2013-04-17 11:12:50] Bebe_sel, quitting. (Remote host closed the connection)
+[2013-04-17 11:14:24] dawagner: Open question: Now that we upload the selenium server jar to sauce, rather than downloading it in every test run, is there a compelling reason to keep serving per-commit builds from http://ci.seleniumhq.org/ ?
+[2013-04-17 11:14:50] jrendell, joining. (#selenium)
+[2013-04-17 11:16:08] barancev: dawagner: ok, got the idea about the queue
+[2013-04-17 11:16:30] SamuraiJack, quitting. (Remote host closed the connection)
+[2013-04-17 11:17:37] barancev: dawagner: as for the per-commit build -- 1) we need the debug server, 2) how do we deploy IEDriverServer?
+[2013-04-17 11:19:16] dawagner: We'll definitely keep hosting the test pages
+[2013-04-17 11:19:52] dawagner: We also upload the IEDriverServer to sauce
+[2013-04-17 11:20:53] dawagner: Bleugh the jenkins internal API LIES!!!
+[2013-04-17 11:21:06] dawagner: "I have 12 tasks to run!" it says when it has 30 tasks to run!
+[2013-04-17 11:21:11] jrendell, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 11:22:04] ShawnM_, joining. (#selenium)
+[2013-04-17 11:24:53] ShawnM, quitting. (Ping timeout: 240 seconds)
+[2013-04-17 11:26:05] seljenkinsbot: Project Chrome Linux Java Tests build #2549: UNSTABLE in 9 min 8 sec: http://ci.seleniumhq.org:8080/job/Chrome%20Linux%20Java%20Tests/2549/
+[2013-04-17 11:29:11] ShawnM_, quitting. (Remote host closed the connection)
+[2013-04-17 11:29:13] asavchuk: barancev: jimevans: are new capability names like driverExtractPath or driverForceCreateProcess correct? or driver prefix is not necessary?
+[2013-04-17 11:29:37] asavchuk: so in java it looks like: public final static String FORCE_CREATE_PROCESS = "driverForceCreateProcess";
+[2013-04-17 11:29:44] ShawnM, joining. (#selenium)
+[2013-04-17 11:29:54] jimevans: ie capabilities are not prefixed. maybe they should be, but for consistency they're not.
+[2013-04-17 11:30:04] jimevans: and now changing them could break existing code.
+[2013-04-17 11:31:03] seljenkinsbot: Project Firefox 10 XP Native Java Tests build #1923: FAILURE in 8 min 22 sec: http://ci.seleniumhq.org:8080/job/Firefox%2010%20XP%20Native%20Java%20Tests/1923/
+[2013-04-17 11:31:04] jimevans: oh, hang on. you're talking about stuff that's command-line switches.
+[2013-04-17 11:31:10] jimevans: for that, i don't care.
+[2013-04-17 11:31:21] asavchuk: hm. they was not available before so it should not break anything. ok, i'll remove driver prefix
+[2013-04-17 11:31:54] asavchuk: no, cmd switches looks like public static final String IE_DRIVER_LOGLEVEL_PROPERTY = "webdriver.ie.driver.loglevel";
+[2013-04-17 11:32:08] jimevans: the IE driver doesn't have to parse those; the language bindings do. so i don't care about the things that get turned into command line switches.
+[2013-04-17 11:32:26] asavchuk: ok, understand.
+[2013-04-17 11:33:40] seljenkinsbot: Project Firefox 20 XP Synthesized Java Tests build #576: UNSTABLE in 2 min 11 sec: http://ci.seleniumhq.org:8080/job/Firefox%2020%20XP%20Synthesized%20Java%20Tests/576/
+[2013-04-17 11:34:45] ShawnM_, joining. (#selenium)
+[2013-04-17 11:35:02] ShawnM, quitting. (Read error: Connection reset by peer)
+[2013-04-17 11:36:52] barancev: dawagner: see FF10 failure ^^^ FATAL: Unable to delete script file /tmp/hudson643748467424291152.sh
+[2013-04-17 11:37:07] dawagner: barancev: Yep, looking at it now
+[2013-04-17 11:39:20] seljenkinsbot: Project Firefox 19 XP Native Java Tests build #142: UNSTABLE in 12 min: http://ci.seleniumhq.org:8080/job/Firefox%2019%20XP%20Native%20Java%20Tests/142/
+[2013-04-17 11:39:28] seljenkinsbot: Project IE 10 Win8 Javascript Tests build #567: UNSTABLE in 5 min 37 sec: http://ci.seleniumhq.org:8080/job/IE%2010%20Win8%20Javascript%20Tests/567/
+[2013-04-17 11:41:33] ShawnM_, quitting. (Remote host closed the connection)
+[2013-04-17 11:42:09] ShawnM, joining. (#selenium)
+[2013-04-17 11:42:50] davehunt, quitting. (Remote host closed the connection)
+[2013-04-17 11:43:38] sburjan, quitting. (Quit: Ex-Chat)
+[2013-04-17 11:46:17] admc, joining. (#selenium)
+[2013-04-17 11:47:21] intchanter, joining. (#selenium)
+[2013-04-17 11:48:05] ddary, joining. (#selenium)
+[2013-04-17 11:50:51] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 11:51:27] seljenkinsbot, joining. (#selenium)
+[2013-04-17 11:51:27] seljenkinsbot: Project IE 9 Java Tests build #2523: FIXED in 12 min: http://ci.seleniumhq.org:8080/job/IE%209%20Java%20Tests/2523/
+[2013-04-17 11:51:54] barancev: ppl, which version of IDEA do you use?
+[2013-04-17 11:52:38] barancev: my IDEA 12 wants to change something in .idea/codeStyleSettings.xml and .idea/compiler.xml
+[2013-04-17 11:52:44] *lukeis is on 11.1'
+[2013-04-17 11:53:04] barancev: can I break older versions if I commit this changes?
+[2013-04-17 11:53:07] *lukeis needs to get a license for the newer version'
+[2013-04-17 11:53:43] lukeis: hopefully not ;) but commit it anyway and the broken ones can complain later ;)
+[2013-04-17 11:54:05] barancev: http://www.jetbrains.com/specials/ -- you want to do this right now!
+[2013-04-17 11:54:12] barancev: with 50% discount
+[2013-04-17 11:54:26] *lukeis won't be personally paying for it :-D'
+[2013-04-17 11:55:42] barancev: ah, sorry, I'm a freelancer, and I always forget that some people are not :)
+[2013-04-17 11:55:54] dimacus, joining. (#selenium)
+[2013-04-17 11:56:30] elro, quitting. (Quit: elro)
+[2013-04-17 12:03:53] jibay, joining. (#selenium)
+[2013-04-17 12:04:46] admc1, joining. (#selenium)
+[2013-04-17 12:04:49] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 12:06:12] admc2, joining. (#selenium)
+[2013-04-17 12:06:22] admc, quitting. (Ping timeout: 246 seconds)
+[2013-04-17 12:06:45] Hammertime38, joining. (#selenium)
+[2013-04-17 12:07:57] alexglow, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 12:09:25] admc1, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 12:09:35] noahsussman, quitting. (Remote host closed the connection)
+[2013-04-17 12:10:32] admc2, quitting. (Ping timeout: 255 seconds)
+[2013-04-17 12:15:14] asavchuk: barancev: i made changes for PR 50, please review it again
+[2013-04-17 12:16:53] dawagner: w00t, the thing, I think it works
+[2013-04-17 12:16:55] admc, joining. (#selenium)
+[2013-04-17 12:17:28] seljenkinsbot, joining. (#selenium)
+[2013-04-17 12:18:09] stephend_, joining. (#selenium)
+[2013-04-17 12:18:36] barancev: asavchuk: ok, i'll review it
+[2013-04-17 12:19:07] barancev: asavchuk: can you explain why r02183f7932a2 fixes #4390?
+[2013-04-17 12:19:08] selbot2: 03 closed/fixed Element cannot be scrolled into view: [object HTMLBodyElement] - https://code.google.com/p/selenium/issues/detail?id=4390 [Type-Defect Priority-Medium Component-WebDriver Browser-Firefox Browser-IE]
+[2013-04-17 12:19:20] barancev: 02183f7932a2
+[2013-04-17 12:19:21] selbot2: 03alex-savchuk 1 day ago - Fixed issue #4390 for FF | https://code.google.com/p/selenium/source/detail?r=02183f7 | http://dashboard.ci.seleniumhq.org/#/revision/02183f7932a27ffdefca4053f6e1d7026c158af1
+[2013-04-17 12:19:39] barancev: what's wrong with non-integers?
+[2013-04-17 12:20:02] barancev: (may be we have similar issues in some other places)
+[2013-04-17 12:20:28] dawagner: barancev: They break somewhere horrible
+[2013-04-17 12:20:30] dawagner: I can't remembe where
+[2013-04-17 12:20:34] AutomatedTester: barancev: ask Simon for an IDEA licence
+[2013-04-17 12:20:35] dawagner: I know I fixed that issue elsewhere
+[2013-04-17 12:20:52] barancev: AutomatedTester: I have one, personal
+[2013-04-17 12:21:04] AutomatedTester: oh right
+[2013-04-17 12:21:15] stephend, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 12:21:22] barancev: I was asking about PyCharm
+[2013-04-17 12:22:00] barancev: but recently I've bought Full personal license on IDEA, it covers all languages
+[2013-04-17 12:23:23] asavchuk: it fixes this issue due non integers like 123.4999 are passed inside bot.dom.getInViewLocation and check which compares position before scrolling + scroll and after scrolling fails due at one of side this .4999 is cleared
+[2013-04-17 12:23:46] seljenkinsbot, quitting. (Remote host closed the connection)
+[2013-04-17 12:24:17] asavchuk: simplest solution was remove this fractional part is using math.loor
+[2013-04-17 12:24:22] seljenkinsbot, joining. (#selenium)
+[2013-04-17 12:24:38] alexglow, joining. (#selenium)
+[2013-04-17 12:24:43] asavchuk: as i speciied at PR comment maybe correct solution is at bot.dom.getInViewLocation level should be
+[2013-04-17 12:25:36] asavchuk: i have seen another F issue with the same exception - i check that my solution doesn't help: it saied something like 2 +0 != 3
+[2013-04-17 12:25:45] asavchuk: *FF
+[2013-04-17 12:26:27] asavchuk: where 2 is position before scroll, 0 is scroll, 3 position after scroll
+[2013-04-17 12:26:35] seljenkinsbot: Project Chrome Linux Java Tests build #2550: FAILURE in 5.6 sec: http://ci.seleniumhq.org:8080/job/Chrome%20Linux%20Java%20Tests/2550/
+[2013-04-17 12:27:22] ddary, leaving. (#selenium)
+[2013-04-17 12:27:27] wolcanus, quitting. (Remote host closed the connection)
+[2013-04-17 12:27:39] Selenium-Git, joining. (#selenium)
+[2013-04-17 12:27:39] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/zLrKmA
+[2013-04-17 12:27:39] Selenium-Git: 13selenium/06master 14c3f5ca2 15Luke Inman-Semerau: updating py docs, adding to docs touch_actions class
+[2013-04-17 12:27:39] Selenium-Git, leaving. (#selenium)
+[2013-04-17 12:28:02] asavchuk: barancev: also my test and your test are passed after this fix
+[2013-04-17 12:29:14] barancev: yes, I'm trying to stretch this knowlege about evilness of non-integers to other similar situations
+[2013-04-17 12:31:07] dawagner: 150af12e
+[2013-04-17 12:31:08] selbot2: 03illicitonion about 1 year ago - DanielWagnerHall: Re-applying revision 15588 without extra logging, and without swallowing exceptions | https://code.google.com/p/selenium/source/detail?r=150af12 | http://dashboard.ci.seleniumhq.org/#/revision/150af12ec2d6865ea880c672f0945cc50e136da9
+[2013-04-17 12:31:27] AutomatedTester: dawagner: are you at work or at home
+[2013-04-17 12:31:45] dawagner: 1009	1009		    // The function bot.dom.getInViewLocation does not work coordinates that are
+[2013-04-17 12:31:45] dawagner: 1010	1010		    // not integers. The mouse positions can be doubles so we need to cut off
+[2013-04-17 12:31:45] dawagner: 1011	1011		    // the decimals.
+[2013-04-17 12:31:51] dawagner: AutomatedTester: Currently at work, about to head home
+[2013-04-17 12:31:52] dawagner: Warum?
+[2013-04-17 12:31:53] admc, quitting. (Quit: Leaving.)
+[2013-04-17 12:31:54] nhirata, quitting. (Quit: nhirata)
+[2013-04-17 12:32:02] AutomatedTester: its late, just curious
+[2013-04-17 12:32:11] AutomatedTester: purty please post SIM
+[2013-04-17 12:32:31] dawagner: yepyep
+[2013-04-17 12:32:52] vila, quitting. (Read error: Operation timed out)
+[2013-04-17 12:32:57] dawagner: I was fixing up our CI, and now that it's fixed up (I hope) I'm heading home :)
+[2013-04-17 12:32:59] dawagner: To send you a SIM :P
+[2013-04-17 12:33:29] vila, joining. (#selenium)
+[2013-04-17 12:33:49] asavchuk: dawagner: yes, it looks very similar to this
+[2013-04-17 12:34:34] nhirata, joining. (#selenium)
+[2013-04-17 12:34:39] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 12:35:16] dawagner, quitting. (Quit: Leaving)
+[2013-04-17 12:37:10] niko__, joining. (#selenium)
+[2013-04-17 12:38:28] h8R, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 12:40:08] noahsussman, joining. (#selenium)
+[2013-04-17 12:42:03] seljenkinsbot: Project Firefox 10 XP Javascript Tests build #1925: STILL UNSTABLE in 5 min 56 sec: http://ci.seleniumhq.org:8080/job/Firefox%2010%20XP%20Javascript%20Tests/1925/
+[2013-04-17 12:43:40] stephend, joining. (#selenium)
+[2013-04-17 12:44:55] riv_, quitting. (Remote host closed the connection)
+[2013-04-17 12:45:33] stephend_, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 12:46:32] riv_, joining. (#selenium)
+[2013-04-17 12:48:55] seljenkinsbot: Project Firefox 10 XP Native Java Tests build #1924: NOW UNSTABLE in 11 min: http://ci.seleniumhq.org:8080/job/Firefox%2010%20XP%20Native%20Java%20Tests/1924/
+[2013-04-17 12:49:17] qaguy, joining. (#selenium)
+[2013-04-17 12:50:08] seljenkinsbot: Project HtmlUnit Java Tests build #2184: FIXED in 5 min 3 sec: http://ci.seleniumhq.org:8080/job/HtmlUnit%20Java%20Tests/2184/
+[2013-04-17 12:51:01] seljenkinsbot: Project Firefox 20 XP Javascript Tests build #766: STILL UNSTABLE in 6 min 16 sec: http://ci.seleniumhq.org:8080/job/Firefox%2020%20XP%20Javascript%20Tests/766/
+[2013-04-17 12:53:06] wolcanus, joining. (#selenium)
+[2013-04-17 12:54:47] seljenkinsbot: Project IE 10 Win8 Javascript Tests build #568: FIXED in 6 min 27 sec: http://ci.seleniumhq.org:8080/job/IE%2010%20Win8%20Javascript%20Tests/568/
+[2013-04-17 12:55:28] seljenkinsbot: Project IE 6 XP Javascript Tests build #2480: NOW UNSTABLE in 5 min 17 sec: http://ci.seleniumhq.org:8080/job/IE%206%20XP%20Javascript%20Tests/2480/
+[2013-04-17 12:55:53] dimacus: AutomatedTester:  hope you don't mind, but after hell of the time compiling the mouse moving plugin for the grid (java noob again) i've updated the README files on how I finally got it working… Also, sent a change request to the downloads page to add your mouse move plugin as a selenium grid plugin
+[2013-04-17 12:57:22] asavchuk: barancev: find the reason why existed test is passed for remote case for PR 52. please check my comment
+[2013-04-17 12:58:32] elro, joining. (#selenium)
+[2013-04-17 12:59:49] elro, quitting. (Client Quit)
+[2013-04-17 13:00:06] seljenkinsbot: Project IE 7 XP Javascript Tests build #2479: FAILURE in 5 min 17 sec: http://ci.seleniumhq.org:8080/job/IE%207%20XP%20Javascript%20Tests/2479/
+[2013-04-17 13:02:43] lukeis: \o/   a TouchAction *just worked without doing anything extra* on Selendroid!   (equivalent of coding something complex and having no errors the first time)
+[2013-04-17 13:06:03] jleyba, quitting. (Quit: Leaving)
+[2013-04-17 13:07:19] seljenkinsbot: Project IE 8 Java Tests build #2525: NOW UNSTABLE in 12 min: http://ci.seleniumhq.org:8080/job/IE%208%20Java%20Tests/2525/
+[2013-04-17 13:08:31] AutomatedTester: lukeis: are you using touch actions in the real world?
+[2013-04-17 13:10:04] seljenkinsbot: Project Firefox 20 Linux Native Java Tests build #766: NOW UNSTABLE in 25 min: http://ci.seleniumhq.org:8080/job/Firefox%2020%20Linux%20Native%20Java%20Tests/766/
+[2013-04-17 13:14:00] lukeis: AutomatedTester: yes ;)
+[2013-04-17 13:14:40] RossPatterson, quitting. (Read error: Connection reset by peer)
+[2013-04-17 13:15:42] AutomatedTester: lukeis: so... want to be on my review list for the touch patch going in to the spec
+[2013-04-17 13:15:46] AutomatedTester: ?
+[2013-04-17 13:15:47] lukeis: and as usual… i'm 'trying commands out' on the command line using python and then translating into the real java code
+[2013-04-17 13:15:53] lukeis: sure
+[2013-04-17 13:16:13] lukeis: touch is current very android specific in the wire protocol
+[2013-04-17 13:16:17] AutomatedTester: want people who "have been there, done that, got the t-shirt'
+[2013-04-17 13:16:34] AutomatedTester: yea, we used that as guidance
+[2013-04-17 13:16:44] nhirata, quitting. (Quit: nhirata)
+[2013-04-17 13:16:44] AutomatedTester: but it has a lot of holes
+[2013-04-17 13:17:39] AutomatedTester: and doesnt take into account the awesomeness of pointer events
+[2013-04-17 13:18:22] lukeis: what's a pointer events on a touch screen? :)
+[2013-04-17 13:20:26] AutomatedTester: touch events are patented by Apple
+[2013-04-17 13:20:40] AutomatedTester: so Microsoft wont implement them on their devices
+[2013-04-17 13:21:26] bfife, joining. (#selenium)
+[2013-04-17 13:21:27] AutomatedTester: but... Microsoft are good guys these days and suggested an alternative that is royalty free
+[2013-04-17 13:22:10] bfife: I have a (hopefully dumb) question... how does the build detect OS architecture?
+[2013-04-17 13:22:10] lukeis: what does android do then? or is it that apple / google just won't sue each other over it?
+[2013-04-17 13:22:12] AutomatedTester: which is pointer events and... since Microsoft are the good guys again, and doing awesomeness in the touch area, have made it for multiple users and not just fingers
+[2013-04-17 13:22:42] bfife: trying to build on x86_64 ubuntu 12.04 and it's being a PITA because of ubuntu's "multiarch"
+[2013-04-17 13:22:57] AutomatedTester: Google are going to implement Pointer events in Chrome
+[2013-04-17 13:23:00] AutomatedTester: and in Blink
+[2013-04-17 13:23:24] seljenkinsbot: Project Firefox 20 XP Native Java Tests build #766: UNSTABLE in 38 min: http://ci.seleniumhq.org:8080/job/Firefox%2020%20XP%20Native%20Java%20Tests/766/
+[2013-04-17 13:23:30] AutomatedTester: and Google are looking to do a touch -> pointer mapping
+[2013-04-17 13:24:53] AutomatedTester: bfife: the multiarch shouldnt affect building
+[2013-04-17 13:25:02] bfife: it's grabbing i686 sdks
+[2013-04-17 13:25:06] bfife: so it doesnt identify it's 64bit
+[2013-04-17 13:25:07] bfife: :/
+[2013-04-17 13:25:22] eanxgeek, changing nick to eanxgeek|log.
+[2013-04-17 13:25:37] AutomatedTester: bfife: it should get both
+[2013-04-17 13:25:39] bfife: so then xpidl won't run because my libIDL that's required is only 64bit, because ia32-libs is just a stub package now
+[2013-04-17 13:25:45] bfife: it's not..
+[2013-04-17 13:26:04] AutomatedTester: bfife: the Googlers have ubuntu x64 as their default OS
+[2013-04-17 13:26:37] bfife: i have a 10.04.3 LTS x86_64 that it's fine on
+[2013-04-17 13:26:46] bfife: grabs both i686 and x86_64
+[2013-04-17 13:27:24] hellahella, joining. (#selenium)
+[2013-04-17 13:27:24] bfife: in 12.04 they rejigged where libs live
+[2013-04-17 13:27:57] *AutomatedTester hasnt moved to 12.04 because it broke all my VMs so cant really help'
+[2013-04-17 13:28:02] bfife: :P
+[2013-04-17 13:28:21] bfife: /usr/lib and /usr/lib32 -> /usr/lib/x86_64-linux-gnu and /usr/lib/i386-linux-gnu
+[2013-04-17 13:28:24] bfife: respectively
+[2013-04-17 13:28:35] stephend_, joining. (#selenium)
+[2013-04-17 13:28:50] bfife: really, i guess it's a debian thing
+[2013-04-17 13:29:13] stephend, quitting. (Read error: Connection reset by peer)
+[2013-04-17 13:29:40] stephend, joining. (#selenium)
+[2013-04-17 13:29:51] AutomatedTester: are you using debian or ubuntu?
+[2013-04-17 13:30:03] bfife: ubuntu. but ubuntu seems to follows debian
+[2013-04-17 13:30:12] AutomatedTester: not always ;)
+[2013-04-17 13:30:21] bfife: Ok, in this specific scenario :P
+[2013-04-17 13:30:36] bfife: https://help.ubuntu.com/community/MultiArch links to the debian multiarch page
+[2013-04-17 13:30:41] hellahella: quick question guys, injecting some javascript code with webdriver?
+[2013-04-17 13:30:53] hellahella: geteval equivalent?
+[2013-04-17 13:31:14] jimevans: hellahella: executeScript(). may require a cast depending on what language you're using.
+[2013-04-17 13:31:38] hellahella: awesome, thanks jimevans
+[2013-04-17 13:31:46] jimevans: in java it looks like this:
+[2013-04-17 13:32:12] jimevans: Object x = ((JavascriptExecutor)driver).executeScript("return 1 + 1;");
+[2013-04-17 13:32:44] sayd, joining. (#selenium)
+[2013-04-17 13:32:51] sayd: is there support for angular?
+[2013-04-17 13:32:57] stephend_, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 13:33:08] hellahella: got it, thanks!
+[2013-04-17 13:34:09] AutomatedTester: sayd: if its in a browser, and is HTML+CSS+JavaScript, it should *just* work
+[2013-04-17 13:35:09] davehunt, joining. (#selenium)
+[2013-04-17 13:35:28] seljenkinsbot: Project Chrome XP Javascript Tests build #2498: FAILURE in 1 hr 0 min: http://ci.seleniumhq.org:8080/job/Chrome%20XP%20Javascript%20Tests/2498/
+[2013-04-17 13:38:42] wolcanus_, joining. (#selenium)
+[2013-04-17 13:38:42] wolcanus, quitting. (Read error: Connection reset by peer)
+[2013-04-17 13:39:55] nhirata, joining. (#selenium)
+[2013-04-17 13:41:05] seljenkinsbot: Project IE 7 Java Tests build #2524: NOW UNSTABLE in 50 min: http://ci.seleniumhq.org:8080/job/IE%207%20Java%20Tests/2524/
+[2013-04-17 13:43:58] testingb0t, quitting. (Quit: Leaving.)
+[2013-04-17 13:44:17] bfife: what are the paste rules
+[2013-04-17 13:44:18] bfife: <5 ?
+[2013-04-17 13:44:23] lukeis: :gist
+[2013-04-17 13:44:23] selbot2: Please paste >3 lines of text to https://gist.github.com
+[2013-04-17 13:44:32] seljenkinsbot: Project Firefox 17 XP Javascript Tests build #659: FAILURE in 1 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2017%20XP%20Javascript%20Tests/659/
+[2013-04-17 13:44:33] bfife: Building: //javascript/firefox-driver:command_processor_xpt as build/javascript/firefox-driver/nsICommandProcessor.xpt
+[2013-04-17 13:44:37] bfife: third_party/gecko-2/linux/bin/xpidl: error while loading shared libraries: libIDL-2.so.0: cannot open shared object file: No such file or directory
+[2013-04-17 13:44:37] seljenkinsbot: Project Firefox 19 Linux Javascript Tests build #144: FAILURE in 1 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2019%20Linux%20Javascript%20Tests/144/
+[2013-04-17 13:44:39] seljenkinsbot: Project Opera 12.01 XP Javascript Tests build #751: FAILURE in 1 hr 0 min: http://ci.seleniumhq.org:8080/job/Opera%2012.01%20XP%20Javascript%20Tests/751/
+[2013-04-17 13:44:40] bfife: Falling back to javascript/firefox-driver/prebuilt/firefox-driver/nsICommandProcessor.xpt
+[2013-04-17 13:44:44] bfife: lucky you guys. that's what im seeing
+[2013-04-17 13:44:57] AutomatedTester: gecko-2?
+[2013-04-17 13:45:00] bfife: it's not terrible because pre-built, but annoying
+[2013-04-17 13:45:26] bfife: those ones were all gecko-2
+[2013-04-17 13:45:31] lukeis: that shouldn't be building
+[2013-04-17 13:45:42] bfife: heh..
+[2013-04-17 13:45:43] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 13:46:07] lukeis: gecko-2 == too damn old ;)
+[2013-04-17 13:46:09] bfife: let me check out a fresh copy and see what builds and what doesnt. this is a bit stale
+[2013-04-17 13:46:16] bfife: a few months at most
+[2013-04-17 13:46:21] lukeis: heh
+[2013-04-17 13:46:33] lukeis: are you on git or svn then?
+[2013-04-17 13:46:53] bfife: it's git
+[2013-04-17 13:47:00] bfife: i did manage to enragingly migrate my local setup
+[2013-04-17 13:47:12] bfife: svn diff, clone, patch
+[2013-04-17 13:47:19] hellahella, leaving. ("Leaving...")
+[2013-04-17 13:53:03] bfife: k it looks like it does eventually grab the x86_64
+[2013-04-17 13:53:07] bfife: odd.
+[2013-04-17 13:53:14] bfife: lets see what else craps out building from scratch
+[2013-04-17 13:53:22] AutomatedTester: jimevans: my twitter stream is currently anti AA atm
+[2013-04-17 13:53:36] aweiteka, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 13:53:36] AutomatedTester: jimevans: even Scott Guthrie has been screwed over by them
+[2013-04-17 13:58:43] mreedell-work, quitting. (Ping timeout: 246 seconds)
+[2013-04-17 14:02:14] jimevans: AutomatedTester: they're just jumping on the bandwagon. :)
+[2013-04-17 14:02:16] qaguy, joining. (#selenium)
+[2013-04-17 14:03:05] asavchuk, quitting. (Read error: Connection reset by peer)
+[2013-04-17 14:04:13] asavchuk, joining. (#selenium)
+[2013-04-17 14:05:23] RexButler, joining. (#selenium)
+[2013-04-17 14:05:35] jrendell, joining. (#selenium)
+[2013-04-17 14:05:52] nhirata, quitting. (Quit: nhirata)
+[2013-04-17 14:06:12] nhirata, joining. (#selenium)
+[2013-04-17 14:06:54] RexButler: Is there a PDF version of the Selenium docs found at the main site?
+[2013-04-17 14:10:53] llaskin: no
+[2013-04-17 14:11:25] RexButler: Well, I know there -used- to be... hmm
+[2013-04-17 14:11:48] jrendell, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 14:11:58] RexButler: I downloaded it
+[2013-04-17 14:12:15] RexButler: I guess that's why I can't find it anymore :)
+[2013-04-17 14:14:20] riv_, quitting. (Remote host closed the connection)
+[2013-04-17 14:17:24] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 14:17:27] jleyba, joining. (#selenium)
+[2013-04-17 14:17:52] jleyba, quitting. (Client Quit)
+[2013-04-17 14:24:50] qaguy, joining. (#selenium)
+[2013-04-17 14:36:11] RexButler, quitting. (Quit: Page closed)
+[2013-04-17 14:44:25] seljenkinsbot: Project Opera 12.01 Linux Java Tests build #863: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/Opera%2012.01%20Linux%20Java%20Tests/863/
+[2013-04-17 14:44:35] seljenkinsbot: Project Firefox 17 XP Native Java Tests build #661: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2017%20XP%20Native%20Java%20Tests/661/
+[2013-04-17 14:44:37] seljenkinsbot: Project IE 10 Java Tests build #568: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/IE%2010%20Java%20Tests/568/
+[2013-04-17 14:44:38] seljenkinsbot: Project Firefox 20 Linux Synthesized Java Tests build #766: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2020%20Linux%20Synthesized%20Java%20Tests/766/
+[2013-04-17 14:44:42] seljenkinsbot: Project Firefox 19 XP Native Java Tests build #143: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2019%20XP%20Native%20Java%20Tests/143/
+[2013-04-17 14:45:00] seljenkinsbot: Project Firefox 20 XP Synthesized Java Tests build #577: FAILURE in 2 hr 0 min: http://ci.seleniumhq.org:8080/job/Firefox%2020%20XP%20Synthesized%20Java%20Tests/577/
+[2013-04-17 14:50:21] wolcanus_, quitting. (Ping timeout: 276 seconds)
+[2013-04-17 14:51:00] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-04-17 14:52:02] elro, joining. (#selenium)
+[2013-04-17 14:52:57] leonardoro, quitting. (Ping timeout: 276 seconds)
+[2013-04-17 14:56:57] jimevans, leaving. (#selenium)
+[2013-04-17 15:01:31] bluescreen10, quitting. (Remote host closed the connection)
+[2013-04-17 15:01:31] stackedsax, quitting. (Quit: Leaving.)
+[2013-04-17 15:07:52] davehunt, quitting. (Remote host closed the connection)
+[2013-04-17 15:14:04] akhet, quitting. (Remote host closed the connection)
+[2013-04-17 15:14:48] smccarthy2, joining. (#selenium)
+[2013-04-17 15:17:44] smccarthy, quitting. (Ping timeout: 260 seconds)
+[2013-04-17 15:18:53] asavchuk, quitting. (Ping timeout: 240 seconds)
+[2013-04-17 15:23:41] stackedsax, joining. (#selenium)
+[2013-04-17 15:24:51] davehunt, joining. (#selenium)
+[2013-04-17 15:31:58] admc, joining. (#selenium)
+[2013-04-17 15:32:19] jost, quitting. (Quit: jost)
+[2013-04-17 15:33:15] qaguy, quitting. (Quit: Leaving.)
+[2013-04-17 15:54:06] davehunt, quitting. (Remote host closed the connection)
+[2013-04-17 15:54:59] intchanter-work, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 16:02:20] lukeis, quitting. (Quit: Leaving.)
+[2013-04-17 16:03:16] jrendell, joining. (#selenium)
+[2013-04-17 16:03:24] jrendell, quitting. (Client Quit)
+[2013-04-17 16:05:24] ShawnM_, joining. (#selenium)
+[2013-04-17 16:07:00] jrendell, joining. (#selenium)
+[2013-04-17 16:08:28] ShawnM, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 16:13:19] selenium770, joining. (#selenium)
+[2013-04-17 16:13:32] selenium770: whoami
+[2013-04-17 16:13:42] selenium770: facepalm
+[2013-04-17 16:15:15] Revery, quitting. (Quit: Leaving.)
+[2013-04-17 16:16:05] selenium770: Question folks, whenever I use Firefox webdriver, it's failing to find  by XPath and spitting out messages like this: https://gist.github.com/anonymous/5408544
+[2013-04-17 16:16:47] Wessix, quitting. (Quit: Nettalk6 - www.ntalk.de)
+[2013-04-17 16:17:02] selenium770: But Chrome can find the same Xpath s with no problem
+[2013-04-17 16:17:15] selenium770: Who do I bitch to?
+[2013-04-17 16:17:31] jarib: yourself for using a generated xpath
+[2013-04-17 16:17:46] selenium770: i already did that
+[2013-04-17 16:18:02] selenium770: some forms have no id,name,class. i had to
+[2013-04-17 16:18:41] phishy, quitting. (Quit: Computer has gone to sleep.)
+[2013-04-17 16:18:42] jarib: find the closest parent of the element you want that has one of those
+[2013-04-17 16:18:53] jarib: then go from there
+[2013-04-17 16:19:17] ShawnM_, quitting. (Remote host closed the connection)
+[2013-04-17 16:19:30] selenium770: and how would I find the child from there?
+[2013-04-17 16:20:02] jarib: depends
+[2013-04-17 16:20:26] jarib: hard to give specific advice without seeing the HTML in question
+[2013-04-17 16:20:45] jarib: you're aware that you can chain find_element calls?
+[2013-04-17 16:20:56] selenium770: :O no
+[2013-04-17 16:21:01] selenium770: now i do
+[2013-04-17 16:21:11] selenium770: that's cool
+[2013-04-17 16:23:08] selenium770: jarib: thanks dude, i think i solved it
+[2013-04-17 16:23:20] jarib: np
+[2013-04-17 16:23:43] Selenium-Git, joining. (#selenium)
+[2013-04-17 16:23:43] Selenium-Git: [13selenium] 15terryyin opened pull request #54: Firefox 20.0.1 on Windows "TypeError: environment can only contain string" problem (06master...06master)  02http://git.io/XMb_-Q
+[2013-04-17 16:23:43] Selenium-Git, leaving. (#selenium)
+[2013-04-17 16:24:32] akhet, joining. (#selenium)
+[2013-04-17 16:26:08] smccarthy2, quitting. (Remote host closed the connection)
+[2013-04-17 16:27:33] selenium770, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 16:29:10] akhet, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 16:53:11] cgoldberg, quitting. (Quit: Ex-Chat)
+[2013-04-17 17:00:23] cmcgraw, quitting. (Quit: cmcgraw)
+[2013-04-17 17:11:36] munderwo-work, joining. (#selenium)
+[2013-04-17 17:16:56] Hammertime38, quitting. (Remote host closed the connection)
+[2013-04-17 17:17:55] akhet, joining. (#selenium)
+[2013-04-17 17:17:55] akhet, quitting. (Changing host)
+[2013-04-17 17:17:55] akhet, joining. (#selenium)
+[2013-04-17 17:22:47] inspiron, joining. (#selenium)
+[2013-04-17 17:23:10] inspiron: can selenium render iphone browser? can it do it headlessly?
+[2013-04-17 17:27:21] nhirata, quitting. (Quit: nhirata)
+[2013-04-17 17:29:52] ShawnM, joining. (#selenium)
+[2013-04-17 17:31:55] munderwo-work: Hi all, im trying to build a test runner for selenium in python. Ideally given that it take a while for firefox to startup I would prefer to start the firefox instance up (ie initialise the driver) one and pass that to the test suite. Had anybody done this before? or is this a bad idea?
+[2013-04-17 17:34:27] ShawnM, quitting. (Ping timeout: 260 seconds)
+[2013-04-17 17:37:04] sfbrian, quitting. (Ping timeout: 256 seconds)
+[2013-04-17 17:42:15] Dude-X, quitting. (Quit: Dude-X)
+[2013-04-17 17:46:35] ryanpetr_, joining. (#selenium)
+[2013-04-17 17:48:01] mreedell-work, joining. (#selenium)
+[2013-04-17 17:49:18] ryanpetrello, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 17:53:53] shmup, leaving. (#selenium)
+[2013-04-17 18:00:44] tobie, quitting. (Quit: tobie)
+[2013-04-17 18:01:46] jibay, quitting. (Remote host closed the connection)
+[2013-04-17 18:05:23] phishy, joining. (#selenium)
+[2013-04-17 18:11:19] admc, quitting. (Quit: Leaving.)
+[2013-04-17 18:17:05] inspiron: anyone use selenium to test again an iphone browser
+[2013-04-17 18:25:14] fatguylaughing, joining. (#selenium)
+[2013-04-17 18:30:54] alexglow, quitting. (Ping timeout: 256 seconds)
+[2013-04-17 18:32:04] mreedell-work, quitting. (Quit: Computer has gone to sleep.)
+[2013-04-17 18:34:25] jrendell, quitting. (Quit: jrendell)
+[2013-04-17 18:36:55] ShawnM, joining. (#selenium)
+[2013-04-17 18:38:11] rapaul, joining. (#selenium)
+[2013-04-17 18:41:58] rapaul: I'd like to take a single node out of a selenium grid to perform maintenance on it. However as new tests are continually being farmed out to it I can't stop it without disruption. Is there a particular command I can send to a node to have it not accept new requests and gracefully exit once it has serviced its current load?
+[2013-04-17 18:45:15] rapaul: A better explanation over at https://groups.google.com/forum/?fromgroups=#!searchin/selenium-users/wean/selenium-users/UsgpWZ6xH0Q/2bZmcR6rJQYJ (excuse the typo in the subject)
+[2013-04-17 18:46:49] nirvdrum: rapaul: You could run this command on the node:  http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer
+[2013-04-17 18:46:55] nirvdrum: But I don't know if it's graceful.
+[2013-04-17 18:47:24] nirvdrum: Otherwise, no, there's no way to say "continue with this request but stop at that point".  You could probably do it by customizing your grid.
+[2013-04-17 18:47:31] rapaul: It kills it immediately, I've tried that already (see the user group post)
+[2013-04-17 18:48:18] nirvdrum: You might be able to unregister the node and still have the hub forward the request, but I doubt it.
+[2013-04-17 18:49:05] nirvdrum: It sounds like a reasonable thing to add.  But I think most of us running grids have come to accept that things will break and have clients retry anyway.
+[2013-04-17 18:49:50] rapaul: You build retying into your test harness if an agent goes away?
+[2013-04-17 18:50:07] nirvdrum: Yeah.
+[2013-04-17 18:50:17] nirvdrum: I run on EC2.  Amazon can kill a server any time they'd like.
+[2013-04-17 18:52:54] rapaul: Sounds like a reasonable approach. But I still think a soft shutdown of a node has merits, even if only to avoid restarting all tests running on that node.
+[2013-04-17 18:53:24] nirvdrum: I agree.
+[2013-04-17 18:53:37] nirvdrum: Normally you'd handle this with a signal handler, but the JVM complicates that.
+[2013-04-17 18:53:38] rapaul: I'll have a play around with JUnit and Cucumber-JVM to see if I can build in retry functionality. Thanks for the insight nirvdrum
+[2013-04-17 18:54:04] nirvdrum: So I guess we'd have to layer it at the hub, which probably means improving the console.
+[2013-04-17 18:56:24] rapaul: That's what I was thinking, have some way to flag a node as being retired and the scheduler can just skip it from then on.
+[2013-04-17 18:57:20] elro, quitting. (Quit: elro)
+[2013-04-17 19:07:05] stephend, quitting. (Remote host closed the connection)
+[2013-04-17 19:07:41] stephend, joining. (#selenium)
+[2013-04-17 19:12:11] stephend, quitting. (Ping timeout: 255 seconds)
+[2013-04-17 19:12:45] alexglow, joining. (#selenium)
+[2013-04-17 19:15:00] inspiron, leaving. (#selenium)
+[2013-04-17 19:25:16] alexglow, quitting. (Ping timeout: 246 seconds)
+[2013-04-17 19:57:08] DarkRift, joining. (#selenium)
+[2013-04-17 19:57:09] DarkRift, quitting. (Changing host)
+[2013-04-17 19:57:09] DarkRift, joining. (#selenium)
+[2013-04-17 20:00:42] DK3, joining. (#selenium)
+[2013-04-17 20:00:43] DK3, quitting. (Changing host)
+[2013-04-17 20:00:43] DK3, joining. (#selenium)
+[2013-04-17 20:03:53] DarkRift, quitting. (Ping timeout: 256 seconds)
+[2013-04-17 20:07:28] rananda, joining. (#selenium)
+[2013-04-17 20:17:42] akhet, quitting. (Remote host closed the connection)
+[2013-04-17 20:53:00] mu91t, joining. (#selenium)
+[2013-04-17 20:55:06] mu91t: Hello All,
+[2013-04-17 20:55:07] mu91t: I am pretty new to Selenium tests and trying to write a selenium test. Can someone help me find out how can I get the xpath of any element during the test run?
+[2013-04-17 20:55:07] mu91t: Thanks in advance!
+[2013-04-17 20:55:07] mu91t: Regards,
+[2013-04-17 20:59:35] asavchuk, joining. (#selenium)
+[2013-04-17 20:59:59] garndt, quitting. (Read error: Operation timed out)
+[2013-04-17 21:00:13] gates_, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 21:00:37] jtfairbank, quitting. (Ping timeout: 248 seconds)
+[2013-04-17 21:00:38] sahazel, quitting. (Ping timeout: 255 seconds)
+[2013-04-17 21:01:19] selloggingbot_, joining. (#selenium)
+[2013-04-17 21:02:02] jtfairbank, joining. (#selenium)
+[2013-04-17 21:02:18] nicegraham, joining. (#selenium)
+[2013-04-17 21:02:20] garndt, joining. (#selenium)
+[2013-04-17 21:03:11] sahazel_, joining. (#selenium)
+[2013-04-17 21:03:41] txwikinger, quitting. (Read error: Connection reset by peer)
+[2013-04-17 21:03:54] selloggingbot, quitting. (Ping timeout: 256 seconds)
+[2013-04-17 21:04:09] txwikinger, joining. (#selenium)
+[2013-04-17 21:04:09] txwikinger, quitting. (Changing host)
+[2013-04-17 21:04:09] txwikinger, joining. (#selenium)
+[2013-04-17 21:05:14] ryanpetr_, quitting. (Remote host closed the connection)
+[2013-04-17 21:11:24] selloggingbot__, joining. (#selenium)
+[2013-04-17 21:11:43] tinygeo, joining. (#selenium)
+[2013-04-17 21:12:12] tinygeo, leaving. (#selenium)
+[2013-04-17 21:13:54] selloggingbot_, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 21:15:17] DK3, quitting. (Read error: Connection reset by peer)
+[2013-04-17 21:23:22] phishy, quitting. (Quit: Computer has gone to sleep.)
+[2013-04-17 21:28:08] akhet, joining. (#selenium)
+[2013-04-17 21:28:08] akhet, quitting. (Changing host)
+[2013-04-17 21:28:08] akhet, joining. (#selenium)
+[2013-04-17 21:31:39] mu91t, quitting. (Quit: Leaving.)
+[2013-04-17 21:32:17] mu91t, joining. (#selenium)
+[2013-04-17 21:32:30] Dude-X_, quitting. (Read error: Connection reset by peer)
+[2013-04-17 21:33:13] akhet, quitting. (Ping timeout: 264 seconds)
+[2013-04-17 21:33:22] Dude-X_, joining. (#selenium)
+[2013-04-17 21:45:49] asavchuk, quitting. (Quit: bye everyone)
+[2013-04-17 21:47:32] mu91t, leaving. (#selenium)
+[2013-04-17 22:05:00] nirvdrum, quitting. (Ping timeout: 272 seconds)
+[2013-04-17 22:09:07] girija, joining. (#selenium)
+[2013-04-17 22:17:49] dimacus, quitting. (Quit: Leaving.)
+[2013-04-17 22:41:16] rananda, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 22:48:05] dimacus, joining. (#selenium)
+[2013-04-17 22:48:53] tinygeo, joining. (#selenium)
+[2013-04-17 22:52:32] dimacus, quitting. (Ping timeout: 252 seconds)
+[2013-04-17 23:00:20] gates_, joining. (#selenium)
+[2013-04-17 23:05:03] papegaaij, joining. (#selenium)
+[2013-04-17 23:06:53] rananda, joining. (#selenium)
+[2013-04-17 23:07:45] SamuraiJack, joining. (#selenium)
+[2013-04-17 23:09:20] ShawnM, quitting. (Remote host closed the connection)
+[2013-04-17 23:16:16] sourabh, joining. (#selenium)
+[2013-04-17 23:22:38] dimacus, joining. (#selenium)
+[2013-04-17 23:23:33] testingb0t, joining. (#selenium)
+[2013-04-17 23:26:42] stackedsax, quitting. (Quit: Leaving.)
+[2013-04-17 23:28:53] dimacus, quitting. (Ping timeout: 245 seconds)
+[2013-04-17 23:32:04] stackedsax, joining. (#selenium)
+[2013-04-17 23:35:06] admc, joining. (#selenium)
+[2013-04-17 23:52:23] stephend, joining. (#selenium)

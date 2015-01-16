@@ -1,0 +1,696 @@
+2011-04-27T00:00:15  *** brettporter has quit IRC
+2011-04-27T00:00:43  *** brettporter has joined #selenium
+2011-04-27T00:12:55  *** barancev has joined #selenium
+2011-04-27T00:13:09  *** csanchez has quit IRC
+2011-04-27T00:18:26  *** sjmikem has joined #selenium
+2011-04-27T00:18:56  *** csanchez has joined #selenium
+2011-04-27T00:28:55  *** toseter has joined #selenium
+2011-04-27T00:35:23  *** zmijunkie has joined #selenium
+2011-04-27T00:50:34  *** sburjan has joined #selenium
+2011-04-27T01:27:50  *** vrockai has joined #selenium
+2011-04-27T01:31:26  <barancev> where is the CI server now?
+2011-04-27T01:31:38  <barancev> http://xserve.openqa.org:8085/ is not available
+2011-04-27T01:32:35  *** freynaud has joined #selenium
+2011-04-27T01:43:07  *** bebef_1987 has joined #selenium
+2011-04-27T01:46:20  *** dave_miles_wfl has joined #selenium
+2011-04-27T02:10:50  *** dave_miles_wfl has quit IRC
+2011-04-27T02:12:59  *** csanchez has quit IRC
+2011-04-27T02:13:38  *** morphles has joined #selenium
+2011-04-27T02:14:20  <morphles> where does selenium store temporary browser profile that is created before each test run? (on linux)
+2011-04-27T02:17:41  <jarib> morphles: usually in /tmp
+2011-04-27T02:20:30  *** csanchez has joined #selenium
+2011-04-27T02:21:43  *** csanchez has joined #selenium
+2011-04-27T02:22:09  <morphles> is there a way to specify dir to be used for that?
+2011-04-27T02:22:33  <morphles> i now see that it uses /tmp, using lsof; creates dir like /tmp/customProfileDir61a9b95d86af40e2adedd9fdb4a55ae3
+2011-04-27T02:24:30  *** bebef_1987 has quit IRC
+2011-04-27T02:31:55  *** brettporter has quit IRC
+2011-04-27T02:42:24  <barancev> go test_firefox breaks in testShouldAllowAUserToSetTheValueOfAPrompt -- what's happened to FirefoxDriver? were there changes in handling alerts and prompts recently?
+2011-04-27T02:43:20  <barancev> or may be it is FF4 related?
+2011-04-27T02:52:42  <barancev> hmm... FF3.6 dies under tests even faster than FF4
+2011-04-27T02:54:50  <barancev> I'm wrong, not faster, same error: org.openqa.selenium.remote.ErrorHandler$UnknownServerException: k is not a function
+2011-04-27T02:56:45  *** rbalent has joined #selenium
+2011-04-27T02:56:58  <barancev> an error in bot.dom.appendVisibleTextLinesFromElement_
+2011-04-27T02:58:02  <barancev> seems to be a side effect of recent changes in text processing related to handling spaces
+2011-04-27T03:11:44  *** vrockai has quit IRC
+2011-04-27T03:21:10  *** csanchez_ has joined #selenium
+2011-04-27T03:24:22  *** csanchez has quit IRC
+2011-04-27T03:24:22  *** csanchez_ is now known as csanchez
+2011-04-27T03:40:29  *** toseter has quit IRC
+2011-04-27T03:44:55  *** uwjweq has joined #selenium
+2011-04-27T03:45:44  <uwjweq> Is there a methode like waitForPageToLoad that just waits no matter what?
+2011-04-27T03:47:19  *** bebef_1987 has joined #selenium
+2011-04-27T03:48:25  <barancev> uwjweq: waitForCondition ?
+2011-04-27T03:49:13  <uwjweq> barancev: Sounds interesting. Where can I find the api documentation?
+2011-04-27T03:51:06  <bebef_1987> Hy guys
+2011-04-27T03:53:44  <bebef_1987> I'm trying to verify the background  of a webpage using selenium. but the background is encoded iin the css part of the page:
+2011-04-27T03:53:46  <bebef_1987> background: url("../img/footer-logo.png") no-repeat scroll left top transparent;
+2011-04-27T03:54:05  <bebef_1987> Can I do that in Selenium
+2011-04-27T03:55:05  <barancev> uwjweq: http://selenium.googlecode.com/svn/trunk/docs/api/java/com/thoughtworks/selenium/DefaultSelenium.html
+2011-04-27T03:55:46  <uwjweq> Thank you very much.
+2011-04-27T04:00:58  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: adding a -servlet parameter to grid hub to allow custom servlet registration - http://code.google.com/p/selenium/source/detail?r=12077
+2011-04-27T04:03:36  <barancev> bebef_1987: not in selenium 1.0
+2011-04-27T04:04:35  <barancev> bebef_1987: in selenium 2 you may use RenderedWebElement.getValueOfCssProperty -- http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/RenderedWebElement.html
+2011-04-27T04:04:58  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: adding. a test to debug timeout and re-registration of nodes.file left out of commit 12073 - http://code.google.com/p/selenium/source/detail?r=12078
+2011-04-27T04:06:05  <bebef_1987> barancev: I'm using Selenium Server 2.0b3
+2011-04-27T04:06:10  <bebef_1987> and python
+2011-04-27T04:07:15  <bebef_1987> I will try to do that :P thanks
+2011-04-27T04:12:21  <bebef_1987> can i do that in python
+2011-04-27T04:12:23  <bebef_1987> ?
+2011-04-27T04:14:02  *** barancev|2 has joined #selenium
+2011-04-27T04:15:02  *** barancev has quit IRC
+2011-04-27T04:15:47  *** barancev|2 has quit IRC
+2011-04-27T04:15:55  *** skiphuffman_ has joined #selenium
+2011-04-27T04:16:19  *** barancev has joined #selenium
+2011-04-27T04:19:40  *** kylls has joined #selenium
+2011-04-27T04:21:32  *** vrockai has joined #selenium
+2011-04-27T04:40:11  *** toseter has joined #selenium
+2011-04-27T04:45:39  *** adamgouchertoo has joined #selenium
+2011-04-27T04:45:40  *** adamgoucher has quit IRC
+2011-04-27T04:45:40  *** adamgouchertoo is now known as adamgoucher
+2011-04-27T04:52:56  *** cburroughs has joined #selenium
+2011-04-27T05:02:38  *** RossPatterson has joined #selenium
+2011-04-27T05:05:52  *** vrockai has quit IRC
+2011-04-27T05:07:43  *** vrockai has joined #selenium
+2011-04-27T05:22:59  <uwjweq> How to handle logins in selenium?
+2011-04-27T05:25:25  <uwjweq> I have to log in again for each testMethod?
+2011-04-27T05:25:52  *** morphles has quit IRC
+2011-04-27T05:37:02  *** pythonirc101 has joined #selenium
+2011-04-27T05:37:18  <pythonirc101> what is the function in selenium to get the text rendered in a browser (not html_source())?
+2011-04-27T05:38:45  <RossPatterson> bebef_1987: You can indeed verify that background in Se 1, at least as well as you can in Se 2.  Neither system will actually let you verify the image (i.e., that it was loaded and that it contains what you expect), but if RenderedWebElement.getValueOfCssProperty() is good enough, well, you can always use JavaScript and selenium.getEval() in Se 1 to retrieve the page's background URL property.
+2011-04-27T05:39:26  <RossPatterson> pythonirc101: It's getText(...element_locator...).
+2011-04-27T05:42:36  *** mbeierl has joined #selenium
+2011-04-27T05:46:01  <pythonirc101> RossPatterson: Thanks.
+2011-04-27T05:46:40  *** nirvdrum has joined #selenium
+2011-04-27T05:51:44  *** adamgouchertoo has joined #selenium
+2011-04-27T05:51:44  *** adamgoucher has quit IRC
+2011-04-27T05:51:45  *** adamgouchertoo is now known as adamgoucher
+2011-04-27T05:54:51  <barancev> anybody khows why http://xserve.openqa.org:8085/ is not available?
+2011-04-27T06:02:24  <adamgoucher> because it crashed?
+2011-04-27T06:04:51  <barancev> at least CI has not moved? it should be there, but temporary unavailable?
+2011-04-27T06:04:53  <selbot> New news from builds: S2RB-REMLX-62 has FAILED (79 tests failed) : Dependant of S2RB-WDUNIT-89 <http://xserve.openqa.org:8085/browse/S2RB-REMLX-62> || S2J-FXLX-160 has FAILED : Updated by Jim Evans <http://xserve.openqa.org:8085/browse/S2J-FXLX-160> || S2RB-GEM-58 was SUCCESSFUL : Manual build by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-GEM-58> || S2RB-WDUNIT-89 was SUCCESSFUL (with 43 tests) : Updated by Jari Bakken <http://xserve.openqa.org:8085/browse/S2RB-WDUNIT-89> || IDE-MOZMILL-8 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-8> || IDE-MOZMILL-7 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-7> || IDE-MOZMILL-6 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-6> || IDE-MOZMILL-5 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-5> || IDE-MOZMILL-4 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-4> || IDE-MOZMILL-3 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-3> || IDE-MOZMILL-2 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-2> || IDE-MOZMILL-1 has FAILED : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-1>
+2011-04-27T06:05:55  <barancev> adamgoucher: thanks! you are a god! it is alive again :)
+2011-04-27T06:06:30  <adamgoucher> none of the agents are up though so dont go heaping too much praise around
+2011-04-27T06:06:50  <uwjweq> How to handle logins in selenium? Do I have to log in for each each testMethod?
+2011-04-27T06:09:29  <barancev> there is ide 1.0.11 pre-build on bamboo that linked from several blogs, and people asked me how to get it, now it is available again
+2011-04-27T06:14:19  <barancev> uwjweq: to perform basic auth you may call selenium.open("http://USER:PASSWORD@site.com/")
+2011-04-27T06:15:11  <barancev> uwjweq: to perform other auth types you have to deal with native windows, selenium has no support for credentials at the moment
+2011-04-27T06:15:13  <uwjweq> barancev: I did not make this clear. I did not mean http-auth, but my own login.
+2011-04-27T06:15:50  <uwjweq> barancev: For every testMethod I have to login again sofar. It is very time-consuming.
+2011-04-27T06:16:04  <barancev> barancev: to perform "soft" login just implement your own login(user, password) function and call it as meeded
+2011-04-27T06:16:14  <barancev> s/meeded/needed/
+2011-04-27T06:16:40  <uwjweq> So no way arround login in every single time?
+2011-04-27T06:16:51  <barancev> uwjweq: if you don't want to login frequently -- don't logout :)
+2011-04-27T06:18:07  <uwjweq> barancev: Logicaly I am getting logged out when Selenium is starting a new browser for the test. I just liked to know if there was a way arround.
+2011-04-27T06:18:39  *** dmachi has quit IRC
+2011-04-27T06:18:40  *** dmachi has joined #selenium
+2011-04-27T06:19:19  <barancev> uwjweq: why do you need to quit browser after each test? why not reuse the same selenium session
+2011-04-27T06:20:26  <uwjweq> barancev: Thats what Selenium does.
+2011-04-27T06:20:40  <uwjweq> barancev: I am using SeleniumRC with PHP-Driver.
+2011-04-27T06:22:55  <barancev> uwjweq: that's what your test execution framowork does (PHPUnit, probably) -- find a way to start browser once, don't quit after each test - that's what you need
+2011-04-27T06:23:44  <uwjweq> barancev: Indeed, I need to find what I am looking for. No big revelation in that statement.
+2011-04-27T06:25:55  <barancev> uwjweq: read about setUpBeforeClass() and tearDownAfterClass(), at least you'll be able to run one browser per test class -- http://www.phpunit.de/manual/3.6/en/fixtures.html#fixtures.more-setup-than-teardown
+2011-04-27T06:26:15  <RossPatterson> uwjweq: Every time your code calls DefaultSelenium(), you get a new browser.  Every time it calls selenium.stop(), that browser is terminated.  If you want to preserve the browser across several tests, you need to create it at the first one and hold off deleting it until the end of the last one.
+2011-04-27T06:26:50  <barancev> uwjweq: or implement your own browser factory class (or even setup a global var) to manage how to start and stop browsers
+2011-04-27T06:27:07  <RossPatterson> However, keeping the browser open across multiple tests makes it easy for tests to interfere with each other, and that's usually a Very Bad Idea.
+2011-04-27T06:28:14  <barancev> RossPatterson: sometimes it is no bad idea to allow tests interfere, you may find interesting bugs - customers don't quite browser after each action :)
+2011-04-27T06:29:08  *** dave_miles_wfh has joined #selenium
+2011-04-27T06:29:48  *** dave_miles has quit IRC
+2011-04-27T06:30:08  <RossPatterson> I just read that as "dave_miles_wtf has joined".  Must be One Of Those Days :-)
+2011-04-27T06:34:14  *** skiphuffman_ has quit IRC
+2011-04-27T06:36:27  *** mbeierl has quit IRC
+2011-04-27T06:53:32  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: fixing compiling error, removing wrong dependency. - http://code.google.com/p/selenium/source/detail?r=12079
+2011-04-27T07:01:44  *** jimevans has joined #selenium
+2011-04-27T07:07:48  *** plightbo has joined #selenium
+2011-04-27T07:18:10  *** mbeierl has joined #selenium
+2011-04-27T07:31:10  *** zmijunkie has quit IRC
+2011-04-27T07:52:15  *** larrys has quit IRC
+2011-04-27T07:54:36  *** larrys has joined #selenium
+2011-04-27T07:54:43  <uwjweq> Can I select part of the value of an attribute with xpath?
+2011-04-27T07:55:07  <RossPatterson> Yes.  Check out the XPath contains() function.
+2011-04-27T07:55:36  *** santiycr has joined #selenium
+2011-04-27T07:56:13  <uwjweq> Thank you, I'll check it out.
+2011-04-27T07:59:54  <adamgoucher> jarib: do you know the state of the server-side webdriverbacked* simon was working on?
+2011-04-27T08:05:44  *** sburjan has quit IRC
+2011-04-27T08:07:41  <jarib> adamgoucher: he sent some of us the patch and then went on vacation
+2011-04-27T08:07:50  <jarib> adamgoucher: can forward it to you if you want
+2011-04-27T08:07:52  *** XCulver has joined #selenium
+2011-04-27T08:08:39  <adamgoucher> sure; ive got a client that could benefit from having it via python drivers but not going to code a whole bunch if its just moving server side
+2011-04-27T08:09:17  <jarib> sent
+2011-04-27T08:09:17  <adamgoucher> whats the webdriver download file story? i know the upload one cross-browser w/o using autoit or similar
+2011-04-27T08:09:31  <jarib> it's definitely moving server side
+2011-04-27T08:10:54  <jarib> adamgoucher: firefox only AFAIK, by tweaking the profile to autosave the specified mime types
+2011-04-27T08:11:12  <jarib> the RubyBindings page on the wiki has the prefs you need
+2011-04-27T08:11:19  <jarib> :wiki rubybindings
+2011-04-27T08:11:19  <selbot2> 1: ScalingWebDriver: Describes issues that have to be handled when running concurrent Se2 - http://code.google.com/p/selenium/wiki/ScalingWebDriver
+2011-04-27T08:11:20  <selbot2> 2: RubyBindings: Ruby bindings - http://code.google.com/p/selenium/wiki/RubyBindings
+2011-04-27T08:11:42  <adamgoucher> jimevans: is there a story around file downloads in the new! and improved! ie driver?
+2011-04-27T08:15:16  *** toseter has quit IRC
+2011-04-27T08:16:15  *** toseter has joined #selenium
+2011-04-27T08:20:05  <adamgoucher> jarib: http://element34.ca/blog/selenium-and-printing also has soem other preference tricks
+2011-04-27T08:34:19  *** bebef_1987 has quit IRC
+2011-04-27T08:35:52  *** BobSilverberg has joined #selenium
+2011-04-27T08:38:35  <BobSilverberg> I am interested in discussing an issue with test design using the page object model.
+2011-04-27T08:46:34  <freynaud> has anyone seen this error before ( Firefox 3.6 on ubuntu, only 1 FF starting ) https://gist.github.com/944377
+2011-04-27T08:47:26  *** rbalent has quit IRC
+2011-04-27T08:50:57  <XCulver> any idea why on one of my 2 win7 x64 boxes to get my tests to run, i need a 1 second wait after every click?
+2011-04-27T08:51:04  <XCulver> all tests are done in IE
+2011-04-27T08:51:10  <XCulver> selenium2 beta 3
+2011-04-27T08:51:10  *** andytinkham has joined #selenium
+2011-04-27T08:51:45  <XCulver> without it i have about a 30% failure rate
+2011-04-27T08:51:47  *** sjmikem has quit IRC
+2011-04-27T08:52:24  *** lfryc has quit IRC
+2011-04-27T08:53:45  *** pnitin has quit IRC
+2011-04-27T08:53:51  *** toseter has joined #selenium
+2011-04-27T08:57:41  *** csanchez has quit IRC
+2011-04-27T09:09:57  *** towski has joined #selenium
+2011-04-27T09:13:09  *** amitev has quit IRC
+2011-04-27T09:17:51  *** ahal has joined #selenium
+2011-04-27T09:18:41  *** uwjweq has quit IRC
+2011-04-27T09:19:32  *** santiycr has quit IRC
+2011-04-27T09:27:14  *** marlena has joined #selenium
+2011-04-27T09:30:43  <jimevans> adamgoucher: not yet. i haven't invested any time in looking for a solution yet.
+2011-04-27T09:32:01  <jimevans> XCulver: do these clicks cause a navigation, and that's what you're seeing fail? if so, look at issue #232, comment 11.
+2011-04-27T09:32:03  <selbot2>  open/needsclarification WebDriver is not working properly with pages after HTTP redirect in IE? - http://code.google.com/p/selenium/issues/detail?id=232
+2011-04-27T09:32:33  <jimevans> the comment contains a complete description of the "wait for navigation complete" algorithm in the IE driver
+2011-04-27T09:34:30  *** Spanktar has joined #selenium
+2011-04-27T09:36:26  <jimevans> adamgoucher: referenced your StackExchange blog post in the discussion taking place about the Selenium proposal.
+2011-04-27T09:36:48  <adamgoucher> thats what it is there for
+2011-04-27T09:37:12  * adamgoucher does occasionally use his powers for good
+2011-04-27T09:37:18  <jimevans> heh.
+2011-04-27T09:38:01  <andytinkham> I just upvoted Tarun's question on meta, and your response, jimevans. Anywhere else that are main points right now where upvoting would he helpful?
+2011-04-27T09:38:05  <jimevans> i like the argument that "browser automation" != "software testing" (necessarily)
+2011-04-27T09:38:11  <adamgoucher> i'm kinda annoyed that there hasnt been more people uncommit. i'd like to see it get below 500  :)
+2011-04-27T09:39:01  <andytinkham> My guess is that people are torn - they don't want the merge, but they do want a better qa site, maybe?
+2011-04-27T09:39:48  <XCulver> jimevans: thanks, i'll look at that
+2011-04-27T09:39:51  <adamgoucher> my guess is they clicked a link because they were nagged and dont care :)
+2011-04-27T09:39:58  <andytinkham> Well, true :)
+2011-04-27T09:40:58  <jimevans> i've only been involved peripherally in the discussion. i really like the StackExchange format. i think that poprely applied, it can help the cream rise to the top.
+2011-04-27T09:41:10  <jimevans> s/poprely/properly
+2011-04-27T09:42:29  <jimevans> StackOverflow has been immensely helpful to me in the past, but the merger as conducted seems arbitrary and narrow-minded.
+2011-04-27T09:43:29  *** vrockai has quit IRC
+2011-04-27T09:43:31  <adamgoucher> as someone pointed out (and it follows what bret said) -- we have a branding problem. all over sehq says 'web application testing' -- with the renewed 'were browser automation' focus the whole site needs a redo
+2011-04-27T09:43:45  <adamgoucher> and not just because we're part of sfc now
+2011-04-27T09:44:57  <jimevans> well, my skillset is about as far away from marketing/branding as you'll find, so i'm definitely not the guy to take on tilting that particular windmill.
+2011-04-27T09:47:52  *** sfbrian has joined #selenium
+2011-04-27T09:48:31  *** christophermcmah has joined #selenium
+2011-04-27T09:49:04  <adamgoucher> i'm happy to tilt at it, but i have bills to pay so can't do much beyond start fires :)
+2011-04-27T09:50:17  <christophermcmah> I have a bizarre issue about getAlert and getConfirmation.  anyone want to talk to me about how those work? my code base may have shot itself in the foot.
+2011-04-27T09:50:31  <keturn> *getwindmill.com's server cabinet starts smoking*
+2011-04-27T09:52:28  <adamgoucher> or shot your foot? :)
+2011-04-27T09:53:06  <adamgoucher> they override the js that renders the controls. which is why you have to say what you want to do with it ahead of time
+2011-04-27T09:53:58  <christophermcmah> adamgoucher: yeah, I have a monkeypatched window.alert, so every time I use getAlert() or getConfirmation() I'm getting two exceptions, one "Confirmation not found" and the other "There was an unexpected confirmation!"
+2011-04-27T09:55:14  <christophermcmah> trying to wrap my head around if there's anything I can do about it
+2011-04-27T09:56:11  <christophermcmah> interestingly, Se IDE consumes the Confirmation, but it has a validation bug, and passes every getConfirmation call regardless of what args the call has.
+2011-04-27T09:57:45  <adamgoucher> why'd you monkeypatch window.alert?
+2011-04-27T09:58:06  <christophermcmah> no idea, I just found it that way.  it's a smell for sure, but I can't get it changed any time soon.
+2011-04-27T09:59:45  *** cheezy_ has joined #selenium
+2011-04-27T09:59:51  <adamgoucher> wihtout having looking at that code in a long while, you might be up the creek or have to provide your own monkeypatch to the monkeypatch to make it behave the way se expects
+2011-04-27T10:00:24  *** pnitin has joined #selenium
+2011-04-27T10:01:56  *** cheezy has quit IRC
+2011-04-27T10:03:30  *** udesh has joined #selenium
+2011-04-27T10:06:29  <adamgoucher> if i wanted to point to a 'se-grid 2.0' place from sehq, what page would i point to?
+2011-04-27T10:07:05  *** sjmikem has joined #selenium
+2011-04-27T10:07:50  *** jleyba has joined #selenium
+2011-04-27T10:13:12  *** cheezy_ has quit IRC
+2011-04-27T10:16:01  *** Rajan has joined #selenium
+2011-04-27T10:26:51  *** sjmikem has quit IRC
+2011-04-27T10:29:16  <adamgoucher> right. new fire started. now for coffee
+2011-04-27T10:30:43  *** barancev has quit IRC
+2011-04-27T10:30:53  *** sjmikem has joined #selenium
+2011-04-27T10:31:15  <jleyba> dawagner: You around?
+2011-04-27T10:32:25  *** miker2 has joined #selenium
+2011-04-27T10:35:22  *** sjmikem has quit IRC
+2011-04-27T10:35:41  *** sjmikem has joined #selenium
+2011-04-27T10:39:06  *** barancev has joined #selenium
+2011-04-27T10:42:45  <RossPatterson> christophermcmah: You're aware I assume that getConfirmation is for window.confirm, not window.alert, right?
+2011-04-27T10:43:34  <christophermcmah> RossPatterson: I am, I have the same monkeypatch affecting both getConfirmation and getAlert.  (don't know what these people were thinking...)
+2011-04-27T10:43:41  <RossPatterson> LOL
+2011-04-27T10:44:17  <christophermcmah> dev mgr. agrees it's a smell, but it ain't getting fixed any time soon
+2011-04-27T10:44:49  <adamgoucher> 'then it ain't gunna be automated any time soon; next!' :)
+2011-04-27T10:44:55  <RossPatterson> Have you studied the related code in selenium-api.js and selenium-browserbot.js and how Selenium takes control of those?
+2011-04-27T10:45:14  <RossPatterson> "I want a pony, too." -- a Product Manager from several jobs ago
+2011-04-27T10:45:32  <christophermcmah> RossPatterson:  I was looking for that and not finding it in a cursory browse of the SVN repo
+2011-04-27T10:45:38  <christophermcmah> so I'm working around...
+2011-04-27T10:45:43  <adamgoucher> people learn not to say that around me; i actually can provide a pony :)
+2011-04-27T10:45:50  *** mashiara has joined #selenium
+2011-04-27T10:45:57  <RossPatterson> Which Se release are you using?  I assume we're taking about the Se RC API, correct?
+2011-04-27T10:46:02  <RossPatterson> s/taking/talking/
+2011-04-27T10:46:11  <RossPatterson> LOL
+2011-04-27T10:46:26  <jimevans> adamgoucher: me too.
+2011-04-27T10:46:41  <jimevans> well, not usually a pony. usually i can provide a horse though.
+2011-04-27T10:47:08  <adamgoucher> my wife doesn't like me trying to give away the livestock though
+2011-04-27T10:47:20  <jimevans> neither does my sister. :)
+2011-04-27T10:47:48  <adamgoucher> christophermcmah: http://code.google.com/p/selenium/source/browse/#svn%2Ftrunk%2Fjavascript%2Fselenium-core%2Fscripts is where that stuff is hiding these days
+2011-04-27T10:48:12  <barancev> jleyba: r12074 (changes in dom.js) causes test AlertsTest.testShouldAllowAUserToSetTheValueOfAPrompt fails for FirefoxDriver
+2011-04-27T10:48:14  <RossPatterson> If you're on 1.0.x, it's a completely different place.
+2011-04-27T10:48:15  <selbot2> jmleyba about 20 hours ago - JasonLeyba: More improvements to bot.dom.getVisibleText to properly - http://code.google.com/p/selenium/source/detail?r=12074
+2011-04-27T10:48:22  * RossPatterson really hates tree reorgs.
+2011-04-27T10:48:28  <christophermcmah> it is interesting that Se IDE handles these (for some definition of "handles", at least they don't fail)
+2011-04-27T10:48:37  <barancev> jleyba: org.openqa.selenium.remote.ErrorHandler$UnknownServerException: k is not a function
+2011-04-27T10:48:41  *** csanchez has joined #selenium
+2011-04-27T10:49:15  <jleyba> barancev: I tested both FF and IE before submitting...
+2011-04-27T10:49:20  <jleyba> Thanks for letting me know, I'll look into it
+2011-04-27T10:49:48  *** sfbrian has quit IRC
+2011-04-27T10:52:51  <RossPatterson> I don't pay a lot of attention to IDE, but I've often wondered if RC's selenium-api.js and selenium-browserbot.js are the same as those in recent releases of IDE.  Being hopelessly stuck for the time being on a 1.0.1 system, I don't really know.
+2011-04-27T10:53:17  <adamgoucher> yes, they are the same
+2011-04-27T10:53:38  <adamgoucher> se-ide is using atoms now too
+2011-04-27T10:53:47  *** AutomatedTester has joined #selenium
+2011-04-27T10:53:53  *** sfbrian has joined #selenium
+2011-04-27T10:54:17  <AutomatedTester> yo
+2011-04-27T10:54:31  <jimevans> AutomatedTester: hi!
+2011-04-27T10:54:33  <adamgoucher> shouldnt you be vacationing and not hiding out online? :P
+2011-04-27T10:54:54  <RossPatterson> That's good to hear.  I've suspected otherwise, when I read reports of odd RC behavior after export from IDE.
+2011-04-27T10:54:58  <jimevans> hey, he's got a 7-month-old. he's got to get away *sometime*.
+2011-04-27T10:55:03  * AutomatedTester is vacationing
+2011-04-27T10:55:14  <AutomatedTester> wife is feeding him before bed
+2011-04-27T10:55:17  <RossPatterson> I know that could be vaguer, but, ... eh
+2011-04-27T10:55:21  <AutomatedTester> so catching up with the world
+2011-04-27T10:55:49  <adamgoucher> RossPatterson: well, if there is a bug in the export (which there are) then oddness could result
+2011-04-27T10:55:53  <AutomatedTester> adamgoucher: did ruby on rails 2 moving to RoR3 change the API?
+2011-04-27T10:56:09  <adamgoucher> 2 -> 3 is a big shift, yes
+2011-04-27T10:56:16  <AutomatedTester> thanks :D
+2011-04-27T10:56:36  <AutomatedTester> off to write an adamgoucher is wrong email
+2011-04-27T10:56:51  * adamgoucher suspects the :D implies his own answer is going to bit him
+2011-04-27T10:56:59  * adamgoucher has been proven correct
+2011-04-27T10:58:52  <RossPatterson> "This statement is a lie."
+2011-04-27T10:59:08  <adamgoucher> just remember, rc is part of se2. swap out the jar starting with 1 and with one starting with 2 and you have technically 'migrated'
+2011-04-27T11:00:17  <adamgoucher> (you just arent using any of the 'cool' bits that also came along with it)
+2011-04-27T11:00:36  <AutomatedTester> with se1?
+2011-04-27T11:00:40  <AutomatedTester> ahh but we are
+2011-04-27T11:01:04  <RossPatterson> Understood.  I just don't see the value in a 1.0.1 -> 2.0b3 update for the RC API when we have a highly functional existing environment.  Now, when we start coding fto WebDriver API, well, that's the horse of a different color you've heard tell about.
+2011-04-27T11:01:17  <barancev> jleyba: function hasText(line) is defined in the end of bot.dom.appendVisibleTextLinesFromElement_, and it is not visible when used in the beginning
+2011-04-27T11:01:22  <AutomatedTester> Se2 atoms has some useful code in Se1 to power both
+2011-04-27T11:01:35  <adamgoucher> there are bug fixes to se-rc in the 2.x version of the server
+2011-04-27T11:01:40  <adamgoucher> what he said
+2011-04-27T11:02:07  <AutomatedTester> maybe we should have taking the Se1 backward compatibilty away and do the RoR approach
+2011-04-27T11:03:25  <adamgoucher> the rails kids i pervcieve to be more willing to spend the time to make the necessary changes than you 'average' qa department would be
+2011-04-27T11:04:33  *** sjmikem1 has joined #selenium
+2011-04-27T11:04:34  *** sjmikem has quit IRC
+2011-04-27T11:15:27  *** Rajan has quit IRC
+2011-04-27T11:17:07  *** Rajan has joined #selenium
+2011-04-27T11:17:20  *** christophermcmah has quit IRC
+2011-04-27T11:25:50  *** Rajan1 has joined #selenium
+2011-04-27T11:25:55  *** BobSilverberg has quit IRC
+2011-04-27T11:27:57  *** Rajan has quit IRC
+2011-04-27T11:33:25  <barancev> I can't pass RenderedWebElementTest.testMovingMouseByRelativeOffset for IE9 on Win7 if fuzzyPositionMatching allows 10pt deviation only
+2011-04-27T11:33:25  *** sjmikem1 has quit IRC
+2011-04-27T11:33:32  *** sjmikem has joined #selenium
+2011-04-27T11:33:34  <barancev> actual deviation is 18pt - is it OK?
+2011-04-27T11:35:02  <jimevans> barancev: that set of tests is brand new. eranm added it just before leaving for vacation. he checked in the move code with the understanding that it wasn't completely correct.
+2011-04-27T11:35:49  *** epall has joined #selenium
+2011-04-27T11:36:09  <epall> anybody else see the gem selenium-webdriver (v0.2.0) fail to connect to Firefox 3.6 occasionally?
+2011-04-27T11:36:27  *** ahal has quit IRC
+2011-04-27T11:39:07  *** gronky has joined #selenium
+2011-04-27T11:39:11  <jleyba> barancev: the closure compiler translates "function hasText(line)" to "var k = function(i)", which prevents it from being parsed as soon as the block is entered, causing the break
+2011-04-27T11:39:43  <jleyba> Not sure why this didn't break when I tested before submitting.  Fix is incoming
+2011-04-27T11:41:47  <AutomatedTester> email done
+2011-04-27T11:45:56  <melter> is there a way to simulate flow control?
+2011-04-27T11:48:29  *** ahal has joined #selenium
+2011-04-27T11:48:53  <AutomatedTester> laters
+2011-04-27T11:48:56  *** AutomatedTester has quit IRC
+2011-04-27T11:50:54  *** pnitin has quit IRC
+2011-04-27T11:53:30  *** anatoli has joined #selenium
+2011-04-27T11:57:27  *** brnull has joined #selenium
+2011-04-27T11:57:57  *** anatoli has quit IRC
+2011-04-27T12:02:05  *** sjmikem has quit IRC
+2011-04-27T12:05:09  <brnull> what is the relation between selenium2 and webdriver ?
+2011-04-27T12:07:19  <andytinkham> brnull: My take (speaking as a non-Se committer) is that Selenium 2 implements the webdriver API, but retains some of Selenium 1's back end which extends the capabilities of what was originally in webdriver some as well
+2011-04-27T12:07:29  *** csanchez has quit IRC
+2011-04-27T12:08:03  <brnull> how well can I use selenium2 via Ruby lang. ?
+2011-04-27T12:08:17  <brnull> seems like selenium-webdriver gem isn't mature
+2011-04-27T12:08:24  <epall> brnull: how so?
+2011-04-27T12:09:15  <brnull> according to the official wiki the ruby bindings aren't complete. there are features missing etc.. the current version is 0.2.0
+2011-04-27T12:09:49  <epall> brnull: selenium-webdriver is the standard way to use both the WebDriver and RC Selenium APIs from Ruby
+2011-04-27T12:10:16  <epall> brnull: Selenium 2 / WebDriver is still pre-1.0, so it's reasonable that the client bindings aren't yet at 1.0
+2011-04-27T12:10:18  <andytinkham> brnull: I'm using selenium-webdriver in my suite. Nothing I've tried to do yet has been impossible (though I'm still building out some infrastrucutre before diving into tests)
+2011-04-27T12:10:24  *** Rajan1 has quit IRC
+2011-04-27T12:10:33  <epall> andytinkham: what kind of infrastructure are you building out?
+2011-04-27T12:11:02  <brnull> can I conclude that using selenium2 via Java will be easier and feature complete?
+2011-04-27T12:11:06  <epall> andytinkham: I'm looking for a few people to alpha test a new Ruby-based Selenium testing framework
+2011-04-27T12:11:14  <epall> brnull: It will be more feature complete, since Simon cares most about it
+2011-04-27T12:11:25  <epall> brnull: but if something is missing from the Ruby API, Jari is extremely quick to respond
+2011-04-27T12:11:35  <epall> brnull: so use whatever language you're most comfortable in
+2011-04-27T12:11:50  <andytinkham> Cross-platform SQL server access, building a implementation-focused layer that seamlessly works with web apps (Selenium) and gui apps, making examples of the rest of the layers so that I"m ready to start ramping people up
+2011-04-27T12:11:58  *** csanchez has joined #selenium
+2011-04-27T12:12:10  <epall> andytinkham: cool! What are you using to drive gui apps?
+2011-04-27T12:12:13  <brnull> epall: so if I get it right you consider Java and Ruby implementations almost equal in quality
+2011-04-27T12:12:19  <epall> brnull: yep
+2011-04-27T12:12:30  <brnull> I see
+2011-04-27T12:12:47  <jimevans> i'd be interested to know where people find the .NET bindings lagging behind Java and Ruby.
+2011-04-27T12:12:51  <brnull> do I lose anything if I use only webdriver API instead of Selenium2 ?
+2011-04-27T12:13:03  <brnull> or there is no such thing..
+2011-04-27T12:13:08  <epall> brnull: Selenium 2 has two APIs: The WebDriver API and the RC API
+2011-04-27T12:13:21  <epall> brnull: The RC API is completely backwards-compatible with Selenium 1
+2011-04-27T12:13:29  <epall> brnull: The WebDriver API is a totally new codebase
+2011-04-27T12:13:45  <brnull> RC APi is JavaScript based in real browser right?
+2011-04-27T12:13:56  <epall> brnull: no
+2011-04-27T12:14:09  <epall> brnull: Selenium Core was an in-browser JavaScript runtime for "Selenese"
+2011-04-27T12:14:27  <brnull> I guess I'm still confused.. sorry for stupid questions
+2011-04-27T12:14:30  <epall> brnull: Selenium RC provides a way for any language to control a browser using Selenium Core
+2011-04-27T12:14:42  <brnull> you have to admit the docs about selenium aren't good enough :)
+2011-04-27T12:14:44  <epall> brnull: nono, keep 'em coming. The project is still confused itself, so you're not alone
+2011-04-27T12:15:04  <epall> brnull: I'm using this as an experiment to see if I can even explain things clearly
+2011-04-27T12:15:21  <epall> brnull: If you're starting on a new project, I recommend using the WebDriver API provided by the selenium-webdriver gem
+2011-04-27T12:15:32  <epall> mostly we're keeping around the RC API for backwards compabilitiy
+2011-04-27T12:15:34  <brnull> so you recomend it over selenium Java ?
+2011-04-27T12:15:42  <epall> I recommend anything over Java =D
+2011-04-27T12:15:48  <RossPatterson> brnull: The RC API does indeed use JavaScript in a real browser, but you write your programs in another language (Java, Ruby, Python, C#, ...)
+2011-04-27T12:15:55  <brnull> I'll be using webdriver definetely
+2011-04-27T12:16:16  <epall> in all seriousness, I don't recommend writing tests in Java because you end up doing a lot of ceremony for simple things. Scripting languages are much better suited to testing IMHO
+2011-04-27T12:16:21  <brnull> as if I know right it has more capabilities compared to the old selenium1
+2011-04-27T12:16:37  <epall> brnull: yeah, it can handle modal alerts better at this point and doesn't have cross-domain problems
+2011-04-27T12:16:43  <epall> but it doesn't yet support Safari
+2011-04-27T12:16:50  <brnull> also I like the idea of uniform API
+2011-04-27T12:17:04  <brnull> as WebDriver is just an interface
+2011-04-27T12:17:17  <brnull> has Chrome,IE,Firefox.. implementations
+2011-04-27T12:17:27  <brnull> or I'm wrong?
+2011-04-27T12:17:29  <epall> brnull: Selenium RC works the same way
+2011-04-27T12:17:37  <epall> one API, many languages, many browsers
+2011-04-27T12:17:47  <brnull> I see
+2011-04-27T12:17:49  <brnull> what about OSs
+2011-04-27T12:18:03  <epall> Selenium 1 and 2 support Windows, Linux, and OSX
+2011-04-27T12:18:06  <brnull> can I easily use Selenium2 java/ruby on both linux/Win
+2011-04-27T12:18:10  <epall> yep
+2011-04-27T12:18:43  <brnull> can you give me some good place to read documentation about the ruby bindings
+2011-04-27T12:19:18  <epall> http://code.google.com/p/selenium/wiki/RubyBindings, and http://rdoc.info/gems/selenium-webdriver/0.2.0/frames
+2011-04-27T12:19:20  <brnull> the selenium-webdriver is hosted in rubygems.com
+2011-04-27T12:19:24  <brnull> but I can't find good docs
+2011-04-27T12:19:33  <RossPatterson> :wiki ruby
+2011-04-27T12:19:34  <selbot2> 1: FrequentlyAskedQuestions: WebDriver FAQs - http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions
+2011-04-27T12:19:35  <selbot2> 2: GoogleSummerOfCode: Featuredgsocdev - http://code.google.com/p/selenium/wiki/GoogleSummerOfCode
+2011-04-27T12:19:35  <selbot2> 3: ReleasingSelenium: The release process for a new selenium - http://code.google.com/p/selenium/wiki/ReleasingSelenium
+2011-04-27T12:19:35  <selbot2> (+ 12 more)
+2011-04-27T12:19:50  <RossPatterson> (OK, that wasn'tbetter)
+2011-04-27T12:20:05  <RossPatterson> :wiki ruby bindings
+2011-04-27T12:20:06  <selbot2> 1: FrequentlyAskedQuestions: WebDriver FAQs - http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions
+2011-04-27T12:20:06  <selbot2> 2: ScalingWebDriver: Describes issues that have to be handled when running concurrent Se2 - http://code.google.com/p/selenium/wiki/ScalingWebDriver
+2011-04-27T12:20:06  <selbot2> 3: RubyBindings: Ruby bindings - http://code.google.com/p/selenium/wiki/RubyBindings
+2011-04-27T12:20:06  <selbot2> (+ 3 more)
+2011-04-27T12:20:14  <brnull> thanks!
+2011-04-27T12:20:18  <RossPatterson> (Still not better.  Never mind)
+2011-04-27T12:22:10  <brnull> does Selenium/WebDriver support OCR?
+2011-04-27T12:23:10  <epall> brnull: nope, not yet
+2011-04-27T12:23:41  <brnull> so what are my ways of validating the screen?  Finding a given object (lets say a label) and check it's content ?
+2011-04-27T12:23:41  <jimevans> and it probably won't. OCR pretty much falls outside the scope of "browser automation"
+2011-04-27T12:25:09  <RossPatterson> brnull: There are some things you can't verify except by looking at images.  Labels aren't one of them - you can look at the DOM and see those.
+2011-04-27T12:25:30  <brnull> I see.
+2011-04-27T12:25:45  <brnull> what about waiting for something. Like a page with lots of AJAX you wait to be loaded
+2011-04-27T12:25:51  <brnull> how does that work?
+2011-04-27T12:26:21  <RossPatterson> But if you want to know if hovering the mouse pointer over an element displays its tooltip, well, that's something that takes an eyeball or some really cool screenshot comparator.
+2011-04-27T12:27:12  <RossPatterson> In the RC API, you just: selenium.WaitForPageToLoad(timeout); selenium.WaitForElementPresent(locator, timeout);
+2011-04-27T12:27:27  <selbot2> jmleyba half a minute ago - JasonLeyba: Declare hasText as a function in the bot.dom namespace to - http://code.google.com/p/selenium/source/detail?r=12080
+2011-04-27T12:27:41  <andytinkham> epall: Sorry - got pulled away
+2011-04-27T12:28:10  <brnull> what about Watir
+2011-04-27T12:28:18  <brnull> how does it go here compared to Selenium
+2011-04-27T12:28:28  *** marlena has quit IRC
+2011-04-27T12:28:29  <brnull> there is some Watir-webdriver development I saw
+2011-04-27T12:28:44  <brnull> it's also mainly ruby
+2011-04-27T12:28:46  <brnull> ?
+2011-04-27T12:29:08  <jimevans> watir-webdriver is the watir api using the webdriver technology to drive the browser.
+2011-04-27T12:29:27  <jimevans> it's completely ruby.
+2011-04-27T12:29:56  <andytinkham> epall: I'm planning to use win32-autogui for the gui apps, but I'm still working on making sure I can plug in the functionality first. Gui stuff comes in the next week or so
+2011-04-27T12:30:06  <jimevans> s/using the webdriver technology/using the webdriver technology via the Ruby bindings.
+2011-04-27T12:32:30  <brnull> jimevans: which would you recomend ?  watir-webdriver or selenium-webdriver ?  In other words should I use Selenium2 or Watir-WebDriver? Which would you prefer
+2011-04-27T12:33:13  <jimevans> i'm not a Ruby user, so I'm not the right person to ask that question. However, it comes down to what API you feel most comfortable working in.
+2011-04-27T12:34:10  <jimevans> In the case of Selenium using the WebDriver API, or using watir-webdriver, they're using the same code underneath it all (the WebDriver code)
+2011-04-27T12:34:22  <andytinkham> brnull: My recommendation would be to identify a fairly short test case and try to automate it in both tools. You can have them side by side and see how the code ends up coming out differently
+2011-04-27T12:35:02  <brnull> andytinkham: thanks, I'll be doing that shortly. Can you advice me to try another similar tool as well? How about Cucumber ?
+2011-04-27T12:35:22  <andytinkham> My suite actually uses Cucumber & Selenium together
+2011-04-27T12:35:41  <andytinkham> Cucumber at the top, a couple levels of custom built ruby code in the middle, and selenium doing the browser driver directly
+2011-04-27T12:35:59  <brnull> so you get best of both worlds
+2011-04-27T12:36:46  <andytinkham> I'm pretty happy with how things are going so far. :)
+2011-04-27T12:38:51  <brnull> are you public? any link to a website?
+2011-04-27T12:39:31  <andytinkham> If you want more information on how it's organized, the slides for my SeConf talk on how I'm using things are at http://slideshare.net/andytinkham. Video of the talk should be posted soon too (and at the risk of going overboard with self-promotion, I'm planning a set of deeper blog posts at testerthoughts.com soon (all that I've done so far is an intro post, but more will be coming soon)
+2011-04-27T12:40:13  *** erwandf has quit IRC
+2011-04-27T12:41:28  <brnull> looks very interesting :)
+2011-04-27T12:41:33  <brnull> wish you good luck
+2011-04-27T12:42:00  <andytinkham> Thanks :)
+2011-04-27T12:42:06  *** csanchez has quit IRC
+2011-04-27T12:48:52  *** udesh has quit IRC
+2011-04-27T12:53:06  *** mbeierl has quit IRC
+2011-04-27T13:01:09  *** sjmikem has joined #selenium
+2011-04-27T13:01:48  *** soc42 has joined #selenium
+2011-04-27T13:02:34  *** marlena has joined #selenium
+2011-04-27T13:06:16  *** RossPatterson has quit IRC
+2011-04-27T13:08:40  *** toseter has quit IRC
+2011-04-27T13:12:28  <reddevil^> Hello, I have opened a jpg picture in my webdriver. How can I save that jpg to a file? Any idea?
+2011-04-27T13:13:29  <andytinkham> reddevil^: My first (perhaps not particularly right) solution would be to use WebDriver to get the URL of the picture, then shell out to curl to download it
+2011-04-27T13:14:22  <reddevil^> andytinkham: okay, this will work but I have to shell out the cookies too
+2011-04-27T13:14:29  *** cburroughs has quit IRC
+2011-04-27T13:14:36  <reddevil^> I thought there must be an easier way
+2011-04-27T13:15:32  <andytinkham> reddevil^: If you have just the jpg open, you could try taking a screenshot from your browser (which is built into selenium) and save *that* off, but that feels kludgy
+2011-04-27T13:16:13  <reddevil^> heh, I need it with "full quality"
+2011-04-27T13:16:48  <reddevil^> I am suprised that there isnt a function to save a file/image
+2011-04-27T13:17:12  <jarib> jleyba: i'm seeing a lot of the "k is not a function" failures on trunk as well
+2011-04-27T13:17:18  <jleyba> Should be fixed
+2011-04-27T13:17:24  <jarib> aha
+2011-04-27T13:17:31  <jleyba> r12080
+2011-04-27T13:17:33  <selbot2> jmleyba about 1 hour ago - JasonLeyba: Declare hasText as a function in the bot.dom namespace to - http://code.google.com/p/selenium/source/detail?r=12080
+2011-04-27T13:17:42  <jarib> thanks :)
+2011-04-27T13:17:55  <andytinkham> reddevil^: I suspect some of the problem is that the browser generally pops up a dialog box to get the save location, and that dialog is out of selenium's reach
+2011-04-27T13:20:17  *** XCulver has quit IRC
+2011-04-27T13:20:53  <reddevil^> well, the addon "webdriver" is used to interact with firefox. Couldnt be that tricky to implement a "save" function without dialog
+2011-04-27T13:21:57  <jleyba> reddevil^: You volunteering to work on it? >:)
+2011-04-27T13:22:13  <jleyba> There are lots of features we'd like to eventually add, but only have limited bandwidth
+2011-04-27T13:22:51  <jimevans> reddevil^: bear in mind that any solution you come up with should be implementable in browsers other than firefox. :)
+2011-04-27T13:23:02  *** epall has quit IRC
+2011-04-27T13:27:04  <barancev> jleyba: I confirm that r12080 works right
+2011-04-27T13:27:06  <selbot2> jmleyba about 1 hour ago - JasonLeyba: Declare hasText as a function in the bot.dom namespace to - http://code.google.com/p/selenium/source/detail?r=12080
+2011-04-27T13:29:50  *** sjmikem has quit IRC
+2011-04-27T13:30:07  *** sjmikem has joined #selenium
+2011-04-27T13:37:34  <jleyba> jarib: Have you ever given any thought to how remote file uploads should work?
+2011-04-27T13:38:07  *** Mike_ has joined #selenium
+2011-04-27T13:38:07  <jleyba> Simon once mentioned having an API like: element.sendKeys(new File("/path/to/file"));
+2011-04-27T13:38:13  *** Mike_ is now known as Mike_k
+2011-04-27T13:38:25  *** Mike_k is now known as kMik
+2011-04-27T13:38:30  <jleyba> And the client would implicitly upload the file to the server so it was available on the test machine
+2011-04-27T13:38:55  <jarib> jleyba: yeah, we've discussed that here
+2011-04-27T13:39:12  <ato> You don't send key input to file fields, though.
+2011-04-27T13:39:16  <jarib> i don't have any better suggestions which doesn't involve adding new methods to the API
+2011-04-27T13:39:19  *** soc42 has quit IRC
+2011-04-27T13:39:26  <kMik> Hi is anyone able to confirm for me whether ChromeDriver is working or not ? I have FirefoxDriver + InternetExplorerDriver working with Selenium as expected but Chrome simply goes to the 'ready' page and stays there. I read some discussion forums with some people experienced the same problem.
+2011-04-27T13:39:41  <ato> Also, it's left up to web browsers how (and if) to deal with INPUT @type="file" elements.
+2011-04-27T13:40:29  <jimevans> kMik: The ChromeDriver has been rewritten since 2.0b3. What version of Selenium are you using?
+2011-04-27T13:40:32  <ato> To make the matter more complex, you also have different native style dialogues.
+2011-04-27T13:40:34  <jleyba> ato: Right, so if you called sendKeys(file) on a @type="file" element, the driver would transfer the file to the server, then do the "right" thing to tirgger that upload
+2011-04-27T13:40:40  <kMik> I am using 2.0b3
+2011-04-27T13:41:08  <jleyba> kMik: Are you comfortable building from head? There's a new implementation of the ChromeDriver available if you are
+2011-04-27T13:41:08  <kMik> Where am I able to get a working ChromeDriver ? Do I have to get it from the current trunk ?
+2011-04-27T13:41:16  <ato> jleyba: I don't see where the sendKeys come in.
+2011-04-27T13:41:30  <jarib> ato: what would you suggest?
+2011-04-27T13:41:31  <barancev> all the tests passed for IE9 and FF3.6 on Win7
+2011-04-27T13:41:42  <ato> jleyba: Also, that might be possible in Opera and Chrome which have native access.  But quite possibly not in IE.
+2011-04-27T13:41:48  <kMik> Hi jleyba, I'm not experienced in that but I am happy to spend some time to learn how to do it if it is working.
+2011-04-27T13:41:52  <jleyba> ato: I agree it's awkward, but it mainly comes from typing the keys to the file path into the file browser dialog
+2011-04-27T13:41:58  <barancev> FF4 failed in CorrectEventFiringTest.testSendingKeysToAFocusedElementShouldNotBlurThatElement
+2011-04-27T13:42:09  <kMik> I checked out the source in the past. It comes with some visual studio projects. Do those need to be built also ?
+2011-04-27T13:42:16  <jleyba> ato: If you try to sendKeys to a file element on IE, it already opens the file dialog, types in the path, and hits OK
+2011-04-27T13:42:28  <ato> jleyba: Again, it's left up to the browser whether to allow typing in file fields.  Most don't.
+2011-04-27T13:42:29  <kMik> Or is there some way I am able to download a more up to date .jar ?
+2011-04-27T13:43:17  <ato> jleyba: I think it depends whether we want to include automating the dialogues.
+2011-04-27T13:43:33  <jleyba> ato:  We're going to have to (and again, already do in this case for IE)
+2011-04-27T13:43:59  <ato> jleyba: In Opera we'll soon be implementing a dialogue API to click on native popup dialogues, but that won't be very generic.
+2011-04-27T13:44:24  <ato> Because, I mean, this is not an area where there is (or necessarily should be) consensus among vendors.
+2011-04-27T13:44:52  <jleyba> Agreed, but we still need a consistent API for file uploads in WebDriver
+2011-04-27T13:45:07  <jleyba> Even if that means it doesn't perfectly fit how file uploads actually work in each browser
+2011-04-27T13:45:29  <kMik> Also I think I found a small 'bug' in Selenium. The IEDriver.dll creates a CImage for taking screenshots. This CImage is only created with 16 nBPP. It should be at least 24 or you will get colour discrepancies compared to the real colour you would obtain from a screenshot.
+2011-04-27T13:46:24  <barancev> go test_chrome says - The path to the chromedriver executable must be set by the webdriver.chrome.driver system property - how to do that? change go.bat?
+2011-04-27T13:46:28  <ato> jleyba: I agree.
+2011-04-27T13:46:35  <ato> jleyba: I haven't got a good proposal for how to do that, though.
+2011-04-27T13:48:03  <ato> jleyba: Opera displays a “text field” like element which opens a file dialogue if you click it; Chrome just shows a button; Firefox does the same as Opera, but with some very strange not-allowed-to-type magic (not the same as disabled or disabling contenteditable).
+2011-04-27T13:48:11  <jleyba> element.upload(new File("foo.txt")?
+2011-04-27T13:48:24  <jleyba> Transfers the file to the test machine, and does the "right" thing for the browser to upload it
+2011-04-27T13:48:31  <jleyba> Throws an error if element is not @type="file"
+2011-04-27T13:48:57  <ato> How do you set the file on the file field?
+2011-04-27T13:49:07  <ato> JavaScript doesn't give you access to it.
+2011-04-27T13:49:10  <jleyba> left as an implementation detail for the individual drivers
+2011-04-27T13:49:31  <jarib> ato: the problem jleyba is talking about is how to do this when the file to upload and the browser isn't running on the same machine
+2011-04-27T13:49:31  <ato> Right.
+2011-04-27T13:49:38  <ato> Well, as for API I'm happy with that.
+2011-04-27T13:50:11  <ato> jarib: Aha, I see.
+2011-04-27T13:50:22  <ato> Supplying a File object or STDIN sounds reasonable.
+2011-04-27T13:50:28  <jleyba> jarib: That's problem (a), problem (b) is what the API would look like (what ato is talking about)
+2011-04-27T13:51:58  <kMik> jleyba: If I want to get a ChromeDriver that will work with Selenium using Java, which part should I be checking out and building ?
+2011-04-27T13:52:30  <ato> For internal builds we implement our dialogues in HTML, then they are translated into a graphical library in Desktop, which could be a way around it for us.  Or we could just tap directly in to the field and set it.
+2011-04-27T13:52:44  <ato> Yep, I agree with you, jleyba, in that implementation wise this is trivial.
+2011-04-27T13:53:09  <jleyba> kMik: If you have Chrome 12 (dev channel), grab the new chromedriver server from the downloads page: http://code.google.com/p/selenium/downloads/list
+2011-04-27T13:54:17  <jleyba> You can use it with 2.0b3.  Start the server, then it's just new RemoteWebDriver("http://localhost:$PORT")
+2011-04-27T13:54:24  <jleyba> where $PORT is whatever you started the server on
+2011-04-27T13:54:45  <jarib> jleyba: some previous discussion here http://selenium.saucelabs.com/irc/logs/selenium.2011-01-11.log (at 2011-01-11T06:54:26) and here http://selenium.saucelabs.com/irc/logs/selenium.2011-02-16.log (at 2011-02-16T03:30:29)
+2011-04-27T13:54:49  <jarib> may be useful
+2011-04-27T13:55:09  <kMik> Okay I will try that. Is there also another version that works for Chrome 10 ? The 2.0b3 seems not to work for that version. Or is the only option now to use Chrome 12 ?
+2011-04-27T13:55:17  *** kylls has quit IRC
+2011-04-27T13:55:48  <jleyba> You'll have to use the current ChromeDriver, which we're not maintaining anymore
+2011-04-27T13:55:53  <jleyba> or use SeleniumRC with Chrome
+2011-04-27T13:56:13  <jleyba> To be honest, SeleniumRC is probably more capable for Chrome 10
+2011-04-27T13:56:17  <jimevans> kMik: yes, to use the new ChromeDriver, you must be using Chrome12.
+2011-04-27T13:58:39  *** sjmikem has quit IRC
+2011-04-27T13:58:59  *** sjmikem has joined #selenium
+2011-04-27T13:59:01  <jarib> jleyba: more :) http://selenium.saucelabs.com/irc/logs/selenium.2011-01-14.log at 2011-01-14T08:29:59
+2011-04-27T13:59:09  <kMik> Thanks jimevans. By SeleniumRC I assume that is to mean v1 ? I have just downloaded SeleniumRC v1.0.1 and will try experiment with that.
+2011-04-27T14:01:34  <jleyba> kMik: SeleniumRC is the v1 API, but it's included in the 2.0b3 jar
+2011-04-27T14:02:34  <jleyba> CommandExecutor executor = new SelenseCommandExecutor(urlOfYourSeleniumServer, urlOfServerUnderTest, desiredCapabilities);
+2011-04-27T14:02:40  <jleyba> WebDriver driver = new RemtoeWebDriver(executor);
+2011-04-27T14:10:10  <kMik> How am I able to set the browser using this method ?
+2011-04-27T14:12:00  <jarib> kMik: desiredCapabilities
+2011-04-27T14:14:06  <jleyba> kMik: For chrome do DesiredCapabilities.chrome()
+2011-04-27T14:18:35  <kMik> Thank you
+2011-04-27T14:20:38  *** marlena has quit IRC
+2011-04-27T14:22:13  *** ian_mac_ has quit IRC
+2011-04-27T14:26:09  *** marlena has joined #selenium
+2011-04-27T14:27:41  *** marlena has quit IRC
+2011-04-27T14:27:41  *** sjmikem has quit IRC
+2011-04-27T14:27:59  *** sjmikem has joined #selenium
+2011-04-27T14:30:30  *** marlena has joined #selenium
+2011-04-27T14:31:14  <jleyba> jarib: http://codereview.appspot.com/4430070
+2011-04-27T14:39:50  <jarib> jleyba: looks good, though a little skeptical of the session resource idea
+2011-04-27T14:39:59  <jarib> what if the file is changed locally?
+2011-04-27T14:41:14  <jarib> i assume the caching would be hidden from the user, so no way to invalidate it
+2011-04-27T14:42:16  *** jleyba_ has joined #selenium
+2011-04-27T14:42:44  <jleyba_> The ability to upload files to the server wouldn't be exposed to users
+2011-04-27T14:43:08  <jarib> right
+2011-04-27T14:43:27  <jleyba_> So you have something like:   element.sendKeys(new File("foo.txt"))
+2011-04-27T14:43:52  <jleyba_> sendKeys() first uploads the file, then sends a second command to use the transfered file
+2011-04-27T14:44:35  <jarib> and then store the filename->id map on the client side, no?
+2011-04-27T14:45:11  <jleyba_> Yeah
+2011-04-27T14:48:44  <jarib> do you have a lot of cases where the same file is uploaded more than once in the same session?
+2011-04-27T14:48:45  *** adamgoucher has quit IRC
+2011-04-27T14:48:52  *** adamgoucher has joined #selenium
+2011-04-27T14:49:10  <jleyba_> I doubt that will happen
+2011-04-27T14:49:44  *** marlena has quit IRC
+2011-04-27T14:50:00  <jarib> so what's the benefit of storing it as a session resource? why not have sendKeys() just send the file content every time?
+2011-04-27T14:50:42  <jleyba_> I was thinking ahead to Eran's advanced user interactions
+2011-04-27T14:51:03  <jleyba_> Where it should be possible to do drag-and-drop from the desktop
+2011-04-27T14:51:05  *** marlena has joined #selenium
+2011-04-27T14:51:38  <jarib> oO
+2011-04-27T14:52:50  <jarib> how does this help with that?
+2011-04-27T14:53:18  *** phdaemon has joined #selenium
+2011-04-27T14:53:46  <jarib> the server would place the file on the desktop?
+2011-04-27T14:53:53  *** charleyb has quit IRC
+2011-04-27T14:54:42  <jleyba_> I guess it would have to.  Although not by default (so maybe there should be an extra param on the file upload)
+2011-04-27T14:54:55  *** charleyb has joined #selenium
+2011-04-27T14:55:35  <phdaemon> to ask questoins about PHPUnit_Extensions_SeleniumTestCase_Driver, is that here or in the PHPUnit channel? cause no one is responding there :(
+2011-04-27T14:56:32  *** sjmikem has quit IRC
+2011-04-27T14:56:47  *** sjmikem has joined #selenium
+2011-04-27T15:00:14  *** marlena has quit IRC
+2011-04-27T15:00:15  <phdaemon> Nvm, i see that the testcase class automatically instantiates the driver
+2011-04-27T15:00:15  <phdaemon> <phdaemon> so long and thanks for all the fish
+2011-04-27T15:12:13  <jarib> jleyba: i'm a bit ambivalent about the added complexity (new state on both client/server, but only for truly remote servers, etc.).
+2011-04-27T15:13:00  <jarib> i'd prefer just an optional 'file' parameter on sendKeys
+2011-04-27T15:13:26  <jarib> of course that wouldn't solve Eran's problem, but having webdriver place a file on the desktop does seem a bit out of scope..
+2011-04-27T15:18:10  <jarib> bedtime here, ttyl
+2011-04-27T15:21:06  *** brettporter has joined #selenium
+2011-04-27T15:24:38  *** kMik has quit IRC
+2011-04-27T15:25:23  *** sjmikem has quit IRC
+2011-04-27T15:25:46  *** sjmikem has joined #selenium
+2011-04-27T15:30:57  *** gronky has quit IRC
+2011-04-27T15:38:32  *** jleyba_ has quit IRC
+2011-04-27T15:44:49  *** andytinkham has quit IRC
+2011-04-27T15:53:08  *** phdaemon is now known as phdaemon|AFK
+2011-04-27T15:54:20  *** sjmikem has quit IRC
+2011-04-27T15:54:34  *** sjmikem has joined #selenium
+2011-04-27T15:59:07  *** jleyba_ has joined #selenium
+2011-04-27T15:59:13  *** jleyba__ has joined #selenium
+2011-04-27T15:59:23  *** jleyba_ has quit IRC
+2011-04-27T15:59:37  *** jleyba_ has joined #selenium
+2011-04-27T16:02:06  *** anatoli_ has joined #selenium
+2011-04-27T16:02:59  *** jleyba_ has quit IRC
+2011-04-27T16:03:29  *** jleyba__ has quit IRC
+2011-04-27T16:08:03  *** SL-BWood has quit IRC
+2011-04-27T16:12:19  *** anatoli_ has left #selenium
+2011-04-27T16:13:32  *** brettporter has quit IRC
+2011-04-27T16:21:23  *** kylls has joined #selenium
+2011-04-27T16:23:09  *** sjmikem has quit IRC
+2011-04-27T16:23:49  *** sjmikem has joined #selenium
+2011-04-27T16:45:47  *** jleyba has quit IRC
+2011-04-27T16:47:48  *** cburroughs has joined #selenium
+2011-04-27T16:52:03  *** sjmikem has quit IRC
+2011-04-27T16:52:28  *** sjmikem has joined #selenium
+2011-04-27T17:01:20  *** sfbrian_ has joined #selenium
+2011-04-27T17:04:04  *** sfbrian has quit IRC
+2011-04-27T17:07:19  *** sjmikem has quit IRC
+2011-04-27T17:09:10  *** sjmikem has joined #selenium
+2011-04-27T17:12:39  *** davemiles has joined #selenium
+2011-04-27T17:15:08  *** testtest has joined #selenium
+2011-04-27T17:15:54  *** dave_miles_wfh has quit IRC
+2011-04-27T17:16:03  <testtest> anyone using python+selenium 2 here by any chance?
+2011-04-27T17:16:19  <testtest> do I need the 2.0b3 jar file to use selenium 2 from python?
+2011-04-27T17:17:53  <testtest> knock knock
+2011-04-27T17:19:50  <adamgoucher> if you want to use the remote webdriver or remote control api then yes, you need the jar
+2011-04-27T17:20:03  <adamgoucher> if you want to use the local webdriver stuff, no you don't need it
+2011-04-27T17:20:14  <testtest> adamgoucher: can i run the firefox instance headless from python in any way?
+2011-04-27T17:20:53  <adamgoucher> xvfb is what you need to look at for that i believe
+2011-04-27T17:21:36  <testtest> adamgoucher: so I cant do it from within python cross-platform then?
+2011-04-27T17:21:53  <adamgoucher> headless has nothing to do with the bindings
+2011-04-27T17:22:34  <testtest> I remember that from java, one can run headless browsers
+2011-04-27T17:23:02  *** cburroughs has quit IRC
+2011-04-27T17:23:04  <adamgoucher> htmlunit is i believe headless -- but you said firefox
+2011-04-27T17:23:26  <testtest> indeed, htmlunit is what i was using
+2011-04-27T17:23:51  <testtest> can we do this using selenium+python+ <any reasonable browser>?
+2011-04-27T17:24:53  <testtest> i still install selenium ide 1.1.0 ide, right?
+2011-04-27T17:25:09  <adamgoucher> htmlunit is a pure headless one. for firefox, etc. you need a head -- but xvfb can fake a head
+2011-04-27T17:25:23  <adamgoucher> ide is a different thing entirely
+2011-04-27T17:26:12  <testtest> adamgoucher: i need an ide to help me generate some python tests
+2011-04-27T17:26:44  <adamgoucher> ide does not currently spit out webdriver code
+2011-04-27T17:27:04  *** Spanktar has quit IRC
+2011-04-27T17:31:07  <testtest> whats the best way to write the webdriver  code in python then? any pointers to docs/tutorials?
+2011-04-27T17:37:24  *** pythonirc1011 has joined #selenium
+2011-04-27T17:37:49  <adamgoucher> by hand. webdriver is just a library. you still need to use py.test, nose, unittest2 or something similar as the runner
+2011-04-27T17:37:49  *** sjmikem has quit IRC
+2011-04-27T17:37:56  *** sjmikem has joined #selenium
+2011-04-27T17:40:12  <testtest> adamgoucher: where can i find the details of this library...i would like to goto a page, fill forms, login, test stuff...
+2011-04-27T17:40:35  <adamgoucher> crack open the module and read the code
+2011-04-27T17:41:09  <testtest> but isnt that harder than just use the IDE , generate python code and use it?
+2011-04-27T17:41:16  <testtest> why would anyone use the webdriver manually ?
+2011-04-27T17:46:07  <pythonirc1011> isnt there an automatic way to convert sel 1 tests to 2 == webdriver?
+2011-04-27T17:47:38  *** testtest has quit IRC
+2011-04-27T17:53:13  *** kylls has quit IRC
+2011-04-27T17:55:31  <adamgoucher> why wouldnt anyone want a tool to generate their python code for them? thats, like, a java crutch :)
+2011-04-27T17:56:00  <adamgoucher> there will be a bridge for remote control -> webdriver -- but its not available yet for python
+2011-04-27T18:00:25  <pythonirc1011> i just installed the sel ide on my firefox 4, seems it doesnt work on 4?
+2011-04-27T18:05:29  <adamgoucher> use the one from http://xserve.openqa.org:8085 -- there are still some bugs in it though
+2011-04-27T18:07:31  <pythonirc1011> adamgoucher: i dont see an ide for firefox 4 there
+2011-04-27T18:08:23  <adamgoucher> http://xserve.openqa.org:8085/browse/IDE-IDE-91/artifact
+2011-04-27T18:18:26  *** dmachi has quit IRC
+2011-04-27T18:18:42  *** dmachi has joined #selenium
+2011-04-27T18:30:44  *** ahal has quit IRC
+2011-04-27T18:36:50  *** towski has quit IRC
+2011-04-27T18:41:42  *** pnitin has joined #selenium
+2011-04-27T18:43:41  *** pythonirc1011 has quit IRC
+2011-04-27T19:05:04  *** barancev has quit IRC
+2011-04-27T19:19:57  *** brettporter has joined #selenium
+2011-04-27T19:36:21  *** dave_miles_wfh has joined #selenium
+2011-04-27T19:39:12  *** davemiles has quit IRC
+2011-04-27T19:40:54  *** brnull has quit IRC
+2011-04-27T19:53:14  *** pnitin has quit IRC
+2011-04-27T19:54:33  *** brettporter_ has joined #selenium
+2011-04-27T19:54:34  *** brettporter_ has joined #selenium
+2011-04-27T20:01:05  *** brettporter_ has quit IRC
+2011-04-27T20:02:46  *** nirvdrum has quit IRC
+2011-04-27T20:03:28  *** nirvdrum has joined #selenium
+2011-04-27T20:04:41  *** nirvdrum has quit IRC
+2011-04-27T20:06:27  <selbot2> jmleyba half a minute ago - JasonLeyba on behalf of KenKania: Adding an executeAsyncScript atom. - http://code.google.com/p/selenium/source/detail?r=12081
+2011-04-27T20:09:26  *** brettporter_ has joined #selenium
+2011-04-27T20:09:26  *** brettporter_ has joined #selenium
+2011-04-27T20:15:34  *** brettporter_ has quit IRC
+2011-04-27T20:18:59  *** jimevans has quit IRC
+2011-04-27T20:24:41  *** pnitin has joined #selenium
+2011-04-27T20:26:45  *** sjmikem has quit IRC
+2011-04-27T20:39:49  *** pnitin has quit IRC
+2011-04-27T20:42:05  *** brettporter_ has joined #selenium
+2011-04-27T20:42:06  *** brettporter_ has joined #selenium
+2011-04-27T20:42:36  *** brettporter_ has quit IRC
+2011-04-27T21:07:46  *** ahal has joined #selenium
+2011-04-27T21:24:13  *** ahal has quit IRC
+2011-04-27T22:11:49  *** lubsick has joined #selenium
+2011-04-27T22:29:59  *** erwandf has joined #selenium
+2011-04-27T22:34:45  *** gronky has joined #selenium
+2011-04-27T22:47:56  <lubsick> :)
+2011-04-27T22:52:04  *** admc has joined #selenium
+2011-04-27T22:54:53  *** ahal has joined #selenium
+2011-04-27T22:56:43  *** pnitin has joined #selenium
+2011-04-27T23:23:11  *** ian_mac has quit IRC
+2011-04-27T23:37:03  *** bebef_1987 has joined #selenium
+2011-04-27T23:40:47  *** ahal has quit IRC
+2011-04-27T23:54:40  *** amitev has joined #selenium
+2011-04-27T23:55:01  *** csanchez has joined #selenium

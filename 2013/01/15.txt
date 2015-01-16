@@ -1,0 +1,1478 @@
+[IRC logfile - Started Tue Jan 15 00:03:42 2013]
+[00:03:42] link15 has joined #selenium
+[00:03:57] link15: hey all i'm trying to use the python binding with selenium.webdriver.remote.WebDriver
+[00:04:05] link15: and i'm not sure what capabilities to request
+[00:04:12] link15: i have the server set up to do full firefox testing
+[00:04:34] lukeis: if you do this import:   from selenium import webdriver
+[00:04:43] lukeis: use webdriver.DesiredCapabilities.FIREFOX
+[00:04:58] lukeis: it's just a python dictionary
+[00:06:43] link15:  desired_capabilities=webdriver.DesiredCapabilities.FIREFOX
+[00:07:04] lukeis: that should work
+[00:07:32] lukeis: and remote is 'shortcutted' as just webdriver.Remote  too
+[00:09:10] link15: cls.driver = WebDriver(command_executor='http://path_to_remote:4444/wd/hub', desired_capabilities=webdriver.DesiredCapabilities.FIREFOX)
+[00:09:23] link15: that gives me an error saying desired_capabilities can't be none
+[00:09:33] link15: my server is just doing java -jar ./selenium-standalone*
+[00:09:54] link15: do i need to somehow indicate to the server that FIREFOX is available to it
+[00:09:55] link15: ?
+[00:11:17] link15: hmm
+[00:11:19] link15: now i get
+[00:11:33] link15: ebDriverException: Message: 'Message: u\'Unable to connect to host 127.0.0.1 on port 7055 after 45000 ms. Firefox console output:\\nError: no display specified\\nError: no display specified\\n\' ; Stacktrace: Method start threw an error in NewProfileExtensionConnection.java
+[00:11:58] lukeis: need to start xvfb and set a display? :)
+[00:12:30] link15:  /etc/environment has DISPLAY=:5.0
+[00:12:59] DaveIngram has joined #selenium
+[00:13:05] lukeis: echo $DISPLAY  <- in the same terminal that you run the jar command
+[00:13:36] lukeis: but maybe the environment should take care of it? /me doesn't do this much :)
+[00:14:04] davehunt has joined #selenium
+[00:14:07] lukeis: most of the time i see export DISPLAY=:5.0; java -jar ....
+[00:14:27] lukeis: or whatever number your display is on
+[00:16:39] santiycr has joined #selenium
+[00:17:40] link15: nope
+[00:17:46] link15: all is in order and still no message
+[00:18:06] link15: any idea?
+[00:23:26] a1g has joined #selenium
+[00:23:27] a1g has joined #selenium
+[00:23:48] Cside has left #selenium
+[00:27:41] llaskin has joined #selenium
+[00:34:33] link15: bah
+[00:34:34] link15: damnit
+[00:34:43] link15: i cant use the stupid selenium server
+[00:34:49] link15: it doesnt understand my display params
+[00:39:16] santiycr has joined #selenium
+[00:43:07] link15: so why would my selenium server not work
+[00:43:28] santiycr: solar spots 
+[00:46:44] link15: seriously, how do i debug this
+[00:46:47] link15: i have a server runing it
+[00:46:50] link15: with xvfb
+[00:46:58] santiycr: what do you mean by it doesn't work?
+[00:46:59] link15: running on DISPLAY=:5.0
+[00:47:12] link15: i mean when i try to connect to it via the python api i recieve this message
+[00:47:41] santiycr: :gist
+[00:47:42] selbot2_: Please paste >3 lines of text to https://gist.github.com
+[00:47:48] link15: http://pastie.org/5686038
+[00:47:53] santiycr: nice
+[00:48:12] link15: i would happly supply more source code if needed
+[00:48:35] link15: i'm running the server with DISPLAY=:5.0 and firefox installed and xvfb running on diplay :5.0
+[00:48:40] santiycr: seems like FirefoxDriver isn't listening once firefox starts
+[00:48:47] santiycr: which firefox version do you have installed?
+[00:49:02] santiycr: can you confirm that firefox got launched?
+[00:49:15] link15: how would i confirm, doesnt selenium launch it
+[00:49:20] santiycr: what's the full log from selenium-server.jar?
+[00:50:24] link15: one sec fetching
+[00:53:21] link15: whoa
+[00:53:24] link15: seems like its working now
+[00:53:25] link15: wtf
+[00:53:47] link15: http://pastie.org/5686054
+[00:53:51] link15: i am officially flummoxed
+[00:53:55] link15: i chanded 0 things
+[00:53:58] link15: *changed
+[00:55:46] link15: well
+[00:55:50] link15: i guess it dont mattter
+[00:56:52] p_l_ has joined #selenium
+[IRC logfile - Started Tue Jan 15 01:07:10 2013]
+[01:07:10] santiycr has joined #selenium
+[01:13:04] smccarthy has joined #selenium
+[01:18:23] bluescreen10 has joined #selenium
+[01:24:22] santiycr has joined #selenium
+[01:31:33] mreedell has joined #selenium
+[01:32:23] santiycr: good
+[01:34:43] farlan has joined #selenium
+[01:37:20] DaveIngram has joined #selenium
+[01:41:43] santiycr: :seen jimevans
+[01:41:43] selbot2_: jimevans was last seen 3 days ago, leaving.
+[01:42:25] santiycr: :note jimevans hey Jim, would you mind giving a look at this? My guess is we need to build support for InternetExplorerOptions inside DesiredCapabilities http://support.saucelabs.com/entries/22935036-internetexploreroptions-with-saucelabs
+[01:42:26] selbot2_: ok!
+[01:51:07] admc1 has joined #selenium
+[01:54:22] DaveIngram has joined #selenium
+[IRC logfile - Started Tue Jan 15 02:33:45 2013]
+[02:33:45] plightbo_work has joined #selenium
+[02:49:22] awilson820 has left #selenium
+[02:55:12] stepheneb has joined #selenium
+[IRC logfile - Started Tue Jan 15 03:07:01 2013]
+[03:07:01] stephend has joined #selenium
+[03:12:25] barancev has joined #selenium
+[03:20:49] noahsussman has joined #selenium
+[03:41:29] stephend has joined #selenium
+[IRC logfile - Started Tue Jan 15 04:06:35 2013]
+[04:06:35] Nari117 has joined #selenium
+[04:07:49] plightbo_work has joined #selenium
+[04:29:24] alexglow has joined #selenium
+[04:37:34] alexglow has joined #selenium
+[04:53:09] admc has joined #selenium
+[04:58:13] alexglow has joined #selenium
+[IRC logfile - Started Tue Jan 15 05:01:42 2013]
+[05:01:42] rananda has joined #selenium
+[05:10:12] noahsussman has joined #selenium
+[05:22:20] alexglow has joined #selenium
+[05:59:06] p0deje has joined #selenium
+[IRC logfile - Started Tue Jan 15 06:03:53 2013]
+[06:03:53] baijum has joined #selenium
+[06:04:42] jeichar has joined #selenium
+[06:05:26] sayd has joined #selenium
+[06:10:07] krosenvold_: :cla
+[06:10:08] selbot2_: http://goo.gl/qC50R
+[06:50:23] SamuraiJack has joined #selenium
+[06:57:25] enbergj has left #selenium
+[IRC logfile - Started Tue Jan 15 07:00:37 2013]
+[07:00:37] awilson820 has joined #selenium
+[07:02:24] alexglow has joined #selenium
+[07:08:29] rananda has joined #selenium
+[07:15:34] noahsussman has joined #selenium
+[07:25:11] nhirata has joined #selenium
+[07:40:49] alexglow has joined #selenium
+[07:40:50] testingb0t has joined #selenium
+[07:42:55] p0deje has joined #selenium
+[07:47:08] amitev has joined #selenium
+[07:48:02] lukeis has joined #selenium
+[IRC logfile - Started Tue Jan 15 08:18:16 2013]
+[08:18:16] Ardesco has joined #selenium
+[08:19:49] lukeis: krosenvold_: so, that was me who added people to a 'team' in the seleniumhq org in github (so that everyone can clone pull requests, of course that now gives them the ability to accidentally push to github…)
+[08:20:09] lukeis: s/clone/close/
+[08:22:10] krosenvold_: I have not checked if the selenium repo is actually read only
+[08:22:20] krosenvold_: add me to the team and I'll find out ;)
+[08:22:25] lukeis: you are
+[08:23:49] lukeis: i wonder if github is doing maintenance? i just got logged out (that's never happened to me before…)
+[08:26:21] krosenvold_: lukeis: Ok, it's not read only. Might hold off on the mass-adding to seleniumhq until it is
+[08:26:59] lukeis: will it ever be?
+[08:27:07] lukeis: does github do that?
+[08:27:08] krosenvold_: Too late for holding off
+[08:27:16] krosenvold_: I will ask github if they can ;)
+[08:27:27] lukeis: yeah, i added a few 'main' contributors already
+[08:27:28] krosenvold_: They do a lot of stuff if you ask
+[08:27:59] lukeis: well, basically everyone i could quickly think of their GH handle ;0
+[08:34:09] p0deje has joined #selenium
+[08:35:22] krosenvold_: I sent off a request to github to make it r/o
+[08:37:27] lukeis: krosenvold_: should you be an owner of seleniumhq  org in github to give it more authority of a request :) or do they just know ;)
+[08:37:41] p0deje has joined #selenium
+[08:38:46] krosenvold_: lukeis: Can you add me as a owner ?
+[08:39:06] lukeis: added...
+[08:39:17] lukeis: i may be abusing my powers a bit much 
+[08:39:26] krosenvold_: You can always remove me later; I am long past wanting excessive priviliges in the oss worls ;)
+[08:39:40] *lukeis expects git access revoking by simon any minute ;)
+[08:39:49] krosenvold_: Nah, don't worry
+[08:39:55] krosenvold_: Simon can be bought with beer
+[08:42:55] lukeis: honestly if we get 'teams' set up well on github, then I don't want to be an 'owner' there :)
+[08:43:46] lukeis: any idea why the mirroring is taking so long?
+[08:44:36] alexglow has joined #selenium
+[08:46:29] testingb0t has joined #selenium
+[08:50:13] lukeis: way beyond my bedtime now :) 'night, I'll see how much trouble i'm in, in the morning 
+[08:50:27] barancev has joined #selenium
+[08:55:06] krosenvold_: jarib: yt ?
+[08:59:44] simonstewart has joined #selenium
+[08:59:45] selbot2_: simonstewart: note from lukeis about 11 hours ago: whatever magic was done to create https://github.com/seleniumhq/selenium please do so for the 'selenium.site' :) (feel freel to delete the seleniumhq/www.seleniumhq.org repo) 
+[IRC logfile - Started Tue Jan 15 09:01:39 2013]
+[09:01:39] simonstewart: :note lukeis I'll ask them nicely. Those are mirrors though, so read-only
+[09:01:41] selbot2_: ok!
+[09:10:23] simonstewart: krosenvold_: I can restrict futz around in the "Teams" setting to reduce access to the github repo
+[09:10:24] sburjan has joined #selenium
+[09:11:51] rananda has joined #selenium
+[09:13:16] krosenvold_: simonstewart: Lukeis granted me infinite powers while you were sleeping
+[09:13:25] krosenvold_: So I suppose I can do it too ;)
+[09:13:29] simonstewart: Heh.
+[09:13:31] simonstewart: Might be an idea.
+[09:13:36] krosenvold_: I just converted github to maven
+[09:13:44] krosenvold_: muahhahhahahah
+[09:13:57] simonstewart: wtf?
+[09:14:00] simonstewart: WHHHYYYY?
+[09:15:20] krosenvold_: Just kidding
+[09:15:35] *simonstewart wipes brow
+[09:15:39] simonstewart: *phew*
+[09:15:39] simonstewart: :)
+[09:15:49] krosenvold_: I tweaked the committers repo to read only
+[09:15:56] krosenvold_: committers group
+[09:16:08] krosenvold_: MIght not be entirely the right thing to do
+[09:16:27] simonstewart: We'll see what happens
+[09:16:43] simonstewart: How did you do that?
+[09:16:44] krosenvold_: But it should restrict pushes to "owners
+[09:17:07] krosenvold_: Futzing with settings below https://github.com/organizations/SeleniumHQ/teams
+[09:17:55] simonstewart: ta
+[09:19:18] simonstewart: Do we need to update the wiki on how to handle checking code in? And handling pull requests?
+[09:23:41] simonstewart: krosenvold_: good job on the mailing lists. Looks like Ivan's having a hard time getting to grips with things
+[09:23:52] simonstewart: Thanks for helping set him straight
+[09:24:21] simonstewart: As I type that, this appears on twitter: https://twitter.com/chrisdavidmills/status/291114511568625664
+[09:24:34] *simonstewart becomes more insufferably smug
+[09:25:08] krosenvold_: If you're using one of those fruity computers you should probably try github  for mac too ;)
+[09:25:14] simonstewart: Now, what does this "network graph" tell me?
+[09:25:21] simonstewart: krosenvold_: I'd rather master the command line
+[09:25:28] simonstewart: I use Macs and Linux boxes
+[09:25:37] simonstewart: I'd hate to be powerless
+[09:25:37] krosenvold_: simonstewart: The network graph is the good shit
+[09:25:54] krosenvold_: Read the blog post at the top of the graph
+[09:26:21] simonstewart: Gosh. github is slow
+[09:26:29] annette has joined #selenium
+[09:26:55] stan has joined #selenium
+[09:28:18] matthewrobbins has joined #selenium
+[09:28:25] simonstewart: Seems like magic to me
+[09:28:32] *simonstewart dons curmudgeon hat
+[09:29:01] simonstewart: So according to that graph, krosenvold_ is two commits ahead of master
+[09:29:12] krosenvold_: Always aheda ;)
+[09:29:13] krosenvold_: ahead
+[09:29:20] simonstewart: :P
+[09:29:32] simonstewart: Is there a pull request for those changes anywhere?
+[09:29:42] simonstewart: Or are you going to push them yourself?
+[09:29:44] krosenvold_: Of course, the mirroring not working properly has me only 1 commit ahead of google code
+[09:30:07] krosenvold_: The *really* imprtant thing about the network graph is that it shows you stuff the community is hacking on
+[09:30:08] simonstewart: Ah. Yes
+[09:30:12] simonstewart: Just did a pull and saw that
+[09:30:31] simonstewart: There's not much happening. I expected about 70 forks and lots of contributions by now
+[09:30:47] krosenvold_: So at any point you really have no way of knowing if a commit on the network graph is ready for submission or just a totally crazy hack someone tried
+[09:31:06] krosenvold_: The pull request is the semantics of saying "i'm done"
+[09:31:07] simonstewart: I assume the latter
+[09:31:13] simonstewart: k
+[09:31:33] simonstewart: (BTW, you appear to have checked in using your apache.org address. I'm fine with that, but thought you'd like to know)
+[09:31:34] krosenvold_: Yes you should; we cannot really pull wild changes just because we find them on github. We need author's consent
+[09:31:49] simonstewart: And the author must have signed the CLA
+[09:32:04] simonstewart: I'll be removing any revision where that's not the case
+[09:32:58] krosenvold_: But I think some of the real niceness lies here: Every now and then I browse the network graph for projects I care about. Sometimes I snoop on changes I see people have done, and sometimes I leave a comment encouraging them to keep on the good work and submit a patch
+[09:33:10] simonstewart: Nice.
+[09:33:24] krosenvold_: s/patch/pull request/ ;)
+[09:33:38] simonstewart: Ha!
+[09:33:45] simonstewart: Wait until we move to hg…. 
+[09:34:53] krosenvold_: So any moment now I'll be moving all my half-assed changes to my personal github clone, and the network graph will explode with all sorts of weird stuff I've been keeping to myself
+[09:35:20] simonstewart: You forgot to include your evil cackle
+[09:35:30] krosenvold_: Some of it is actually good stuff
+[09:35:50] simonstewart: Such as?
+[09:36:02] krosenvold_: But since I switch computers a lot I *always* push to github, som sometimes I push mid-sentence
+[09:37:13] krosenvold_: By the look of the branch list in the old https://github.com/krosenvold/selenium2 I have some jetty7 migration tests
+[09:37:28] krosenvold_: And a few test cases
+[09:38:28] simonstewart: handy
+[09:43:26] krosenvold_: Its work I started on migrating EVERYTHING to jettt7/8
+[09:43:44] krosenvold_: Of course there is the dark magic ssl stuff which impeeded the whole effort
+[09:43:51] krosenvold_: <insert big todo>
+[09:43:53] simonstewart: It'd be nice to get everything on one version of an http server
+[09:44:14] simonstewart: Yeah. That SSL stuff blocked plightbo a long time ago, and is why we never updated jetty
+[09:44:16] krosenvold_: And I spent a few hours trying to get us there
+[09:44:32] krosenvold_: I have the feeling it should be doable
+[09:44:53] krosenvold_: Just requires a big crash helmet and the ability to break everything. I wonder who can do that ;)
+[09:44:57] simonstewart: We're using a Turing complete language. It's doable
+[09:45:06] simonstewart: :whobrokethebuild
+[09:45:59] simonstewart: I really need to sort out the exceptions in this project
+[09:46:08] simonstewart: "No alert present" should be "no such alert"
+[09:46:15] simonstewart: in keeping with the other "No such..."
+[09:46:24] zeljkof has joined #selenium
+[09:46:54] simonstewart: And there's a lot of xpath specific errors that could be crunched down to invalid selectors.
+[09:46:58] krosenvold_: Fact 1: Selenium switched to git
+[09:47:01] krosenvold_: Fact 2: https://status.github.com/
+[09:47:38] simonstewart: Ha
+[09:54:35] KebabBob has joined #selenium
+[09:55:13] stan has joined #selenium
+[09:55:19] *simonstewart starts replacing status codes with strings
+[09:55:49] krosenvold_: enums ?
+[09:57:38] simonstewart: Nope. Because the client never knows all the response codes it might see
+[IRC logfile - Started Tue Jan 15 10:02:19 2013]
+[10:02:19] simonstewart: Right. That compiles
+[10:02:37] rbalent has joined #selenium
+[10:02:37] rbalent has joined #selenium
+[10:09:48] caddoo has joined #selenium
+[10:26:51] simonstewart has joined #selenium
+[10:27:09] simonstewart: Back again, and with Mozilla for the rest of the morning
+[10:28:16] miguel has joined #selenium
+[10:28:21] andreastt: krosenvold_: Hah.
+[10:28:26] andreastt: How big is the repo now anyways?
+[10:29:07] miguel: hi.
+[10:30:32] simonstewart: andreastt: "big" :)
+[10:30:47] simonstewart: AutomatedTester has had to come into the office to clone it in a reasonable amount of time....
+[10:30:52] *simonstewart is just sayin'
+[10:30:58] miguel: How to make a POST request with Selenium? Because we use a firefox extension that generate only POSTs and GETs.
+[10:34:03] jamesoram has joined #selenium
+[10:34:45] jibay has joined #selenium
+[10:37:00] annette has left #selenium
+[10:41:26] p0deje has joined #selenium
+[10:45:18] AutomatedTester: andreastt: whats a good email for you?
+[10:45:26] AutomatedTester: andreastt@youremployer.com?
+[10:45:28] andreastt: Yes.
+[10:50:32] freynaud has joined #selenium
+[10:51:53] AutomatedTester: andreastt: you should have mail, its not urgent 
+[10:52:16] barancev: a question: is it possible to edit wiki ages via web interface after transition?
+[10:52:35] barancev: s/ages/pages/
+[10:52:42] andreastt: AutomatedTester: Thanks, I'll take a look after lunch.
+[10:53:42] Manoj has joined #selenium
+[10:53:58] Ardesco: *sigh*
+[10:54:02] Ardesco: selenium moves to github
+[10:54:09] Ardesco: github grinds to a halt
+[10:54:12] Ardesco: coincidence?
+[10:54:26] Ardesco: (by moves i mean adds a read only github mirror
+[10:54:47] Manoj: Kudo's team for the move to Git :) Wasn't there for a while these days.
+[10:56:35] simonstewart: barancev: wiki or the website?
+[10:56:40] simonstewart: wiki
+[10:56:43] simonstewart: lemme see
+[10:57:10] simonstewart: Yes it's possible
+[10:57:13] mates has joined #selenium
+[10:57:16] simonstewart: Go to the page and hit the "edit" button
+[10:57:43] krosenvold_: If daniel decides to show up, he can use his google powers to have tht git administrator super-pack the repo to save about 100mb
+[10:57:47] simonstewart: Or find the source of the page in the wiki repo and click the little pencil
+[10:58:30] simonstewart: :note dawagner is there any way to can use your google powers to have the git administrator super-pack the repo to save about 100mb?
+[10:58:31] selbot2_: ok!
+[10:58:47] simonstewart: There, krosenvold_, I fixed it for you
+[10:58:49] simonstewart: :)
+[10:59:13] alexglow has joined #selenium
+[10:59:17] Ardesco: blah tried cloning twice so far, first time it stuck on 14% this time it's stuck on 16%
+[10:59:20] Ardesco: stupid github
+[10:59:28] simonstewart: Don't clone github
+[10:59:33] simonstewart: Clone the google code repo
+[10:59:37] simonstewart: Taht's the canonical one
+[10:59:46] simonstewart: (also we appear to have broken github)
+[10:59:46] krosenvold_: Ardesco: "fork" on github, clone from google code
+[10:59:51] simonstewart: (that may be a coincidence)
+[10:59:54] krosenvold_: Add github as remote, then fetch
+[IRC logfile - Started Tue Jan 15 11:00:06 2013]
+[11:00:06] simonstewart: Why add github as remote in that case?
+[11:00:12] simonstewart: GC supports the ability to fork a repo too
+[11:00:25] krosenvold_: lol
+[11:00:29] Ardesco: bleh
+[11:00:32] Ardesco: i forked on github
+[11:00:37] Ardesco: now i'm cloning my fork locally
+[11:00:37] simonstewart: bmp then
+[11:00:48] simonstewart: nmp then 
+[11:00:53] simonstewart: (damn autocorrect on lion)
+[11:01:04] Ardesco: it's cloning my fork that stalling
+[11:01:04] krosenvold_: Ardesco: You need a bunch of commits that you're missing.- You can get those from google code or girhub
+[11:01:06] krosenvold_: github
+[11:01:39] Ardesco: as soon as I have cloned my fork i'll pull changes from upstream
+[11:01:40] krosenvold_: simonstewart: I got a response from github support; they say the synch on the mirror is something like twice a day. If we want more frequent we need to install hook in google code repo
+[11:01:57] simonstewart: Do they have a hook we can point to?
+[11:02:03] simonstewart: Because I can add one really easily
+[11:02:10] krosenvold_: The hook should be in google code
+[11:02:16] krosenvold_: A push hook. I think I found that
+[11:02:25] krosenvold_: Then the push hook can push to github
+[11:02:28] simonstewart: A post-commit hook
+[11:02:34] simonstewart: That's what it's called
+[11:02:48] simonstewart: It's a URL that a POST containing information about the change will be sent to
+[11:02:58] simonstewart: Presumably it'll live somewhere on github
+[11:03:07] krosenvold_: Note dawagner I wouldn't be surprised if the google code guys have such a hook alread and can just pop it in for us
+[11:03:22] simonstewart: They don't
+[11:03:29] simonstewart: http://code.google.com/p/support/wiki/PostCommitWebHooks
+[11:03:41] krosenvold_: I read that; i'm still saying ;)
+[11:04:19] simonstewart: I can tell you that they don't have that hook
+[11:04:22] krosenvold_: The hook basically needs to trigger a 2 line shell script that does:
+[11:04:25] krosenvold_: git fetch googlecode
+[11:04:32] krosenvold_: git push --tags github
+[11:04:42] simonstewart: It'd need the ssh key of someone who can commit to the mirror
+[11:04:48] krosenvold_: Yup
+[11:05:09] simonstewart: Which is why if it was hosted on github it'd be easy to make this work
+[11:05:29] krosenvold_: So it's basically just a git clone --bare <googlecode>
+[11:05:33] krosenvold_: Where does selbot run ?
+[11:05:39] simonstewart: I have no idea
+[11:05:48] krosenvold_: "The cloud"
+[11:06:21] krosenvold_: Obviously thegithub guys think the source should push in a mirroring setup. I would do that too ;)
+[11:06:54] simonstewart: I almost wrote an app engine script to do that
+[11:07:16] krosenvold_: While we're thinking I'll whack together the 3 line shell script on the account I use to maintain the existing "Selenium2" repo
+[11:07:34] krosenvold_: No
+[11:07:40] krosenvold_: I forgot; public ip needed
+[11:08:06] simonstewart: Fuck you, lion. It's appengine .
+[11:08:17] zeljkof has joined #selenium
+[11:08:28] simonstewart: Right. Appengine. You see?
+[11:13:01] AutomatedTester: selbot2_: runs on jarib's VPS iirc
+[11:14:04] krosenvold_: I sent mail to devlist. Someone probably has somewhere to put it ;)
+[11:15:15] krosenvold_: simonstewart: I assume you have the bit on google code that allows us to insert the hook ?
+[11:15:24] simonstewart: Yes I do
+[11:15:35] krosenvold_: Does it support multiple hooks ?
+[11:15:41] simonstewart: Yes it does
+[11:15:59] simonstewart: Oh. It may do
+[11:16:26] Ardesco: heh 6:43 this morning - Selenium hits github
+[11:16:34] Ardesco: 8:52 this morning - Network performance is impacted due to a significant increase in traffic. Working towards a resolution.
+[11:16:40] Ardesco: must be :)
+[11:18:13] p_l: what's the address for selenium repo? :D
+[11:18:30] krosenvold_: code.google.com/p/selenium
+[11:18:41] p_l: the github one ;)
+[11:19:19] krosenvold_: github.com/seleniumHQ
+[11:19:31] krosenvold_: Why do I have to be OP to set topic ?
+[11:19:42] p_l: krosenvold_: because +t is set for channel
+[11:19:47] sam__ has joined #selenium
+[11:19:57] simonstewart: Aha! I couldn't find this yesterday: http://www.mail-archive.com/dri-devel@lists.sourceforge.net/msg39091.html
+[11:20:13] krosenvold_: p_l: Perhaps not entirely the answer I was looking for
+[11:21:09] p_l: heh
+[11:21:30] p_l: but good to see it on GH. code.google.com is annoying when all you want is to read a bit of source
+[11:22:05] krosenvold_: simonstewart: I still think it's ok to rebase submissions to head when inserting into authorative history
+[11:22:14] krosenvold_: Not mandatory, but ok
+[11:22:36] krosenvold_: But usually a submission is just 1 commit, so there's not much "internal" history
+[11:22:43] krosenvold_: I know the purists disagree
+[11:23:27] krosenvold_: I don't think the article actually covers that
+[11:28:36] jamesoram has joined #selenium
+[11:28:56] ChanServ has altered krosenvold_'s mode: +o
+[11:29:03] AutomatedTester: krosenvold_: change the topic now :)
+[11:29:57] krosenvold_ has set the topic to "code.google.com/p/selenium mirrored on github.com/seleniumHQ/selenium - we're working on the frequency of the github mirroring
+[11:30:01] Dave_B has joined #selenium
+[11:30:24] *krosenvold_ feels the power
+[11:30:30] tanmay has joined #selenium
+[11:30:36] Dave_B: Hey guys - I'm wondering if anyone has handled this situation:
+[11:30:45] ChanServ has altered krosenvold_'s mode: -o
+[11:31:05] Dave_B: When testing a site in firefox (remotewebdriver) I encountered an unexpected 'authorisation required' dialog
+[11:31:08] *AutomatedTester takes krosenvold_ power away *muahahahaha*
+[11:31:12] *krosenvold_ sighs in relief
+[11:31:16] papegaaij has joined #selenium
+[11:31:23] Dave_B: this caused my tests to fail 9expected) but then teardown failed
+[11:31:30] *krosenvold_ knows that with much power comes much responsibility
+[11:31:52] Dave_B: the grid node remained tied up even once the timeout had expired
+[11:32:28] Dave_B: anyone know how to deal with this? I can check for the auth in teardown I guess, but what if something else goes wrong? Should the nodes cleanup not be able to handle this? :/
+[11:33:44] jamesoram has joined #selenium
+[11:33:46] simonstewart: The site being visited is requesting auth? Or the grid node?
+[11:33:54] Dave_B: the site
+[11:34:23] Dave_B: but when the auth dialog is open you can't close the browser - I'm assumnig this is why the node doesn't clean up after the timeout times out
+[11:34:56] simonstewart: You want #34
+[11:34:58] selbot2_: 03simon.m.stewart open/accepted Support BASIC and Digest HTTP authentication - https://code.google.com/p/selenium/issues/detail?id=34 [Type-Enhancement Priority-Medium Component-WebDriver]
+[11:35:06] simonstewart: Star that one
+[11:35:33] Dave_B: thanks i'll take a look :)
+[11:35:37] simonstewart: np
+[11:35:55] teodosia_sel has joined #selenium
+[11:36:15] tanmay has left #selenium
+[11:36:39] p0deje_ has joined #selenium
+[11:37:20] t_s has joined #selenium
+[11:39:17] Ardesco: I have a git question
+[11:39:39] Ardesco: how do i add the googlecode repo as a remote?
+[11:39:59] Ardesco: git remote add googlecode https://code.google.com/p/selenium/ gives me "fatal: Not a git repository (or any of the parent directories): .git"
+[11:40:27] Ardesco: but https://code.google.com/p/selenium/source/checkout?repo=default doesn't show a path that ends in .git
+[11:40:32] t_s: I am new to Selenium. I want to do multiple selection.Using ruby  I am doing $driver.action.key_down(:shift).click(el).click(el2).key_up(:shift).perform. Is this right ? 
+[11:41:02] Ardesco: I don't see an obvious .git path to use browsing the repo either
+[11:42:08] simonstewart: You may need to modify your .netrc
+[11:42:33] simonstewart: Or use your.gc.username@code.google.com/p/selenium
+[11:42:37] simonstewart: as the remote
+[11:43:28] eanxgeek has joined #selenium
+[11:45:57] Ardesco: or i could cd into the directory of the cloned repo
+[11:46:00] SamG: Ardesco http://code.google.com/p/support/wiki/GitFAQ that might help
+[11:46:02] *Ardesco smacks head against table
+[11:46:07] SamG: :P
+[11:46:24] Ardesco: i now hover get "fatal: https://code.google.com/p/selenium/git/info/refs not found: did you run git update-server-info on the server?"
+[11:46:39] Ardesco: hover = however (stupid autocorrect)
+[11:46:44] SamG: what do you get when you run git remote -v
+[11:47:14] Ardesco: googlecode	https://code.google.com/p/selenium/git/ (fetch)
+[11:47:15] Ardesco: googlecode	https://code.google.com/p/selenium/git/ (push)
+[11:47:15] Ardesco: origin	git@github.com:Ardesco/selenium.git (fetch)
+[11:47:16] Ardesco: origin	git@github.com:Ardesco/selenium.git (push)
+[11:47:27] Ardesco: 4 lines, just
+[11:47:29] Ardesco: :)
+[11:49:08] Ardesco: t_s: I'm not a ruby person but it kind of looks sane from here
+[11:51:04] t_s: Ardesco:  but its not working :(
+[11:51:47] t_s: its clicking only el2 
+[11:53:30] Ardesco: locator correct for el?
+[11:56:35] t_s: yes
+[11:57:00] rananda has joined #selenium
+[11:59:36] t_s: I am able to click them separately 
+[IRC logfile - Started Tue Jan 15 12:00:35 2013]
+[12:00:35] Ardesco: hitting #4385 maybe ?
+[12:00:36] selbot2_: 03 open/needsclarification Actions.KeyDown(Keys.Shift) does not work in firefox and IE - https://code.google.com/p/selenium/issues/detail?id=4385 [Type-Defect Priority-Medium Component-WebDriver]
+[12:02:16] simonstewart: Furruf
+[12:07:50] zeljkof has joined #selenium
+[12:16:26] AutomatedTester: :spec
+[12:16:27] selbot2_: http://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html | http://dvcs.w3.org/hg/webdriver/
+[12:17:41] t_s: Ardesco: ya. may be. I am using selenium-webdriver (2.25.0)
+[12:19:11] Ardesco: has anybody managed to get the googlecode repo working as a remote yet ?
+[12:19:21] Ardesco: or is it just me ?
+[12:19:40] zeljkof has joined #selenium
+[12:20:50] AutomatedTester: Ardesco: I pushed to it earlier...
+[12:21:00] Ardesco: i have the github selenium repo set up as a remote fine and fetches work
+[12:21:14] Ardesco: just can't seem to get the googlecode one working
+[12:21:52] Ardesco: fuuuuuuuuuuu
+[12:22:02] *Ardesco goes and scratches his head
+[12:22:38] simonstewart: Ardesco: can you do an initial clone from Google Code?
+[12:23:23] Ardesco: I could but it'll take some time to start the download again :)
+[12:23:57] simonstewart: Start it: you want to determine whether there's some weird config problem or whether you're just not reaching google code
+[12:24:05] simonstewart: Also, which git version are you on>
+[12:24:24] Ardesco: initial clone from googlecode seems to be working
+[12:24:50] Ardesco: git version 1.7.9.6 (Apple Git-31.1)
+[12:25:03] simonstewart: ok
+[12:25:06] simonstewart: that should be fine
+[12:26:06] simonstewart: According to the git FAQ on google code this should work:
+[12:26:07] simonstewart: git remote add googlecode https://code.google.com/p/myprojectname
+[12:26:10] simonstewart: Note the use of https
+[12:26:21] simonstewart: And our project is "selenium" not "myprojectname"
+[12:26:55] simonstewart: And you may need your .netrc configured too, but probably not
+[12:28:14] Ardesco: deleted the remote added it again and it's working now
+[12:28:25] Ardesco: i must have had a typo in there
+[12:28:49] Ardesco: obviously not a good day :)
+[12:28:52] Ardesco: thanks for the help
+[12:28:54] simonstewart: Well, it's working now. Woot!
+[12:30:53] krosenvold_: simonstewart: I think we should actually stick to linus practice
+[12:30:59] krosenvold_: Never rebase anything but your own commit
+[12:31:12] simonstewart: I'm happy with that
+[12:31:15] RossPatterson has joined #selenium
+[12:31:16] ChanServ has altered RossPatterson's mode: +o
+[12:31:30] krosenvold_: Maybe
+[12:32:00] krosenvold_: it means we'll need an extra merge commit for fast forward merges 
+[12:32:00] simonstewart: And I quite like the idea of "don't expose your crap"
+[12:32:15] krosenvold_: well I think that's kind of implicit
+[12:32:21] simonstewart: I'm not sure I understand the subtleties of git well enough
+[12:32:21] krosenvold_: Well not
+[12:32:23] t_s: Ardesco: Woot! Its working now.I have updated it to selenium-webdriver (2.27.2) and it started working.
+[12:32:32] Ardesco: sweet
+[12:32:34] t_s: Thanks for the help
+[12:32:35] simonstewart: Hadanza!
+[12:38:59] barancev|2 has joined #selenium
+[12:40:03] miguel: bye
+[12:41:05] simonstewart: My eyes just crossed: http://www.w3.org/TR/html5/browsers.html#windows
+[12:42:48] andreastt: So a browsing context is a frame, essentially.  I wonder if it defines viewport.
+[12:43:20] AutomatedTester: we shouldnt be defining viewport since there are other specs that define it well
+[12:44:29] simonstewart: I think that's what andreastt was asking
+[12:44:42] andreastt: It says in the note:
+[12:44:48] andreastt: “A tab or window in a Web browser typically contains a browsing context, as does an iframe or frames in a frameset.”
+[12:45:02] andreastt: The “as does” bit is confusing.
+[12:45:25] andreastt: Especially to implementors.  As what they're _really_ saying is that it's really not the same.
+[12:45:59] simonstewart: Wait until you get to the bit where a single window or frame can have more than one browsing context
+[12:46:54] *simonstewart starts going through the spec ripping out NamesLikeThisForErrorCodes and replacing with "names like this"
+[12:47:54] andreastt: AutomatedTester: Going to have to look at that email later today, a P1 landed in my lap.
+[12:48:10] AutomatedTester: andreastt: as I said earlier, it's not urgent :)
+[12:50:46] barancev|2: so transition is over and it's time to update to FF18
+[12:52:07] simonstewart: Yup
+[12:52:13] simonstewart: And then do the first git release
+[12:52:21] AutomatedTester: where is jimevans when you need him
+[12:52:29] simonstewart: Ideally a git expert should have the bacon for this one
+[12:52:37] simonstewart: So that they can update the wiki as the release occurs
+[12:57:17] AutomatedTester: tbh... tagging in git is much simpler than svn
+[12:58:23] simonstewart: svn cp was hard?
+[12:58:45] simonstewart: I find tagging in git more complex: there are two types of tag and the one that's generated isn't obvious
+[12:58:58] simonstewart: unless you happen to know the flags to git tag 
+[12:59:45] AutomatedTester: git tag -m 'This is a tag' vs svn cp <is it remove url> <other thing goes here
+[IRC logfile - Started Tue Jan 15 13:00:01 2013]
+[13:00:01] AutomatedTester: remote url
+[13:00:16] simonstewart: You could just use a local checkout
+[13:00:25] simonstewart: and svn cp trunk tags/your-tag-name-here
+[13:00:35] simonstewart: svn commit -m "Tagging" tags
+[13:00:38] simonstewart: Ohhh....
+[13:00:42] simonstewart: complex
+[13:00:44] simonstewart: :P
+[13:01:00] simonstewart: Question: which kind of tag did your git command create?
+[13:01:02] barancev: AutomatedTester: why http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/18.0/ has no MD5SUMS file?
+[13:01:07] t_s has left #selenium
+[13:01:21] AutomatedTester: barancev: I give up, why doesnt it have MD5SUMS?
+[13:01:29] AutomatedTester: :)
+[13:01:31] AutomatedTester: let me ask
+[13:02:41] p_l has joined #selenium
+[13:03:42] krosenvold_: 2 kinds of tags ?
+[13:04:03] krosenvold_: "There can be only 1"
+[13:04:48] krosenvold_: The other interesting thing I found in my trustworthy old svn repo was an implementation of httpd.js for firefox with keepalives
+[13:04:52] simonstewart: 3
+[13:04:56] krosenvold_: old git repo, that is
+[13:05:00] simonstewart: Signed, tag objects and lightweight tags
+[13:05:00] xtian_ has joined #selenium
+[13:05:11] simonstewart: With signed and tag objects being the same thing, but different in some way
+[13:06:27] barancev: and, btw, no sdk 18.0 sources published...
+[13:06:39] simonstewart: ffs
+[13:07:16] krosenvold_: But I assume marionette is going to change all that, eh. AutomatedTester ?
+[13:09:00] *krosenvold_ just deleted https://github.com/krosenvold/Selenium2 Bye bye!
+[13:10:24] p0deje has joined #selenium
+[13:11:10] nacho has joined #selenium
+[13:19:45] _kW has joined #selenium
+[13:23:22] AutomatedTester: krosenvold_: tbh if the mouse and keyboard stuff had been extracted it wouldnt have mattered
+[13:23:29] AutomatedTester: but with Marionette it wont matter
+[13:23:49] AutomatedTester: that will be my, and the team I am in, problem
+[13:29:45] Cside has joined #selenium
+[13:32:02] samphippen has joined #selenium
+[13:36:02] farlan has joined #selenium
+[13:41:18] nirvdrum has joined #selenium
+[13:45:21] mreedell has joined #selenium
+[13:46:11] simonstewart: Just pushed my changes
+[13:46:17] simonstewart: to the spec
+[13:46:18] AutomatedTester: barancev: the people who look after releases are looking into it
+[13:46:44] barancev: AutomatedTester: thanks!
+[13:47:04] AutomatedTester: barancev: when I know more will let you know
+[13:48:03] simonstewart: This is the biggest change: https://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html#error-codes
+[13:48:17] simonstewart: I'm working on pushing something like that into our tree
+[13:48:19] simonstewart: It's coming
+[13:48:23] simonstewart: TTFN
+[13:54:03] rananda has joined #selenium
+[13:55:33] rananda has joined #selenium
+[IRC logfile - Started Tue Jan 15 14:05:14 2013]
+[14:05:14] fatguylaughing has joined #selenium
+[14:09:30] cmcgraw has joined #selenium
+[14:17:59] p_l: can I use PageFactory to instantiate something other than WebElement (but which extends WebElement)?
+[14:18:07] p_l: (selenium java)
+[14:19:55] gdennis has joined #selenium
+[14:20:06] Shakyj: can not for the life of me figure why I'm getting "Exception in thread "main" java.lang.NoSuchMethodError: org.openqa.selenium.logging.LoggingPreferences.addPreferences"
+[14:21:13] stan has joined #selenium
+[14:22:56] nirvdrum: AutomatedTester: It looks like your changes to .gitignore used different line endings.  Unlikely to be a big deal, but we should probably keep it consistent.
+[14:23:13] AutomatedTester: arggg
+[14:23:45] AutomatedTester: nirvdrum: where do you see that?
+[14:23:50] AutomatedTester: in the file?
+[14:23:55] AutomatedTester: or on google code?
+[14:24:17] nirvdrum: I ran "git log -p" to see what changed recently and all your diffs had an "^M" at the end of the line.
+[14:24:42] AutomatedTester: nirvdrum: interesting
+[14:25:00] nirvdrum: git will highlight whitespace changes.  I like that a lot.
+[14:25:13] AutomatedTester: nirvdrum: https://www.evernote.com/shard/s63/sh/4eab25d5-ae14-4304-8e6d-fcab48ad7313/e41e6b17ca9bd5c5710eb130fdb1408d
+[14:25:25] AutomatedTester: nirvdrum: it's not showing it for me 
+[14:25:25] rananda has joined #selenium
+[14:25:28] nirvdrum: If it's any consolation, Simon did the same when fixing the guava paths.
+[14:25:36] nirvdrum: krosenvold_: How do you want to handle line endings?
+[14:25:39] AutomatedTester: must be an OSX thing
+[14:26:22] AutomatedTester: nirvdrum: I have seen ^M before but thought that was windows thing since it happened to me when working on the python IEDriver bindings
+[14:26:44] nirvdrum: IIRC, Windows uses CR, Mac uses LF, and Linux uses CRLF by default.
+[14:27:01] *AutomatedTester shakes his fist and OS differences
+[14:27:12] simonstewart has joined #selenium
+[14:27:14] simonstewart: Back again
+[14:27:57] p_l: nirvdrum: nope, nope, nope
+[14:27:57] AutomatedTester: :yt gloria gaynor - i will survice
+[14:28:00] selbot2_: Gloria Gaynor performs "I Will Survive" at Mandela Day 2009 from Radio City Music Hall - http://www.youtube.com/watch?v=zPPqEHj997w&feature=youtube_gdata
+[14:28:22] Shakyj has joined #selenium
+[14:28:32] nirvdrum: AutomatedTester: And consider adding the color section to your ~/.gitconfig: https://gist.github.com/4539080
+[14:28:39] p_l: windows uses classic line endings (CRLF), *nix (including OSX) use LF for simplicity, Classic MacOS uses CR to be a dick
+[14:28:40] nirvdrum: It makes diff output much nicer, IMHO.
+[14:29:06] AutomatedTester: nirvdrum: that config is amazing!
+[14:29:08] nirvdrum: p_l: Gotcha.  Well, the point was more that they're different.
+[14:29:51] p_l: nirvdrum: yeah, but someone might use wrong conversion params :P
+[14:31:01] *AutomatedTester gives nirvdrum a great big hug
+[14:31:15] AutomatedTester: my diffs are beautiful now
+[14:31:32] nirvdrum: AutomatedTester: There's some aliases in there for svn-compat shortcuts.  E.g., "git ci" 
+[14:31:47] AutomatedTester: nirvdrum: I had those already, you have a few more which look useful
+[14:32:03] p_l: heh. Thanks to just copying a bunch of stuff from one $HOME to another, I forgot what was in my gitconfig, enough that I had to look...
+[14:32:06] nirvdrum: Some use legit (installable with pip)
+[14:32:40] nirvdrum: AutomatedTester: Your diff looks like: http://dl.dropbox.com/u/536435/line_endings.png
+[14:33:05] AutomatedTester: nirvdrum: hmm
+[14:33:45] AutomatedTester: nirvdrum: aha I see them now
+[14:33:49] zeljkof has joined #selenium
+[14:33:52] AutomatedTester: now that I have colours 
+[14:35:29] nirvdrum: p_l: It looks like he inserted CRLF and he's on Mac.
+[14:35:56] p_l: nirvdrum: just fool any sensible editor into thinking it has to use CRLF :)
+[14:36:02] nirvdrum: Heh.
+[14:36:32] p_l: most sensible editors try intelligently switch line endings
+[14:36:48] nirvdrum: You can override it in your git defaults too.
+[14:37:29] nirvdrum: Although it looks like that file uses CRLF throughout, so maybe it's just my terminal.
+[14:37:40] nirvdrum: Assuming my hex editor isn't lying to me.
+[14:38:01] AutomatedTester: nirvdrum: how do I fix it
+[14:38:23] *AutomatedTester tries emacs
+[14:38:51] nirvdrum: AutomatedTester: I may just be an asshole.  It looks like your line endings match the rest of the file.
+[14:39:11] AutomatedTester: may?
+[14:39:12] AutomatedTester: :P
+[14:39:22] nirvdrum: Well, with regards to this one particular item.
+[14:39:23] *AutomatedTester ruffles nirvdrum's hair
+[14:39:30] *simonstewart gets popcorn
+[14:39:32] nirvdrum: I don't mind it.
+[14:40:05] simonstewart: Right. So, we're moving from ints to strings for status codes on responses
+[14:40:07] qaguy has joined #selenium
+[14:40:09] melter has joined #selenium
+[14:40:33] simonstewart: Debating what to do with Response.status
+[14:41:04] simonstewart: It's tempting to leave it alone, so we can interop with older clients/servers while making The Great Int To String Switcheroo
+[14:41:05] RossPatterson: Would now be the time to observe that SVN converts text files between LF in the repo and LF, CR, or CRLF on the client depending on the client side?  Just sayin' :-)
+[14:41:11] nirvdrum: simonstewart: Does this have to do with JS and thus JSON not really having an int type?
+[14:41:14] simonstewart: Yes, RossPatterson now is the time
+[14:41:29] simonstewart: It's from feedback on the specs. 
+[14:41:40] simonstewart: Turns out that no-one understands what integers mean
+[14:41:49] knorrium has joined #selenium
+[14:41:57] nirvdrum: Heh.  Interesting.
+[14:41:58] simonstewart: And we'd probably need to rejig ours in any case because it's full of holes
+[14:41:59] RossPatterson: "[\d]+"
+[14:42:10] simonstewart: Thank you, RossPatterson 
+[14:42:18] AutomatedTester: it also aligns us more with the approach that HTML5 is taking
+[14:42:47] AutomatedTester: iirc
+[14:42:50] simonstewart: https://dvcs.w3.org/hg/webdriver/raw-file/tip/webdriver-spec.html#error-codes
+[14:42:57] simonstewart: That's what we're heading to
+[14:43:12] simonstewart: I'm also going to be taking an axe to our exception hierarchy
+[14:43:19] simonstewart: There's way too many xpath specific things in there
+[14:43:45] simonstewart: which should be generalized to Invalid Selectors
+[14:44:21] dude-x has joined #selenium
+[14:44:21] RossPatterson: I like the new Error Codes section.  Since they're strings, presumably they're exact values?  No leading/trailing whitespace, and case-sensitive?
+[14:44:32] simonstewart: Exact values
+[14:44:36] simonstewart: All lower case
+[14:44:41] *RossPatterson smiles
+[14:44:44] simonstewart: All case sensitive
+[14:47:04] AutomatedTester: RossPatterson: you are teaching us well ;)
+[14:47:10] RossPatterson: LOL
+[14:47:48] RossPatterson: Also nice to see the JSON/HTTP serialization is now normative.
+[14:48:33] simonstewart: What's the alternative name for "status" on the Response object.
+[14:48:35] nirvdrum: simonstewart: Should I hold off on the changes I was looking to make to the exception classes then?
+[14:48:40] simonstewart: Best I can come up with right now is "code"
+[14:48:51] simonstewart: I don't know what changes you were thinking of :)
+[14:49:05] simonstewart: Response.code contains the string that is the response code
+[14:49:07] RossPatterson: Result?
+[14:49:22] simonstewart: Could be confused with the value
+[14:49:38] RossPatterson: Denouement?
+[14:49:41] RossPatterson: )
+[14:49:43] RossPatterson: :-)
+[14:49:47] nirvdrum: simonstewart: Mostly reworking cases of UnknownError where we know exactly what they are into either their correct exception types or introducing new ones.
+[14:49:57] simonstewart: Go for it
+[14:50:32] RossPatterson: Perhaps just errorCode?  Since the codes are called Error Codes?
+[14:50:55] simonstewart: Possibly. Though I don't like the idea of "success" being an _error_ code
+[14:50:56] *RossPatterson always liked C's perror() output: "No error" :-)
+[14:51:00] RossPatterson: ^^^
+[14:51:09] nirvdrum: In ruby, response.code is the status code.
+[14:51:21] simonstewart: ffs
+[14:51:26] simonstewart: This is going to get messy
+[14:53:44] simonstewart: Response.state
+[14:53:58] simonstewart: That works, right?
+[14:54:09] RossPatterson: SGTM
+[14:54:15] simonstewart: Then that's what we're using
+[14:54:23] simonstewart: I love it when a plan comes togetgher
+[14:54:28] simonstewart: Also, spelling
+[14:55:37] RossPatterson: OK to start another spec topic?
+[IRC logfile - Started Tue Jan 15 15:00:05 2013]
+[15:00:05] bluescreen10 has joined #selenium
+[15:00:13] RossPatterson: 2.2 Response says: "The default value for the sessionId must be the sessionId used in the Command that this is a response to, unless the Command's sessionId was the null value, in which case a unique sessionId must be assigned (see newSession for how this is achieved)."
+[15:01:25] RossPatterson: I'm having a hard time figuring out any other command than "newSession" that should be allowed to change the sessionId.  Because the sessionId binds the Command and Response to each other, right?
+[15:01:43] sahazel has joined #selenium
+[15:11:03] simonstewart: RossPatterson: there might be commands that control the remote end
+[15:11:08] simonstewart: "quitquitquit" would be one
+[15:11:41] simonstewart: Adding a new browser config or node to a grid would be other examples
+[15:12:24] RossPatterson: Got it - Response.sessionId == null is only allowed for commands not related to a session.  Correct?
+[15:12:34] simonstewart: Yes
+[15:12:42] RossPatterson: 'scoo bro'
+[15:12:46] simonstewart: But the commands are sequenced by sessionId
+[15:12:59] simonstewart: So when a new conversation is started, a sessionid must exist
+[15:13:26] simonstewart: Which implies that the remote end must assign a sessionid if one is not already specified
+[15:13:40] simonstewart: Perhaps I should read the spec before pushing it....
+[15:14:34] fatguylaughing has joined #selenium
+[15:17:23] cgoldberg has joined #selenium
+[15:33:28] zeljkof has joined #selenium
+[15:34:56] SamG: What is the opinion on input agnosticism and finer grained 'pointer' inputs with webdriver I noticed in the spec that it should fall back to mouse events if touch and mouse is available,  is there any inclination to make this more configurable?
+[15:36:30] simonstewart: Right now? No
+[15:36:42] simonstewart: One of the things we need to wrestle with is Pointer Events
+[15:36:43] AutomatedTester: cgoldberg: hey when did your boxes update to Firefox 18?
+[15:37:03] regex has joined #selenium
+[15:37:09] simonstewart: I suspect that, mouse and and touch events all need to get in a box with a knife and duke it out
+[15:37:18] regex: :seen jimevans
+[15:37:19] selbot2_: jimevans was last seen 3 days ago, leaving.
+[15:37:35] AutomatedTester: simonstewart: well the thing is that a lot of the time touch and mouse need to work together
+[15:37:38] simonstewart: SamG: do you have any particular needs?
+[15:37:41] AutomatedTester: simonstewart: e.g. tap()
+[15:37:41] cgoldberg: hey.. i can check.  but it my CI slaves get nightly package updates from the main Ubuntu repos for Precise LTS version )12.04)
+[15:38:07] SamG: simonstewart I agree but I also agree with AutomatedTester
+[15:38:12] cgoldberg: AutomatedTester, ^^
+[15:38:24] AutomatedTester: simonstewart: it needs to do touchstart touchend mousemove <something else> click
+[15:38:40] simonstewart: AutomatedTester: well, WebElement.click should redirect to "whatever is most appropriate for the device" between click and tap
+[15:38:55] simonstewart: And then those are ambiguous
+[15:39:09] simonstewart: We don't implement that with a redirect in http
+[15:39:19] simonstewart: But we should really be constructing things that way on the server side
+[15:39:26] simonstewart: (the equivalent Actions)
+[15:40:05] simonstewart: I'm rather enjoying this right now: http://www.youtube.com/watch?v=cEOct6CEidc
+[15:40:29] AutomatedTester: simonstewart: this is one of the issues Mozilla is wrestling with at the moment
+[15:40:36] simonstewart: k
+[15:40:50] simonstewart: So, is the problem with WebElement.click() or with the TouchActions?
+[15:40:54] simonstewart: Or Actions?
+[15:41:34] AutomatedTester: semantics really
+[15:41:56] simonstewart: Of which method?
+[15:42:00] AutomatedTester: click()
+[15:42:11] jimevans has joined #selenium
+[15:42:11] AutomatedTester: they dont agree with the method when on a mobile device
+[15:42:12] selbot2_: jimevans: note from santiycr about 14 hours ago: hey Jim, would you mind giving a look at this? My guess is we need to build support for InternetExplorerOptions inside DesiredCapabilities http://support.saucelabs.com/entries/22935036-internetexploreroptions-with-saucelabs 
+[15:42:15] simonstewart: WebElement.click() or Actions.click()
+[15:42:17] AutomatedTester: it should be .tap()
+[15:42:31] AutomatedTester: and then tap needs to fire different events
+[15:42:43] simonstewart: WebElement.click() or Actions.click()?
+[15:42:48] AutomatedTester: webelement
+[15:42:51] simonstewart: OK
+[15:42:55] simonstewart: Then see my answer above :)
+[15:43:18] simonstewart: WebElement methods are "do what I mean"
+[15:43:31] simonstewart: So WebElement.click() on a desktop browser is handled via a mouse
+[15:43:40] simonstewart: On a mobile device, it maps down to a tap
+[15:43:51] SamG: The problem we have is that on mobile devices touch actions behave differently in terms of 300ms delay than mouse actions, and we see reports with people having issues with touch devices with mouse support. It would be nice to find and be able to test these cases.
+[15:44:00] AutomatedTester: simonstewart: and on Windows 8?
+[15:44:08] AutomatedTester: where I can use both...
+[15:44:16] simonstewart: If you want to be unambiguous, use Actions or TouchActions
+[15:44:22] AutomatedTester: since the events can be different
+[15:44:37] simonstewart: On Win8, I'd expect a tablet to map to touch, and a laptop to be mouse
+[15:44:49] simonstewart: Or, put another way, Metro to be touch
+[15:44:57] simonstewart: "Classic desktop" to be mouse
+[15:45:09] SamG: But metro can accept mouse input right?
+[15:45:16] simonstewart: SamG: Right. 
+[15:45:27] simonstewart: So if you want to be unambiguous specify the device
+[15:45:37] simonstewart: By using the advanced user interaction APIs
+[15:45:54] RossPatterson: Oh what a tangled web we weave, when first we practise to abstract :-)
+[15:46:07] simonstewart: This stuff is easy right now :)
+[15:46:10] simonstewart: Here's how i think of it
+[15:46:31] simonstewart: WebElement.click() == "I want to simulate something clicking or tapping that thing. I don't care how"
+[15:46:48] simonstewart: Actions.click() (with the other actions bundled in too) == "I want to click on that thing with a mouse"
+[15:47:08] simonstewart: TouchActions.singleTap() == "I want to click on that thing as a touch device"
+[15:47:20] simonstewart: See. Simple
+[15:47:31] zeljkof has joined #selenium
+[15:47:35] simonstewart: If I care what the device is, I never want to use WEbElement.click()
+[15:47:51] SamG: Yes agreed, tbh I was only middy aware of Actions
+[15:47:53] SamG: *midly
+[15:47:57] simonstewart: :)
+[15:48:01] SamG: *mildly damnit
+[15:48:20] simonstewart: We added them precisely because WebElement didn't offer a great deal of control but was mostly enough
+[15:48:32] simonstewart: In the common case, I _don't_ care how user input is done
+[15:48:47] testingb0t1 has joined #selenium
+[15:49:22] simonstewart: Good news: my changes to the remote webdriver and state and status on the response object haven't broken compilation or the htmlunit tests.
+[15:49:22] jimevans: g'day all! 
+[15:49:27] SamG: Yes, this is awesome :P I love learning new things I didn't realise 
+[15:49:32] simonstewart: :)
+[15:49:41] SamG: thanks simonstewart
+[15:49:45] simonstewart: np
+[15:49:48] jimevans: i leave you people for a couple of days, and there's a new source code control system?!?!?
+[15:49:48] simonstewart: Always happy to help
+[15:49:54] simonstewart: Um. 
+[15:49:55] simonstewart: yeah.
+[15:49:57] simonstewart: soz
+[15:50:05] jeichar has joined #selenium
+[15:50:32] jimevans: simonstewart: forgot to set the "mock outrage" bit on that last.
+[15:50:49] simonstewart: jimevans: forgot to set "sarky brit" bit on that last
+[15:50:50] simonstewart: :)
+[15:51:00] jimevans: :D
+[15:51:08] simonstewart: We better get a fuck-ton of commits from new contributors
+[15:51:11] *RossPatterson has been enjoying watching simonstewart play the grouchy old man for a change :-)
+[15:51:21] simonstewart: Because otherwise detro and I are having words
+[15:51:27] simonstewart: "for a change"?
+[15:51:39] RossPatterson: It's usualy jimevans' and my role :-)
+[15:52:56] simonstewart: I'm fairly sure I'm grumpy a lot of the time
+[15:53:16] simonstewart: Less so since The Boy arrived, but I've made up for it with exhausted irascibility 
+[15:53:32] simonstewart: Well. That didn't work
+[15:54:06] AutomatedTester: darn no one in the office has a Win8 tablet/dock combo
+[15:54:36] simonstewart: s/in the office/
+[15:54:44] simonstewart: s/in the office//
+[15:54:46] simonstewart: even
+[15:56:12] AutomatedTester: argg the train 30 mins later than I was planning on getting gets home only 10 mins later
+[15:56:26] simonstewart: D'oh!
+[15:56:32] simonstewart: Come and hang out in the Facebook office
+[15:56:41] simonstewart: I have another hour or so until I leave
+[15:56:52] AutomatedTester: directions
+[15:56:58] *AutomatedTester will walk there now
+[15:56:59] simonstewart: 42 Earlham Streety
+[15:57:19] simonstewart: Walk up to 7 Dials, then walk down Earlham Street
+[15:57:54] AutomatedTester: ok leaving now
+[15:58:01] AutomatedTester: simonstewart: do you have power for me there?
+[15:58:05] simonstewart: Yes
+[15:58:13] AutomatedTester: do I need my power cord?
+[15:58:15] simonstewart: I have a new MBP power adapter here
+[15:58:20] AutomatedTester: I am coming sans bag
+[15:58:21] simonstewart: You can borrow mine
+[15:58:24] simonstewart: k
+[15:58:28] AutomatedTester: awesome
+[15:58:59] AutomatedTester: coming now
+[IRC logfile - Started Tue Jan 15 16:00:30 2013]
+[16:00:30] cgoldberg: new Selenium development video  - Gource visualization of activity for Selenium in the past year:  http://www.youtube.com/watch?v=O-EFhdSvYIA
+[16:00:50] cgoldberg: enjoy :)  and congratsd to all the contributors featured in the visualization
+[16:01:04] simonstewart: fast work
+[16:01:05] simonstewart: nice
+[16:01:21] andreastt: I'm unsure if this is good news.
+[16:01:23] dude-x: first time i was in London I got off Picadily Circus. I expected to see elephants at the circus. Instead I saw a huge circle like street structure.
+[16:01:39] dude-x: actually i've only been to London once.
+[16:01:49] andreastt: The new test system I've designed gets too many test results.
+[16:02:00] simonstewart: That's good
+[16:02:03] cgoldberg: dude-x, i'm always pissed at lack of clowns and elephants there
+[16:02:14] andreastt: Always another bottleneck to solve I guess (_.
+[16:02:16] andreastt: (-:
+[16:02:45] andreastt: People are complaining because the server can't process test results quickly enough.
+[16:03:02] andreastt: Always interesting when data hits the IO layer. d-:
+[16:04:14] dude-x: cgoldberg: what's fun about London is learning all the different British name things. Instead of "Exit" there is "Way Out"; instead of "Watch the gap" its "Mind the Gap" and other little differences
+[16:04:42] RossPatterson: Always wanted to see a "Groovy" sign instead of "Way Out".
+[16:05:23] andreastt: dude-x: I suggest we table that discussion.
+[16:06:42] dude-x: andreastt: ok. i'll table it, if you object orient. :p
+[16:07:16] cgoldberg: dude-x, i work with mostly uk peeps.. been there several times.. i love London.. but those little differences always catch me as funny
+[16:08:13] andreastt: cgoldberg: I'm always a little jealous that you have offices in interesting places.
+[16:08:21] smccarthy has joined #selenium
+[16:08:27] andreastt: I'm going to Linköping, Sweden soon, which kind of isn't the same thing.
+[16:08:44] dude-x: cgoldberg: my biggest fear while in London is needing help and the person has a wicked accent. Happened once but I was able to listen carefully.
+[16:08:59] cgoldberg: andreastt, the bulk of my colleagues are actually from argentina... but haven't had the chance to get down there
+[16:09:02] dude-x: Sweden is on my list of places to visit
+[16:09:40] andreastt: dude-x: Trust me, you don't want to visit the country side. (-:
+[16:09:46] dude-x: cgoldberg: i was in Buenos Aires last year. Worth a visit. However there is government turmoil as the govenrment has turned a bit left wing (which is fine with me) but they have banned a lot of american things.
+[16:09:55] dude-x: andreastt: Just Stockholm is fine.
+[16:10:03] andreastt: 'Tis a nice city.
+[16:10:04] cgoldberg: dude-x, interesting
+[16:10:17] bluescreen10 has joined #selenium
+[16:10:33] cgoldberg: speaking cities... who is coming to Boston for seconf?
+[16:10:51] ner0x has joined #selenium
+[16:10:53] RossPatterson: I'm trying to arrange it.  Might be self-funded though.
+[16:11:03] dude-x: I'll definitely attend. Hopefully my company will sponsor me.
+[16:11:28] jimevans: krosenvold_: yt?
+[16:11:42] dude-x: I was in Boston in 2010. really like the academic feel to the city. also it's small
+[16:11:51] bluescreen10 has joined #selenium
+[16:11:53] cgoldberg: I live right in downtown boston.. so it's a no-brainer for me.  will probably self-fund and take conference-days off from work
+[16:12:27] smccarthy: I am most likely going to Boston for SeConf 2013
+[16:12:56] cgoldberg: dude-x, maybe we can have a mini sprint to work on py3 for selenium
+[16:13:05] bluescreen10 has joined #selenium
+[16:13:42] dude-x: Sounds like a good idea
+[16:14:47] bluescreen10 has joined #selenium
+[16:16:04] davehunt has joined #selenium
+[16:17:35] bluescreen10 has joined #selenium
+[16:19:16] intchanter-work has joined #selenium
+[16:19:46] bluescreen10 has joined #selenium
+[16:22:41] bluescreen10 has joined #selenium
+[16:29:38] bfife: hello, do your CI tests verify proxys in firefox on linux?
+[16:29:47] Valcriss has joined #selenium
+[16:29:49] _kW has joined #selenium
+[16:29:54] Valcriss: hello !
+[16:30:13] Ardesco: hi !
+[16:31:06] simonstewart has joined #selenium
+[16:31:12] simonstewart: Back again
+[16:31:30] Valcriss: i have a little question about c# and selenium, can i run the same test at the same time ? in Parallel ?
+[16:32:19] Valcriss: in fact i would like to simulate 20 users at the same time
+[16:32:40] simonstewart: Valcriss: "threads and SauceLabs"
+[16:35:37] Valcriss: ok will look at this
+[16:38:18] AutomatedTester: Valcriss: nunit and mbunit have mechanisms for parallel testing iirc
+[16:38:42] simonstewart: 20 simultaneous users is hard work on a machine
+[16:39:53] smccarthy: Valcriss: I've done stuff like this in TestNG and using Selenium Grid : 	@Test(threadPoolSize = 20, invocationCount = 20)
+[16:41:21] rbalent has joined #selenium
+[16:41:28] AutomatedTester: smccarthy: he is after c# though
+[16:41:29] Valcriss: ok will try this, we have a EC2 serveur to run the tests, can we simulate 20 users ?
+[16:41:45] Valcriss: yes its c#
+[16:42:04] simonstewart: You might want more than one ec2 server for 20 browser instances
+[16:42:09] Valcriss: ok
+[16:42:10] simonstewart: I tend to run up to 8 per machine
+[16:42:16] simonstewart: But I'm lame like that
+[16:42:17] smccarthy: AutomatedTester: oh.. sorry didnt see that C# part
+[16:42:22] Valcriss: good to know
+[16:42:40] regex: does the driver.switchTo() method handle file download dialogs?
+[16:42:55] Ardesco: no
+[16:43:30] Ardesco: http://ardesco.lazerycode.com/index.php/2012/07/how-to-download-files-with-selenium-and-why-you-shouldnt/\
+[16:43:56] AutomatedTester: Ardesco: fork selbot so it you can just do a keyword and it writes the URL
+[16:44:32] Ardesco: :)
+[16:46:03] Ardesco: I could always add :detro -> tweet @detronizator WTF you done to the build???
+[16:46:19] Ardesco: and then get it to time how long it takes him to log on IRC
+[16:46:40] rbalent has joined #selenium
+[16:46:49] Ardesco: I suppose it would also need an :add bet 67 seconds
+[16:47:08] Ardesco: and it would have to report the winner
+[16:47:33] stephend has joined #selenium
+[16:47:34] Ardesco: AutomatedTester: you were correct detronizator logged onto irc in 13 seconds!!!
+[16:47:48] *Ardesco wanders off into his crazy little world in the corner
+[16:48:10] alexglow has joined #selenium
+[16:48:15] AutomatedTester: Ardesco: do it!
+[16:48:22] simonstewart: DO IT!
+[16:48:57] RossPatterson: Sounds like a new :whobrokeit
+[16:48:58] selbot2_: simonstewart
+[16:49:07] lukeis has joined #selenium
+[16:49:08] selbot2_: lukeis: note from simonstewart about 8 hours ago: I'll ask them nicely. Those are mirrors though, so read-only 
+[16:49:43] lukeis: simonstewart: thx :)
+[16:50:24] simonstewart: Is that what you want?
+[16:50:36] simonstewart: A read-only mirror of the site?
+[16:50:39] lukeis: yeah, i don't mind the same setup as the main repo
+[16:50:42] simonstewart: OK
+[16:50:44] simonstewart: I'll ask
+[16:51:23] *lukeis values consistency
+[16:52:10] AutomatedTester: consistency?
+[16:52:13] AutomatedTester: eventually...
+[16:52:41] jimevans: so in the flurry of git emails, i've kinda gotten a little lost. what's the expected way of working on the code now? should I simply clone the googlecode repository?
+[16:52:53] simonstewart: yes
+[16:53:02] simonstewart: Same as before, but instead of svn, git
+[16:53:12] jimevans: alright. that's easy enough.
+[16:53:13] simonstewart: And please check in logical changes rather than incremental steps to get there
+[16:53:21] simonstewart: Which may involve squashing commits before pushing
+[16:56:32] davehunt has joined #selenium
+[16:57:06] regex: hey players.  Does the driver.SwitchTo() method work well with file downloads?
+[16:57:12] regex: The dialog popup
+[16:57:25] jimevans: regex: no.
+[16:57:41] RossPatterson: regex: You should read http://ardesco.lazerycode.com/index.php/2012/07/how-to-download-files-with-selenium-and-why-you-shouldnt/
+[16:57:43] regex: jimevans: Great to see you.  I was worried.
+[16:57:52] Valcriss: thx for all the replies, nunit works like a charm thx ;)
+[16:58:03] regex: RossPatterson: Unfortunately it's required for the type of testing I'm assigned
+[16:58:06] jimevans: regex: think very very very carefully about why you want to download files. RossPatterson is right, go read that blog post right now.
+[16:58:19] regex: jimevans: I can't convince my boss of that...
+[16:58:31] jimevans: have *him/her* go read that blog post, right now.
+[16:58:37] Ardesco: regex: that blog post also tells you how to do it
+[16:58:49] regex: jimevans: I'm scared to send :) 
+[16:59:04] RossPatterson: Really, you need to read it, not just say "But I have to."
+[16:59:11] lukeis: as another option isn't there a profile setting with firefox to auto download files to directory x?
+[16:59:32] Ardesco: yup, but if you do that you probably aren't testing the file download process
+[16:59:38] simonstewart: regex: what kind of testing have you been assigned?
+[16:59:41] Ardesco: just downloading stuff to a folder that you never look at
+[16:59:43] Ardesco: :)
+[16:59:52] RossPatterson: Ardesco's argument (like jimevans' and mine) is that it's a bad idea, but he gives you a variety of options if you disagree.
+[16:59:54] lukeis: unless your test reads that file :)
+[IRC logfile - Started Tue Jan 15 17:00:17 2013]
+[17:00:17] Ardesco: but then you have to work out when the file has finished downloading
+[17:00:22] Ardesco: what do you do if the file isn't there
+[17:00:24] ebi has joined #selenium
+[17:00:29] zac_sel has joined #selenium
+[17:00:30] Ardesco: what if you only find a partial download
+[17:00:32] jimevans: lukeis: true, but the 80% case is that most people downloading the file never check its content
+[17:00:41] lukeis: webdriverwait(60).until(file exists)
+[17:00:42] lukeis: :)
+[17:00:43] regex: simonstewart: Basic web data driven testing, framework, and ensuring that all dialogs/downloads/uploads are tested...
+[17:00:53] jmathes_ has joined #selenium
+[17:00:54] regex: RossPatterson: thanks
+[17:01:00] Ardesco: existence of a file is no guarantee it is the fully downloaded copy of it
+[17:01:06] simonstewart: And how do you ensure that all the downloads are okay?
+[17:01:09] lukeis: i think it does with ff
+[17:01:13] RossPatterson: Thank Ardesco - it's his blog :-)
+[17:01:48] simonstewart: Ardesco: let's follow this one through. Maybe there's another way to verify the unverifiable
+[17:01:56] regex: simonstewart: Past developer used a file compare string.  Just comparing the download exists in the directory via string comparison.
+[17:02:08] Ardesco: it's definitely an option lukeis, but I would rather get an http status code to tell me what happened when I requested the file than guess based on whether a file is or is not in the down load folder
+[17:02:11] simonstewart: "Testing all downloads work" is a pretty broad concept
+[17:02:21] regex: Ardesco: I totally agree.  Hash would be the best utility to ensure the integrity of the file
+[17:02:23] Ardesco: and also you have to make sure you remember to clear out the download folder after the test
+[17:02:38] Ardesco: or you will get a bunch of false positives when you run the test again and the file is already there
+[17:02:40] lukeis: Ardesco: i know :) /me doesn't actually ever download anything either
+[17:02:44] simonstewart: regex: then I'd only run the download tests in firefox and I'd set all the settings to always save everything automatically to the same directory
+[17:03:03] simonstewart: I'd also mention to Those In Charge that the test is worthless, since you only know that _something_ was downloaded
+[17:03:08] simonstewart: but not "what" was downloaded
+[17:04:09] Ardesco: IMHO "Testing all downloads work" just shows that somebody doesn't really understand the concept of testing
+[17:04:23] regex: Are you guys advocating hash compare.  Are you saying that's a useless test even if you're going to the ends of the earth to ensure 'what' was downloaded?
+[17:04:39] Ardesco: it should be "prove to me that the download process works correctly and give me a high level of confidence that it will always give the user the file we expect it to"
+[17:05:09] simonstewart: If you're going to the ends of the earth, it may be okay. 
+[17:05:12] regex: Ardesco: We are testing 'what' was downloaded.  We are just doing it currently in a minimal way.  That the file names and URL's are right.  
+[17:05:23] simonstewart: THough I'd suggest it's better as an integration test of the component that generate the download
+[17:05:37] simonstewart: (Browsers are pretty good at this "downloading stuff of the Web" thing)
+[17:05:58] Ardesco: regex my default position is what would you do if the download doesn't work
+[17:06:14] Ardesco: can you fix the browser if it's broken
+[17:06:19] Ardesco: can you force a browser release
+[17:06:22] regex: simonstewart: Perhaps I didn't communicate the intricacies clearly.  Yes, dialogs ALWAYS work.  We are not testing a browser dialog.  But we need to be able to handle the download in order to test 'what' was downloaded.
+[17:06:31] Ardesco: can you make your users use the version of the browser with the fix
+[17:06:40] jimevans: regex: i would submit that you're *not* actually testing what was downloading. you know you downloaded *something*, and that it has a file name you expect, but you've no idea if you've actually downloaded anything remotely approaching the correct bits.
+[17:06:59] regex: Ardesco: Yes, I push the button to release new Chrome versions :)  
+[17:07:15] simonstewart: regex: sure. I heard that. :) I was suggesting that there was a component of your system responsible for creating the thing that's downloaded. I'd be keen to write an integration test around that component, and that component alone.
+[17:07:29] simonstewart: But the other crazy idea I suggested would also work :)
+[17:07:39] simonstewart: As would the suggestions on Ardesco's blog post
+[17:07:51] jimevans: regex: and if all you're working to do is make sure that "link to URL 'foo' points to a file with contents 'bar'", you really don't need a browser to do that.
+[17:08:13] regex: jimevans: It's just a pain to do a hash compare.  It's like using excavator to dig a hole instead of using a shovel. 
+[17:08:18] Ardesco: then why are you using selenium to check that the chrome download dialogue works?
+[17:08:19] Ardesco: :)
+[17:09:06] simonstewart: OK chaps. I'm off
+[17:09:07] jimevans: regex: depends on how big the hole you want is.
+[17:09:12] simonstewart: regex: best of luck with your testing
+[17:09:32] regex: You guys are a lot of help.  You push me to my limit though and add work to my overworked schedule...
+[17:09:36] simonstewart: Everyone here is genuinely trying to help, I can promise you)
+[17:10:09] Ardesco: well i would submit you don't need to test every file download
+[17:10:23] *lukeis may try to sabotage tho ;)
+[17:10:28] Ardesco: just one file through each functional path of the site that would produce a file download
+[17:10:40] Ardesco: which means there shouldn't be that many file to perform a hash match on
+[17:13:43] jimevans: :note santiycr no need to change anything for the .NET bindings. they already support what your user is looking for.
+[17:13:44] selbot2_: ok!
+[17:17:23] lukeis: ok, so I was pretty tired when I added people to the team on github, I missed a few people, who else should have it / wants it? (all you get is the 'privilege' to close pull requests on github) freynaud? (I missed adding you for some reason)
+[17:17:56] regex: jimevans: Have you encountered problems with the IEDriverServer on XP?  
+[17:18:26] jimevans: regex: not especially, but i don't have an XP system handy to test with that much.
+[17:18:58] regex: jimevans: Still doesn't work on this platform.  Had to get a Windows 7 machine and it runs smoothly.
+[17:19:30] jimevans: regex: next step, a clean windows xp machine.
+[17:19:33] Spanktar has joined #selenium
+[17:19:41] jimevans: (which is why i *love* vms)
+[17:19:53] regex: jimevans: That might take a few weeks.  I'll keep you updated. 
+[17:20:13] regex: jimevans: In the mean time, if you have any recommendations on rebuilding the server.  I have isolated that method. 
+[17:21:22] jimevans: regex: rebuilding the server should be just as easy as choosing the Win32 platform in Visual Studio and building the projec.t
+[17:21:37] regex: Right.  I mean altering that method however.
+[17:21:56] regex: I've done all that prep stuff. 
+[17:24:11] jimevans: regex: then i'd start debugging. :) set a breakpoint in your c# code, attach to the running IEDriverServer.exe process and set a breakpoint in the C++ code, then continue into the C++ code to your breakpoint.
+[17:28:23] jcarr has joined #selenium
+[17:28:37] qaguy has joined #selenium
+[17:30:33] sfbrian has joined #selenium
+[17:41:22] santiycr has joined #selenium
+[17:41:23] selbot2_: santiycr: note from jimevans 28 minutes ago: no need to change anything for the .NET bindings. they already support what your user is looking for. 
+[17:43:57] RossPatterson: :yt Jimmy Webb - By The Time I Get To Phoenix
+[17:43:58] selbot2_: Jimmy Webb - By The Time I Get To Phoenix - http://www.youtube.com/watch?v=sJoi2QpbiF4&feature=youtube_gdata
+[17:45:07] sayd has joined #selenium
+[17:52:18] krosenvold_: jimevans: yes
+[17:52:53] jimevans: krosenvold_: nvm. i got my answer elsewhere. just wondering about the new workflow for committers under the new git regime.
+[17:53:19] krosenvold_: nirvdrum: Definitely no carriage returns in the repo
+[17:53:28] krosenvold_: Highway to hell
+[17:53:44] qaguy has joined #selenium
+[17:53:45] krosenvold_: I'm going to write something up on that right >now<
+[17:54:18] jimevans: krosenvold_: :D
+[17:54:27] knorrium_ has joined #selenium
+[17:54:33] lukeis: holy cow, i just realized i'm now completely working in git (for work and open source. yes, my workplace still uses p4, but not the team(s) i work with!)
+[17:58:23] krosenvold_: AutomatedTester: What was your "git config --get core.autocrlf" when you committed carriage returns
+[17:58:29] krosenvold_: ?
+[17:59:33] Ardesco_ has joined #selenium
+[IRC logfile - Started Tue Jan 15 18:03:19 2013]
+[18:03:19] regex: perforce lukeis ?
+[18:03:36] lukeis: yes?
+[18:03:47] regex: You must be in paradise.  P4 is the best.  Top.  Chieftan of all source control.  It's the 'bomb'. 
+[18:04:08] jimevans: regex: you forgot the <sarcasm> tag on that.
+[18:04:10] lukeis: i no longer have to use 'the bomb' only on git :)
+[18:04:26] regex: lukeis: Please do not switch to git.  Why would you leave paradise?  P4 can solve all problems.
+[18:04:42] krosenvold_: regex: world hunger too, according to what I hear
+[18:04:46] *lukeis not sure what to do with this trolling
+[18:05:25] admc has joined #selenium
+[18:05:27] RossPatterson: Someone set lukeis up the bomb.
+[18:05:34] krosenvold_: Ok, the .gitattributes file I just committed should put an end to all carriage returns. No need to poke about with core.autocrlf
+[18:05:46] *RossPatterson appluads that action
+[18:06:01] regex: krosenvold_: p4 worked in conjuntion with Norman Borlaug on world hunger.
+[18:06:03] plightbo_work has joined #selenium
+[18:06:06] *jimevans does a pull.
+[18:07:47] noahsussman has joined #selenium
+[18:08:18] regex: Everytime I used p4, if I pressed any button, or pulled, merged, anything.  I'd always break the build.  I simply stopped using it altogether and just saved my stuff locally. 
+[18:09:16] regex: Are you guys buying AAPL on this dip?  I'd load up. 
+[18:10:48] *lukeis takes all stock buying tips from IRC :-D
+[18:11:24] krosenvold_: btw: who UNDERSTANDS the bits and pieces under "For Java" in https://code.google.com/p/selenium/wiki/ReleasingSelenium ??
+[18:11:53] jcarr has joined #selenium
+[18:12:07] krosenvold_: I see some svn commands but it totally escapes me what those7 lines of script are trying to accomplish ?
+[18:12:56] lukeis: krosenvold_: they are trying to make sure that a delete java file gets the autogenerated javadoc deleted too
+[18:13:07] lukeis: git replacement is to just rm -rf docs/java first ;)
+[18:13:16] lukeis: then git add docs/java/**
+[18:13:20] lukeis: yay
+[18:13:44] krosenvold_: You fix docs ?
+[18:13:45] lukeis: docs/api/java that is
+[18:13:56] lukeis: fix?
+[18:14:05] krosenvold_: Update, they think we use svn
+[18:14:18] krosenvold_: That was yesterday
+[18:14:35] lukeis: heh, i plan to do some of that in the near future, yes
+[18:15:09] regex: jimevans: I put my architecture on GitHub...
+[18:15:55] regex: jimevans: Remeber however that this is open and accepting community.  Like writing music.  You may not like it but you're open and accepting of the contribution...
+[18:16:32] stackedsax has joined #selenium
+[18:16:41] jamesoram has joined #selenium
+[18:16:41] *regex tries to prepare my self for criticism
+[18:25:14] link15 has joined #selenium
+[18:25:31] link15: is there a way with selenium to confirm that a download was initiated?
+[18:26:55] Archdude has joined #selenium
+[18:27:12] dude-x: link15: no, but you can poll the filesystem to see if there's a file created in the download directory
+[18:29:39] knorrium has joined #selenium
+[18:34:08] barancev|2 has joined #selenium
+[18:45:54] krosenvold_: jarib: Doesnt selbot do commits yet ?
+[18:45:56] lukeis: that was wierd, because of the change to .gitattributes my workspace thought .gitignore was modified due to line endings and thus wouldn't let me 'rebase origin master'… i had to locally edit .gitattributes, then stash it and then i could rebase. weird.
+[18:46:12] krosenvold_: lukeis: are you on windows ?
+[18:46:16] lukeis: mac
+[18:46:41] santiycr has joined #selenium
+[18:47:25] krosenvold_: Are you sure there isn't a problem in .gitignore ?
+[18:48:16] krosenvold_: There was
+[18:48:18] lukeis: well after i did that i saw no complaints and gitignore shows no modifications
+[18:48:20] krosenvold_: NOtany more
+[18:48:41] lukeis: rhttps://code.google.com/p/selenium/source/detail?r=55504b8b466f398898897e2af29b3bdcfd15cfd6
+[18:48:51] lukeis: d'oh
+[18:49:02] lukeis: r55504b8b466f
+[18:49:26] lukeis:  r55504b8b466f 
+[18:50:09] krosenvold_: selbot does not seem up to it yet
+[18:50:19] lukeis: guess jarib hasn't reset selbot2 yet, that was merged yesterday
+[18:54:15] link15: how do i fill in a text field with selenium?
+[18:54:19] lukeis: krosenvold_: did we or are we going to fix google code to not allow fast-forwarding? (--force)
+[18:54:40] lukeis: link15: driver.findElement(By.tagName("input")).sendKeys("text to fill")
+[18:54:57] link15: lukeis: thanks!
+[18:55:15] *lukeis should have asked which API… but that's WebDriver
+[18:55:35] santiycr: :seen dawagner
+[18:55:36] selbot2_: dawagner was last seen about 23 hours ago, quitting.
+[18:55:38] link15: aye, thats the one iw as looking for, was thrown off because in the api docs it says "weve alread seen how to input text" but doesn't mention where
+[18:56:06] lukeis: where in the docs?
+[18:57:01] lukeis: oh rHEAD
+[18:57:04] selbot2_: 03detronizator@gmail.com 3 days ago - IvanDeMarino: README.md now uses GitHub-Markdown. | https://code.google.com/p/selenium/source/detail?r=18456 | http://seleniumhq.org/ci.jsp?r=18456
+[18:57:19] lukeis: that still works, but not really ;)
+[18:57:35] link15: http://seleniumhq.org/docs/03_webdriver.jsp#selenium-webdriver-api-commands-and-operations
+[18:58:00] link15: foudn where it is, they describe how to in Introducing the Selenium-WebDriver API by Example but dont explain it in the "Filling out forms" section
+[IRC logfile - Started Tue Jan 15 19:00:09 2013]
+[19:00:09] lukeis: ah, yeah, that's not clear.. implied is from the first example that does element.sendKeys("cheese!")
+[19:00:42] *lukeis will try to remember to correct that
+[19:00:44] lukeis: :)
+[19:06:38] link15: lukeis: i'm getting WebElement has no Attribute "SendKeys"
+[19:06:52] link15: * sendKeys
+[19:06:53] lukeis: what language?
+[19:07:13] link15: python
+[19:07:19] link15: using remote
+[19:07:19] lukeis: send_keys
+[19:07:31] teodosia_sel has left #selenium
+[19:07:38] link15: :X
+[19:08:17] nsussman has joined #selenium
+[19:09:21] Archdude_ has joined #selenium
+[19:10:44] santiycr: jimevans:  just noticed all the IE specific caps that cover the IEDriver config. Thanks
+[19:11:17] santiycr: one thing I noticed is the IE caps are the only ones that are not namespaced to IE: https://code.google.com/p/selenium/wiki/DesiredCapabilities#IE_specific
+[19:12:00] santiycr: the chrome, opera and safari specific caps, all start with browsername.capability
+[19:12:12] jimevans: santiycr: what the client code should do is use InternetExplorerOptions, adding the sauce-specific caps to the options using AddAdditionalCapability(), then pass options.ToCapabilities() to the remote constructor.
+[19:12:15] santiycr: s/start with/follow the pattern/
+[19:12:44] santiycr: oh, interesting 
+[19:13:35] santiycr: ok, I'll try to make this work and put it in the iedriver wiki
+[19:13:55] jimevans: ToCapabilities() returns ICapabilities, rather than DesiredCapabilities, so you have to start with the options class, and add additional caps there, rather than the other way 'round.
+[19:14:37] santiycr: yeah, was wondering if I could use DesiredCaps and then merge whatever ieoptions gave me back
+[19:15:03] andreastt: santiycr: The so called pattern with using the browser name as a prefix is just because noone have really gotten around to synchronize them yet.
+[19:15:30] santiycr: jimevans: not a fan of asking people to add random capabilities into the InternetExplorerOptions object
+[19:15:36] santiycr: not that it matters much :)
+[19:15:38] andreastt: It's easier to say, I'm going to smack "opera." in front so that I know it won't conflict.
+[19:15:59] santiycr: andreastt:  makes it for a nice separation nevertheless 
+[19:16:06] barancev: in web interface for git there is no "newer" link to navigate through the list of commits, you can go to "older" ones only :(
+[19:16:06] andreastt: For some things of course.
+[19:16:08] jimevans: santiycr: but you're asking them to do it to DesiredCapabilities. not sure i see the differenc.e
+[19:16:38] andreastt: I started out supporting proxy as opera.proxy, then later changed the code to support the base proxy capability.
+[19:17:02] andreastt: So it could be thought of in similar terms as CSS vendor prefixes.
+[19:17:45] santiycr: jimevans:  that's what DesiredCapabilities are for. General capabilities used to drive the browser
+[19:18:28] santiycr: also, asking them to add them to IEOptions instead of desired caps, means they need to duplicate a bunch of code and special case it for whenever IE is being run
+[19:18:50] santiycr: and by that, I'm talking about the desired capabilities setup
+[19:20:21] jimevans: as a .NET developer, i hate DesiredCapabilities. a string, object dictionary? with no type safety? ugh.
+[19:20:49] santiycr: heh
+[19:20:49] jimevans: that's why the options classes exist in the first place.
+[19:20:55] santiycr: as a python developer, I'm home
+[19:21:07] jimevans: to provide type safety for the options you want that would ordinarily go in DesiredCapabilities.
+[19:21:40] santiycr: I see
+[19:22:15] jimevans: but it would be a simple matter to change .ToCapabilities() to return DesiredCapabilities instead of ICapabilities, which would solve the problem too.
+[19:23:15] jimevans: it would just mean to get your base capabilities object, you'd call "new InternetExplorerOptions().ToCapabilities() instead of DesiredCapabilities.InternetExplorer().
+[19:26:39] mac-convert has joined #selenium
+[19:27:08] santiycr: I see
+[19:27:52] santiycr: well, that's your call
+[19:28:19] awilson820 has joined #selenium
+[19:28:21] jimevans: i'm not sure i care that much either way, but in the particular scenario your customer was asking about would work just fine for them. they're already using the options class for local runs.
+[19:29:09] barancev: gecko sdk 18 is over 400M :(
+[19:29:37] *jimevans keeps waiting on m-day.
+[19:29:38] selbot2_: M-Day: day in the future when Marionette is made available for non-debug builds
+[19:29:48] santiycr: jimevans:  fair enough. I'll reply with the current way
+[19:30:06] santiycr: not worrying about this much
+[19:30:54] barancev: to be clear: *bzipped* gecko sdk 18 is over 400M
+[19:31:04] andreastt: jimevans: I did something similar with capabilities for the OperaDriver.
+[19:31:20] rbalent has joined #selenium
+[19:32:02] andreastt: To make a long story short, I was tired of having to do type and value checks on the key/value string capabilities storage every time I used them.  It also frequently caused conflicts internally as some of the capabilities were evaluated at driver initialization.
+[19:32:16] jimevans: exactly so.
+[19:32:36] andreastt: So once the OperaDriver receives a set of capabilities, they are immediately converted into an OperaSettings object (much similar to IEOptions and ChromeOptions I believe).
+[19:32:49] link15: thanks for the help lukeis :)
+[19:32:52] andreastt: The OperaSettings has #toCapabilities() which returns a Capabilities object.
+[19:33:12] jimevans: for strongly-typed languages, having opaque blobby type data structures is inelegant.
+[19:33:31] andreastt: Yes, especially when you can't guarantee what the user sends you.
+[19:33:39] andreastt: If they make a mistake, they'll end up blaming you
+[19:33:55] jimevans: yep! :)
+[19:34:22] link15 has left #selenium
+[19:34:23] andreastt: Besides, things like capabilities objects is hard to get right in a typechecked language.
+[19:34:39] andreastt: Like, you might be able to get DesiredCapabilities.InternetExplorer right.
+[19:34:46] andreastt: But getting the Proxy thing right is a nightmare.
+[19:35:45] mac-convert: We just converted over to Selenium 2.28 from 2.24 (using Java) and the IEDriverServer.exe appears to be the cause for slowness that we are now seeing.  We see tests take about 25-30% longer than with the older driver.  Any ideas?
+[19:36:48] jimevans: mac-convert: what OS are you running the IEDriverServer on?
+[19:37:09] mac-convert: jimevans: Win2k8.
+[19:37:39] jimevans: i've heard reports that running on server OSes may cause a perf hit.
+[19:37:57] mac-convert: jimevans: I am seeing the same slowness on Win7 as well
+[19:38:40] mac-convert: though I can't say what the performance of 2.24 was on Win7, I just tried Win7 for comparison purposes.
+[19:38:57] nirvdrum: krosenvold_: I think there was a CRLF issue with an IDEA file that Simon committed.  Dunno if you care on those.
+[19:40:48] mac-convert: why do we need the IEDriverServer.exe in 2.28 when in 2.24 it wasn't required?
+[19:41:01] dhpe: anyone going to the selenium meetup in SF tonight?
+[19:41:07] mac-convert: I would think spinning up a new process and requiring IPC would make things slower
+[19:41:14] jimevans: mac-convert: http://jimevansmusic.blogspot.com/2012/11/are-you-kidding-me-ie-driver-another.html
+[19:42:14] jimevans: mac-convert: the dirty little secret is that you were doing IPC via HTTP calls even without the separate .exe.
+[19:43:00] krosenvold_: nirvdrum: Not *that* much 
+[19:43:10] mac-convert: jimevans: but isn't this an extra IPC hop?  sure you were doing HTTP to the browser, but now it's HTTP to IEDriverServer to the browser, right?
+[19:43:21] mac-convert: jimevans: reading your blog post
+[19:43:39] jimevans: mac-convert: nope, it was HTTP to the IEDriver.dll to the browser before.
+[19:44:40] nirvdrum: krosenvold_: Well, glad you fixed it before it became a big issue.  Some take the stance that it shouldn't be a project setting but rather an individual developer setting.
+[19:45:27] krosenvold_: Bah. It's a PITA when it goes wrong
+[19:46:58] jimevans: contrary to public opinion, it's rare that i make a change to either the IE driver or the .net bindings without having *some* reason for doing so.
+[19:47:10] mac-convert: jimevans: ok, assuming that the EXE isn't making things any slower, could there be anything else that would make it slower?
+[19:47:35] *lukeis <3 jimevans
+[19:47:50] mac-convert: jimevans: I'm certain you do, it's all good :-)
+[19:48:09] *jimevans is fighting the perception that he only makes changes to the IE driver or the bindings to inconvenience users. :)
+[19:48:38] lukeis: that's the only reason *I* code :)
+[19:49:27] AutomatedTester: krosenvold_: I dont have it set
+[19:49:42] mac-convert: jimevans: do you have a suggestion to help make things a bit faster or maybe a log file I can look at?  because our test suite for IE takes over 24 hours (before the upgrade from 2.24 to 2.28)
+[19:49:44] AutomatedTester: barancev: the MD5SUMS are up now
+[19:50:16] jimevans: mac-convert: could be any number of things, from a slow down in one of the javascript automation atoms, to a change in the native event code that i didn't expect, to whatever.
+[19:50:40] mac-convert: jimevans: so if I extrapolate the new time, maybe it'll take 30 hours instead… 
+[19:50:44] jamesoram has joined #selenium
+[19:50:48] AutomatedTester: one slow down is the ability to support CSS Transforms
+[19:50:57] jimevans: mac-convert: what kind of log file are you asking for?
+[19:50:59] AutomatedTester: that has come in between 2.24 and 2.28
+[19:51:03] krosenvold_: AutomatedTester: It does not matter any more. I have set it for you ;)
+[19:51:15] RossPatterson: jimevans: Turtles all the way down!
+[19:51:17] AutomatedTester: krosenvold_: what should it be?
+[19:51:26] AutomatedTester: krosenvold_: asking for all my other projects
+[19:51:43] mac-convert: jimevans: Not sure, just anything…  
+[19:51:45] jimevans: RossPatterson: indeed :)
+[19:51:58] _kW has joined #selenium
+[19:52:21] mac-convert: AutomatedTester: what kind of slowdown is expected there?  not sure if we're using CSS transforms
+[19:52:25] RossPatterson: mac-convert: :changelog
+[19:52:26] selbot2_: .NET: http://goo.gl/SL88L | Java: http://goo.gl/50JPE | Ruby: http://goo.gl/K9ayk | Python: http://goo.gl/Ikm8u | IDE: http://goo.gl/tm4FM
+[19:52:32] RossPatterson: ^^^
+[19:52:44] AutomatedTester: mac-convert: the selenium code checks for CSS transforms as part of its visibility checks
+[19:52:51] AutomatedTester: which means it needs to walk the DOM 
+[19:53:15] AutomatedTester: hmmm wanted to ask jleyba a question about how we could optimise
+[19:53:25] jimevans: RossPatterson: yeah, but that doesn't include the IEDriverServer change log. which is at http://code.google.com/p/selenium/source/browse/cpp/IEDriverServer/CHANGELOG
+[19:53:42] RossPatterson: Time for a selbot2 code patch!
+[19:54:08] jimevans: oooh, and the selbot change log links point to svn! 
+[19:54:14] AutomatedTester: I wonder if we could do a memoization of elements we find in the visibility checks and just walk what we store a long the way...
+[19:54:25] mac-convert: AutomatedTester: if we're not using CSS transforms, would it not make things slower unless we did?
+[19:54:35] lukeis: yeah, selbot2_ needs a lot of patches
+[19:54:53] AutomatedTester: mac-convert: webdriver wouldnt know you arent using CSS Transforms so walks anyway
+[19:55:08] lukeis: svn -> git has a lot of subtleties that we need to iron out
+[19:55:13] jimevans: i wonder if de-atomizing the IE driver would make it any faster.
+[19:55:18] *jimevans shudders at the thought.
+[19:55:31] jimevans: because i know it almost certainly would.
+[19:55:34] AutomatedTester: TIL I learnt that Facebook moved from GIT to Mercurial for speed reasons
+[19:55:40] mac-convert: AutomatedTester: so it'll cause slowness even if I'm not using CSS transforms maybe
+[19:56:08] AutomatedTester: "maybe"
+[19:56:14] jimevans: mac-convert: what version of IE are you using?
+[19:56:29] mac-convert: jimevans: do you guys do any benchmarking to compare performance across releases?
+[19:56:33] AutomatedTester: mac-convert: also using IE X64 will cause slowness
+[19:56:36] AutomatedTester: since the JS JIT is optimized for x86
+[19:56:38] mac-convert: jimevans: IE9
+[19:56:43] jimevans: mac-convert: benchmarking? hahahahahahahaha
+[19:57:04] jimevans: mac-convert: sorry. 
+[19:57:04] mac-convert: jimevans: or anything to decide if things get slower?  
+[19:57:16] jimevans: mac-convert: patches most welcome.
+[19:57:18] lukeis: s/hahahahhahahahaha/were not quite there yet :)/
+[19:57:37] lukeis: s/were/we're/
+[19:57:58] AutomatedTester: s/we're not quite there yet/thats up to the browser vendors soon/
+[19:58:04] mac-convert: jimevans: that'll come in 3.0 right ;-)
+[19:58:05] jimevans: mac-convert: make sure you're using 32-bit IE9. that's seriously the biggest perf gain you'll have.
+[19:58:21] lukeis: AutomatedTester: mday ;)
+[19:58:22] selbot2_: M-Day: day in the future when Marionette is made available for non-debug builds
+[19:59:43] mac-convert: jimevans: we're using 32-bit IE
+[IRC logfile - Started Tue Jan 15 20:00:08 2013]
+[20:00:08] zeljkof has joined #selenium
+[20:00:24] jimevans: if you're using the 32-bit IEDriverServer, then yes, you are. :)
+[20:00:53] mac-convert: jimevans: my point was, you said use 32-bit IE, and we are..
+[20:01:26] mac-convert: jimevans: do you have a day job like the rest of us?  selenium is pretty good, must take a lot of someone's efforts
+[20:01:29] jimevans: mac-convert: yes, i get that. and *my* point is that if your language runtime in 2.24 was 64-bit, you weren't.
+[20:01:39] jimevans: mac-convert: indeed i do.
+[20:01:55] mac-convert: jimevans: bowing - thank you!
+[20:02:09] lukeis: mac-convert: everyone on this project has day-jobs ;)
+[20:02:09] jimevans: which is why i'm so quick to say "patches welcome" rather than just going off to do it myself.
+[20:02:26] jimevans: the selenium project is all-volunteer\
+[20:02:47] mac-convert: jimevans: are you talking about 64-bit Java or the .NET runtime?
+[20:02:54] jimevans: mac-convert: either.
+[20:03:21] mac-convert: jimevans: ok, so if on the client-side we're using 64-bit Java, with a 32-bit IE, could that cause slowness?
+[20:03:31] mac-convert: jimevans: re: patches, understood
+[20:03:53] AutomatedTester: mac-convert: and limit the getText() calls to smaller items
+[20:03:53] AutomatedTester: getText() on a <table> will be very very slow
+[20:03:53] AutomatedTester: since it needs to walk the DOM for text collection and for visibility
+[20:03:54] a1g has joined #selenium
+[20:03:59] jimevans: mac-convert: not likely, given the ipc mechanism.
+[20:04:13] jimevans: (which is http)
+[20:04:33] jimevans: were you using a 64-bit jvm with 2.24, and not using the IEDriverServer?
+[20:04:37] mac-convert: jimevans: just trying to understand what 32-bit vs. 64-bit has to do with slowness then
+[20:05:05] jimevans: ah, because the updated javascript engine for IE9 that used JIT compilation wasn't available in 64-bit IE9, only 32-bit
+[20:05:29] mac-convert: jimevans: got it
+[20:06:05] mac-convert: jimevans: I believe we're using a 64-bit JVM (not sure).  But for sure, with 2.24, we were not using IEDriverServer
+[20:06:43] mac-convert: jimevans: are we forced to use IEDriverServer in 2.28 (stupid question maybe, just making sure)
+[20:06:54] jimevans: mac-convert: yep.
+[20:07:03] jimevans: for all the reasons mentioned in the blog post.
+[20:07:12] mac-convert: jimevans: right
+[20:07:39] mac-convert: jimevans: OK, well, thanks for your help and your hard work taking up your own free time to work on this.
+[20:07:54] jimevans: np. 
+[20:07:58] mac-convert has left #selenium
+[20:08:51] AutomatedTester: mac-convert: the IE JavaScript JIT is optimised for 32bit
+[20:08:52] AutomatedTester: and we use a lot of JavaScript
+[20:09:15] jimevans: he left.
+[20:09:26] *AutomatedTester mutters about crappy internet connection 
+[20:11:30] AutomatedTester: I am tethered to my phone on the train home
+[20:11:55] jamesoram has joined #selenium
+[20:12:44] dude-x: i wish i can tether without paying AT&T more money
+[20:13:09] dude-x: it's terrible how under a republican administration AT&T is bigger than what it was pre-breakup
+[20:13:18] AutomatedTester: dude-x: how do they tell the difference ?
+[20:13:40] AutomatedTester: dude-x: the providers here say you should pay but I never have
+[20:13:58] dude-x: i guess my iphone rats me out. suposedly jailbreaking doesn't have this issue but then you have the issue of having a jailbroken phone.
+[20:14:11] AutomatedTester: interesting
+[20:14:46] AutomatedTester: lol... google maps on my phone is trying to track where I am going
+[20:14:58] AutomatedTester: and it putting me on the nearest road and tracking me along that
+[20:15:09] AutomatedTester: thats going to skew their data for Google Now
+[20:15:53] AutomatedTester: laters boys and girls
+[20:15:58] dude-x: o/
+[20:17:09] krosenvold_: jimevans: needs to fix his avatars ;)
+[20:19:27] towski has joined #selenium
+[20:21:18] bluescreen100 has joined #selenium
+[20:21:50] davehunt has joined #selenium
+[20:28:36] jimevans: wait, what?
+[20:34:01] lukeis: https://github.com/jimevans <-
+[20:34:17] jimevans: ah.
+[20:34:24] jimevans: that
+[20:34:51] sayd: lukeis: santiycr did you guys lunch today?
+[20:35:05] lukeis: no, we both forgot
+[20:35:58] lukeis: we are both bad with schedules unless it's on our calendar ;)
+[20:37:56] sayd: hehhe
+[20:38:11] sayd: well if you decide to reschedule let me know
+[20:39:12] lukeis: davehunt: how long you in town for? (are you in the city or MV?)
+[20:39:30] davehunt: in the city until Saturday
+[20:39:39] davehunt: flight is Saturday afternoon I think
+[20:40:17] lukeis: ok, tomorrow or thursday free for lunch?
+[20:40:49] lukeis: (no worries if you're booked up :) )
+[20:40:55] RossPatterson: from 9 to 5 i have to spend my time at work
+[20:40:55] davehunt: stephend: ^
+[20:41:25] lukeis: RossPatterson: you're a slave ;)
+[20:41:33] stephend: lukeis: we have a 1:30 pm QA meeting tomorrow, so might not be the best day
+[20:41:54] stephend: but thursday/friday, we could probably work something out
+[20:42:30] RossPatterson: Just wishing I was on Echo Beach :-)
+[20:42:56] lukeis: ok, thursday is my only chance (can't friday)
+[20:44:44] qaguy has joined #selenium
+[20:51:56] davehunt: lukeis: you attending the meetup tonight?
+[20:52:07] lukeis: no i'm not :(
+[20:52:30] lukeis: the wife has a meeting
+[20:54:10] davehunt: ah, k
+[20:54:32] davehunt: We have lunch in the office each day, but I'm sure you're free to join us :)
+[20:54:42] davehunt: There seems to be more than enough
+[20:54:55] lukeis: thx ;) you guys just live in excess huh? ;)
+[20:55:13] davehunt: yeah, apparently ordering a sensible amount of food is hard
+[20:55:15] davehunt: stephend: ^
+[20:55:53] stephend: heh, better over than under, but yes, you're welcome to join us for lunch
+[20:55:59] *lukeis doesn't feel bad eating your guys' food, I did donate to mozilla (a mere $50 with company matching to make it $100) ;)
+[20:56:17] *lukeis will do more this year
+[20:57:32] dhpe: somebody from palo alto / nearby driving to the meetup today?
+[20:58:31] lukeis: dhpe: post it on the meetup group :)
+[20:59:16] dhpe: i will
+[IRC logfile - Started Tue Jan 15 21:08:25 2013]
+[21:08:25] dhpe: or the train...
+[21:10:35] lukeis: cal train is a decent option from there
+[21:12:08] lukeis: although i probably would transfer to bart in milbrae to avoid the long (cold) walk
+[21:12:50] *lukeis complains about the 'cold' when it's in the 50's ;)
+[21:42:26] sayd: when configuring jenkins to run selenium tests, can i have it open something in a repo that is part of the build?
+[21:42:43] sayd: like if i have TestSuite.html at the root of the repo im 'building
+[21:49:02] adamgoucher has joined #selenium
+[21:52:28] jost has joined #selenium
+[IRC logfile - Started Tue Jan 15 22:00:03 2013]
+[22:00:03] stackedsax has joined #selenium
+[22:01:20] gdennis has left #selenium
+[22:02:05] a1g has joined #selenium
+[22:02:05] a1g has joined #selenium
+[22:04:57] qaguy has joined #selenium
+[22:06:10] matthewrobbins has joined #selenium
+[22:23:35] alexglow has joined #selenium
+[22:28:42] admc has joined #selenium
+[22:29:54] jamesoram has joined #selenium
+[22:32:10] regex has joined #selenium
+[22:33:30] regex: jimevans: I have an error on a 64 bit machine using IeDriverServer
+[22:33:48] jimevans: okay, 32-bit or 64-bit IEDriverServer?
+[22:33:59] jimevans: and what's the error?
+[22:34:00] regex: 32 bit
+[22:34:24] regex: 'object doesn't support property or method 'isHomePage'
+[22:35:17] jimevans: that doesn't sound like an IEDriverServer error
+[22:35:56] *lukeis blames jimevans for all my page object pattern problems
+[22:36:01] lukeis: s/jimevans/IE/
+[22:36:11] lukeis: ;)
+[22:36:31] jimevans: lukeis: you'd be surprised how many people consider them one and the same. :)
+[22:36:54] lukeis: if i hadn't met you in person I'd believe it :-D
+[22:36:58] regex: As soon as I switch out the servers from 32 to 64 the error arrives.
+[22:38:10] jimevans: so the problem occurs with 32-bit IEDriverServer, and doesn't with the 64-bit IEDriverServer?
+[22:39:00] jimevans: (to be honest, that sounds like a c# runtime error, not one coming from the IEDriverServer)
+[22:39:39] jimevans: regex: is there any call to "isHomePage" in your C# code?
+[22:39:52] regex: No..
+[22:40:16] jimevans: because there isn't any reference to such a thing in the entire IEDriverServer code base.
+[22:40:50] jimevans: can you show me the C# code you're running when it fails?
+[22:41:27] jimevans: (also, you've got about 10 minutes more of my time before i've got to leave)
+[22:42:43] regex: I could but it's on the other machine.
+[22:42:48] regex: Hold please.
+[22:44:48] regex64 has joined #selenium
+[22:46:37] a1g has joined #selenium
+[22:48:21] sayd: lukeis: so i generated some tests with that ide you suggested.. how do i now automate those as part of a build? :)
+[22:49:19] lukeis: export (save as) something like java or python or ruby (make sure you chose 'Selenium 2')
+[22:49:34] lukeis: i'd recommend python ;)
+[22:49:56] jimevans: regex: don't know which machine you're looking at right now, but post a stack trace from when you get the error.
+[22:50:08] jimevans: regex64: ^^
+[22:50:16] sayd: lukeis: cool
+[22:50:22] jimevans: and you're down to about 2 minutes now.
+[22:50:40] sayd: im fixing up my tests. they don't support a couple of the things like clickAndWait and runScript
+[22:52:08] sayd: i figured out the workaround for clickAndWait, but not runScript
+[22:52:16] lukeis: python?
+[22:52:23] friskd has joined #selenium
+[22:52:24] sayd: well this is just through ide
+[22:52:26] lukeis: driver.execute_script("…..")
+[22:52:30] sayd: i cant get to the export step yet
+[22:52:43] lukeis: ah
+[22:53:45] lukeis: 'night jimevans :)
+[22:54:06] jimevans: g'night everybody!
+[22:54:08] jimevans has left #selenium
+[22:54:12] sayd: lukeis: so thats prob an issue with the ide?
+[22:54:23] lukeis: yeah
+[22:55:26] noahsussman has joined #selenium
+[22:55:28] sayd: maybe i just need to remove that step and manually add it in after an export.. ugh
+[22:55:32] lukeis: first pull request! first pull request!  (through github ;) that's not krosenvold_)
+[22:56:20] dude-x: what's the official selenium account for github?
+[22:56:49] dude-x: selenium2 is krosenved's account but is that the official one now?
+[22:57:02] lukeis: https://github.com/SeleniumHQ/selenium
+[22:57:24] *lukeis notes the topic
+[22:58:19] ChanServ has altered lukeis's mode: +o
+[22:59:27] dude-x: thanks lukeis
+[22:59:30] regex: crap
+[22:59:44] lukeis has set the topic to "code.google.com/p/selenium mirrored on github.com/seleniumHQ/selenium - we're on git now!
+[IRC logfile - Started Tue Jan 15 23:00:54 2013]
+[23:00:54] lukeis has altered lukeis's mode: -o
+[23:01:21] lukeis: :cla
+[23:01:22] selbot2_: http://goo.gl/qC50R
+[23:02:40] fatguylaughing has joined #selenium
+[23:02:55] dude-x has joined #selenium
+[23:03:36] awilson820 has joined #selenium
+[23:10:16] sayd: anyone know what is a better way to use runScript from the builder so an export is possible
+[23:10:32] sayd: s/better way/alternative for
+[23:10:46] lukeis: eval?
+[23:13:00] jamesoram has joined #selenium
+[23:13:48] sayd: lukeis: i dont see that in the ide anywhere
+[23:14:07] lukeis: sorry, was a guess :)
+[23:14:55] sayd: maybe there is some command line way to do the export that supports runScript?
+[23:27:11] nsussman has joined #selenium
+[23:30:46] qaguy has left #selenium
+[23:33:45] davehunt has joined #selenium
+[23:37:20] awilson8201 has joined #selenium
+[23:38:36] sayd: lukeis: grr that selenium builder sux
+[23:38:55] sayd: its saying all scripts must be selenium 1 scripts? 
+[23:38:57] lukeis: i wouldn't go that far
+[23:39:15] lukeis: i was able to export to webdriver from it
+[23:39:48] lukeis: davehunt: mind doing me a favor… go here https://github.com/SeleniumHQ/selenium/pull/3  and see if you have a 'reopen' button at the bottom? (I want to confirm permissions)
+[23:40:01] sayd: lukeis: it seems to only support selenium 1, does that cover webdriver?
+[23:40:11] lukeis: no
+[23:40:18] davehunt: lukeis: I don't see reopen
+[23:40:19] lukeis: and it supports selenium 2
+[23:40:23] lukeis: davehunt: k, thx
+[23:41:40] lukeis: :note krosenvold_ the way the team is setup i don't think they can close pull requests (just pull access doesn't allow them to reopen issues at least, don't have an open pull request to confirm, that's why i set it to pull&push originally)
+[23:41:42] selbot2_: ok!
+[23:42:34] lukeis: :note krosenvold_ remember you are an 'owner' :)
+[23:42:35] selbot2_: ok!
+[23:47:00] sayd: lukeis: ok i think i got a suite/test/steps <-- what is that anyways in selenium-speak? to export to python. i have other tests though and don't see a way to export my whole collection (the thing the builder loads) as a python file
+[23:47:28] jamesoram has joined #selenium
+[23:48:50] awilson820 has joined #selenium
+[23:49:09] lukeis: sayd: i don't know… you might have to export each one individually
+[23:49:28] lukeis: i would hope there's a mechanism to do the whole thing
+[23:49:34] lukeis: but i honestly have no idea ;)
+[23:49:46] jost has joined #selenium
+[23:51:08] jleyba has joined #selenium
+[23:55:53] sayd: lukeis: yeah, im sure it shouldnt be this difficult to get going
+[23:58:28] sayd: is selenium2 a subset of features supported by selenium 1?
+[23:58:58] lukeis: other way around
+[23:59:04] lukeis: gtg, 'night

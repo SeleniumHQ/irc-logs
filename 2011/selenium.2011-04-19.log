@@ -1,0 +1,737 @@
+2011-04-19T00:05:26  *** soc42 has joined #selenium
+2011-04-19T00:16:38  *** zmijunkie has joined #selenium
+2011-04-19T00:31:22  <bebef_1987> Hey guys  can you help me change my Ff user agent using selenium and python
+2011-04-19T00:32:54  *** ato__ has joined #selenium
+2011-04-19T00:37:43  *** ato has quit IRC
+2011-04-19T01:02:01  *** bebef_1987 has quit IRC
+2011-04-19T01:02:08  *** freynaud has joined #selenium
+2011-04-19T01:02:19  *** bebef_1987 has joined #selenium
+2011-04-19T01:06:09  *** anatoli_ has quit IRC
+2011-04-19T01:07:32  *** bebef_1987 has joined #selenium
+2011-04-19T01:09:40  *** anatoli_ has joined #selenium
+2011-04-19T01:19:01  *** brettporter has joined #selenium
+2011-04-19T01:40:05  *** dave_miles has joined #selenium
+2011-04-19T01:50:35  *** vrockai has joined #selenium
+2011-04-19T01:57:40  *** zmijunkie has quit IRC
+2011-04-19T01:59:05  *** zmijunkie has joined #selenium
+2011-04-19T02:14:53  *** csanchez has joined #selenium
+2011-04-19T02:33:50  *** pnitin has quit IRC
+2011-04-19T02:56:50  *** ato__ is now known as ato
+2011-04-19T02:58:18  *** pnitin has joined #selenium
+2011-04-19T03:00:46  *** csanchez has quit IRC
+2011-04-19T03:24:44  *** AutomatedTester has joined #selenium
+2011-04-19T03:48:38  *** nitin_ has joined #selenium
+2011-04-19T03:48:42  *** pnitin has quit IRC
+2011-04-19T04:16:39  <adamgoucher> so if i wanted to wrap my head around the webdriver api (for say writing a se-ide formatter) -- it is just enough to basically understand commands.py / commands.rb?
+2011-04-19T04:18:38  <adamgoucher> actuall, better to look at org.openqa.selenium.internal.*
+2011-04-19T04:23:13  *** skiphuffman__ has joined #selenium
+2011-04-19T04:29:02  <adamgoucher> heh. the test coverage for seleniumemulation is awesomely bad
+2011-04-19T04:29:57  <AutomatedTester> adamgoucher: if you want to see the API I suggest looking at the IDL that is being formatted
+2011-04-19T04:30:35  *** epsas has joined #selenium
+2011-04-19T04:31:05  <selbot2> adam_goucher@hotmail.com half a minute ago - AdamGoucher - adding getCssCount() to the java selenium emulation. and move .size() right up against getXpathCount() - http://code.google.com/p/selenium/source/detail?r=12042
+2011-04-19T04:31:33  <adamgoucher> i dont suppose anyone has nice written up the mapping between rc <-> webdriver?
+2011-04-19T04:33:24  <AutomatedTester> not yet
+2011-04-19T04:33:39  <AutomatedTester> Simon apparent has a server side emulator working
+2011-04-19T04:34:16  <AutomatedTester> so that no clients have to worry about it
+2011-04-19T04:35:12  <adamgoucher> right. but for me, i have to take what se-ide wants to export as rc code and flip it to rc
+2011-04-19T04:35:16  <adamgoucher> erm, to webdriver
+2011-04-19T04:35:35  *** kylls has joined #selenium
+2011-04-19T04:35:59  <AutomatedTester> i suspect going from IDE to webdriver would be better
+2011-04-19T04:36:23  <AutomatedTester> and simpler
+2011-04-19T04:36:58  *** davehunt|away is now known as davehunt
+2011-04-19T04:37:07  <adamgoucher> and i am. but the way formatters work is 'if i am command x, then export y' -- i dont know the relationships between the two apis
+2011-04-19T04:38:16  <davehunt> adamgoucher: I looked into writing a WebDriver formatter for IDE and promptly gave up
+2011-04-19T04:38:37  <adamgoucher> thanks for the confidence boost :P
+2011-04-19T04:38:39  <davehunt> I'm not sure how easy it'll be with the existing formatter code
+2011-04-19T04:39:15  <adamgoucher> the existing, completely undocumented formatter code
+2011-04-19T04:39:16  <davehunt> adamgoucher: It might be worth speaking with Samit, I know he has some great ideas wrt formatters
+2011-04-19T04:39:29  <adamgoucher> noted
+2011-04-19T04:39:38  <davehunt> adamgoucher: I'd be tempted to say undocumentable ;)
+2011-04-19T04:39:50  <jarib> Samit told me he could do it in a few hours :)
+2011-04-19T04:39:55  <adamgoucher> nah. i'm pretty much figured it out
+2011-04-19T04:40:10  <adamgoucher> samit needs to hang out on irc more...
+2011-04-19T04:40:18  <davehunt> he's on vacation atm
+2011-04-19T04:40:34  <davehunt> AutomatedTester: adamgoucher said I should speak to you about XrayWrappers
+2011-04-19T04:40:47  * AutomatedTester runs away
+2011-04-19T04:40:56  <davehunt> heh
+2011-04-19T04:41:04  <davehunt> We have a pretty major bug in #1571
+2011-04-19T04:41:05  <selbot2> dave.h...@gmail.com open/accepted Exceptions when attempting to open chrome:// documents - http://code.google.com/p/selenium/issues/detail?id=1571
+2011-04-19T04:41:21  <davehunt> Affects Firefox 3.6 and 4.0
+2011-04-19T04:41:23  <adamgoucher> heh! i was guessing at the term. but that reaction i think makes me think i got it right
+2011-04-19T04:41:49  <davehunt> I'm starting to think this is more of an issue related to the page your unloading rather than the one your loading though
+2011-04-19T04:42:38  <davehunt> There's some code that unwraps the current window object that Simon added. It looks like if I step through the unwrap code I get a window object that is a XPCNativeWrapper, however when I step over it I get a XPCSafeJSObjectWrapper. The latter seems to cause the issue.
+2011-04-19T04:42:52  * davehunt thinks AutomatedTester did actually run away
+2011-04-19T04:43:02  <davehunt> :)
+2011-04-19T04:43:23  * AutomatedTester has his fingers in his ears going LALALLALALA, not my problem LALALALALA
+2011-04-19T04:43:37  * AutomatedTester needs coffee to explain this
+2011-04-19T04:44:33  * davehunt needs Limitless to understand it
+2011-04-19T04:44:53  <davehunt> NZT even
+2011-04-19T04:44:59  <AutomatedTester> jarib: whats the getWindow issue number?
+2011-04-19T04:45:03  <davehunt> I haven't watched the movie :P
+2011-04-19T04:46:10  <adamgoucher> limitless was a pretty good movie
+2011-04-19T04:46:31  <adamgoucher> in terms of shut-your-brain-off-for-90-minutes
+2011-04-19T04:46:37  *** anatoli_ has quit IRC
+2011-04-19T04:46:37  *** ammar01 has quit IRC
+2011-04-19T04:46:38  *** Muz has quit IRC
+2011-04-19T04:46:40  <adamgoucher> (ironically)
+2011-04-19T04:46:56  *** brettporter has quit IRC
+2011-04-19T04:47:12  <jarib> AutomatedTester: #1438
+2011-04-19T04:47:12  <selbot2>  open/accepted WebDriver + Firefox 4: this.getWindow() is null - http://code.google.com/p/selenium/issues/detail?id=1438
+2011-04-19T04:47:45  <AutomatedTester> thanks jarib
+2011-04-19T04:48:06  <AutomatedTester> so...
+2011-04-19T04:48:08  <adamgoucher> for the curious, there is 153 methods in the python rc api one needs to care about
+2011-04-19T04:48:48  <AutomatedTester> adamgoucher: care about in what way?
+2011-04-19T04:49:13  <adamgoucher> in the context of doing a mapping
+2011-04-19T04:49:23  <adamgoucher> (coulda done it in java, but, its java)
+2011-04-19T04:49:38  <AutomatedTester> adamgoucher: thats why we are moving to a server side issue
+2011-04-19T04:49:48  <AutomatedTester> which Simon has "working"
+2011-04-19T04:50:43  <AutomatedTester> so the issue is the Outer and Inner Window of the Browser get out of sync while a page is unloading and then loading
+2011-04-19T04:50:55  <AutomatedTester> davehunt: ^
+2011-04-19T04:51:14  <AutomatedTester> so your issue and #1438 are very similar
+2011-04-19T04:51:15  <selbot2>  open/accepted WebDriver + Firefox 4: this.getWindow() is null - http://code.google.com/p/selenium/issues/detail?id=1438
+2011-04-19T04:51:30  <davehunt> AutomatedTester: and the solution is...? :)
+2011-04-19T04:51:53  <davehunt> This affects 3.6 in my case
+2011-04-19T04:52:00  <adamgoucher> heh. ah. well, its only 8am so it only took twice for me to understand. so in theory just need to change the constructor to RemoteWebDriver and a selenium emulation capability(?) and things 'magically' work?
+2011-04-19T04:52:07  <AutomatedTester> what we, Simon commited, was to add a nasty setTimeout to get the page windows to sync up
+2011-04-19T04:52:28  <AutomatedTester> this is a "feature" of Firefox
+2011-04-19T04:52:45  <AutomatedTester> and I am trying to find the right person to pester to make them see this is a bug
+2011-04-19T04:52:49  *** soc42 has quit IRC
+2011-04-19T04:52:50  <davehunt> AutomatedTester: I'm not sure the issues are the same. I am working off trunk
+2011-04-19T04:53:08  *** anatoli_ has joined #selenium
+2011-04-19T04:53:08  *** ammar01 has joined #selenium
+2011-04-19T04:53:08  *** Muz has joined #selenium
+2011-04-19T04:53:15  <AutomatedTester> the hack was added to Selenium-Core
+2011-04-19T04:54:14  <davehunt> okay, but this was working in 3.6 before
+2011-04-19T04:54:49  <davehunt> so I don't understand why we need a hack, and if a hack has been committed it's not working for me
+2011-04-19T04:56:48  <AutomatedTester> well we needed a hack to make RC work
+2011-04-19T04:57:16  <AutomatedTester> the new JS engine in Firefox4 made this more obvious
+2011-04-19T04:57:28  <AutomatedTester> the issue has always been there
+2011-04-19T04:57:43  <davehunt> I think these are different issues then
+2011-04-19T04:58:26  <davehunt> This one is an issue trying to change the window.location after the window object has been 'unwrapped'
+2011-04-19T04:58:51  * AutomatedTester goes to find the IRC logs
+2011-04-19T04:59:19  <AutomatedTester> the window.location gives the wrong object when the inner and outer window are out of sync
+2011-04-19T04:59:46  *** epsas has quit IRC
+2011-04-19T04:59:54  <AutomatedTester> if you "slow" it down then you get the XPCNativeWrapper that you can then unwrap
+2011-04-19T05:00:27  <davehunt> I see, however we don't need to unwrap for Firefox 3.6
+2011-04-19T05:00:45  <davehunt> So since we added the unwrap it's caused the issue
+2011-04-19T05:01:36  <davehunt> Can you point me to the commit of the hack?
+2011-04-19T05:01:41  <davehunt> I can't find it
+2011-04-19T05:01:56  * AutomatedTester is looking
+2011-04-19T05:03:14  *** RossPatterson has joined #selenium
+2011-04-19T05:04:18  <AutomatedTester> r11699
+2011-04-19T05:04:20  <selbot2> simon.m.stewart about 1 month ago - SimonStewart: Down to one failing test for RC and Firefox 4. Turns out that unwrapping the current window helps an awful lot - http://code.google.com/p/selenium/source/detail?r=11699
+2011-04-19T05:04:50  <davehunt> okay so that's the commit that causes my issue
+2011-04-19T05:05:13  * AutomatedTester is looking for the other one
+2011-04-19T05:05:24  <AutomatedTester> but not remembering the exact file is slowing me down
+2011-04-19T05:08:11  *** amitev has joined #selenium
+2011-04-19T05:10:23  <AutomatedTester> finding a lot of code where Simon wants to take the MozMill approach
+2011-04-19T05:10:42  *** epsas has joined #selenium
+2011-04-19T05:10:59  <ato> AutomatedTester: I quite liked your talk on test automation at Mozilla, by the way.
+2011-04-19T05:11:03  <ato> AutomatedTester: Just saw it on Twitter.
+2011-04-19T05:11:10  <AutomatedTester> thanks ato
+2011-04-19T05:11:19  *** Archdude has quit IRC
+2011-04-19T05:12:16  *** bracki has joined #selenium
+2011-04-19T05:14:24  <AutomatedTester> arggg you would think that Google would understand search
+2011-04-19T05:14:31  <AutomatedTester> cant find what I want
+2011-04-19T05:15:01  <bracki> respond.session.getWindow() is null, happens to me a lot since switching to watir-webdriver 0.2.2 which in turn uses selenium-webdriver 0.1.4.
+2011-04-19T05:15:02  *** Archdude has joined #selenium
+2011-04-19T05:15:11  <bracki> Anybody else seen these popping up?
+2011-04-19T05:15:40  <AutomatedTester> bracki: is this like #1438?
+2011-04-19T05:15:40  <selbot2>  open/accepted WebDriver + Firefox 4: this.getWindow() is null - http://code.google.com/p/selenium/issues/detail?id=1438
+2011-04-19T05:17:46  <bracki> Looks similar. But I'm using FF3.6.
+2011-04-19T05:17:51  <AutomatedTester> davehunt: http://code.google.com/p/selenium/source/detail?r=11731
+2011-04-19T05:17:58  <AutomatedTester> thats the hack I was talking about
+2011-04-19T05:18:38  *** csanchez has joined #selenium
+2011-04-19T05:19:08  <AutomatedTester> if the timeout is shorter then we get XRayWrappers
+2011-04-19T05:19:56  <AutomatedTester> and cant override window object
+2011-04-19T05:20:05  <davehunt> I'm not getting an XRayWrapper, I'm getting a XPCSafeJSObjectWrapper
+2011-04-19T05:20:23  *** mbeierl has joined #selenium
+2011-04-19T05:20:48  *** wsmoak has joined #selenium
+2011-04-19T05:20:48  *** wsmoak has joined #selenium
+2011-04-19T05:25:40  <AutomatedTester> jarib: http://selenium.saucelabs.com/irc/logs/selenium.2011-03-21.log at 2011-03-21T08:54:17 onwards is kinda an explanation of the issue
+2011-04-19T05:33:49  *** esteele has joined #selenium
+2011-04-19T05:37:57  <jarib> AutomatedTester: i see
+2011-04-19T05:37:59  <jarib> doesn't sounds simple
+2011-04-19T05:38:14  <AutomatedTester> yup
+2011-04-19T05:38:32  <AutomatedTester> and now you can see why people dont see it as a "bug"
+2011-04-19T05:39:14  <jarib> yeah
+2011-04-19T05:39:37  <jarib> we still need some way to fix it though
+2011-04-19T05:39:47  <AutomatedTester> +1 to that
+2011-04-19T05:41:21  <jarib> having a test case that could reproduce it consistently would help
+2011-04-19T05:42:06  <jarib> and perhaps just call driver.switch_to.default_content if the window reference is undefined
+2011-04-19T05:42:17  * jarib doesn't know the fx driver internals well enough
+2011-04-19T05:42:37  *** adamgoucher has quit IRC
+2011-04-19T05:43:14  <AutomatedTester> i dont either
+2011-04-19T05:43:29  <AutomatedTester> I started looking at the internals since Aurora isnt working with Se2
+2011-04-19T05:51:00  <jarib> AutomatedTester: would be great if you knew the Fx driver well :D
+2011-04-19T05:52:07  *** soc42 has joined #selenium
+2011-04-19T05:55:42  *** epsas has quit IRC
+2011-04-19T05:57:03  *** XCulver has joined #selenium
+2011-04-19T06:03:27  * jarib thinks about pushing a new pre-release gem
+2011-04-19T06:03:46  *** anatoli_ has quit IRC
+2011-04-19T06:04:25  *** adamgoucher has joined #selenium
+2011-04-19T06:05:55  *** esteele_ has joined #selenium
+2011-04-19T06:07:20  *** esteele has quit IRC
+2011-04-19T06:07:21  *** esteele_ is now known as esteele
+2011-04-19T06:17:42  *** dmachi1 has quit IRC
+2011-04-19T06:17:51  *** carlisia has quit IRC
+2011-04-19T06:18:03  *** dmachi has joined #selenium
+2011-04-19T06:20:48  <bracki> jarib: just thought i had found a "reliable" test, but right now it keeps switching between Selenium::WebDriver::Error::ElementNotDisplayedError and respond.session.getWindow() is null.
+2011-04-19T06:23:03  *** SL-BWood has joined #selenium
+2011-04-19T06:24:07  * AutomatedTester would <3 a reliable test
+2011-04-19T06:31:07  <jarib> bracki: you should be able to avoid the ElementNotDisplayedError by doing proper waiting
+2011-04-19T06:31:44  <jarib> e.g. Selenium::WebDriver::Wait.new.until { driver.find_element(...).displayed? }
+2011-04-19T06:34:41  <davehunt> AutomatedTester: My Mozmill tests replicate #1571 every time
+2011-04-19T06:34:41  <selbot2> dave.h...@gmail.com open/accepted Exceptions when attempting to open chrome:// documents - http://code.google.com/p/selenium/issues/detail?id=1571
+2011-04-19T06:35:16  <bracki> What I menat is w/ v0.2.2 ceratin tests no oscillate between ElementNotDisplayedError/respond.session.getWindow() is null. w/ v0.1.8 they work nicely.
+2011-04-19T06:35:19  *** amitev has quit IRC
+2011-04-19T06:36:40  <AutomatedTester> i thought you said that doesnt do the window null thing?
+2011-04-19T06:36:46  <AutomatedTester> different bugs
+2011-04-19T06:37:07  <bracki> Nah, I said it does.
+2011-04-19T06:37:23  <AutomatedTester> bracki: sorry that was for davehunt
+2011-04-19T06:37:38  <davehunt> yeah, different bugs
+2011-04-19T06:44:10  *** ammar01 has quit IRC
+2011-04-19T06:44:25  *** ammar01 has joined #selenium
+2011-04-19T06:44:33  <AutomatedTester> charleyb: is there viewable code for your last tweet?
+2011-04-19T06:45:59  *** nirvdrum has joined #selenium
+2011-04-19T06:46:49  <AutomatedTester> nevermind, found it
+2011-04-19T06:49:18  *** nitin_ has quit IRC
+2011-04-19T06:50:51  *** Archdude_ has joined #selenium
+2011-04-19T06:53:08  *** Archdude has quit IRC
+2011-04-19T06:53:10  *** Archdude_ is now known as Archdude
+2011-04-19T06:53:42  *** amitev has joined #selenium
+2011-04-19T06:54:54  *** gronky has joined #selenium
+2011-04-19T06:55:40  *** vrockai has quit IRC
+2011-04-19T07:06:11  *** werdo has joined #selenium
+2011-04-19T07:06:45  *** Muz_ has joined #selenium
+2011-04-19T07:06:59  <werdo> hi all! I have just downloaded Selenium and recorded my first test, just like in the intro video. Now I would like to play that test, but all play buttons are greyed out and not clickable. Why? Also, the "table" view is grey, I only see python (which I selected before)
+2011-04-19T07:08:35  *** Muz has quit IRC
+2011-04-19T07:08:57  <adamgoucher> you cant play the python; only the html
+2011-04-19T07:08:59  <AutomatedTester> if you want it to be run in python you need to copy it into a .py file
+2011-04-19T07:13:42  <selbot2> james.h.evans.jr half a minute ago - JimEvans: Cleaning up .NET Chrome tests. - http://code.google.com/p/selenium/source/detail?r=12043
+2011-04-19T07:13:59  *** jimevans has joined #selenium
+2011-04-19T07:17:30  *** ammar01 has quit IRC
+2011-04-19T07:17:37  *** Muz_ is now known as Muz
+2011-04-19T07:18:30  <werdo> thanks adamgoucher and AutomatedTester - that was easy :)
+2011-04-19T07:18:48  *** QAguy has joined #selenium
+2011-04-19T07:22:37  *** epsas has joined #selenium
+2011-04-19T07:23:09  <charleyb> AutomatedTester: Tim's doing some pretty cool perf work, it's an area I've got less familiarity with
+2011-04-19T07:23:31  <AutomatedTester> charleyb: did you see my workshop at SeConf?
+2011-04-19T07:23:42  <charleyb> yes indeed! :)
+2011-04-19T07:24:06  <AutomatedTester> my first attempt at it was shown at GTAC 2008
+2011-04-19T07:24:24  <AutomatedTester> jarib: has a similar gem out I believe
+2011-04-19T07:24:27  <charleyb> oh cool, i'll have to look up the video
+2011-04-19T07:24:31  <charleyb> is it online?
+2011-04-19T07:24:40  <AutomatedTester> it should be on Youtube
+2011-04-19T07:24:44  <charleyb> sweet
+2011-04-19T07:24:55  <werdo> what does this error mean? obviously, the 2 values are identical: [error] Actual value 'Here be text' did not match 'Here be text'
+2011-04-19T07:25:09  *** ammar01 has joined #selenium
+2011-04-19T07:25:23  <AutomatedTester> werdo: there may be a whitespace difference
+2011-04-19T07:26:01  <werdo> hmm
+2011-04-19T07:27:57  <charleyb> AutomatedTester: i'd consider your tweet, but I work remote :P
+2011-04-19T07:28:32  <AutomatedTester> charleyb: well OH, IM
+2011-04-19T07:28:34  <AutomatedTester> so close
+2011-04-19T07:28:58  <charleyb> OH, IM?
+2011-04-19T07:30:05  <AutomatedTester> Over Heard/ Instant Message
+2011-04-19T07:30:10  <charleyb> aha
+2011-04-19T07:30:42  <AutomatedTester> for remotee its pretty much the same
+2011-04-19T07:31:33  *** andytinkham has joined #selenium
+2011-04-19T07:32:21  *** werdo has quit IRC
+2011-04-19T07:33:42  *** soc42_ has joined #selenium
+2011-04-19T07:35:06  *** soc42 has quit IRC
+2011-04-19T07:39:48  *** miker2 has joined #selenium
+2011-04-19T07:42:05  <jarib> charleyb: tim's work goes back to some code that AutomatedTester did in C# i believe
+2011-04-19T07:42:13  *** mrprometheus has joined #selenium
+2011-04-19T07:42:40  <AutomatedTester> jarib: it does
+2011-04-19T07:42:47  <AutomatedTester> he even included my bugs :D
+2011-04-19T07:42:52  <charleyb> jarib: yep, impressive timing information
+2011-04-19T07:42:56  <charleyb> hahaha
+2011-04-19T07:42:56  * AutomatedTester should clean that up
+2011-04-19T07:43:27  * AutomatedTester is just excited that lots of people are looking at this part of webapps
+2011-04-19T07:43:46  <charleyb> yeah, absolutely agreed, i did some a while back
+2011-04-19T07:44:04  <charleyb> but just quick decorators for elements in watir for the Gap
+2011-04-19T07:44:34  <AutomatedTester> unfortunately though the spec is buggy
+2011-04-19T07:44:48  *** mrprometheus has left #selenium
+2011-04-19T07:44:55  <AutomatedTester> but I believe Moz and Google are working to sort that out
+2011-04-19T07:50:51  <AutomatedTester> can we stop supporting Windows please?
+2011-04-19T07:51:08  <jimevans> hey!
+2011-04-19T07:51:24  <jarib> lol
+2011-04-19T07:51:26  <jimevans> <mock outrage>
+2011-04-19T07:51:42  * AutomatedTester has bug that the code works on all platforms bar windows
+2011-04-19T07:52:07  <AutomatedTester> <- sad panda
+2011-04-19T08:00:24  *** vrockai has joined #selenium
+2011-04-19T08:01:41  *** csanchez has quit IRC
+2011-04-19T08:05:05  <selbot2> theautomatedtester less than a minute ago - DavidBurns updated parse to force a file since breaks in Windows for issue 1569 - http://code.google.com/p/selenium/source/detail?r=12044
+2011-04-19T08:10:03  *** toseter has joined #selenium
+2011-04-19T08:14:12  *** carze has joined #selenium
+2011-04-19T08:21:37  <jarib> jimevans: have you had any flakiness with tests for navigating back/forward with IE?
+2011-04-19T08:21:50  <ato> What's the reasoning behind now allowing clicking of disabled elements in WebDriver?
+2011-04-19T08:21:55  <ato> s/now/not
+2011-04-19T08:22:04  <jarib> that a user can't
+2011-04-19T08:22:17  <jarib> oh wait
+2011-04-19T08:22:17  <jarib> disabled
+2011-04-19T08:22:28  <jarib> hmm, good question
+2011-04-19T08:22:31  <jimevans> jarib: haven't really seen any issues with back/forward.
+2011-04-19T08:22:32  <ato> But if I tell the WebDriver to do something, I want it to do what I tell it to.
+2011-04-19T08:22:46  <jarib> a user can absolutely click a disabled element
+2011-04-19T08:23:02  <jarib> so that doesn't make much sense
+2011-04-19T08:23:26  <ato> The use case here is that we want to test whether clicking a disabled input element… crashes the browser, or that it doesn't actually get checked.
+2011-04-19T08:23:44  <jarib> i see a reason for not allowing clicks on non-visible elements
+2011-04-19T08:23:53  <jarib> on disabled elements, i can't see any reason to disallow it
+2011-04-19T08:23:59  <ato> Oh yes, that needs to stay in.
+2011-04-19T08:24:20  <ato> We could probably rescue the exception, but it doesn't seem like a good solution.
+2011-04-19T08:24:27  <jimevans> ato, jarib: advanced user interactions api?
+2011-04-19T08:24:28  <jarib> i'd say raise this on the selenium-dev list, explaining your use case
+2011-04-19T08:24:36  <ato> So currently we've made a static flag in OperaDriver so we build internal versions of the jar.
+2011-04-19T08:24:59  <ato> jimevans: Can you elaborate?  We've already implemented most of that.
+2011-04-19T08:25:54  <jarib> jimevans: i'm seeing this spec failing quite often on IE only: http://www.google.com/codesearch/p?hl=en#2tHw6m3DZzo/trunk/common/test/rb/spec/navigation_spec.rb&q=navigation_spec.rb%20package:http://selenium%5C.googlecode%5C.com&l=4
+2011-04-19T08:25:55  <jimevans> the "mouseclick" operation in the advanced interactions api doesn't do any checking about element status.
+2011-04-19T08:26:22  <AutomatedTester> i thought that info was all server side?
+2011-04-19T08:27:26  <jimevans> it is. my point is rather than doing a WebElement.click(), you do a moveto(element) [moves to the center of the element] and a mouseclick().
+2011-04-19T08:27:47  <jimevans> which blindly clicks at the mouse coordinates (if I'm understanding the api correctly).
+2011-04-19T08:27:53  *** zmijunkie has quit IRC
+2011-04-19T08:28:29  <jimevans> jarib: where do you see it failing most often?
+2011-04-19T08:29:48  <ato> jimevans: http://code.google.com/p/selenium/wiki/AdvancedUserInteractions ← do you mean void click(WebElement onElement)?
+2011-04-19T08:29:56  <jimevans> jarib:oh, wait. your spec doesn't do the same thing my back/forward tests do.
+2011-04-19T08:30:16  <ato> jimevans: Or should I be looking at the reference implementation in HtmlUnit?
+2011-04-19T08:30:18  <jimevans> ato: yeah, that would do it, i believe.
+2011-04-19T08:30:19  <jarib> jimevans: oops
+2011-04-19T08:30:28  <jarib> that code searhc isn't correct
+2011-04-19T08:30:35  <jarib> it's outdated
+2011-04-19T08:31:10  <jarib> http://code.google.com/p/selenium/source/browse/trunk/rb/spec/integration/selenium/webdriver/navigation_spec.rb#4
+2011-04-19T08:31:13  <jarib> that's the one
+2011-04-19T08:31:17  <jarib> it fails on line 9
+2011-04-19T08:31:34  <jarib>      Failure/Error: driver.title.should == "We Arrive Here"
+2011-04-19T08:31:34  <jarib>        expected: "We Arrive Here"
+2011-04-19T08:31:34  <jarib>             got: "We Leave From Here" (using ==)
+2011-04-19T08:32:28  <jimevans> okay, that doesn't sound like it has anything to do with back/forward. the submit is not working as it should.
+2011-04-19T08:32:53  <jarib> ah
+2011-04-19T08:33:18  <jimevans> we're losing the race condition during the submit, i'd wager.
+2011-04-19T08:33:41  <jarib> would a click be better?
+2011-04-19T08:34:46  <jarib> hmm, no
+2011-04-19T08:35:14  <jimevans> under the covers, we're doing a .Click() anyway.
+2011-04-19T08:35:29  <jarib> right
+2011-04-19T08:35:36  <jimevans> so it's the standard race condition with clicks.
+2011-04-19T08:36:34  <jimevans> for what it's worth, i'm testing back/forward in isolation from clicks and submits in the .net tests.
+2011-04-19T08:36:42  <jarib> just using .get?
+2011-04-19T08:37:15  <jimevans> i.e., the test navigates to page 1, then navigates to page 2 (yes, using .get), then calls back()/forward().
+2011-04-19T08:37:30  <jarib> looks like i've stolen this from PageLoadingTest.java:126
+2011-04-19T08:38:22  <jimevans> yeah, hold on.
+2011-04-19T08:38:48  <jimevans> i'm looking at the wrong test file. .net tests back/forward in two different places.
+2011-04-19T08:39:54  <jimevans> ok in PageLoadingTest.cs (and .java), there's no guard against the submit() not happening fast enough.
+2011-04-19T08:40:02  <jimevans> it could break there.
+2011-04-19T08:40:10  <jarib> indeed
+2011-04-19T08:40:19  <jimevans> i know of no way to synchronize the ie driver any more than i already to.
+2011-04-19T08:41:22  <jimevans> i added a comment to #232 explaining the wait algorithm of the ie driver. it might be instructive.
+2011-04-19T08:41:23  <selbot2>  open/needsclarification WebDriver is not working properly with pages after HTTP redirect in IE? - http://code.google.com/p/selenium/issues/detail?id=232
+2011-04-19T08:43:24  <jarib> jimevans: is that the same algorithm used after back/forward?
+2011-04-19T08:43:33  *** esteele has quit IRC
+2011-04-19T08:43:55  <ato> jimevans: “If this element is not clickable, then this operation is a no-op since it's pretty common fore someone to accidentally miss the target when clicking in Real Life” (from WebElement.java interface)
+2011-04-19T08:44:01  <jimevans> yes, it's used for get(), back(), forward(), click(), and submit().
+2011-04-19T08:44:16  <jarib> ok
+2011-04-19T08:44:18  <jarib> i'lladd some waiting
+2011-04-19T08:45:13  <jarib> jimevans: and for refresh()?
+2011-04-19T08:45:21  <jimevans> however, in the case of back(), and forward(), those should be synchronous, because we're calling the IWebBrowser2::GoBack() and ::FoForward() methods.
+2011-04-19T08:45:35  <jimevans> s/::FoForward()/::GoForward()
+2011-04-19T08:45:39  <jarib> aha
+2011-04-19T08:46:01  <jimevans> yeah, refresh() too.
+2011-04-19T08:46:27  *** mattp_ has quit IRC
+2011-04-19T08:47:12  *** mattp_ has joined #selenium
+2011-04-19T08:48:36  <jimevans> ato: remember, i'm not talking about using WebElement.click(). i'm talking about doing HasInputDevices.getActionChainsGenerator().click(element)
+2011-04-19T08:49:02  <jarib> i think those will eventually become the same though
+2011-04-19T08:49:32  *** davehunt is now known as davehunt|away
+2011-04-19T08:50:38  <ato> jimevans: Looking at click() in HtmlUnitWebElement.java it's actually clicking if disabled (by catching exception), is this the relevant piece of code?
+2011-04-19T08:51:31  <jimevans> ato: i'm not sure. i've not looked at the htmlunit implementation.
+2011-04-19T08:51:54  <ato> I thought HtmlUnit was the only implementation that had implemented this advanced user interaction API?
+2011-04-19T08:52:13  <jarib> IE too
+2011-04-19T08:52:35  <jimevans> IE mostly. :)
+2011-04-19T08:53:03  <jimevans> (still can't do double-click or context-click, shared native event code doesn't support it yet)
+2011-04-19T08:53:21  <ato> So is that available in Java, or just in C#?
+2011-04-19T08:53:47  <jarib> though it doesn't make sense that WebElement.click() and clicking through the advanced user interaction API have different semantics
+2011-04-19T08:53:54  <jimevans> should be everywhere it's implemented in remote.
+2011-04-19T08:54:12  <jarib> ato: it's available in Java/C#/Ruby atm, with a patch landing soon for python
+2011-04-19T08:55:04  <jimevans> using the advanced api doesn't check for element availability, i know that much.
+2011-04-19T08:55:12  <jimevans> and it won't.
+2011-04-19T08:55:34  <jimevans> the semantics of the API are such that it allows clicking at an arbitrary x,y.
+2011-04-19T08:55:43  <jimevans> regardless of what's there.
+2011-04-19T08:56:43  <jarib> jimevans: i seem to recall reading something that would indicate WebElement.click() would be implemented as getMouse().click(this.getLocation()) or some such
+2011-04-19T08:56:55  <jarib> can't remember exactly. i may be wrong
+2011-04-19T08:57:16  <ato> jarib: That seems to be what the HtmlUnitWebElement is doing.
+2011-04-19T08:58:07  <jimevans> sure. that would be consistent then. it would depend on whether getLocation() returned an error if the element isn't visible/enabled.
+2011-04-19T08:58:27  <ato> They do that checking before getting coordinates as far as I can see.
+2011-04-19T08:58:29  <jarib> for non-visible, having getLocation raise makes sense indeed
+2011-04-19T08:58:49  <ato> Although there is no differentiation between visible element and disabled element; there is just InvalidElementStateException.
+2011-04-19T08:58:50  <jimevans> right, but i don't believe it does for disabled. i'd have to look at the atom code.
+2011-04-19T08:59:14  <jimevans> ato: for clicking, at the moment, no, there's no difference.
+2011-04-19T08:59:17  *** Stuk has quit IRC
+2011-04-19T08:59:44  <ato> jimevans: Alright
+2011-04-19T08:59:49  <ato> Thanks, anyways!
+2011-04-19T09:00:40  <jimevans> but again, using the interactions API should allow you to click at an arbitrary location without regard to the visibility/enabled state of the element underneath the coordinates.
+2011-04-19T09:00:53  * ato nods.
+2011-04-19T09:07:03  <jimevans> right. lunchtime.
+2011-04-19T09:08:49  <AutomatedTester> Advanced User Interactions code is within minutes of landing
+2011-04-19T09:09:00  <AutomatedTester> final clean up and tests being run
+2011-04-19T09:09:30  * AutomatedTester needs a SSD
+2011-04-19T09:10:24  <AutomatedTester> sounds a plane is taking off here
+2011-04-19T09:10:40  *** marlenac has joined #selenium
+2011-04-19T09:10:46  <XCulver> heh
+2011-04-19T09:10:55  <ato> It's sound of tests passing
+2011-04-19T09:11:00  <ato> (Or IntelliJ indexing your sources)
+2011-04-19T09:11:13  <AutomatedTester> or CrazyFun building Selenium
+2011-04-19T09:11:19  <ato> Haha.
+2011-04-19T09:11:27  <AutomatedTester> its the last one btw
+2011-04-19T09:14:05  <selbot2> theautomatedtester less than 20 seconds ago - DavidBurns, on behalf of TomohiroKaizu, Advanced User Interactions for python - http://code.google.com/p/selenium/source/detail?r=12045
+2011-04-19T09:16:10  <AutomatedTester> i am ready for B4 now
+2011-04-19T09:16:16  <AutomatedTester> bbiab
+2011-04-19T09:17:08  *** ian_mac_ has quit IRC
+2011-04-19T09:20:03  *** Spanktar has joined #selenium
+2011-04-19T09:24:07  <jimevans> who's going to be release wrangler while simon's on holiday?
+2011-04-19T09:24:35  <jarib> i think eran volunteered
+2011-04-19T09:24:37  <jimevans> (hey, i'm american. i love my cowboy metaphors.)
+2011-04-19T09:24:54  <jarib> :D
+2011-04-19T09:26:31  <jimevans> and for the record, i *hate* the name ActionChainsGenerator.
+2011-04-19T09:27:12  <ato> What would be better?  UserInteractionBuilder?
+2011-04-19T09:27:24  <jimevans> .net uses ActionSequenceBuilder.
+2011-04-19T09:27:47  <jimevans> 'cause that's my domain. all mine.. bwahahahahaha! :D
+2011-04-19T09:28:55  * adamgoucher enjoys jimevans' maniacal outbursts all the more now that hes met him in person
+2011-04-19T09:29:11  <jarib> haha
+2011-04-19T09:29:15  <jarib> ruby has ActionBuilder
+2011-04-19T09:30:04  <andytinkham> adamgoucher: It does make them easier to picture :)
+2011-04-19T09:31:06  <jimevans> it's been one of those days. i needed a good maniacal outburst to maintain what little of my sanity remains.
+2011-04-19T09:32:09  <jarib> hmm
+2011-04-19T09:32:28  <jarib> it seems like native events aren't enabled on windows although the client is telling it to enable them in every possible way
+2011-04-19T09:32:35  <jarib> ...for firefox
+2011-04-19T09:32:40  *** esteele has joined #selenium
+2011-04-19T09:33:03  <jarib> it's giving back nativeEvents=false in the caps
+2011-04-19T09:34:03  <jarib> and if i enable the tests for .../moveto, it complains about native events not being available on that platform
+2011-04-19T09:34:05  <selbot2> jari.bakken half a minute ago - JariBakken: Making navigation_spec more robust with native events (IE). - http://code.google.com/p/selenium/source/detail?r=12046
+2011-04-19T09:34:09  <jarib> jimevans: do you have Fx4 on your machine?
+2011-04-19T09:34:16  <jimevans> i do.
+2011-04-19T09:34:31  <jimevans> starting to investigate right now.
+2011-04-19T09:34:35  <jarib> thanks
+2011-04-19T09:34:54  <jarib> was hoping you had 3.6 maybe
+2011-04-19T09:35:06  <jarib> i can try downgrading
+2011-04-19T09:35:18  <jimevans> note to self: don't do an 'svn up' on a vm while trying to work on the host. slows to a crawl.
+2011-04-19T09:36:18  <jimevans> jarib: i ran into a "native events not enabled" problem with moveto about a week ago, but eran fixed that issue.
+2011-04-19T09:37:06  <jarib> it appears to be a firefox 4 thing
+2011-04-19T09:37:18  <jarib> with 3.6 i get "nativeEvents":true back
+2011-04-19T09:38:22  <jarib> or perhaps it's a matter of prebuilts not being updated, but you build them yourself?
+2011-04-19T09:38:23  <jimevans> odd. i get nativeEvent: true from ff4.
+2011-04-19T09:38:26  <jarib> if it works for you with 4
+2011-04-19T09:38:36  <jimevans> yeah, i build myself.
+2011-04-19T09:38:40  *** sfbrian has joined #selenium
+2011-04-19T09:38:46  <jarib> so that's probably it then.
+2011-04-19T09:38:55  <jarib> would you be able to update the prebuilts?
+2011-04-19T09:39:08  <jimevans> let me see.
+2011-04-19T09:40:01  *** larrys has quit IRC
+2011-04-19T09:40:40  <jarib> jimevans: i can't find any changes in the native code from eran recently though
+2011-04-19T09:40:40  <jimevans> is it only the c++ dll?
+2011-04-19T09:40:55  <jimevans> no, the changes as i recall all happened in javascript.
+2011-04-19T09:41:02  <jarib> hm
+2011-04-19T09:41:04  <jimevans> hang on a sec.
+2011-04-19T09:41:06  <jarib> you're on win 7?
+2011-04-19T09:41:22  <jimevans> yes. win7 x64
+2011-04-19T09:41:38  <jarib> i'm still my good old xp vm
+2011-04-19T09:41:42  *** larrys has joined #selenium
+2011-04-19T09:42:00  <jimevans> eran's change for moveto is in r12032
+2011-04-19T09:42:02  <selbot2> eran.mes@gmail.com 4 days ago - EranMes: Implementing the moveto command for Firefox. This implementation, while funtionally correct, is not optimal for two reasons: First, the current X,Y coordinates are not stored as a part of the session but on the firefoxDriver instance itself. Second, the current resolution for generating the mouse move events is too low which means the mouse cursor will not end up on the desired coordinates. Both issues ...
+2011-04-19T09:42:02  <selbot2> ... will be attended in a follow-up changeset. - http://code.google.com/p/selenium/source/detail?r=12032
+2011-04-19T09:43:24  *** ammar01 has quit IRC
+2011-04-19T09:44:04  <jarib> jimevans: perhaps it's ruby-specific - let me write a short script you can run to check
+2011-04-19T09:44:09  <jimevans> sure.
+2011-04-19T09:44:15  *** nitin_ has joined #selenium
+2011-04-19T09:44:16  <jarib> run //rb:firefox first
+2011-04-19T09:44:26  *** csanchez has joined #selenium
+2011-04-19T09:44:33  *** ahal has joined #selenium
+2011-04-19T09:45:54  <jimevans> waiting on your gist.
+2011-04-19T09:46:04  <jarib> jimevans: https://gist.github.com/928811
+2011-04-19T09:48:07  <jimevans> holy schnikies that's a lot of debug output when doing creating a new FirefoxDriver instance.
+2011-04-19T09:48:12  <jarib> :)
+2011-04-19T09:48:49  <jarib> here's what i get: #<Selenium::WebDriver::Remote::Capabilities:0x1388220 @browser_name="firefox", @version="4.0", @platform=:winnt, @javascript_enabled=true, @css_selectors_enabled=true, @takes_screenshot=true, @native_events=false, @rotatable=false, @firefox_profile=nil, @proxy=nil>
+2011-04-19T09:49:54  <jimevans> I get: #<Selenium::WebDriver::Remote::Capabilities:0x48fd710 @native_events=true, @takes_screenshot=true, @proxy=nil, @css_selectors_enabled=true, @firefox_profile=nil, @javascript_enabled=true, @version="3.6.15", @rotatable=false, @platform=:winnt, @browser_name="firefox">
+2011-04-19T09:50:01  <jarib> hmm
+2011-04-19T09:50:15  <jarib> oh
+2011-04-19T09:50:18  <jarib> that's not Fx 4
+2011-04-19T09:50:27  <jimevans> hang on, i just saw that
+2011-04-19T09:50:35  * jarib hangs
+2011-04-19T09:50:53  <jimevans> damn. i was sure i'd updated this to FF4. i'm on a different machine than usual.
+2011-04-19T09:51:28  <jimevans> would you like me to try FF4?
+2011-04-19T09:51:42  <jarib> so perhaps the native code isn't Fx 4 compatible yet, and it's just rejected
+2011-04-19T09:52:26  <jimevans> hm. i don't remember whether i ran the firefox tests on my laptop or not (which I *know* is FF4).
+2011-04-19T09:52:34  <jimevans> give me a minute.
+2011-04-19T09:56:46  <jimevans> *le sigh*.
+2011-04-19T09:57:25  <jimevans> build is s l o o o o o w
+2011-04-19T09:58:38  *** jleyba has joined #selenium
+2011-04-19T09:58:59  *** esteele_ has joined #selenium
+2011-04-19T09:59:38  <jimevans> okay, it's ff4 alright.
+2011-04-19T09:59:52  <jarib> same problem?
+2011-04-19T10:00:06  <jimevans> i get the same result for the capabilities.
+2011-04-19T10:00:15  <jarib> same as me? :)
+2011-04-19T10:00:20  <jimevans> yes.
+2011-04-19T10:00:23  <jarib> ok
+2011-04-19T10:00:24  <jarib> phew
+2011-04-19T10:00:48  <jimevans> oddly though, if i look at the error console, i see "webdriverserver.js:62 - Using native events: true"
+2011-04-19T10:00:57  <jarib> yeah
+2011-04-19T10:01:04  <jarib> that's just reading the pref i think
+2011-04-19T10:01:10  <jimevans> ok
+2011-04-19T10:01:15  *** esteele has quit IRC
+2011-04-19T10:01:15  *** esteele_ is now known as esteele
+2011-04-19T10:03:56  *** bebef_1987 has quit IRC
+2011-04-19T10:06:25  <ato> Are there any tests for ActionChainsGenerator anywhere?  I couldn't find any.
+2011-04-19T10:06:42  <jimevans> please hold, caller. :)
+2011-04-19T10:06:55  <ato> Found.
+2011-04-19T10:07:02  <ato> I greped the wrong directory.
+2011-04-19T10:07:03  <jimevans> ok.
+2011-04-19T10:09:37  *** vrockai has quit IRC
+2011-04-19T10:16:29  <jleyba> jimevans: When you open a XML doc in IE, is the javascript engine initialized?
+2011-04-19T10:17:14  <jimevans> oooh, good question. give me a sec.
+2011-04-19T10:17:30  <jimevans> you mean raw xml, right?
+2011-04-19T10:17:51  <jleyba> Yeah.  #1552
+2011-04-19T10:17:57  <selbot2>  open/new possible IE regression bug: xpath locators - http://code.google.com/p/selenium/issues/detail?id=1552
+2011-04-19T10:19:25  <jimevans> i'm pretty sure the answer is no.
+2011-04-19T10:19:45  <jleyba> that's what i thought
+2011-04-19T10:21:31  *** amitev has quit IRC
+2011-04-19T10:24:04  <jimevans> hmm... oddly enough, i'm able to find an element using xpath on a raw xml file. so i must be mistaken.
+2011-04-19T10:24:25  *** Archdude_ has joined #selenium
+2011-04-19T10:25:08  <jimevans> oh, no wait. not true.
+2011-04-19T10:25:24  *** lfryc is now known as lfryc_away
+2011-04-19T10:26:48  *** Archdude has quit IRC
+2011-04-19T10:26:48  *** Archdude_ is now known as Archdude
+2011-04-19T10:28:10  *** Archdude_ has joined #selenium
+2011-04-19T10:28:38  *** marlenac has quit IRC
+2011-04-19T10:29:52  <jimevans> jleyba: i have a more definitive answer for you.
+2011-04-19T10:30:30  *** Archdude has quit IRC
+2011-04-19T10:30:31  *** Archdude_ is now known as Archdude
+2011-04-19T10:30:41  <jimevans> yes, the script engine is initialized. you can find elements in an xml document using javascript against the dom.
+2011-04-19T10:31:29  <jimevans> however, in the case of the IE driver, the minute you try to do anything with that element, we check to verify it's in a valid HTML DOM by walking nodes to the root to see if we have an <html> element at the root.
+2011-04-19T10:32:08  <jimevans> In the case of a raw XML document, we don't, so we assume the DOM node you have is disconnected from its DOM (as a stale element would be).
+2011-04-19T10:32:52  *** marlenac has joined #selenium
+2011-04-19T10:38:02  *** christopherl has joined #selenium
+2011-04-19T10:38:03  <jleyba> ah.
+2011-04-19T10:38:36  <jimevans> i'm experimenting with something now.
+2011-04-19T10:41:37  <jimevans> jleyba: how important is this to fix?
+2011-04-19T10:41:58  <jimevans> (i know what the issue reporter would say)
+2011-04-19T10:48:54  <AutomatedTester> jleyba: yo
+2011-04-19T10:49:08  <AutomatedTester> what version of python is used within Google?
+2011-04-19T10:49:20  <AutomatedTester> is it still 2.5?
+2011-04-19T10:52:06  *** toseter has quit IRC
+2011-04-19T10:54:30  <jleyba> AutomatedTester: I believe it's 2.6
+2011-04-19T10:54:52  <jleyba> jimevans: It's not a high priority.  I was just spending a few minutes triaging bugs
+2011-04-19T10:55:19  *** Archdude_ has joined #selenium
+2011-04-19T10:55:27  <AutomatedTester> i am quite happy to support 2.6 and 2.7
+2011-04-19T10:55:44  <AutomatedTester> 2.5 seems like a waste since its really old
+2011-04-19T10:56:03  *** Rajan has joined #selenium
+2011-04-19T10:56:05  <AutomatedTester> Ubuntu 11, which is due out immenently has 2.7 built in
+2011-04-19T10:56:14  <AutomatedTester> jleyba: what are your thoughts?
+2011-04-19T10:58:26  *** Archdude has quit IRC
+2011-04-19T10:58:26  *** Archdude_ is now known as Archdude
+2011-04-19T10:58:30  *** nitin__ has joined #selenium
+2011-04-19T11:00:46  <AutomatedTester> i'll put it to the people
+2011-04-19T11:01:03  *** nitin_ has quit IRC
+2011-04-19T11:01:37  <jleyba> Yeah, we're on 2.6 so we should at least support that :)
+2011-04-19T11:13:19  *** soc42_ has quit IRC
+2011-04-19T11:16:43  *** toseter has joined #selenium
+2011-04-19T11:20:46  *** eranm has joined #selenium
+2011-04-19T11:23:30  <eranm> jarib: still here?
+2011-04-19T11:23:37  <jarib> eranm: yes
+2011-04-19T11:23:53  <eranm> OK, so native events with Firefox 4 are not known to work.
+2011-04-19T11:24:06  <jarib> gotcha
+2011-04-19T11:24:17  <eranm> I've had to patch the native events library code to get it compile with gecko 2 but it still wouldn't actually work
+2011-04-19T11:24:27  <eranm> So Firefox 3.6 is the best bet
+2011-04-19T11:24:34  <eranm> All variants of the moveto command should work
+2011-04-19T11:24:41  <eranm> (I've just committed it before going on vacation)
+2011-04-19T11:24:51  <eranm> The click is not implemented yet
+2011-04-19T11:25:51  <jarib> i see
+2011-04-19T11:25:55  <jarib> that clears things up
+2011-04-19T11:26:48  <jarib> thanks
+2011-04-19T11:27:01  <jarib> sorry to disturb your vacation :)
+2011-04-19T11:28:33  *** anatoli has joined #selenium
+2011-04-19T11:32:54  *** anatoli has quit IRC
+2011-04-19T11:34:34  <eranm> No worries
+2011-04-19T11:35:05  *** csanchez_ has joined #selenium
+2011-04-19T11:35:06  *** csanchez has quit IRC
+2011-04-19T11:35:06  *** csanchez_ is now known as csanchez
+2011-04-19T11:42:29  *** eranm has quit IRC
+2011-04-19T11:42:34  *** Archdude_ has joined #selenium
+2011-04-19T11:45:40  *** Archdude has quit IRC
+2011-04-19T11:45:42  *** Archdude_ is now known as Archdude
+2011-04-19T11:50:28  *** Archdude_ has joined #selenium
+2011-04-19T11:52:36  *** Archdude has quit IRC
+2011-04-19T11:52:37  *** Archdude_ is now known as Archdude
+2011-04-19T11:52:43  *** csanchez has quit IRC
+2011-04-19T11:57:47  *** AutomatedTester has quit IRC
+2011-04-19T12:00:13  *** esteele has quit IRC
+2011-04-19T12:02:31  *** esteele has joined #selenium
+2011-04-19T12:03:27  *** csanchez has joined #selenium
+2011-04-19T12:07:14  *** lord1234 has joined #selenium
+2011-04-19T12:07:25  <lord1234> $selenium.stop should close the associated browser correct?
+2011-04-19T12:09:09  <andytinkham> lord1234: I forget for Se1, but I use .quit in ruby in Selenium-Webdriver (se2)
+2011-04-19T12:10:11  *** |izzie has quit IRC
+2011-04-19T12:10:28  *** dave_miles has quit IRC
+2011-04-19T12:10:44  *** dave_miles has joined #selenium
+2011-04-19T12:11:19  *** soc42 has joined #selenium
+2011-04-19T12:11:19  *** erwandf has quit IRC
+2011-04-19T12:11:22  *** adamgoucher has quit IRC
+2011-04-19T12:15:23  <lord1234> i use se2
+2011-04-19T12:15:26  <lord1234> ok
+2011-04-19T12:16:07  *** rbalent has quit IRC
+2011-04-19T12:23:55  *** wsmoak has left #selenium
+2011-04-19T12:26:01  *** marlenac has quit IRC
+2011-04-19T12:26:17  *** nirvdrum has quit IRC
+2011-04-19T12:32:38  *** nitin__ has quit IRC
+2011-04-19T12:35:39  *** lord1234 has quit IRC
+2011-04-19T12:41:04  *** marlenac has joined #selenium
+2011-04-19T12:41:49  *** |izzie has joined #selenium
+2011-04-19T12:52:23  *** marlenac has quit IRC
+2011-04-19T12:54:15  *** RossPatterson has quit IRC
+2011-04-19T12:54:51  *** charleyb has quit IRC
+2011-04-19T12:56:08  *** marlenac has joined #selenium
+2011-04-19T12:57:16  *** adamgoucher has joined #selenium
+2011-04-19T13:01:16  *** ian_mac_ has joined #selenium
+2011-04-19T13:02:50  *** toseter has quit IRC
+2011-04-19T13:03:33  *** gronky has quit IRC
+2011-04-19T13:04:34  *** marlenac has quit IRC
+2011-04-19T13:05:39  *** toseter has joined #selenium
+2011-04-19T13:06:00  *** epsas has quit IRC
+2011-04-19T13:07:20  *** antlong has joined #selenium
+2011-04-19T13:14:40  *** Fyrespray^ has joined #selenium
+2011-04-19T13:17:02  *** Fyrespray has quit IRC
+2011-04-19T13:17:14  *** gronky has joined #selenium
+2011-04-19T13:18:12  *** charleyb has joined #selenium
+2011-04-19T13:18:22  *** soc42 has quit IRC
+2011-04-19T13:19:40  *** esteele has quit IRC
+2011-04-19T13:22:11  *** skiphuffman__ has quit IRC
+2011-04-19T13:22:12  *** jimevans has quit IRC
+2011-04-19T13:27:15  *** mbeierl has quit IRC
+2011-04-19T13:30:18  *** Hyper-Core has joined #selenium
+2011-04-19T13:33:31  *** plightbo has joined #selenium
+2011-04-19T13:33:43  *** freynaud has quit IRC
+2011-04-19T13:46:27  *** vector_xyz has quit IRC
+2011-04-19T13:50:06  *** jganot has quit IRC
+2011-04-19T13:50:42  *** miker2 has quit IRC
+2011-04-19T13:53:41  *** kylls has quit IRC
+2011-04-19T13:54:00  *** jganot has joined #selenium
+2011-04-19T14:05:26  *** Hyper-Core has left #selenium
+2011-04-19T14:08:10  *** plightbo has quit IRC
+2011-04-19T14:11:29  *** plightbo has joined #selenium
+2011-04-19T14:11:47  <charleyb> does anyone know anything about cloud?
+2011-04-19T14:13:20  <jarib> in what context?
+2011-04-19T14:14:47  <jarib> plightbo knows a thing or two i imagine :)
+2011-04-19T14:15:32  <charleyb> bit of a goof
+2011-04-19T14:16:07  <adamgoucher> whats the name of the group that provides free continuous integration for open source projects?
+2011-04-19T14:16:13  <charleyb> sorry to be an interloper in this channel
+2011-04-19T14:16:14  <xirkus> anyone here know if ActiveTestSuite is supported in junit 4 with annotations? I would like to run 10 simultaneous WebDriver tests in parallel.
+2011-04-19T14:16:43  *** ivog has joined #selenium
+2011-04-19T14:17:26  <charleyb> adamgoucher: the problem is running headfull :)
+2011-04-19T14:17:51  <adamgoucher> regardless; i'm at the point where i cant find it and its bugging me :)
+2011-04-19T14:18:14  <charleyb> FB does it
+2011-04-19T14:18:55  <jarib> adamgoucher: osuosl maybe? though not specific to ci
+2011-04-19T14:19:35  <selbot2> dave.hunt@gmail.com half a minute ago - DaveHunt: Nightly builds of Firefox 3.5 and 3.6 are now detected as Firefox. This fixes issue 1404. - http://code.google.com/p/selenium/source/detail?r=12047
+2011-04-19T14:19:50  <adamgoucher> jarib: i think that might be it; i jsut found them (on page 6 of search results)
+2011-04-19T14:20:07  *** nirvdrum has joined #selenium
+2011-04-19T14:23:16  *** mbeierl has joined #selenium
+2011-04-19T14:24:21  *** ian_mac_ has quit IRC
+2011-04-19T14:34:39  *** csgeek has quit IRC
+2011-04-19T14:34:59  *** XCulver has quit IRC
+2011-04-19T14:36:06  *** gronky has quit IRC
+2011-04-19T14:36:30  *** csgeek has joined #selenium
+2011-04-19T14:50:07  *** SL-BWood has quit IRC
+2011-04-19T14:50:32  *** antlong has quit IRC
+2011-04-19T14:51:49  *** Muz has quit IRC
+2011-04-19T14:59:04  *** nnd has joined #selenium
+2011-04-19T14:59:34  *** brettporter has joined #selenium
+2011-04-19T15:06:42  *** Muz has joined #selenium
+2011-04-19T15:11:39  *** toseter has quit IRC
+2011-04-19T15:22:51  *** andytinkham has quit IRC
+2011-04-19T15:26:24  *** QAguy has quit IRC
+2011-04-19T15:29:15  *** mbeierl has quit IRC
+2011-04-19T15:49:32  *** anatoli_ has joined #selenium
+2011-04-19T15:49:50  *** christopherl has quit IRC
+2011-04-19T15:54:56  *** sfbrian has quit IRC
+2011-04-19T15:56:00  *** foolfoolz has joined #selenium
+2011-04-19T15:56:52  <foolfoolz> im using the *mock browserstring and isElementPresent() is returning true for everything. is this expected behavior with the mock browser?
+2011-04-19T16:05:34  *** csanchez has quit IRC
+2011-04-19T16:18:27  *** Archdude_ has joined #selenium
+2011-04-19T16:19:20  *** Archdude_ has quit IRC
+2011-04-19T16:20:07  *** Archdude_ has joined #selenium
+2011-04-19T16:20:30  *** Archdude has quit IRC
+2011-04-19T16:20:30  *** Archdude_ is now known as Archdude
+2011-04-19T16:21:31  *** miker2 has joined #selenium
+2011-04-19T16:29:01  *** Archdude has quit IRC
+2011-04-19T16:29:22  *** Archdude has joined #selenium
+2011-04-19T16:31:11  *** Archdude has joined #selenium
+2011-04-19T16:34:02  *** miker2 has quit IRC
+2011-04-19T16:37:44  *** Archdude has quit IRC
+2011-04-19T16:38:02  *** Archdude has joined #selenium
+2011-04-19T16:38:59  *** Archdude has quit IRC
+2011-04-19T16:39:46  *** Archdude has joined #selenium
+2011-04-19T16:44:11  *** Archdude has quit IRC
+2011-04-19T16:44:55  *** Archdude has joined #selenium
+2011-04-19T16:46:15  *** Archdude has joined #selenium
+2011-04-19T16:52:28  *** keshureddyp has quit IRC
+2011-04-19T16:52:50  *** Archdude has quit IRC
+2011-04-19T16:53:08  *** Archdude has joined #selenium
+2011-04-19T16:54:53  *** Archdude has joined #selenium
+2011-04-19T17:00:52  *** Archdude has quit IRC
+2011-04-19T17:01:12  *** Archdude has joined #selenium
+2011-04-19T17:02:57  *** Archdude has joined #selenium
+2011-04-19T17:07:38  *** Archdude has quit IRC
+2011-04-19T17:08:22  *** Archdude has joined #selenium
+2011-04-19T17:08:59  *** Archdude has quit IRC
+2011-04-19T17:09:43  *** Archdude has joined #selenium
+2011-04-19T17:15:33  *** Archdude has quit IRC
+2011-04-19T17:15:58  *** Archdude has joined #selenium
+2011-04-19T17:17:38  *** Archdude has joined #selenium
+2011-04-19T17:21:43  *** Spanktar has quit IRC
+2011-04-19T17:24:25  *** Archdude has quit IRC
+2011-04-19T17:24:46  *** Archdude has joined #selenium
+2011-04-19T17:25:42  *** Archdude has quit IRC
+2011-04-19T17:26:29  *** Archdude has joined #selenium
+2011-04-19T17:32:12  *** Archdude has quit IRC
+2011-04-19T17:32:32  *** Archdude has joined #selenium
+2011-04-19T17:32:50  *** esteele|away is now known as esteele
+2011-04-19T17:33:30  *** Archdude has quit IRC
+2011-04-19T17:34:15  *** Archdude has joined #selenium
+2011-04-19T17:35:39  *** ahal has quit IRC
+2011-04-19T17:40:00  *** ner0x has joined #selenium
+2011-04-19T17:47:58  <plightbo> charleyb: whatcha trying to do?
+2011-04-19T17:49:26  *** plightbo has quit IRC
+2011-04-19T17:52:28  *** foolfoolz has quit IRC
+2011-04-19T17:52:51  *** foolfoolz has joined #selenium
+2011-04-19T17:57:14  *** foolfoolz has quit IRC
+2011-04-19T18:05:03  *** miker2 has joined #selenium
+2011-04-19T18:18:01  *** dmachi1 has joined #selenium
+2011-04-19T18:18:02  *** dmachi has quit IRC
+2011-04-19T18:22:38  *** charleyb has quit IRC
+2011-04-19T18:22:58  *** charleyb has joined #selenium
+2011-04-19T18:25:40  *** dmachi1 has quit IRC
+2011-04-19T18:26:15  *** dmachi has joined #selenium
+2011-04-19T18:46:05  *** ian_mac has quit IRC
+2011-04-19T18:46:16  *** ian_mac has joined #selenium
+2011-04-19T19:09:03  *** pnitin has joined #selenium
+2011-04-19T19:16:04  *** miker2 has quit IRC
+2011-04-19T19:20:14  *** kylls has joined #selenium
+2011-04-19T19:26:20  *** esteele is now known as esteele|away
+2011-04-19T19:26:29  *** kylls has quit IRC
+2011-04-19T19:42:43  *** nirvdrum has quit IRC
+2011-04-19T19:55:09  *** pnitin has quit IRC
+2011-04-19T20:06:48  *** ivog has quit IRC
+2011-04-19T20:11:05  *** |izzie has quit IRC
+2011-04-19T20:16:30  *** ner0x has quit IRC
+2011-04-19T20:52:25  *** dave_miles_cf has joined #selenium
+2011-04-19T20:56:07  *** dave_miles has quit IRC
+2011-04-19T21:10:24  *** |izzie has joined #selenium
+2011-04-19T21:29:03  *** pnitin has joined #selenium
+2011-04-19T21:45:56  *** |izzie has quit IRC
+2011-04-19T21:50:09  *** erwandf has joined #selenium
+2011-04-19T22:02:14  *** |izzie has joined #selenium
+2011-04-19T22:54:59  *** erwandf has quit IRC
+2011-04-19T22:56:48  *** pnitin has quit IRC
+2011-04-19T22:58:11  *** pnitin has joined #selenium
+2011-04-19T23:16:46  *** nitin_ has joined #selenium
+2011-04-19T23:18:11  *** pnitin has quit IRC
+2011-04-19T23:28:01  *** csanchez has joined #selenium
+2011-04-19T23:36:50  *** brettporter has quit IRC
+2011-04-19T23:40:52  *** soc42 has joined #selenium
+2011-04-19T23:42:19  *** brettporter has joined #selenium
+2011-04-19T23:43:58  *** freynaud has joined #selenium

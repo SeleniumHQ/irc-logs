@@ -1,0 +1,674 @@
+[2013-11-22 00:01:28] robinsmidsrod: does anyone know why opera doesn't default to english (http accept-language) when using the the standalone server with webdriver api?
+[2013-11-22 00:01:49] robinsmidsrod: ato: ^^
+[2013-11-22 00:02:40] robinsmidsrod: I assume you might know, as I just read an article by you on the opera webdriver
+[2013-11-22 00:03:15] stackedsax4, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 00:15:52] sebhoss, quitting. (Remote host closed the connection)
+[2013-11-22 00:29:10] zeljkof, joining. (#selenium)
+[2013-11-22 00:31:24] stackedsax1, quitting. (Quit: Leaving.)
+[2013-11-22 00:32:21] sebhoss, joining. (#selenium)
+[2013-11-22 00:34:59] zeljkof, quitting. (Quit: zeljkof)
+[2013-11-22 00:36:26] zeljkof, joining. (#selenium)
+[2013-11-22 00:45:39] ArSn, joining. (#selenium)
+[2013-11-22 00:51:47] sburjan, joining. (#selenium)
+[2013-11-22 01:01:59] ddary, joining. (#selenium)
+[2013-11-22 01:08:25] bimmelino, joining. (#selenium)
+[2013-11-22 01:09:09] markboxall, joining. (#selenium)
+[2013-11-22 01:25:48] AdamDangoor, joining. (#selenium)
+[2013-11-22 01:39:47] operatiay, joining. (#selenium)
+[2013-11-22 01:41:38] Bebe_sel, joining. (#selenium)
+[2013-11-22 01:58:17] Tuplario, joining. (#selenium)
+[2013-11-22 02:02:50] zac_se, joining. (#selenium)
+[2013-11-22 02:05:02] operatiay, quitting. (Remote host closed the connection)
+[2013-11-22 02:08:50] sebhoss, quitting. (Read error: Connection reset by peer)
+[2013-11-22 02:09:41] sebhoss_, joining. (#selenium)
+[2013-11-22 02:10:16] koshie, quitting. (Quit: leaving)
+[2013-11-22 02:12:13] Bebe_sel, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 02:12:57] sburjan, quitting. (Remote host closed the connection)
+[2013-11-22 02:15:23] losh, joining. (#selenium)
+[2013-11-22 02:18:46] p_l, joining. (#selenium)
+[2013-11-22 02:22:40] operatiay, joining. (#selenium)
+[2013-11-22 02:24:16] Bebe_sel, joining. (#selenium)
+[2013-11-22 02:26:02] sburjan, joining. (#selenium)
+[2013-11-22 02:43:50] zeljkof, quitting. (Quit: zeljkof)
+[2013-11-22 02:50:07] zeljkof, joining. (#selenium)
+[2013-11-22 02:52:13] smoke, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 02:54:27] operatiay, quitting. ()
+[2013-11-22 03:02:08] sebhoss_, quitting. (Remote host closed the connection)
+[2013-11-22 03:03:57] smoke, joining. (#selenium)
+[2013-11-22 03:06:06] jkrocil, joining. (#selenium)
+[2013-11-22 03:09:59] ato: robinsmidsrod: Perhaps your remote end has a different locale set?  It's my only guess.
+[2013-11-22 03:10:49] robinsmidsrod: ato: so opera tries to use the locale of the OS to figure out how to set the accept-language?
+[2013-11-22 03:11:04] robinsmidsrod: if it is completely undefined...
+[2013-11-22 03:11:32] ato: I'm guessing.  operadriver certainly doesn't have anything to do with it.
+[2013-11-22 03:11:57] robinsmidsrod: ato: indeed, I'm just trying to get consistent results among browsers
+[2013-11-22 03:12:20] robinsmidsrod: firefox, chrome and safari all defaulted to english, while ie and opera defaulted to Norwegian
+[2013-11-22 03:12:48] diancho, joining. (#selenium)
+[2013-11-22 03:13:00] ato: My best suggestion is to open up the profile/preferences and see what goes on there.
+[2013-11-22 03:13:07] robinsmidsrod: in IE's case I just had to remove accept-language config in the browser, but for opera that didn't make any difference
+[2013-11-22 03:13:30] ato: Possibly you can tweak it through opera:prefs, which has an API through driver.preferences().set("foo", "bar").
+[2013-11-22 03:14:06] robinsmidsrod: ato: it does, but I can't seem to understand how to call that when I use standalone server called from Perl (Selenium::Remote::Driver)
+[2013-11-22 03:14:31] ato: Ah, well it's only exposed on Java.
+[2013-11-22 03:14:47] robinsmidsrod: not available via the remote api?
+[2013-11-22 03:14:49] ato: It's missing the command primitives to do it via the wire protocol.
+[2013-11-22 03:15:08] robinsmidsrod: ato: so is that something that is on a todo list?
+[2013-11-22 03:15:29] ato: Yes, probably.  But I don't work for Opera anymore (-:
+[2013-11-22 03:15:42] robinsmidsrod: ato: ooh :)
+[2013-11-22 03:16:00] robinsmidsrod: got any idea where I can submit a bug report on getting user preference possible via remote?
+[2013-11-22 03:16:54] ato: You can try the issue tracker on github but I wouldn't hold my hopes high.  Opera recently backed out of the webdriver standardization process, and have announced they're abandoning Presto-based Opera early next year.
+[2013-11-22 03:18:08] robinsmidsrod: so I guess at that point I shouldn't really bother to test opera at all? :)
+[2013-11-22 03:19:08] ato: My point of view is that you should ask yourself if not testing Chromium (which all new Operas are based on) will be sufficient.
+[2013-11-22 03:19:37] robinsmidsrod: ato: I'm already testing with standard Chrome, so that might possibly be GoodEnough(TM)
+[2013-11-22 03:20:29] robinsmidsrod: I solved my immediate problem by specifying an explicit opera.profile which I customized accordingly
+[2013-11-22 03:20:30] ato: Yeah.  Believe me when I say there's no substantial difference between Chrome beta/dev channels and Opera final's.
+[2013-11-22 03:21:01] ato: You could possibly tweak the profile manually and try to send that across as a capability.
+[2013-11-22 03:21:31] robinsmidsrod: already ended up doing that - just wanted to try and avoid that, as it requires more setup on the test client machine
+[2013-11-22 03:21:34] ato: Tweaking the profile is what the operadriver does for you on the remote end if you do it before the start of the browser.  While it's running it uses Scope to chage prefs.
+[2013-11-22 03:22:13] *AutomatedTester hopes Opera will join us again'
+[2013-11-22 03:22:40] ato: Excuse me for a moment.
+[2013-11-22 03:22:42] ato: HAHAH.
+[2013-11-22 03:22:57] robinsmidsrod: also, the Selenium::Remote::Driver code seems to work well when using Perl
+[2013-11-22 03:23:07] robinsmidsrod: +1 from me
+[2013-11-22 03:23:21] ato: Yup, the wire protocol is wonderful (-:
+[2013-11-22 03:23:34] AutomatedTester: its ok
+[2013-11-22 03:39:08] jibay, joining. (#selenium)
+[2013-11-22 03:39:17] losh, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 03:54:10] ddary, quitting. (Quit: http://www.kiwiirc.com/ - A hand crafted IRC client)
+[2013-11-22 04:02:29] sebhoss, joining. (#selenium)
+[2013-11-22 04:05:38] kedoodek, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 04:14:20] kedoodek, joining. (#selenium)
+[2013-11-22 04:20:10] rananda, quitting. (Quit: /AWAY Leaving)
+[2013-11-22 04:30:41] ddary, joining. (#selenium)
+[2013-11-22 04:39:29] farlan, quitting. (Quit: Leaving.)
+[2013-11-22 04:42:12] eanxgeek|log, changing nick to eanxgeek.
+[2013-11-22 04:46:30] hum_ph_, quitting. (Remote host closed the connection)
+[2013-11-22 04:58:29] mreedell-work, joining. (#selenium)
+[2013-11-22 04:59:48] zeljkof, quitting. (Quit: zeljkof)
+[2013-11-22 05:02:51] mreedell-work, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 05:06:56] mreedell-work, joining. (#selenium)
+[2013-11-22 05:17:43] zeljkof, joining. (#selenium)
+[2013-11-22 05:19:06] nicholasdipiazza, joining. (#selenium)
+[2013-11-22 05:19:42] nicholasdipiazza: back when i installed selenium IDE plugin while back, it used selenium RC. now it uses the new stuff. but when I export my old test cases from Selenium RC all my runScripts now give me ERROR: Unsupported command [runScript ....
+[2013-11-22 05:19:57] nicholasdipiazza: any jiras already open on it?
+[2013-11-22 05:20:05] nicholasdipiazza: *issue tickets
+[2013-11-22 05:20:30] nicholasdipiazza: "The Click at and the run script commands are currently not supported  by the WebDriver exporters. You can manually convert these commands once  the test case has been exported. For the click at, you should take a look at the WebDriver Actions  class (in Java). I believe it is called ActionChains class in Python.  The moveByOffset and click methods should help."
+[2013-11-22 05:20:55] nicholasdipiazza: is there no way to runscripts in the web driver?
+[2013-11-22 05:22:34] quatron, joining. (#selenium)
+[2013-11-22 05:27:48] losh, joining. (#selenium)
+[2013-11-22 05:34:15] chp, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 05:34:32] chp, joining. (#selenium)
+[2013-11-22 05:43:18] dhenry__, joining. (#selenium)
+[2013-11-22 05:45:56] hum_ph, joining. (#selenium)
+[2013-11-22 05:46:42] selenium33, joining. (#selenium)
+[2013-11-22 05:46:44] selenium33, leaving. (#selenium)
+[2013-11-22 05:48:05] AdamDangoor, quitting. (Quit: Leaving...)
+[2013-11-22 05:53:40] AdamDangoor, joining. (#selenium)
+[2013-11-22 05:59:46] losh, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 06:01:10] Nakul, joining. (#selenium)
+[2013-11-22 06:01:16] ddary, quitting. (Quit: http://www.kiwiirc.com/ - A hand crafted IRC client)
+[2013-11-22 06:01:38] losh, joining. (#selenium)
+[2013-11-22 06:03:45] dhenry, joining. (#selenium)
+[2013-11-22 06:03:49] dhenry__, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 06:06:51] Nakul: I am following the tutorial of WebDriverJS, and now trying to use it directly in the browser. (https://code.google.com/p/selenium/wiki/WebDriverJs#Working_in_a_Browser)
+[2013-11-22 06:07:00] Nakul: But, ./go //javascript/webdriver:webdriver
+[2013-11-22 06:07:08] Nakul: is giving following error
+[2013-11-22 06:07:17] Nakul: Compiling: //javascript/webdriver:webdriver as build/javascript/webdriver/webdriver.js go aborted! Missing provider for (webdriver.testing.assert)
+[2013-11-22 06:07:34] losh, quitting. (Remote host closed the connection)
+[2013-11-22 06:08:01] losh, joining. (#selenium)
+[2013-11-22 06:09:50] Nakul: anyone can help?
+[2013-11-22 06:10:54] farlan, joining. (#selenium)
+[2013-11-22 06:18:41] hum_ph, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 06:20:49] bluescreen10, joining. (#selenium)
+[2013-11-22 06:20:49] mdas, joining. (#selenium)
+[2013-11-22 06:24:42] cmcgraw, joining. (#selenium)
+[2013-11-22 06:28:41] nirvdrum, joining. (#selenium)
+[2013-11-22 06:31:24] Nakul, quitting. (Quit: Page closed)
+[2013-11-22 06:31:51] SamuraiJack, quitting. (Quit: Konversation terminated!)
+[2013-11-22 06:42:47] hum_ph, joining. (#selenium)
+[2013-11-22 06:45:20] dhenry_, joining. (#selenium)
+[2013-11-22 06:45:49] dhenry, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 06:45:56] PaulB010101, joining. (#selenium)
+[2013-11-22 06:50:54] gdennis, joining. (#selenium)
+[2013-11-22 06:54:47] hum_ph, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 06:55:36] Cliff123, quitting. (Quit: Konversation terminated!)
+[2013-11-22 07:00:20] fatguylaughing, joining. (#selenium)
+[2013-11-22 07:01:14] cgoldberg, joining. (#selenium)
+[2013-11-22 07:01:40] bluescreen10, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 07:02:38] qaguy, joining. (#selenium)
+[2013-11-22 07:06:28] AutomatedTester: nicholasdipiazza: we havent used Jira in years
+[2013-11-22 07:06:36] AutomatedTester: listernally years
+[2013-11-22 07:06:45] AutomatedTester: literally even
+[2013-11-22 07:08:14] elopio, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 07:11:58] elopio, joining. (#selenium)
+[2013-11-22 07:14:14] Prometheian, joining. (#selenium)
+[2013-11-22 07:14:32] opapo, joining. (#selenium)
+[2013-11-22 07:15:25] intchanter-work, joining. (#selenium)
+[2013-11-22 07:17:56] Tuplario, leaving. ("Leaving")
+[2013-11-22 07:25:13] Prometheian: If I need to check if an element is on a page but I'm forced to use an xpath, is there a way to do "if exists, blah, else blah" without having Selenium bomb out on me? This is in Java.
+[2013-11-22 07:26:09] AutomatedTester: Prometheian: a try catch around the find element?
+[2013-11-22 07:26:26] Prometheian: Ah, kk!
+[2013-11-22 07:28:21] bimmelino, leaving. (#selenium)
+[2013-11-22 07:28:54] AutomatedTester: or ArrayList<WebElement> founds = driver.findElements(By); and then check its length is > 0
+[2013-11-22 07:31:04] selenium33, joining. (#selenium)
+[2013-11-22 07:33:15] dhenry_, quitting. (Read error: Operation timed out)
+[2013-11-22 07:34:54] dhenry_, joining. (#selenium)
+[2013-11-22 07:36:45] Prometheian: First thing didn't work, will try other one.
+[2013-11-22 07:37:39] hum_ph, joining. (#selenium)
+[2013-11-22 07:40:49] Grant484, joining. (#selenium)
+[2013-11-22 07:41:35] lord1234, joining. (#selenium)
+[2013-11-22 07:42:12] PaulB010101, quitting. (Remote host closed the connection)
+[2013-11-22 07:42:41] PaulB010101, joining. (#selenium)
+[2013-11-22 07:44:13] frio80, joining. (#selenium)
+[2013-11-22 07:45:11] frio80: Do you need to start selenium sever (Standalone) to use WebDriver?  If so, why would you ever start selenium server?
+[2013-11-22 07:45:38] AutomatedTester: frio80: you dont need it unless you want to use the server on different machines
+[2013-11-22 07:47:21] PaulB010101, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 07:48:55] hum_ph, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 07:49:06] frio80: AutomatedTester: Got it. Thx.
+[2013-11-22 07:53:21] fatguylaughing, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 07:53:24] fatguylaughing_, joining. (#selenium)
+[2013-11-22 07:57:32] smccarthy, joining. (#selenium)
+[2013-11-22 07:57:40] nicholasdipiazza, quitting. (Quit: Leaving.)
+[2013-11-22 07:57:54] sburjan, quitting. (Remote host closed the connection)
+[2013-11-22 08:02:00] mganz, joining. (#selenium)
+[2013-11-22 08:03:47] stephend, joining. (#selenium)
+[2013-11-22 08:06:37] noahsussman, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 08:14:00] AdamDangoor, quitting. (Quit: Leaving...)
+[2013-11-22 08:14:09] jkrocil, quitting. (Read error: Operation timed out)
+[2013-11-22 08:14:29] jkrocil, joining. (#selenium)
+[2013-11-22 08:16:20] sebhoss, quitting. (Remote host closed the connection)
+[2013-11-22 08:16:26] chrismcmahon, joining. (#selenium)
+[2013-11-22 08:20:23] lord12341, joining. (#selenium)
+[2013-11-22 08:22:44] lord1234, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 08:23:12] dhenry_, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 08:24:38] lukeis, joining. (#selenium)
+[2013-11-22 08:25:24] papegaaij, quitting. (Remote host closed the connection)
+[2013-11-22 08:27:49] Dude-X, joining. (#selenium)
+[2013-11-22 08:29:16] dhenry_, joining. (#selenium)
+[2013-11-22 08:29:47] frio80, quitting. (Quit: Page closed)
+[2013-11-22 08:31:02] noahsussman, joining. (#selenium)
+[2013-11-22 08:32:30] hum_ph, joining. (#selenium)
+[2013-11-22 08:33:32] intchanter-work, quitting. (Quit: Leaving.)
+[2013-11-22 08:33:46] intchanter-work, joining. (#selenium)
+[2013-11-22 08:34:03] Prometheian: AutomatedTester: That worked, sorry for late reply. Lunch! :D
+[2013-11-22 08:34:20] AutomatedTester: Prometheian: interesting that the try catch didnt work
+[2013-11-22 08:34:43] Prometheian: Yeah, I'm not sure I executed it correctly.
+[2013-11-22 08:37:55] rebelagentm, joining. (#selenium)
+[2013-11-22 08:43:32] Bebe_sel, quitting. (Remote host closed the connection)
+[2013-11-22 08:44:32] losh, quitting. (Remote host closed the connection)
+[2013-11-22 08:44:38] hum_ph, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 08:51:40] jkrocil, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 08:55:29] dimacus, joining. (#selenium)
+[2013-11-22 09:00:24] dimacus, quitting. (Quit: Leaving.)
+[2013-11-22 09:02:50] ArSn, quitting. (Remote host closed the connection)
+[2013-11-22 09:03:33] davidlai, joining. (#selenium)
+[2013-11-22 09:03:37] davidlai, quitting. (Client Quit)
+[2013-11-22 09:03:58] davidlai, joining. (#selenium)
+[2013-11-22 09:05:32] jkrocil, joining. (#selenium)
+[2013-11-22 09:09:54] zeljkof, quitting. (Quit: zeljkof)
+[2013-11-22 09:12:59] Dude-X, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 09:19:35] markboxall, quitting. (Remote host closed the connection)
+[2013-11-22 09:20:11] markboxall, joining. (#selenium)
+[2013-11-22 09:24:42] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 09:27:23] hum_ph, joining. (#selenium)
+[2013-11-22 09:27:56] stackedsax, joining. (#selenium)
+[2013-11-22 09:29:28] jimevans, joining. (#selenium)
+[2013-11-22 09:30:19] jimevans: ahoy, everybody
+[2013-11-22 09:30:36] lukeis: hiya jimevans
+[2013-11-22 09:31:26] jimevans: lukeis: holding down the fort?
+[2013-11-22 09:31:37] lukeis: which fort? ;)
+[2013-11-22 09:31:59] *lukeis sit (well, mostly lying) on my couch ;)'
+[2013-11-22 09:32:15] jimevans: yeah, well, it's friday. that's normal for you . :)
+[2013-11-22 09:32:24] lukeis: where in the world is jimevans today? :)
+[2013-11-22 09:32:55] jimevans: in the air. SEA-DFW-TPA.
+[2013-11-22 09:33:17] jimevans: home for the weekend, then on a big boat in the caribbean.
+[2013-11-22 09:33:57] lukeis: you gonna be out at sea for turkey day?
+[2013-11-22 09:34:27] ato: jimevans: Ohoy there.
+[2013-11-22 09:34:48] jimevans: lukeis: i will.
+[2013-11-22 09:39:35] lord12341: 48 more hours here
+[2013-11-22 09:39:37] lord12341: its sorta sad actually
+[2013-11-22 09:39:55] lukeis: "here" being boston?
+[2013-11-22 09:40:26] sfbrian, joining. (#selenium)
+[2013-11-22 09:43:20] mansi, joining. (#selenium)
+[2013-11-22 09:43:29] BigVoice, joining. (#selenium)
+[2013-11-22 09:53:05] Dude-X, joining. (#selenium)
+[2013-11-22 09:53:46] bluescreen10, joining. (#selenium)
+[2013-11-22 09:53:56] fatguylaughing_, quitting. (Quit: fatguylaughing_)
+[2013-11-22 09:54:03] Prometheian: I want to find an element by linkText, however there's two items on the page that match it. How can I select the second one?
+[2013-11-22 09:54:36] Dude-X: Prometheian: use xpath or css selector
+[2013-11-22 09:55:01] Dude-X: probably xpath since you can index
+[2013-11-22 09:55:22] Prometheian: css selector? I'd like to avoid xpath's since items on the page can vary
+[2013-11-22 09:55:33] lord12341: lukeis: this company actually
+[2013-11-22 09:55:36] lord12341: i'm sad i'm leaving
+[2013-11-22 09:55:54] lukeis: 48 hours? you count Saturday?
+[2013-11-22 09:55:56] lord12341: i am going to be hard pressed to find a place like this place
+[2013-11-22 09:55:59] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 09:56:01] lord12341: lukeis: well 48h in boston
+[2013-11-22 09:56:03] lord12341: 4 h at this company
+[2013-11-22 09:56:04] Dude-X: Prometheian: xpath can be as good as css selector
+[2013-11-22 09:56:05] noahsussman, joining. (#selenium)
+[2013-11-22 09:56:06] lukeis: ;)
+[2013-11-22 09:56:15] Prometheian: I'll just try xpath then
+[2013-11-22 09:56:44] lukeis: Prometheian: just use findElements <- with an s
+[2013-11-22 09:56:45] Dude-X: don't do dumb things like /html/body/div/div/guiseme/glaive/div[1]
+[2013-11-22 09:56:50] Dude-X: or that
+[2013-11-22 09:56:52] manoj9788, joining. (#selenium)
+[2013-11-22 09:57:06] lukeis: driver.findElements(By.linkText("duplicate")).get(1);   <- second one
+[2013-11-22 09:57:24] stephend, quitting. (Remote host closed the connection)
+[2013-11-22 09:57:41] brma: relative xpath is more flexible than absolute xpath
+[2013-11-22 09:57:44] lukeis: driver.find_elements_by_link_text("duplicate")[1]   (python) :)
+[2013-11-22 09:57:50] stephend, joining. (#selenium)
+[2013-11-22 09:57:57] Prometheian: Ah!
+[2013-11-22 09:57:59] Prometheian: ty
+[2013-11-22 09:58:26] eanxgeek, changing nick to eanxgeek|log.
+[2013-11-22 09:59:48] selenium33, leaving. (#selenium)
+[2013-11-22 10:00:40] hum_ph, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 10:02:07] stephend, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 10:04:35] jimevans: did my reply to the "intuitive wait" thread on se-dev come through for anyone?
+[2013-11-22 10:04:47] lukeis: nope
+[2013-11-22 10:05:04] *lukeis fighting the good fight all by himself'
+[2013-11-22 10:05:16] lukeis: ;)
+[2013-11-22 10:05:31] jimevans: well damn.
+[2013-11-22 10:05:32] jimevans: i had a nice long reply about how "it's not that simple" using IE as an example
+[2013-11-22 10:05:56] jimevans: but it's disappeared into the aether.
+[2013-11-22 10:06:05] lukeis: must be cached 'somewhere' unless you did it from your phone
+[2013-11-22 10:06:14] jimevans: i guess i'll have to try to reconstruct.
+[2013-11-22 10:06:32] stackedsax, quitting. (Read error: Connection reset by peer)
+[2013-11-22 10:06:51] stackedsax, joining. (#selenium)
+[2013-11-22 10:06:52] lukeis: i've had a few emails just 'disappear' after sending on my phone (all at times of very suspect internet connectivity… i think there's a bug in ios)
+[2013-11-22 10:07:15] admc, joining. (#selenium)
+[2013-11-22 10:07:54] jimevans: perhaps. this is actually on my laptop.
+[2013-11-22 10:08:11] lukeis: heh, gmail bug! ;)
+[2013-11-22 10:14:33] Prometheian: There's various items in a table, each item has several columns and one of the columns will have identical text. It's plaintext. Is there a way to get all elements on that page with that plaintext? I want to get their xpaths and do an action based off of it.
+[2013-11-22 10:15:19] awilson820, joining. (#selenium)
+[2013-11-22 10:15:19] lukeis: just gave an example of that to another guy the other day ;)
+[2013-11-22 10:15:31] Prometheian: Copy n paste!
+[2013-11-22 10:15:33] lukeis: "//tr/td[2
+[2013-11-22 10:15:37] lukeis: oops
+[2013-11-22 10:15:47] lukeis: "//tr/td[2][.='text']/.."
+[2013-11-22 10:16:02] lukeis: gets the rows that have the second column with 'text' in it
+[2013-11-22 10:16:04] Prometheian: I've got an xpath to one of the [td].
+[2013-11-22 10:16:07] Prometheian: html/body/form[1]/table/tbody/tr[2]/td/div[2]/div[2]/table/tbody/tr[2]/td[2]/table/tbody/tr/td/div/table/tbody/tr[4]/td/table[2]/tbody/tr/td/table/tbody/tr[1]/td[3]
+[2013-11-22 10:16:12] lukeis: no....
+[2013-11-22 10:16:15] lukeis: please god… no
+[2013-11-22 10:16:17] Prometheian: :D
+[2013-11-22 10:16:18] Goatman, joining. (#selenium)
+[2013-11-22 10:16:45] lukeis: fire the UI developer
+[2013-11-22 10:16:53] lukeis: seriously.. fired.
+[2013-11-22 10:16:59] jkrocil, quitting. (Quit: Ex-Chat)
+[2013-11-22 10:17:06] Prometheian: This application is moving towards becoming legacy.
+[2013-11-22 10:17:08] lukeis: 6 nested tables? are you kidding me?
+[2013-11-22 10:17:17] Prometheian: I'm simply writing some scripts to maintain this crap for now.
+[2013-11-22 10:17:21] p_l: lukeis: ... at least there's no iframe in between
+[2013-11-22 10:17:22] Prometheian, leaving. (#selenium)
+[2013-11-22 10:17:30] Prometheian, joining. (#selenium)
+[2013-11-22 10:17:33] Prometheian: Fucking firefox
+[2013-11-22 10:17:35] Prometheian: sometimes
+[2013-11-22 10:17:48] lukeis: no, nothing in that is related to firefox ;)
+[2013-11-22 10:17:56] Prometheian: I left the channel
+[2013-11-22 10:17:58] Prometheian: Sorry
+[2013-11-22 10:18:14] lukeis: there's always the :log ;)
+[2013-11-22 10:18:14] selbot2: https://raw.github.com/SeleniumHQ/irc-logs/master/2013/11/22.txt
+[2013-11-22 10:18:20] sanguisdex: firefox like vi is better
+[2013-11-22 10:18:33] Prometheian: Anywho
+[2013-11-22 10:18:40] Prometheian: I've got this ass of a nested table
+[2013-11-22 10:19:04] Prometheian: I needa run though items there, if text==blah, grab the xpath and ../../whatever to do something.
+[2013-11-22 10:19:23] zac_se, quitting. (Quit: Leaving)
+[2013-11-22 10:19:31] diancho, quitting. (Quit: Leaving...)
+[2013-11-22 10:22:10] Prometheian: So, I do
+[2013-11-22 10:22:26] Prometheian: driver.findElements(By.xpath("//tr/td[2][.='text']/.."))?
+[2013-11-22 10:23:46] stackedsax, quitting. (Quit: Leaving.)
+[2013-11-22 10:24:12] stackedsax, joining. (#selenium)
+[2013-11-22 10:24:28] hum_ph, joining. (#selenium)
+[2013-11-22 10:31:06] jimevans: okay, landing. back online in awhile.
+[2013-11-22 10:31:10] jimevans, quitting. (Quit: Leaving.)
+[2013-11-22 10:31:21] stephend, joining. (#selenium)
+[2013-11-22 10:31:31] mansi, quitting. (Remote host closed the connection)
+[2013-11-22 10:31:53] BigVoice, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 10:32:17] BigVoice, joining. (#selenium)
+[2013-11-22 10:32:29] lukeis: Prometheian: sure… but replace 'text' with your string you're trying to find and replace 2 with the column you think it actually is in
+[2013-11-22 10:33:08] Prometheian: ....../tbody/tr/td/table/tbody/tr[X]/td[3]
+[2013-11-22 10:33:11] Prometheian: X is what changes
+[2013-11-22 10:33:34] Prometheian: So would I just end at /tbody/?
+[2013-11-22 10:33:51] mansi_, joining. (#selenium)
+[2013-11-22 10:34:22] lukeis: the X will pick the row…. you asked me for something different before
+[2013-11-22 10:34:36] Prometheian: sec
+[2013-11-22 10:35:30] SamuraiJack, joining. (#selenium)
+[2013-11-22 10:35:46] Prometheian: http://i.imgur.com/1evFysE.jpg
+[2013-11-22 10:35:52] Prometheian: Subject column.
+[2013-11-22 10:37:35] Goatman, quitting. (Read error: Connection reset by peer)
+[2013-11-22 10:40:55] stackedsax2, joining. (#selenium)
+[2013-11-22 10:42:19] santiycr, joining. (#selenium)
+[2013-11-22 10:43:03] stackedsax, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 10:44:42] dhenry__, joining. (#selenium)
+[2013-11-22 10:44:58] dhenry_, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 10:47:10] Prometheian: lukeis?
+[2013-11-22 10:50:33] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 10:51:08] noahsussman, joining. (#selenium)
+[2013-11-22 10:54:54] PaulB010101, joining. (#selenium)
+[2013-11-22 10:55:52] nicholasdipiazza, joining. (#selenium)
+[2013-11-22 10:57:59] hum_ph, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 10:59:17] nicholasdipiazza: AutomatedTester: so we just have the google issue tracker?
+[2013-11-22 10:59:33] nicholasdipiazza: (google code issue tracker for lack of a better word)
+[2013-11-22 11:01:10] lukeis: Prometheian: not sure how I can help ya there, screenshots don't translate into html structure well (what would be needed to help with locating the elements you want)
+[2013-11-22 11:01:20] admc, quitting. (Quit: Leaving.)
+[2013-11-22 11:01:38] Prometheian: I can provide a direct xpath to the top element.
+[2013-11-22 11:01:53] lukeis: still not very useful
+[2013-11-22 11:02:14] Prometheian: kk
+[2013-11-22 11:02:19] Prometheian: Well, I'll ignore it for now.
+[2013-11-22 11:02:50] Prometheian: Unlikely to be an issue as this will create one entry every month and a half or so, and this application will be cycled to legacy in a year or year and a half.
+[2013-11-22 11:03:16] Prometheian: ty ^^
+[2013-11-22 11:03:50] admc, joining. (#selenium)
+[2013-11-22 11:04:35] lord12341, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 11:05:33] stackedsax2, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 11:06:34] lord1234, joining. (#selenium)
+[2013-11-22 11:08:05] lord12341, joining. (#selenium)
+[2013-11-22 11:08:50] markboxall, joining. (#selenium)
+[2013-11-22 11:10:51] lord1234, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 11:12:24] SamuraiJack, quitting. (Quit: Konversation terminated!)
+[2013-11-22 11:13:36] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 11:16:49] dhenry__, changing nick to dhenry.
+[2013-11-22 11:18:31] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 11:21:02] lord1234, joining. (#selenium)
+[2013-11-22 11:21:04] stackedsax1, joining. (#selenium)
+[2013-11-22 11:21:29] hum_ph, joining. (#selenium)
+[2013-11-22 11:22:58] Prometheian, leaving. (#selenium)
+[2013-11-22 11:23:16] lord12341, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 11:25:52] stackedsax3, joining. (#selenium)
+[2013-11-22 11:28:04] stackedsax1, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 11:28:07] admc, quitting. (Quit: Leaving.)
+[2013-11-22 11:29:22] barancev, joining. (#selenium)
+[2013-11-22 11:29:22] barancev|2, quitting. (Read error: Connection reset by peer)
+[2013-11-22 11:30:52] noahsussman, joining. (#selenium)
+[2013-11-22 11:31:29] BigVoice, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 11:33:21] hum_ph, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 11:37:20] stackedsax3, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 11:40:44] sevaseva, joining. (#selenium)
+[2013-11-22 11:42:39] chrismcmahon, changing nick to chrismcmalunch.
+[2013-11-22 11:43:07] santiycr, quitting. (Quit: Leaving.)
+[2013-11-22 11:44:18] emil_tester, joining. (#selenium)
+[2013-11-22 11:46:13] santiycr, joining. (#selenium)
+[2013-11-22 11:46:15] dimacus, joining. (#selenium)
+[2013-11-22 11:46:49] mansi_, quitting. (Remote host closed the connection)
+[2013-11-22 11:48:49] PaulB010101, quitting. (Read error: Connection reset by peer)
+[2013-11-22 11:49:03] PaulB010101, joining. (#selenium)
+[2013-11-22 11:49:23] PaulB010101, quitting. (Client Quit)
+[2013-11-22 11:50:06] stackedsax1, joining. (#selenium)
+[2013-11-22 11:50:30] admc, joining. (#selenium)
+[2013-11-22 11:50:54] PaulB010101, joining. (#selenium)
+[2013-11-22 11:50:56] mansi, joining. (#selenium)
+[2013-11-22 11:54:52] stackedsax1, quitting. (Read error: Connection reset by peer)
+[2013-11-22 11:54:57] stackedsax3, joining. (#selenium)
+[2013-11-22 11:55:07] manoj9788, leaving. (#selenium)
+[2013-11-22 11:55:18] mansi, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 11:59:33] stackedsax3, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 11:59:37] mansi, joining. (#selenium)
+[2013-11-22 12:00:30] BigVoice, joining. (#selenium)
+[2013-11-22 12:03:32] stackedsax1, joining. (#selenium)
+[2013-11-22 12:04:04] mansi, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 12:07:02] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 12:08:12] AutomatedTester: nicholasdipiazza: yup
+[2013-11-22 12:11:09] mdas, quitting. (Remote host closed the connection)
+[2013-11-22 12:11:44] mdas, joining. (#selenium)
+[2013-11-22 12:14:22] dhenry_, joining. (#selenium)
+[2013-11-22 12:15:01] dhenry, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 12:15:57] mdas, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 12:16:22] hum_ph, joining. (#selenium)
+[2013-11-22 12:16:33] santiycr, quitting. (Quit: Leaving.)
+[2013-11-22 12:24:22] lukeis: letter addressed to my father shows up at my house… spam for "pre-paying cremation", I think they're trying to tell me something…. and I might actually buy it and give it to him for christmas. then I can say "Instead of coal this year, I got you coal as a future version of yourself."
+[2013-11-22 12:24:54] mansi, joining. (#selenium)
+[2013-11-22 12:25:19] mansi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 12:25:41] mansi, joining. (#selenium)
+[2013-11-22 12:27:44] hum_ph, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 12:31:48] Dude-X: jeeze
+[2013-11-22 12:36:40] nicholasdipiazza, quitting. (Quit: Leaving.)
+[2013-11-22 12:41:11] dimacus: lukeis:  i don't know whether to laugh or be horrified
+[2013-11-22 12:41:26] dimacus: although… my dad would apriciate that… he has a twisted sense of humor
+[2013-11-22 12:50:02] chrismcmalunch, changing nick to chrismcmahon.
+[2013-11-22 12:50:09] ato: lukeis: That's morbid!
+[2013-11-22 12:50:20] lukeis: yes, yes it is ;)
+[2013-11-22 12:50:24] ato: The ad I mean.  The gift idea reminds me of a Tom Lehrer song.
+[2013-11-22 12:51:21] BigVoice, quitting. (Quit: Leaving)
+[2013-11-22 12:53:26] cmcgraw, quitting. (Quit: cmcgraw)
+[2013-11-22 12:57:44] markboxall, joining. (#selenium)
+[2013-11-22 12:59:21] stackedsax1, quitting. (Read error: Connection reset by peer)
+[2013-11-22 12:59:34] stackedsax2, joining. (#selenium)
+[2013-11-22 13:01:12] mreedell-work, quitting. (Read error: Operation timed out)
+[2013-11-22 13:02:30] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 13:02:58] mdas, joining. (#selenium)
+[2013-11-22 13:04:05] stackedsax2, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 13:04:48] stackedsax, joining. (#selenium)
+[2013-11-22 13:05:32] lord1234, quitting. (Quit: Leaving.)
+[2013-11-22 13:05:56] lord1234, joining. (#selenium)
+[2013-11-22 13:05:57] lord1234, leaving. (#selenium)
+[2013-11-22 13:07:16] stackedsax, quitting. (Read error: Connection reset by peer)
+[2013-11-22 13:07:29] stackedsax, joining. (#selenium)
+[2013-11-22 13:09:33] stackedsax, quitting. (Read error: Connection reset by peer)
+[2013-11-22 13:09:50] stackedsax2, joining. (#selenium)
+[2013-11-22 13:09:57] dhenry__, joining. (#selenium)
+[2013-11-22 13:10:40] dhenry_, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 13:10:45] elopio, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 13:10:48] admc1, joining. (#selenium)
+[2013-11-22 13:11:11] hum_ph, joining. (#selenium)
+[2013-11-22 13:11:36] elopio, joining. (#selenium)
+[2013-11-22 13:14:16] admc, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 13:16:35] miebster_atwork, joining. (#selenium)
+[2013-11-22 13:17:28] noahsussman, joining. (#selenium)
+[2013-11-22 13:22:17] noahsussman, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 13:22:38] hum_ph, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 13:22:51] qaguy, quitting. (Quit: Leaving.)
+[2013-11-22 13:24:12] dimacus, quitting. (Quit: Leaving.)
+[2013-11-22 13:25:09] admc1, quitting. (Quit: Leaving.)
+[2013-11-22 13:25:11] qaguy, joining. (#selenium)
+[2013-11-22 13:26:25] santiycr, joining. (#selenium)
+[2013-11-22 13:27:45] gdennis, quitting. (Quit: gdennis)
+[2013-11-22 13:31:10] tilgovi, joining. (#selenium)
+[2013-11-22 13:33:18] PaulB010101, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 13:34:14] jimevans, joining. (#selenium)
+[2013-11-22 13:34:38] admc, joining. (#selenium)
+[2013-11-22 13:34:56] admc, quitting. (Client Quit)
+[2013-11-22 13:41:02] rebelagentm, leaving. (#selenium)
+[2013-11-22 13:42:13] farlan, leaving. (#selenium)
+[2013-11-22 13:43:14] qaguy, leaving. (#selenium)
+[2013-11-22 13:43:46] tilgovi_, joining. (#selenium)
+[2013-11-22 13:43:57] tilgovi_, quitting. (Remote host closed the connection)
+[2013-11-22 13:52:43] jimevans: lukeis: yt?
+[2013-11-22 13:52:52] lukeis: sí
+[2013-11-22 13:53:55] admc, joining. (#selenium)
+[2013-11-22 13:54:00] admc, quitting. (Client Quit)
+[2013-11-22 13:54:41] stackedsax2, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 13:55:46] fatguylaughing, joining. (#selenium)
+[2013-11-22 13:57:57] dhenry__, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 14:00:47] stackedsax1, joining. (#selenium)
+[2013-11-22 14:01:55] dhenry__, joining. (#selenium)
+[2013-11-22 14:02:00] dhenry__, quitting. (Client Quit)
+[2013-11-22 14:04:45] stephend_, joining. (#selenium)
+[2013-11-22 14:06:05] hum_ph, joining. (#selenium)
+[2013-11-22 14:06:38] stephend, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 14:12:55] mansi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:13:10] noahsussman, joining. (#selenium)
+[2013-11-22 14:13:14] mansi, joining. (#selenium)
+[2013-11-22 14:15:41] mansi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:16:03] mansi, joining. (#selenium)
+[2013-11-22 14:17:30] hum_ph, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 14:18:15] santiycr, quitting. (Quit: Leaving.)
+[2013-11-22 14:19:43] santiycr, joining. (#selenium)
+[2013-11-22 14:20:05] mansi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:20:50] mansi, joining. (#selenium)
+[2013-11-22 14:21:54] jimevans: i really wish i could figure out I18nTest.testShouldBeAbleToReturnTheTextInAPage fails only on IE10.
+[2013-11-22 14:22:05] jimevans: i mean other browsers' behavior is just weird
+[2013-11-22 14:25:19] mansi, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 14:25:23] awilson820, quitting. (Quit: Leaving.)
+[2013-11-22 14:25:29] awilson820, joining. (#selenium)
+[2013-11-22 14:27:03] mansi, joining. (#selenium)
+[2013-11-22 14:27:16] mansi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:27:43] mansi, joining. (#selenium)
+[2013-11-22 14:33:42] mdas, quitting. (Remote host closed the connection)
+[2013-11-22 14:34:15] mdas, joining. (#selenium)
+[2013-11-22 14:34:29] mdas, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:34:57] mdas, joining. (#selenium)
+[2013-11-22 14:36:09] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 14:36:10] admc, joining. (#selenium)
+[2013-11-22 14:40:25] stackedsax3, joining. (#selenium)
+[2013-11-22 14:41:18] noahsussman, joining. (#selenium)
+[2013-11-22 14:42:38] stackedsax1, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 14:45:44] santiycr, quitting. (Quit: Leaving.)
+[2013-11-22 14:45:56] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2013-11-22 14:46:27] jimevans, quitting. (Quit: Leaving.)
+[2013-11-22 14:46:30] markboxall, joining. (#selenium)
+[2013-11-22 14:46:36] bluescreen10, quitting. (Remote host closed the connection)
+[2013-11-22 14:47:49] santiycr, joining. (#selenium)
+[2013-11-22 14:50:16] Dude-X, quitting. (Quit: Dude-X)
+[2013-11-22 14:50:49] mansi, quitting. (Remote host closed the connection)
+[2013-11-22 14:50:51] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 14:51:25] mansi, joining. (#selenium)
+[2013-11-22 14:52:05] santiycr, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 14:52:32] tilgovi, quitting. (Read error: Connection reset by peer)
+[2013-11-22 14:54:28] miebster_atwork, quitting. (Remote host closed the connection)
+[2013-11-22 14:55:43] mansi, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 14:56:03] mansi, joining. (#selenium)
+[2013-11-22 15:01:01] hum_ph, joining. (#selenium)
+[2013-11-22 15:01:04] admc1, joining. (#selenium)
+[2013-11-22 15:03:23] stephend_, quitting. (Remote host closed the connection)
+[2013-11-22 15:03:29] admc, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 15:03:59] stephend, joining. (#selenium)
+[2013-11-22 15:05:42] Eleccy, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 15:07:32] intchanter-work, quitting. (Quit: Leaving.)
+[2013-11-22 15:12:35] hum_ph, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 15:15:45] santiycr, joining. (#selenium)
+[2013-11-22 15:20:33] cgoldberg, quitting. (Quit: Ex-Chat)
+[2013-11-22 15:43:44] mansi, quitting. (Remote host closed the connection)
+[2013-11-22 15:44:17] mansi, joining. (#selenium)
+[2013-11-22 15:48:31] mansi, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 15:49:30] smccarthy, quitting. (Remote host closed the connection)
+[2013-11-22 15:50:21] lukeis, quitting. (Quit: Leaving.)
+[2013-11-22 15:55:51] hum_ph, joining. (#selenium)
+[2013-11-22 16:07:01] hum_ph, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 16:07:11] santiycr, quitting. (Quit: Leaving.)
+[2013-11-22 16:11:46] chrismcmahon, quitting. (Quit: Leaving.)
+[2013-11-22 16:25:23] Eleccy, joining. (#selenium)
+[2013-11-22 16:30:37] awilson820, quitting. (Quit: Leaving.)
+[2013-11-22 16:35:09] mansi, joining. (#selenium)
+[2013-11-22 16:35:29] markboxall, joining. (#selenium)
+[2013-11-22 16:37:49] santiycr, joining. (#selenium)
+[2013-11-22 16:39:45] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 16:42:12] santiycr, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 16:48:33] mreedell-work, joining. (#selenium)
+[2013-11-22 16:51:18] mreedell-work, quitting. (Client Quit)
+[2013-11-22 16:59:01] riotz, quitting. (Remote host closed the connection)
+[2013-11-22 17:00:37] riotz, joining. (#selenium)
+[2013-11-22 17:03:43] hum_ph, joining. (#selenium)
+[2013-11-22 17:05:03] stephend, quitting. (Remote host closed the connection)
+[2013-11-22 17:08:12] sfbrian, quitting. (Quit: sfbrian)
+[2013-11-22 17:11:34] fatguylaughing, joining. (#selenium)
+[2013-11-22 17:11:34] fatguylaughing, quitting. (Client Quit)
+[2013-11-22 17:11:41] stackedsax3, quitting. (Quit: Leaving.)
+[2013-11-22 17:15:05] hum_ph, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 17:17:27] hum_ph, joining. (#selenium)
+[2013-11-22 17:25:04] awilson820, joining. (#selenium)
+[2013-11-22 17:29:52] awilson820, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 17:38:24] santiycr, joining. (#selenium)
+[2013-11-22 17:39:57] mreedell-work, joining. (#selenium)
+[2013-11-22 17:43:01] santiycr, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 17:44:37] hum_ph, quitting. (Read error: Connection reset by peer)
+[2013-11-22 17:45:16] hum_ph, joining. (#selenium)
+[2013-11-22 17:50:17] mreedell-work, quitting. (Quit: Computer has gone to sleep.)
+[2013-11-22 17:57:04] admc1, quitting. (Quit: Leaving.)
+[2013-11-22 18:13:12] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 18:13:38] noahsussman, joining. (#selenium)
+[2013-11-22 18:17:48] nsussman, joining. (#selenium)
+[2013-11-22 18:17:53] noahsussman, quitting. (Read error: Connection reset by peer)
+[2013-11-22 18:18:06] admc, joining. (#selenium)
+[2013-11-22 18:18:12] nsussman, quitting. (Remote host closed the connection)
+[2013-11-22 18:18:19] noahsussman, joining. (#selenium)
+[2013-11-22 18:20:26] admc, quitting. (Client Quit)
+[2013-11-22 18:25:47] awilson820, joining. (#selenium)
+[2013-11-22 18:27:52] farlan, joining. (#selenium)
+[2013-11-22 18:30:22] awilson820, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 18:36:42] davidlai, quitting. (Quit: Leaving.)
+[2013-11-22 18:36:54] davidlai, joining. (#selenium)
+[2013-11-22 18:39:21] santiycr, joining. (#selenium)
+[2013-11-22 18:41:29] davidlai, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 18:43:54] santiycr, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 18:45:12] awilson820, joining. (#selenium)
+[2013-11-22 18:46:59] awilson820, quitting. (Read error: Connection reset by peer)
+[2013-11-22 18:47:00] awilson8201, joining. (#selenium)
+[2013-11-22 18:48:29] noahsussman, quitting. (Remote host closed the connection)
+[2013-11-22 18:49:02] noahsussman, joining. (#selenium)
+[2013-11-22 18:51:16] mdas, quitting. (Remote host closed the connection)
+[2013-11-22 18:51:49] mdas, joining. (#selenium)
+[2013-11-22 18:51:59] awilson8201, quitting. (Ping timeout: 272 seconds)
+[2013-11-22 18:53:00] ladweeba, joining. (#selenium)
+[2013-11-22 18:53:12] noahsussman, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 18:56:05] mdas, quitting. (Ping timeout: 248 seconds)
+[2013-11-22 19:03:29] stephend, joining. (#selenium)
+[2013-11-22 19:14:50] ladweeba, quitting. (Quit: —I-n-v-i-s-i-o-n— 3.1.2 (March '10))
+[2013-11-22 19:19:21] noahsussman, joining. (#selenium)
+[2013-11-22 19:28:45] noahsussman, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 19:54:41] noahsussman, joining. (#selenium)
+[2013-11-22 20:03:53] noahsussman, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 20:13:05] markboxall, joining. (#selenium)
+[2013-11-22 20:16:17] santiycr, joining. (#selenium)
+[2013-11-22 20:16:24] santiycr, quitting. (Client Quit)
+[2013-11-22 20:17:33] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 20:19:13] stephend, quitting. (Remote host closed the connection)
+[2013-11-22 20:19:27] stephend, joining. (#selenium)
+[2013-11-22 20:30:01] noahsussman, joining. (#selenium)
+[2013-11-22 20:39:18] noahsussman, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 21:05:19] noahsussman, joining. (#selenium)
+[2013-11-22 21:05:40] jibay, quitting. (Remote host closed the connection)
+[2013-11-22 21:14:43] noahsussman, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 21:17:55] hum_ph, quitting. (Remote host closed the connection)
+[2013-11-22 21:34:02] nirvdrum, quitting. (Ping timeout: 265 seconds)
+[2013-11-22 21:40:39] noahsussman, joining. (#selenium)
+[2013-11-22 21:49:57] noahsussman, quitting. (Ping timeout: 246 seconds)
+[2013-11-22 21:50:26] Selenium-Git, joining. (#selenium)
+[2013-11-22 21:50:26] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/2j-JNA
+[2013-11-22 21:50:26] Selenium-Git, leaving. (#selenium)
+[2013-11-22 21:50:26] Selenium-Git: 13selenium/06master 14bf7ea9d 15Jason Leyba: Fix SeleniumAppServer
+[2013-11-22 21:51:34] nicholasdipiazza, joining. (#selenium)
+[2013-11-22 21:57:30] Selenium-Git, joining. (#selenium)
+[2013-11-22 21:57:30] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/0-XOrw
+[2013-11-22 21:57:30] Selenium-Git: 13selenium/06master 14b29d70f 15Jason Leyba: On Unix, use the default IANA ephemeral port range if unable to retrieve the current system's range....
+[2013-11-22 21:57:30] Selenium-Git, leaving. (#selenium)
+[2013-11-22 22:02:08] markboxall, joining. (#selenium)
+[2013-11-22 22:06:27] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 22:12:47] mansi, quitting. (Remote host closed the connection)
+[2013-11-22 22:15:58] noahsussman, joining. (#selenium)
+[2013-11-22 22:23:39] seljenkinsbot: Project IE 11 Java Tests build #1: UNSTABLE in 2 min 9 sec: http://ci.seleniumhq.org:8080/job/IE%2011%20Java%20Tests/1/
+[2013-11-22 22:25:08] noahsussman, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 22:28:06] Grant484, quitting. (Quit: leaving)
+[2013-11-22 22:29:03] sevaseva, quitting. (Quit: Leaving)
+[2013-11-22 22:29:37] SamuraiJack, joining. (#selenium)
+[2013-11-22 22:38:36] amit, joining. (#selenium)
+[2013-11-22 22:38:53] amit: hi all
+[2013-11-22 22:38:54] amit: good morning
+[2013-11-22 22:39:00] amit, changing nick to Guest50139.
+[2013-11-22 22:39:30] Guest50139: hi all good morning
+[2013-11-22 22:40:15] Guest50139, quitting. (Client Quit)
+[2013-11-22 22:44:57] seljenkinsbot: Project IE 11 Win8.1 Javascript Tests build #1: UNSTABLE in 1 min 4 sec: http://ci.seleniumhq.org:8080/job/IE%2011%20Win8.1%20Javascript%20Tests/1/
+[2013-11-22 22:49:23] daemon, quitting. (Read error: No route to host)
+[2013-11-22 22:53:07] daemon, joining. (#selenium)
+[2013-11-22 22:53:44] daemon, changing nick to Guest96876.
+[2013-11-22 22:57:48] Guest96876, quitting. (Read error: Connection reset by peer)
+[2013-11-22 23:05:11] nicholasdipiazza, quitting. (Quit: Leaving.)
+[2013-11-22 23:06:06] daemon_, joining. (#selenium)
+[2013-11-22 23:08:14] nicholasdipiazza, joining. (#selenium)
+[2013-11-22 23:08:44] nicholasdipiazza, leaving. (#selenium)
+[2013-11-22 23:13:51] mansi, joining. (#selenium)
+[2013-11-22 23:14:28] sine_nitore, joining. (#selenium)
+[2013-11-22 23:18:04] mansi, quitting. (Ping timeout: 240 seconds)
+[2013-11-22 23:21:23] noahsussman, joining. (#selenium)
+[2013-11-22 23:22:59] barancev|2, joining. (#selenium)
+[2013-11-22 23:25:25] barancev, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 23:29:30] barancev, joining. (#selenium)
+[2013-11-22 23:29:30] barancev|2, quitting. (Read error: Connection reset by peer)
+[2013-11-22 23:29:52] noahsussman, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 23:36:32] stephend, quitting. (Remote host closed the connection)
+[2013-11-22 23:37:00] stephend, joining. (#selenium)
+[2013-11-22 23:41:15] stephend, quitting. (Ping timeout: 245 seconds)
+[2013-11-22 23:45:28] smoke, quitting. (Ping timeout: 264 seconds)
+[2013-11-22 23:51:02] markboxall, joining. (#selenium)
+[2013-11-22 23:52:49] daemon_, changing nick to daemon.
+[2013-11-22 23:53:19] daemon, changing nick to Guest17177.
+[2013-11-22 23:55:21] markboxall, quitting. (Ping timeout: 252 seconds)
+[2013-11-22 23:56:31] smoke, joining. (#selenium)
+[2013-11-22 23:56:45] noahsussman, joining. (#selenium)

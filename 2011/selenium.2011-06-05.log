@@ -1,0 +1,209 @@
+2011-06-05T00:07:30  *** Nirdosh has joined #selenium
+2011-06-05T00:55:07  *** sjmikem has quit IRC
+2011-06-05T01:05:33  *** freynaud has joined #selenium
+2011-06-05T02:22:18  *** sjmikem has joined #selenium
+2011-06-05T02:23:26  *** |izzie has joined #selenium
+2011-06-05T03:32:03  *** nirvdrum has joined #selenium
+2011-06-05T03:41:26  <selbot2> francois.reynaud 1 minute ago - FrancoisReynaud: refactoring the command line parameters and the logic behind for grid hub + node - http://code.google.com/p/selenium/source/detail?r=12367
+2011-06-05T03:56:23  *** c089 has joined #selenium
+2011-06-05T03:56:34  *** c089 has left #selenium
+2011-06-05T03:56:43  *** c089 has joined #selenium
+2011-06-05T03:56:55  *** c089 has left #selenium
+2011-06-05T03:59:48  *** c089 has joined #selenium
+2011-06-05T04:01:26  <c089> hi everyone :) trying to implement tests using the new rc2 on firefox results in "native events are disabled on this platform"... what can I do about this?
+2011-06-05T04:03:28  <c089> calling driver.getProfile().enableNativeEvents() does not help
+2011-06-05T04:06:31  <barancev> c089: what OS do you use?
+2011-06-05T04:07:02  <c089> ubuntu
+2011-06-05T04:07:24  <c089> up-to-date system with ff4
+2011-06-05T04:07:25  <barancev> from official release: Native events on Linux may not work properly on tests that include alerts and prompts
+2011-06-05T04:08:08  <c089> nothing like that in the tests
+2011-06-05T04:10:39  <barancev> I'm on Windows, sorry. you'd better come here tomorrow, all the people enjoy weekend now :)
+2011-06-05T04:11:14  <c089> :)
+2011-06-05T04:12:36  *** nirvdrum has quit IRC
+2011-06-05T04:14:24  *** Mayank1 has joined #selenium
+2011-06-05T04:16:26  *** Mayank has quit IRC
+2011-06-05T04:20:38  <freynaud> barancev: was it you asking for config files for the grid setup yesterday ?
+2011-06-05T04:26:00  *** Mayank1 has quit IRC
+2011-06-05T04:26:34  *** Mayank has joined #selenium
+2011-06-05T04:29:44  *** cheezy has joined #selenium
+2011-06-05T04:49:29  *** c_mcintosh has joined #selenium
+2011-06-05T04:50:35  <c_mcintosh> does anyone have the link to the code that lets you take screenshots using selenium
+2011-06-05T05:01:34  <c_mcintosh> would have been nice if instead of trashing the forums they found a way to save all of those docs
+2011-06-05T05:02:52  <freynaud> ?
+2011-06-05T05:03:05  <barancev> freynaud: yes, and I've seen your commit, thanks!
+2011-06-05T05:03:23  <freynaud> http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/grid/common/defaults/WebDriverDefaultNode.json
+2011-06-05T05:03:40  <freynaud> would something along those lines solve you problem ?
+2011-06-05T05:08:25  <barancev> yes, and -file option, r12366 is exactly what I wanted
+2011-06-05T05:08:28  <selbot2> francois.reynaud about 13 hours ago - FrancoisReynaud: adding a node configuration via config files + keep the current command line solution - http://code.google.com/p/selenium/source/detail?r=12366
+2011-06-05T05:08:41  <freynaud> k
+2011-06-05T05:08:48  <freynaud> there are probably some missing pieces
+2011-06-05T05:09:17  <freynaud> for instance in the config; you need to specify the node URL, and you can use "ip"
+2011-06-05T05:09:28  <freynaud> to have it replaced by the current ip
+2011-06-05T05:09:56  <freynaud> that's the only dynamic param i thought about, but there may be more. Let me know if you need more dynamic parts
+2011-06-05T05:10:40  <barancev> it's enough for now, may be some usability issues will come later
+2011-06-05T05:10:57  <freynaud> i would assume so :)
+2011-06-05T05:13:09  *** denizt_ has joined #selenium
+2011-06-05T05:13:09  *** denizt has quit IRC
+2011-06-05T05:13:10  *** denizt_ is now known as denizt
+2011-06-05T05:25:57  <barancev> freynaud: next thing that bother me is keeping nodes registered after hub restart - there is an issue #1718 on this
+2011-06-05T05:25:58  <selbot2> francois.reynaud open/new Selenium 2 Grid RCs and WebDriver nodes need restart after hub failure. - http://code.google.com/p/selenium/issues/detail?id=1718
+2011-06-05T05:27:11  <freynaud> i don't know how to fix this one yet, i have to think about it
+2011-06-05T05:27:36  <barancev> it is not so critical in producton environment, but when working with trunk it is annoying
+2011-06-05T05:27:59  <freynaud> why ?
+2011-06-05T05:28:20  <barancev> may be it is possible to save node network layout in a file on stop, and load it after restart
+2011-06-05T05:28:42  <barancev> when trunk rebuilt, I have to restart hub
+2011-06-05T05:29:12  <barancev> but I don't want to restart nodes too
+2011-06-05T05:29:16  <freynaud> i see
+2011-06-05T05:29:44  <freynaud> that you should be able to do
+2011-06-05T05:30:47  <freynaud> on your now, you will have something that looks like WebDriverDefaultNode.json
+2011-06-05T05:31:28  <freynaud> if you pass that as a param using -file, it will start the node server, change ip by its value, send send the json file to the hub for registration
+2011-06-05T05:32:10  <freynaud> if you know where your nodes are, you can save the node1.json, node2.json on the machine where you node is
+2011-06-05T05:32:30  <freynaud> and generating the request yourself
+2011-06-05T05:33:43  <barancev> sounds reasonable. atm I use shell script that restart nodes over ssh, sending a series of json requests would be much better
+2011-06-05T05:34:44  <freynaud> you should even be able to do that using a fake node
+2011-06-05T05:34:55  <freynaud> relaunch you hub
+2011-06-05T05:35:12  <freynaud> then for every node that you know is up, on the hub machine for instance
+2011-06-05T05:35:24  <freynaud> -role webdriver -file node1.json
+2011-06-05T05:35:35  <freynaud> with node1.json having the proper ip
+2011-06-05T05:35:58  <barancev> yes, I see
+2011-06-05T05:36:07  <freynaud> and also register = false
+2011-06-05T05:36:18  <freynaud> ah, no
+2011-06-05T05:36:27  <freynaud> that the other way around sorry
+2011-06-05T05:36:31  <freynaud> there is a pram missing
+2011-06-05T05:36:56  <freynaud> register = true , startServerOnNode = false
+2011-06-05T05:37:01  <freynaud> start server isn't done
+2011-06-05T05:54:00  *** c_mcintosh has quit IRC
+2011-06-05T06:10:43  *** hhhjn has joined #selenium
+2011-06-05T06:12:04  *** hhhjn has quit IRC
+2011-06-05T06:39:56  *** nirvdrum has joined #selenium
+2011-06-05T06:44:02  *** ahal has joined #selenium
+2011-06-05T06:45:39  *** stepheneb has joined #selenium
+2011-06-05T06:48:32  *** miker2 has joined #selenium
+2011-06-05T07:10:03  *** davehunt|away has quit IRC
+2011-06-05T07:11:21  *** barancev has quit IRC
+2011-06-05T07:16:47  *** miker2 has quit IRC
+2011-06-05T07:45:34  *** nirvdrum has quit IRC
+2011-06-05T07:58:11  *** ahal has quit IRC
+2011-06-05T08:03:13  *** stepheneb has quit IRC
+2011-06-05T08:22:25  *** denizt_ has joined #selenium
+2011-06-05T08:22:26  *** denizt has quit IRC
+2011-06-05T08:22:26  *** denizt_ is now known as denizt
+2011-06-05T08:32:35  *** pnitin has joined #selenium
+2011-06-05T08:45:37  *** barancev has joined #selenium
+2011-06-05T08:57:07  *** nirvdrum has joined #selenium
+2011-06-05T08:58:40  *** stepheneb has joined #selenium
+2011-06-05T09:19:06  *** denizt_ has joined #selenium
+2011-06-05T09:19:06  *** denizt has quit IRC
+2011-06-05T09:19:06  *** denizt_ is now known as denizt
+2011-06-05T09:39:50  *** freynaud has left #selenium
+2011-06-05T09:45:15  *** freynaud has joined #selenium
+2011-06-05T10:09:33  *** cgoldberg has joined #selenium
+2011-06-05T10:23:36  *** cgoldberg has quit IRC
+2011-06-05T10:30:12  *** duder has joined #selenium
+2011-06-05T10:42:44  *** AutomatedTester has joined #selenium
+2011-06-05T10:56:27  *** AutomatedTester has quit IRC
+2011-06-05T11:19:14  *** nirvdrum has quit IRC
+2011-06-05T11:33:31  *** denizt_ has joined #selenium
+2011-06-05T11:33:31  *** denizt has quit IRC
+2011-06-05T11:33:32  *** denizt_ is now known as denizt
+2011-06-05T12:01:26  *** lisak has joined #selenium
+2011-06-05T12:05:17  *** miker2 has joined #selenium
+2011-06-05T12:06:46  *** denizt_ has joined #selenium
+2011-06-05T12:06:46  *** denizt has quit IRC
+2011-06-05T12:06:47  *** denizt_ is now known as denizt
+2011-06-05T12:08:48  *** Mayank has quit IRC
+2011-06-05T12:09:05  <lisak> guys does anybody know answer to the last part of this question ? http://stackoverflow.com/q/6215857/306488
+2011-06-05T12:09:56  <lisak> if I get a WebElement,  and the element node changes in the browser, are the changes reflected to the instance of WebElement ?
+2011-06-05T12:10:19  <lisak> does it work like reference/pointer ? like in JavaScript ?
+2011-06-05T12:12:26  <barancev> lisak: I'd suppose you'll get StaleElementException if it is changed
+2011-06-05T12:14:22  <lisak> so if I presume that node changes, I gotta "find" the element again to see the changes
+2011-06-05T12:14:33  <lisak> because there is no  webElement.reload(); method
+2011-06-05T12:14:51  <barancev> though, ià only an attrubute is changed -- may be it is not marked "staled"
+2011-06-05T12:15:25  <barancev> in this case, yes, you'll see changed element, because WebElement acts as is a reference (pointer)
+2011-06-05T12:16:00  <barancev> it contains element unique id only, not element data
+2011-06-05T12:16:35  *** miker2 has quit IRC
+2011-06-05T12:17:17  <lisak> specifically I'm talking about that a new css class appears on the element
+2011-06-05T12:17:29  <lisak> for instance, validation-error
+2011-06-05T12:18:01  <lisak> so that I do some action and then check for the presence of this css class
+2011-06-05T12:18:07  <lisak> on the same instance of webElement
+2011-06-05T12:18:44  <lisak> great
+2011-06-05T12:19:23  <lisak> btw are the attribute names the same as in Javascript ?
+2011-06-05T12:19:38  <lisak> kinda cannot find a way to print them all out
+2011-06-05T12:20:31  <barancev> must be the same
+2011-06-05T12:20:41  *** Spanktar has joined #selenium
+2011-06-05T12:20:47  <barancev> they are accessed via JS
+2011-06-05T12:22:11  <lisak> good, thank you man
+2011-06-05T12:23:11  *** nirvdrum has joined #selenium
+2011-06-05T12:29:41  <lisak> I don't get the meaning of @CacheLookup  feature then :-)
+2011-06-05T12:29:47  *** denizt has quit IRC
+2011-06-05T12:30:06  *** denizt has joined #selenium
+2011-06-05T12:30:56  <lisak> it is just caching a pointer to a node on client side
+2011-06-05T12:31:25  <lisak> I wasn't aware of the fact that webElements don't keep any state
+2011-06-05T12:33:11  *** Spanktar has quit IRC
+2011-06-05T12:36:59  *** pnitin has quit IRC
+2011-06-05T12:41:38  *** Mayank has joined #selenium
+2011-06-05T12:41:46  *** Spanktar has joined #selenium
+2011-06-05T12:42:20  *** nirvdrum has quit IRC
+2011-06-05T13:15:56  *** c089 has quit IRC
+2011-06-05T13:30:25  *** stepheneb has quit IRC
+2011-06-05T13:30:48  *** stepheneb has joined #selenium
+2011-06-05T13:52:55  *** red^ is now known as reddeviL
+2011-06-05T14:06:25  *** Spanktar has quit IRC
+2011-06-05T14:10:32  *** cakehero has joined #selenium
+2011-06-05T14:21:18  <selbot2> francois.reynaud half a minute ago - FrancoisReynaud: #1745 adding new firefox icons. - http://code.google.com/p/selenium/source/detail?r=12368
+2011-06-05T14:22:01  *** davehunt|away has joined #selenium
+2011-06-05T14:29:18  <selbot2> francois.reynaud less than 20 seconds ago - FrancoisReynaud: #1762 fixing NPE on hub side when the browser isn't specified, and adding a check for the same problem on the parser for the node parameters. - http://code.google.com/p/selenium/source/detail?r=12369
+2011-06-05T14:37:49  *** freynaud has quit IRC
+2011-06-05T14:45:49  *** Spanktar has joined #selenium
+2011-06-05T14:47:15  *** jcake has joined #selenium
+2011-06-05T15:12:59  *** brettporter has joined #selenium
+2011-06-05T15:20:23  *** duder has quit IRC
+2011-06-05T15:37:41  *** Mayank1 has joined #selenium
+2011-06-05T15:40:18  *** Mayank has quit IRC
+2011-06-05T16:15:17  <Mayank1> barancev: Hey, I am using this code- window.alert = null; to supress the onload window alerts (any alerts for that matter), but now Selenium test fails as it detects an alert, if I use assertAlert the tests fail saying - there were no alerts.
+2011-06-05T16:15:38  *** Mayank1 is now known as Mayank
+2011-06-05T16:21:35  *** Spanktar has quit IRC
+2011-06-05T16:31:18  *** towski has quit IRC
+2011-06-05T16:32:14  *** Spanktar has joined #selenium
+2011-06-05T16:34:54  *** miker2 has joined #selenium
+2011-06-05T16:47:17  <Mayank> Hi, all I have suppressed the onLoad window alert by using the JavaScript -> window.alert = null; Though the onLoad alert is visibly supressesd Selenium detects it and gives an error - unexpected alert! and the tests fail. If I use assertAlert Selenium is not able to do it as it is an onLoad alert. When Selenium cannot handle onLoad alerts, and the alert is not visibly present, then why are the tests failing due to - unexpected alert? <I am sure there is n
+2011-06-05T16:54:34  *** lisak has quit IRC
+2011-06-05T17:28:45  *** Spanktar has quit IRC
+2011-06-05T18:04:37  *** jcake has quit IRC
+2011-06-05T18:17:42  *** cakehero has quit IRC
+2011-06-05T18:26:53  *** nirvdrum has joined #selenium
+2011-06-05T18:34:45  *** jcake has joined #selenium
+2011-06-05T18:51:27  *** miker2 has quit IRC
+2011-06-05T19:05:19  *** nirvdrum has quit IRC
+2011-06-05T19:05:32  *** nirvdrum has joined #selenium
+2011-06-05T19:32:53  *** cakehero has joined #selenium
+2011-06-05T20:04:04  *** |izzie has quit IRC
+2011-06-05T20:15:44  *** cakehero has quit IRC
+2011-06-05T20:15:45  *** denizt has quit IRC
+2011-06-05T20:16:04  *** denizt has joined #selenium
+2011-06-05T20:44:14  *** Mayank has quit IRC
+2011-06-05T20:44:52  *** Mayank has joined #selenium
+2011-06-05T20:50:43  *** overlords has quit IRC
+2011-06-05T20:50:50  *** overlords has joined #selenium
+2011-06-05T20:51:31  *** |izzie has joined #selenium
+2011-06-05T20:59:46  *** dmachi has joined #selenium
+2011-06-05T21:10:49  *** cakehero has joined #selenium
+2011-06-05T21:13:57  *** cakehero has quit IRC
+2011-06-05T21:40:34  *** melter has quit IRC
+2011-06-05T21:44:22  *** melter has joined #selenium
+2011-06-05T22:00:45  *** nirvdrum has quit IRC
+2011-06-05T22:09:36  *** denizt_ has joined #selenium
+2011-06-05T22:09:36  *** denizt has quit IRC
+2011-06-05T22:09:36  *** denizt_ is now known as denizt
+2011-06-05T22:22:43  *** stepheneb has quit IRC
+2011-06-05T22:23:52  *** pnitin has joined #selenium
+2011-06-05T22:32:42  *** c089 has joined #selenium
+2011-06-05T23:13:43  *** ovnimancer has quit IRC
+2011-06-05T23:23:24  *** denizt_ has joined #selenium
+2011-06-05T23:23:24  *** denizt has quit IRC
+2011-06-05T23:23:24  *** denizt_ is now known as denizt
+2011-06-05T23:43:47  *** freynaud has joined #selenium
+2011-06-05T23:48:38  *** lfryc has joined #selenium
+2011-06-05T23:49:18  *** lfryc has quit IRC
+2011-06-05T23:49:37  *** lfryc has joined #selenium
+2011-06-05T23:53:21  <selbot`> New news from builds: IDE-IDE-101 was SUCCESSFUL : Dependant of IDE-JAVA-10 <http://xserve.openqa.org:8085/browse/IDE-IDE-101> || IDE-JAVA-10 was SUCCESSFUL : Updated by adam_goucher@hotmail.com <http://xserve.openqa.org:8085/browse/IDE-JAVA-10> || IDE-IDE-100 was SUCCESSFUL : Dependant of IDE-EDITOR-123 <http://xserve.openqa.org:8085/browse/IDE-IDE-100> || IDE-EDITOR-123 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-123> || S2J-FXXP-174 was SUCCESSFUL (with 645 tests) : Manual build by Alexei Barantsev <http://xserve.openqa.org:8085/browse/S2J-FXXP-174> || IDE-IDE-99 was SUCCESSFUL : Dependant of IDE-EDITOR-121 <http://xserve.openqa.org:8085/browse/IDE-IDE-99> || IDE-MOZMILL-9 was SUCCESSFUL : Manual build by Dave Hunt <http://xserve.openqa.org:8085/browse/IDE-MOZMILL-9> || IDE-EDITOR-122 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-122> || IDE-EDITOR-121 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-121> || IDE-IDE-98 was SUCCESSFUL : Dependant of IDE-EDITOR-120 <http://xserve.openqa.org:8085/browse/IDE-IDE-98> || IDE-EDITOR-120 was SUCCESSFUL : Updated by simon.m.stewart <http://xserve.openqa.org:8085/browse/IDE-EDITOR-120> || WEB-SEHQ-111 was SUCCESSFUL : Updated by Patrick Lightbody <http://xserve.openqa.org:8085/browse/WEB-SEHQ-111> || WEB-SEHQ-110 was SUCCESSFUL : Updated by Patrick Lightbody <http://xserve.openqa.org:8085/browse/WEB-SEHQ-110> || WEB-SEHQ-109 was SUCCESSFUL : Updated by Samit Badle, Tarun Bhaduria <http://xserve.openqa.org:8085/browse/WEB-SEHQ-109>

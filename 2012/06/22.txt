@@ -1,0 +1,859 @@
+[IRC logfile - Started Fri Jun 22 00:05:39 2012]
+[00:05:39] brettporter has joined #selenium
+[00:10:27] mreedell has joined #selenium
+[00:11:32] adamgoucher: you people and your old python version
+[00:11:33] adamgoucher: s
+[00:11:47] adamgoucher: (i think i know the magic commands to do a release now to not cause that again)
+[00:21:35] jarib has joined #selenium
+[00:35:57] noahsussman has joined #selenium
+[00:50:54] rbalent has joined #selenium
+[00:50:54] rbalent has joined #selenium
+[00:58:33] mdgreenfield has joined #selenium
+[IRC logfile - Started Fri Jun 22 01:22:02 2012]
+[01:22:02] ian_mac2 has joined #selenium
+[01:40:34] jarib has joined #selenium
+[01:43:13] travis-ci has joined #selenium
+[01:43:13] travis-ci: [travis-ci] jarib/selbot2#30 (master - 7c89587 : Jari Bakken): The build passed.
+[01:43:13] travis-ci: [travis-ci] Change view : https://github.com/jarib/selbot2/compare/885ef6e61cb2...7c89587019a1
+[01:43:13] travis-ci: [travis-ci] Build details : http://travis-ci.org/jarib/selbot2/builds/1678320
+[01:43:13] travis-ci has left #selenium
+[01:43:53] selbot2 has joined #selenium
+[01:58:13] kinow has left #selenium
+[IRC logfile - Started Fri Jun 22 02:50:37 2012]
+[02:50:37] mreedell has joined #selenium
+[02:55:06] jcrza_ has joined #selenium
+[IRC logfile - Started Fri Jun 22 03:13:33 2012]
+[03:13:33] davehunt has joined #selenium
+[03:18:05] klrmn has joined #selenium
+[03:21:12] ian_mac2 has joined #selenium
+[03:54:44] JackDandy has joined #selenium
+[IRC logfile - Started Fri Jun 22 04:30:20 2012]
+[04:30:20] c|m has joined #selenium
+[IRC logfile - Started Fri Jun 22 06:03:53 2012]
+[06:03:53] baijum has joined #selenium
+[06:13:07] Dome_ has joined #selenium
+[06:49:43] faille has joined #selenium
+[IRC logfile - Started Fri Jun 22 07:01:00 2012]
+[07:01:00] jeichar has joined #selenium
+[07:04:55] Ameya has joined #selenium
+[07:07:48] Guest79237 has left #selenium
+[07:10:05] ameyan has joined #selenium
+[07:17:41] Aparna has joined #selenium
+[07:31:00] Swadq has joined #selenium
+[IRC logfile - Started Fri Jun 22 08:01:07 2012]
+[08:01:07] testingb0t1 has joined #selenium
+[08:06:15] Jackneill has joined #selenium
+[08:06:15] Jackneill has joined #selenium
+[08:14:13] baijum has joined #selenium
+[08:28:22] robbim02 has joined #selenium
+[08:36:54] zac_sel has joined #selenium
+[08:42:28] lfryc has joined #selenium
+[08:42:28] lfryc has joined #selenium
+[08:49:10] lfryc has joined #selenium
+[08:49:10] lfryc has joined #selenium
+[08:56:16] jibay has joined #selenium
+[IRC logfile - Started Fri Jun 22 09:00:23 2012]
+[09:00:23] AutomatedTester has joined #selenium
+[09:09:22] sburjan has joined #selenium
+[09:11:47] mwalton has joined #selenium
+[09:14:41] mwalton: good morning. Does anyone know of a http request I can make to a selenium hub, that will close/quit the browser for a specific session id?
+[09:15:12] testingb0t has joined #selenium
+[09:15:29] andreastt: :wiki jsonwireprotocol
+[09:15:31] selbot2: 1: 03JsonWireProtocol: A description of the protocol used by WebDriver to communicate with remote instances - https://code.google.com/p/selenium/wiki/JsonWireProtocol
+[09:15:32] mwalton: I've tried a http delete with the session id. that ends the session, but leaves the browser open on the node
+[09:15:46] mwalton: thanks
+[09:16:28] mwalton: I have already looked through that, and didn't find anything to close the browser
+[09:20:59] Automate_ has joined #selenium
+[09:24:04] Ale has joined #selenium
+[09:25:10] teodosia has joined #selenium
+[09:30:26] AutomatedTester: jarib: #4129
+[09:30:26] selbot2: 03 open/new Reopen 3987 - https://code.google.com/p/selenium/issues/detail?id=4129 [Type-Defect Priority-Medium Status-Untriaged]
+[09:31:14] jeichar has joined #selenium
+[09:34:56] Bebe_home has joined #selenium
+[09:36:02] sjaak_trekhaak has joined #selenium
+[09:36:22] foolx has joined #selenium
+[09:40:18] rbalent has joined #selenium
+[09:53:19] Bebe has joined #selenium
+[IRC logfile - Started Fri Jun 22 10:35:28 2012]
+[10:35:28] davehunt: AutomatedTester: hey, observation for you.. it looks like setting a http proxy in Java expects host[:port] (port optional), but Python expects http://host[:port]
+[10:37:01] davehunt: If the protocol is not specified it gives a rather unfriendly index exception
+[10:37:19] AutomatedTester: can I see what you mean?
+[10:38:26] AutomatedTester: is this in Firefox?
+[10:39:05] davehunt: sure, if you modify test_sets_http_proxy to use proxy.http_proxy = 'test.hostname:1234' you should reproduce it
+[10:39:15] davehunt: in ff_profile_tests.py
+[10:40:05] AutomatedTester: davehunt: can you raise a :newissue with the traceback?
+[10:40:05] selbot2: https://code.google.com/p/selenium/issues/entry
+[10:40:50] davehunt: I sure can. I'm not sure if we should change it to remove the protocol (because it's actually implied by the key), or to just detect and accept either format.
+[10:41:24] davehunt: I'll raise a new issue momentarily. Would've done it last night but it was late and I wanted to run it by you first. :)
+[10:43:08] dawagner has joined #selenium
+[10:49:31] ian_mac2 has joined #selenium
+[10:49:53] davehunt: AutomatedTester: what's the build task for running just the python tests?
+[10:50:14] AutomatedTester: for firefox its just ./go clean test_py
+[10:50:22] AutomatedTester: davehunt: ^
+[10:50:33] davehunt: ah, I was using py_test because of py_install :)
+[10:51:18] AutomatedTester: i like to keep people on their toes
+[10:53:07] davehunt: :)
+[IRC logfile - Started Fri Jun 22 11:02:15 2012]
+[11:02:15] davehunt: AutomatedTester: raised, with failing testcase and trace of failure
+[11:02:21] davehunt: #4134
+[11:02:23] selbot2: 03dave.h...@gmail.com open/new Specifying a proxy without a protocol throws an IndexError exception - https://code.google.com/p/selenium/issues/detail?id=4134 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Lang-Python Browser-Firefox]
+[11:05:27] AutomatedTester: thanks davehunt
+[11:05:33] AutomatedTester: will look at it shortly :)
+[11:06:19] davehunt: AutomatedTester: absolutely no rush, I can specify the protocol to avoid the failure
+[IRC logfile - Started Fri Jun 22 12:14:09 2012]
+[12:14:09] nirvdrum has joined #selenium
+[12:36:35] skiphuffman_ has joined #selenium
+[12:38:51] juria_roberts has joined #selenium
+[12:39:22] juria_roberts: I am getting the following error on windows
+[12:39:26] juria_roberts: Invalid response while accessing the Selenium Server at 
+[12:39:27] juria_roberts:    'http://localhost:4444/selenium-server/driver/': 
+[12:39:29] juria_roberts:     ERROR Server Exception: sessionId should not be null; 
+[12:39:30] juria_roberts: has this session been started yet?
+[12:39:32] juria_roberts: Invalid response while accessing the Selenium Server at 
+[12:39:33] juria_roberts:    'http://localhost:4444/selenium-server/driver/': 
+[12:39:35] juria_roberts:    Failed to start new browser session: Error while launching browser
+[12:39:38] juria_roberts: how do I solve it?
+[12:47:33] RossPatterson has joined #selenium
+[IRC logfile - Started Fri Jun 22 13:11:19 2012]
+[13:11:19] selbot2: 03eran.mes@gmail.com half a minute ago - EranMes on behalf of EmmaSoderberg: Control web storage using capabilities for the Firefox driver. Fixes issue 3898. | https://code.google.com/p/selenium/source/detail?r=17253 | http://seleniumhq.org/ci.jsp?r=17253
+[13:12:18] Swadq has joined #selenium
+[13:13:27] mwalton has left #selenium
+[13:20:48] selbot2: 03dave.hunt@gmail.com half a minute ago - DaveHunt: Fixed an issue with setting an SSL proxy in the Python client bindings. | https://code.google.com/p/selenium/source/detail?r=17254 | http://seleniumhq.org/ci.jsp?r=17254
+[13:22:20] davehunt: :note AutomatedTester I found/fixed an issue with setting an SSL proxy in r17254, which will also suffer from #4134
+[13:22:21] selbot2: ok!
+[13:22:21] selbot2: 03dave.h...@gmail.com open/new Specifying a proxy without a protocol throws an IndexError exception - https://code.google.com/p/selenium/issues/detail?id=4134 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Lang-Python Browser-Firefox]
+[13:22:22] selbot2: 03dave.hunt@gmail.com 2 minutes ago - DaveHunt: Fixed an issue with setting an SSL proxy in the Python client bindings. | https://code.google.com/p/selenium/source/detail?r=17254 | http://seleniumhq.org/ci.jsp?r=17254
+[13:26:57] AutomatedTester has joined #selenium
+[13:26:57] selbot2: AutomatedTester: note from davehunt 5 minutes ago: I found/fixed an issue with setting an SSL proxy in r17254, which will also suffer from #4134 
+[13:28:06] AutomatedTester: r17254
+[13:28:08] selbot2: 03dave.hunt@gmail.com 8 minutes ago - DaveHunt: Fixed an issue with setting an SSL proxy in the Python client bindings. | https://code.google.com/p/selenium/source/detail?r=17254 | http://seleniumhq.org/ci.jsp?r=17254
+[13:29:50] AutomatedTester: #4134
+[13:29:52] selbot2: 03dave.h...@gmail.com open/new Specifying a proxy without a protocol throws an IndexError exception - https://code.google.com/p/selenium/issues/detail?id=4134 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Lang-Python Browser-Firefox]
+[13:30:46] AutomatedTester: davehunt|away: are you saying your patch above is failing for the same reason as 4134?
+[13:31:03] davehunt|away: AutomatedTester: It would if you didn't specify a protocol
+[13:31:13] nacho has joined #selenium
+[13:31:29] davehunt|away: Which I don't think you should, or at least it should support not specifying a protocol (or give a more useful error message)
+[13:31:53] nacho has joined #selenium
+[13:32:01] davehunt|away: The commit I made passes. I wouldn't commit something that fails.
+[13:32:13] davehunt|away: Unless it was a test :)\
+[13:33:11] davehunt|away: I'm about to go for lunch, need anything from me AutomatedTester?
+[13:33:35] AutomatedTester: davehunt|away: nah, see ya later
+[13:34:48] davehunt|away: cheers. btw I'm happy to fix #4134 if you let me know the desired behaviour (protocol/no protocol/both/etc)
+[13:34:49] selbot2: 03dave.h...@gmail.com open/new Specifying a proxy without a protocol throws an IndexError exception - https://code.google.com/p/selenium/issues/detail?id=4134 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Lang-Python Browser-Firefox]
+[13:34:52] davehunt|away: bbl
+[13:44:24] jimevans has joined #selenium
+[13:47:05] mreedell has joined #selenium
+[13:49:42] Bebe_home has joined #selenium
+[13:51:01] cgoldberg has joined #selenium
+[IRC logfile - Started Fri Jun 22 14:02:35 2012]
+[14:02:35] zac_sel_ has joined #selenium
+[14:04:01] Bebe_home has joined #selenium
+[14:08:24] dawagner: barancev: Are you investigating the native events breakage? If not, I'm going to roll back the change
+[14:09:02] foolx: when i use findElements and create a for loop for the results. is there any way to check weather or not the element is clickable?
+[14:10:06] Parabola: not that i'm aware not, not natively anyway
+[14:12:48] dawagner: r17239
+[14:12:51] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Introducing unexpectedAlertBehaviour capability | https://code.google.com/p/selenium/source/detail?r=17239 | http://seleniumhq.org/ci.jsp?r=17239
+[14:13:01] foolx: okay, then i will simply try to click for every element and discard the error ;)
+[14:16:18] llaskin: cgoldberg: u gonna come to the SE meetup next month?
+[14:16:39] cgoldberg: llaskin, sure.. where/when?  got a link
+[14:16:48] llaskin: ummm one sec
+[14:16:52] llaskin: i dunno if nirvdrum has announced it yet
+[14:17:05] llaskin: i think its in cambridge
+[14:17:11] llaskin: i'm doing a warmup chat
+[14:17:16] llaskin: and Santicyr is doing the main talk
+[14:17:23] cgoldberg: llaskin, do you know the date?  I'm travelling and will be away July1-Jul14
+[14:17:27] Parabola: foolx: theres gotta be a better way :P
+[14:17:30] cgoldberg: but sounds great.. i'd love to go
+[14:18:01] llaskin: not sure off top of head
+[14:20:32] Chuckleteeth has joined #selenium
+[14:22:41] Chuckleteeth: jimevans: thanks for fixing my ticket
+[14:23:09] jimevans: np
+[14:23:33] jimevans: it'll be available in the next release
+[14:23:52] jimevans: please don't ask for an ETA; i don't have one.
+[14:24:46] Chuckleteeth: heh, actually i was planning to just get a local build working today
+[14:24:51] Chuckleteeth: then i wouldn't have to ask :P
+[14:26:09] Parabola: jimevans: go IE!
+[14:26:48] selbot2: 03dawagner less than 20 seconds ago - DanielWagnerHall: Rolling back revision 17238, it breaks native events in firefox. | https://code.google.com/p/selenium/source/detail?r=17255 | http://seleniumhq.org/ci.jsp?r=17255
+[14:26:49] llaskin: yay jim
+[14:27:08] RossPatterson: cgoldberg: July 9, per http://sauceio.com/index.php/2012/06/upcoming-selenium-events-page-object-model-optimizing-test-performance-and-more/
+[14:27:51] llaskin: come back from ur trip
+[14:27:52] llaskin: special
+[14:28:01] cgoldberg: RossPatterson, llaskin:   damn.. I'll be away July 9.. can't make it
+[14:28:07] llaskin: damn
+[14:28:09] cgoldberg: that stinks.
+[14:28:16] dawagner: r17238
+[14:28:18] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Allowing to enable/disable native events in FirefoxDriver using Capabilities | https://code.google.com/p/selenium/source/detail?r=17238 | http://seleniumhq.org/ci.jsp?r=17238
+[14:28:23] cgoldberg: llaskin, take some video
+[14:28:55] llaskin: we will probably
+[14:29:01] llaskin: sauce is pretty good about recording things
+[14:31:27] seljenkinsbot has joined #selenium
+[14:37:24] Xodius has joined #selenium
+[14:38:23] RossPatterson: And then apparently Santi will be coming down here to reprise it for the DC group.
+[14:38:36] noahsussman has joined #selenium
+[14:40:05] nirvdrum: llaskin: The meetup page is up.  You should have been emailed the details.
+[14:40:59] hayo has joined #selenium
+[14:45:30] llaskin: i don't ever get emails from meetup
+[14:45:32] llaskin: i dunno why
+[14:45:41] Parabola: they are trying to not invite you llaskin  :P
+[14:45:49] AutomatedTester: Parabola: ++
+[14:45:54] llaskin: aaah its cuz its spammed out by gmail
+[14:45:55] llaskin: lol
+[14:45:58] llaskin: AutomatedTester: i love you
+[14:47:00] llaskin: ooohh i found it....my name is in lights:-P
+[14:49:27] Chuckleteeth: why does the iphone portion of the source require authorization?
+[14:49:48] hourback has joined #selenium
+[14:50:55] llaskin: cuz ummm duh
+[14:50:59] llaskin: you need an apple dev login
+[14:51:17] Chuckleteeth: ive never developed stuff for that before
+[14:52:36] Chuckleteeth: i didn't know that was even possible with svn
+[14:52:42] Chuckleteeth: to have sections link completely elsewhere
+[14:53:18] llaskin: woot seems a guy i used to work with is coming to the meetup
+[IRC logfile - Started Fri Jun 22 15:00:09 2012]
+[15:00:09] Chuckleteeth: so absolutely no surprise....i couldn't build out of box
+[15:00:34] jimevans: Chuckleteeth: what did you try to build?
+[15:01:02] jimevans: and what prerequisites did you install?
+[15:01:05] Chuckleteeth: go //java/server/src/org/openqa/selenium/remote/server:server:uber //java/client
+[15:01:08] Chuckleteeth: er
+[15:01:11] Chuckleteeth: it got cut off
+[15:01:13] Chuckleteeth: anyways
+[15:01:21] Chuckleteeth: i installed jdk
+[15:01:34] Chuckleteeth: it was going along fine
+[15:01:40] Chuckleteeth: compiling and downloading stuff
+[15:02:06] Chuckleteeth: then it shit the bed on //javascript/firefox-driver:webdriver
+[15:02:11] mdgreenfield has joined #selenium
+[15:02:27] Chuckleteeth: 'jar' is not recoginized as an internal or external command
+[15:02:45] jimevans: is the bin directory of your jdk installation on the path?
+[15:02:56] mdgreenfield has left #selenium
+[15:03:17] Chuckleteeth: let me check
+[15:03:46] *jimevans launches his dev vm
+[15:04:10] Chuckleteeth: only the jre is on the path
+[15:04:50] jimevans: yeah, you need the jdk bin dir on the path. to compile the java bits, you'll need the "jar" and "javac" commands, which are, of course, part of the jdk.
+[15:05:06] Chuckleteeth: sigh...why doesn't the jdk installer do this
+[15:05:18] jimevans: the jdk installer is pretty brain-dead
+[15:05:57] jimevans: to be fair, though, the python installer doesn't add itself to the path either. (ruby installer at least gives you the option)
+[15:06:48] *jimevans had, at one time, a script that went from clean windows machine to selenium-build-ready, but has misplaced it.
+[15:07:00] Chuckleteeth: Program Files\Java\jdk1.7.0_05\bin  i assume
+[15:07:14] jimevans: that's the one.
+[15:07:41] Chuckleteeth: oh i meant to ask you, since i looked into your google code profile
+[15:07:49] Chuckleteeth: what happened to that .net webdriver?
+[15:07:53] Chuckleteeth: is it a dead project?
+[15:07:53] jimevans: protip: open the command prompt and execute "javac" at the command line. if you get a usage block, your path is right.
+[15:08:09] jimevans: what do you mean? the .net implementation of a webdriver server?
+[15:08:31] opapo has joined #selenium
+[15:08:32] Chuckleteeth: i dont remember the name, it was strontium or something
+[15:08:38] jimevans: yeah, that's the one.
+[15:08:58] jimevans: it's still viable, but nobody uses it, so it hasn't been updated in months.
+[15:09:12] jimevans: shouldn't take but a few edits to whip it back into shape though.
+[15:09:42] Chuckleteeth: how does it stay uptodate with the latest webdriver?
+[15:10:17] jimevans: Chuckleteeth: manually. :)
+[15:10:27] jimevans: which is to say, not at all.
+[15:10:58] Chuckleteeth: : (
+[15:11:10] Chuckleteeth: you mean you would have to manually port the code/
+[15:11:11] Chuckleteeth: ?
+[15:11:17] jimevans: though it's not strongly-named, so dropping in the latest WebDriver.dll should work fine.
+[15:11:23] dawagner: andreastt: I can't help but notice that the opera tests have something in common with the IE6 tests, and no others, on our CI...
+[15:11:30] farlan has joined #selenium
+[15:11:44] dawagner: Is that really the company you want to keep? ;)
+[15:11:52] jimevans: the only changes that would have to be made would be to understand new json wire protocol commands
+[15:12:02] jimevans: dawagner: hey! :)
+[15:12:28] dawagner: jimevans: Sorry :p
+[15:12:37] jimevans: (i know you meant the browser, not the driver, so i'm not really offended)
+[15:12:50] Chuckleteeth: can we add that to the wiki then? the whole, adding to the path?
+[15:12:59] jimevans: i wouldn't want to be seen on the net with IE6 either...
+[15:13:31] Chuckleteeth: heh, one of the products here i wrote tests for still ONLY supports IE6....it disgusts me
+[15:13:48] jimevans: Chuckleteeth: we probably should. let me know if your build succeeds after that, so as to minimize the number of edits.
+[15:15:18] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Fixing LogEntries serialisation | https://code.google.com/p/selenium/source/detail?r=17256 | http://seleniumhq.org/ci.jsp?r=17256
+[15:16:06] brokenthumbs has joined #selenium
+[15:20:09] ccooper has joined #selenium
+[15:20:47] selbot2: 03dawagner half a minute ago - DanielWagnerHall: Clarify event behaviour of WebElement#clear | https://code.google.com/p/selenium/source/detail?r=17257 | http://seleniumhq.org/ci.jsp?r=17257
+[15:20:50] Chuckleteeth: so i tried to run the go target for combined client/server
+[15:20:59] Chuckleteeth: but i dont know which jar is the combined build
+[15:21:32] Chuckleteeth: is it client-combined-standalone.jar in the build\java\client\src\org\openqa\selenium folder?
+[15:23:18] Chuckleteeth: nope, it is not 
+[15:23:58] llaskin: so tell me
+[15:24:03] llaskin: my brother just sent me to a link from w3schools
+[15:24:06] llaskin: should i disown him?
+[15:24:20] Chuckleteeth: why the hate on w3school?
+[15:37:44] jimevans: Chuckleteeth: so i forget, are you running the remote driver, or the regular firefox driver?
+[15:45:29] Chuckleteeth: so here is a question, why is the build files written in ruby instead of ant?
+[15:45:35] Chuckleteeth: i thought ant was pretty standard for java
+[15:46:38] jimevans: Chuckleteeth: you're laboring under the misconception that WebDriver is a java project. :)
+[15:46:59] Chuckleteeth: well isn't the majority of it written in java?
+[15:47:10] jimevans: besides, given the chance to write code vs. xml, i'll take code any day.
+[15:47:13] Chuckleteeth: i mean at this point ive seen java, c++, ruby, python
+[15:47:17] Chuckleteeth: how many more languages are you using?
+[15:47:19] ccooper: agreed
+[15:47:22] jimevans: javascript
+[15:47:26] jimevans: c#
+[15:47:29] Chuckleteeth: well javascript is a given
+[15:47:31] ccooper: thats why gradle is up and coming build tool for java projects
+[15:47:35] Chuckleteeth: which part is written in c#?
+[15:47:39] jimevans: the .net bindings.
+[15:47:41] ccooper: because coding your build is much cleaner
+[15:47:45] Chuckleteeth: oh right ...lol
+[15:47:47] jimevans: they're all part of the project.
+[15:48:43] jimevans: objective-c
+[15:49:00] jimevans: (for the iPhone driver)
+[15:50:03] Chuckleteeth: btw, i was able to build the standalone driver successfully so you can make that wiki entry :D
+[15:50:12] Chuckleteeth: surprised thats the only thing that was needed
+[15:50:34] jimevans: the build process has been pretty well beaten smooth.
+[15:51:04] jimevans: now, if you're interested in .net-specific stuff, i'd suggest using the //dotnet/test:remote target.
+[15:51:31] jimevans: that'll build the standalone java server, along with the firefox extension.
+[15:51:57] jimevans: if you want to build the standalone IE executables, the targets you want are //cpp:ie_win32_exe and //cpp:ie_x64_exe
+[15:52:24] AutomatedTester: jython is making me sad
+[15:52:28] Chuckleteeth: the output of those targets...is the standalone server target smart enough to take those outputs and include them?
+[15:52:43] jimevans: (n.b., that presupposes you have visual studio 2010 professional or better)
+[15:53:02] jimevans: should do.
+[15:53:18] jimevans: it order to make the standalone server, it has to embed all that stuff inside the jar.
+[15:53:36] jimevans: (well, not the IE standalone servers, but still)
+[15:54:34] jimevans: you should also now be able to build/debug from within visual studio too.
+[15:55:48] jimevans: WebDriver.csproj has a post-build event command line that looks for the native binaries in the build output locations, and if it doesn't find them there, copies them from the prebuilts directory.
+[15:56:27] jimevans: which is one reason we *have* a prebuilts directory in the first place.
+[15:57:06] Archdude: would you guys say selenium/webdriver has advantages over waitr/webdriver
+[15:57:25] Archdude: i just need fuel for my argument that it's better lol
+[15:57:33] Chuckleteeth: so i guess my next hurdle would be to figure out how to debug this badboy
+[15:57:44] jimevans: Archdude: over watir? or over watir-webdriver? 
+[15:58:12] Archdude: waitr-webdriver
+[15:58:37] Archdude: i'm not 100% sure which theyre using but lets assume theyre using the more modern one
+[15:58:40] jimevans: Chuckleteeth: debug which part? debugging the .net bindings is easy. debugging the IE standalone server is pretty easy. debugging the javascript parts of the firefox driver, i find challenging.
+[15:59:08] AutomatedTester: Archdude: I believe locator lookups are faster in selenium webdriver since watir-webdriver converts things to xpath a lot
+[15:59:15] AutomatedTester: other than that I cant help
+[15:59:30] jimevans: Archdude: for watir-webdriver, i don't think either has any real advantages. you're arguing over api preference at that point.
+[15:59:32] Chuckleteeth: well at least with javascript i can goto a page and just inject the same stuff to see whats going on
+[15:59:37] Archdude: is selenium/webdriver better with browser compabtibility or are they the same?
+[15:59:39] Chuckleteeth: i dont have a java ide installed on this machine
+[15:59:47] AutomatedTester: Archdude: the same
+[15:59:49] Chuckleteeth: and i haven't touched java in probably something like 15 years
+[IRC logfile - Started Fri Jun 22 16:00:02 2012]
+[16:00:02] jimevans: Archdude: watir-webdriver *uses* selenium-webdriver underneath its api.
+[16:00:03] Chuckleteeth: so i dont really have the slightlest clue how i would debug this jar file
+[16:00:33] Archdude: jimevans: so wouldn't using selenium-webdriver mean that its updated more frequently?
+[16:00:45] Archdude: additions and bug fixes
+[16:01:25] jimevans: Archdude: the maintainer of the selenium-webdriver gem and the watir-webdriver gem are the same guy. jarib. so, no, i wouldn't say that at all. :)
+[16:01:31] Archdude: i'm basically trying to make the argument that using webdrive with python is better than using waitr-ruby
+[16:01:41] faille has joined #selenium
+[16:01:55] Archdude: of course i'm biased because i like python
+[16:02:12] Archdude: ;P
+[16:02:18] jimevans: Archdude: it depends on whether you mean watir or watir-webdriver. they're two very different things.
+[16:02:20] jfunk has joined #selenium
+[16:02:36] ccooper: archdude, arch linux?
+[16:03:45] jimevans: Chuckleteeth: the good news is that most anything that you'd need to debug in the .jar can be debugged using a different language binding. it's very rare that i find a bug in IE driver, for example, that repros in one language but not another. so most of my debugging for the IE driver is done using c# test code.
+[16:04:05] jimevans: (since i'm in windows, and using visual studio anyway)
+[16:06:24] Archdude: ccooper: is that someone you know?
+[16:06:57] Dude-X: he's asking are you named archdude because you're a fan of the linux distribution Arch Linux
+[16:07:46] Archdude: oh right 
+[16:07:46] Archdude: ive 
+[16:07:56] Archdude: ive used it but thats not why i made the nickname
+[16:07:57] Archdude: ma
+[16:08:10] Archdude: colloquy is lagging
+[16:10:37] ccooper: yeah thats what i was asking
+[16:10:41] ccooper: soorry if i wasn't clear
+[16:13:23] Chuckleteeth: well that sounds good... what is the interface between the IE driver and the selenium server java stuff?
+[16:14:46] hayo has joined #selenium
+[16:15:38] klrmn has joined #selenium
+[16:19:54] Chuckleteeth: hey klrmn
+[16:20:07] Chuckleteeth: if you are interested, the bug fix for that firefox click issue is resolved
+[16:21:04] klrmn: awesome!
+[16:21:24] klrmn: again, my appretiations for doing the hard work to figure out what the problem was
+[16:21:40] jimevans: Chuckleteeth: all of the language bindings talk to the IE standalone server via a JSON-over-HTTP wire protocol. so the IE driver spins up a local HTTP server, and all of the language bindings communicate over that.
+[16:22:14] simonstewart has joined #selenium
+[16:22:15] selbot2: simonstewart: note from barancev 2 days ago: r17214 has broken maven build 
+[16:22:15] selbot2: simonstewart: note from dawagner 2 days ago: You appear to have broken the build, good sir: http://sci.illicitonion.com:8080/job/Maven%20build/1385/ 
+[16:22:38] Dude-X: can native events work with the mac if you keep the window in the foreground?
+[16:23:06] Dude-X: it's only for testing a script 
+[16:23:29] testingb0t has joined #selenium
+[16:25:04] simonstewart: maven doesn't count as part of the build :)
+[16:25:52] simonstewart: How do people feel about me checking in an API with absolutely no implementation?
+[16:26:13] klrmn: big comment block that says that's what it is?
+[16:26:27] simonstewart: Nope
+[16:26:35] simonstewart: But it should be freaking obvious
+[16:26:45] klrmn: i'm a noob =)
+[16:27:34] jimevans: simonstewart: go for it!
+[16:27:46] *jimevans loves random apis with no implemetnation
+[16:28:43] simonstewart: OK
+[16:28:45] simonstewart: You asked for it
+[16:28:51] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Adding the API for using basic and digest authentication dialogs, but no implementation. I am a very, very bad man | https://code.google.com/p/selenium/source/detail?r=17258 | http://seleniumhq.org/ci.jsp?r=17258
+[16:32:12] simonstewart: Alright chaps. Does anyone have an opinion on that?
+[16:32:18] selbot2: 03simon.m.stewart half a minute ago - SimonStewart: Remembering to add the 'beta' warning to the new API with no implementation. | https://code.google.com/p/selenium/source/detail?r=17259 | http://seleniumhq.org/ci.jsp?r=17259
+[16:33:37] Dude-X: that would be a useful feature
+[16:34:16] lukeis has joined #selenium
+[16:37:31] ner0x has joined #selenium
+[16:40:15] AutomatedTester: simonstewart: I hate it, I have no reason to other than I am a troll so therefore I hate it
+[16:43:08] simonstewart: I'm sorry. I don't deal with douchebags
+[16:43:22] lukeis: Credentials seems to be a umm, fairly light interface
+[16:43:32] simonstewart: That's the idea
+[16:43:37] simonstewart: It's a marker rather than anything else
+[16:43:58] simonstewart: Think about the case where someone's got a biometric lock on their browser
+[16:44:09] simonstewart: (or a face lock, such as in Android)
+[16:44:19] simonstewart: UserAndPassword should suffice for almost everybody, though
+[16:44:36] AutomatedTester: simonstewart: i like it
+[16:44:50] simonstewart: We may need to rename "Alert" to "Dialog" at some point
+[16:44:53] AutomatedTester: be good to see how you want to implement it
+[16:44:58] simonstewart: But I'll leave that for a bit
+[16:44:59] lukeis: ok... but as it stands RemoteWebDriver would need to cast it in order to get any info out of it to pass along the wire...
+[16:45:10] lukeis: or how do you invision that :)
+[16:45:12] simonstewart: Nope.
+[16:45:22] simonstewart: The bean to json converter will Do The Right Thing
+[16:45:25] simonstewart: already
+[16:45:27] FuegoDog has joined #selenium
+[16:45:28] lukeis: ah
+[16:45:36] simonstewart: Well, at least for punting it across the wire
+[16:45:45] simonstewart: Reconstituting it is another thing entirely
+[16:46:09] lukeis: so... what's the wire call going to look like then?
+[16:46:21] lukeis: :)
+[16:46:22] Chuckleteeth: what all does PageFactoryInitElements do?
+[16:46:38] Chuckleteeth: can i use it as an inexpensive way to clear cache?
+[16:46:38] FuegoDog: Hi. Anyone ever tried running watir-webdriver/selenium using JRuby?
+[16:46:50] simonstewart: command name: authenticateUsing
+[16:46:57] Chuckleteeth: er invalidate cached webelements?
+[16:46:59] simonstewart: Parameters: "credentials" 
+[16:47:09] FuegoDog: (On windows 7 or XP)
+[16:47:11] Frank24 has joined #selenium
+[16:47:12] simonstewart: with a json encoded version of whatever the credentials are
+[16:47:28] foolx: Another short question: When visiting a page, i get a validat-request before the page itself. Can Selenium 2 now talk to those popups?
+[16:47:29] simonstewart: In this case {"username": username, "password": password}
+[16:47:32] simonstewart: simples
+[16:47:33] lukeis: i imagine... but you didn't define it... should be easy enough
+[16:47:36] davehunt: movement on basic authentication? +++ :)
+[16:47:57] lukeis: htmlunit can be the first simple implementation
+[16:48:14] baijum has joined #selenium
+[16:48:31] simonstewart: Alerts in htmlunit are a clusterfuck
+[16:48:42] lukeis: but setting the authentication isn't
+[16:49:17] lukeis: or this is *only* available via alert handling
+[16:49:19] lukeis: ?
+[16:49:51] simonstewart: For now
+[16:50:21] Frank840 has joined #selenium
+[16:50:55] lukeis: hrm... i think i would like better a flow of: driver.....authenticateUsing(); driver.get('');
+[16:51:15] lukeis: ... means probably something in manage()
+[16:51:20] simonstewart: Right
+[16:51:25] simonstewart: But the flow tends to be
+[16:51:27] simonstewart: click on something
+[16:51:31] simonstewart: wow, there's a dialog
+[16:51:33] lukeis: yeah
+[16:51:35] simonstewart: I'll enter details
+[16:51:46] simonstewart: Which means adding to alert makes more sense
+[16:51:47] lukeis: can we do both?
+[16:51:55] simonstewart: But then alert no longer handles just alerts
+[16:52:02] simonstewart: So we need to rename alert to dialog at some point
+[16:52:12] simonstewart: We could, but I like There's Just One Way To Do Things
+[16:52:25] lukeis: but there's many ways to do things :-D
+[16:52:52] davehunt: I've thought about this a bit, and envisioned a manage() way for authentication
+[16:53:14] davehunt: because the authentication could pop up on gets, or opens, and potentially several times in a session
+[16:53:30] davehunt: but I'd just be glad to see an implementation :D
+[16:54:27] simonstewart: davehunt: this is the second iteration on the design
+[16:54:27] lukeis: also the after the fact approach won't work for htmlunit... everyone will still have to do (what they're already doing) and updating the WebClient themselves
+[16:54:33] simonstewart: The first did stick the method on manage
+[16:54:39] Frank840: Hey guys I need help concerning a WebDriver bug !?
+[16:54:47] simonstewart: I'm seriously considering dropping support for htmlunit
+[16:55:21] simonstewart: It's not been updated for a very long time
+[16:55:24] davehunt: simonstewart: what factors made the manage method unsuitable, out of interest?
+[16:55:29] simonstewart: And the bug reports are a PITA to deal with, 
+[16:55:37] simonstewart: Because there's often not much we can do about them
+[16:55:44] lukeis: might be wise... i don't think i actually use it all for one test. Others I just use straight htmlunit ;)
+[16:55:46] simonstewart: davehunt: common expected usage
+[16:55:49] simonstewart: was the main one
+[16:56:13] simonstewart: And the bug reports I've seen
+[16:56:17] davehunt: simonstewart: that's a big one, and I can fully see why
+[16:56:20] simonstewart: There's an expectation it's on the alert method
+[16:56:24] davehunt: okay, fair enough
+[16:57:16] rpereir__ has joined #selenium
+[16:57:35] simonstewart: But we'll see what happens when we put this in people's hands
+[16:57:37] davehunt: I guess failing with unexpected dialog or similar if it's not interacted with?
+[16:57:48] simonstewart: yeah
+[16:58:27] davehunt: So we could catch that exception for sites that have authentication only on certain environments, or similar
+[16:58:34] lukeis: the new auto-dismiss feature may be problematic here though
+[16:58:45] teodosia has left #selenium
+[16:59:18] lukeis: r17238
+[16:59:20] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Allowing to enable/disable native events in FirefoxDriver using Capabilities | https://code.google.com/p/selenium/source/detail?r=17238 | http://seleniumhq.org/ci.jsp?r=17238
+[16:59:30] lukeis: that's not it..
+[16:59:43] lukeis: r17239
+[16:59:46] selbot2: 03barancev 1 day ago - AlexeiBarantsev: Introducing unexpectedAlertBehaviour capability | https://code.google.com/p/selenium/source/detail?r=17239 | http://seleniumhq.org/ci.jsp?r=17239
+[16:59:52] lukeis: that's the one
+[IRC logfile - Started Fri Jun 22 17:00:29 2012]
+[17:00:29] awilson820 has joined #selenium
+[17:00:39] simonstewart: We just dismiss the authentication dialog if someone's not handling it
+[17:01:47] Frank840: Can anyone help me with this bug? http://code.google.com/p/selenium/issues/detail?can=2&q=3354&colspec=ID%20Stars%20Type%20Status%20Priority%20Milestone%20Owner%20Summary&id=3354
+[17:02:12] lukeis: man... i don't think i will allow anyone on my team to use the unexpected alert thing... asking for trouble
+[17:02:46] davehunt: I'm learning to expect everything :)
+[17:03:04] lukeis: heuristic "know thine app" ;)
+[17:03:09] davehunt: Unexpected = test failure
+[17:03:12] Chuckleteeth: jimevans: are you still here?
+[17:04:12] jimevans: Chuckleteeth: sorry, was involved in a meeting.
+[17:04:18] jimevans: i'm back now.
+[17:04:20] Chuckleteeth: thats mighty ok
+[17:04:31] Chuckleteeth: i have a few questions regarding pagefactory
+[17:04:40] Chuckleteeth: i was looking at the source
+[17:04:41] jimevans: okay. i'll try to answer them.
+[17:04:58] jimevans: the source is the authoritative truth. :)
+[17:05:00] Chuckleteeth: im wondering how much effort would be required in making a function to invalidate the cached pages
+[17:05:35] Chuckleteeth: ive not written my own attributes before, not sure what all is possible
+[17:05:44] Chuckleteeth: some of this appears like black magic to me
+[17:05:54] jimevans: well, you have to go through a special step to cache elements in the page factory.
+[17:06:10] jimevans: s/in/using/
+[17:06:31] Chuckleteeth: well i noticed there was this dirty-ness 
+[17:06:37] Chuckleteeth: invocation.Method.Name == "get_WrappedElement"
+[17:07:04] jimevans: that's not dirty, that's using an interceptor the right way.
+[17:07:28] Chuckleteeth: but that actual function doesn't exist right?
+[17:07:55] Chuckleteeth: sigh, im being called away, brb
+[17:07:55] jimevans: sure it does. if the value implements IWrapsElement.
+[17:08:49] jimevans: Chuckleteeth: for when you return, that's what a property getter looks like under reflection.
+[17:09:42] foolx: okay... i am back, but i am not sure if there is a way to send information to that "please authorize" window, or if selenium 2 is not able ;)
+[17:10:55] Frank840 has left #selenium
+[17:11:41] Tiffy571 has joined #selenium
+[17:12:04] Bebe_home has joined #selenium
+[17:12:58] Bebe has joined #selenium
+[17:13:32] foolx: i did read what was written, but i'm not sure if that was other stuff or an answer to my problem.
+[17:14:08] jimevans: brb.
+[17:14:09] Tiffy571: http://code.google.com/p/selenium/issues/detail?can=2&q=3354&colspec=ID%20Stars%20Type%20Status%20Priority%20Milestone%20Owner%20Summary&id=3354
+[17:15:08] Tiffy571: Can anyone help me please?
+[17:16:47] jimevans: simonstewart: yt?
+[17:23:35] toabctl has joined #selenium
+[17:24:45] opapo_ has joined #selenium
+[17:24:57] nacho has joined #selenium
+[17:25:34] nacho has joined #selenium
+[17:27:55] klrmn has joined #selenium
+[17:29:31] simonstewart has left #selenium
+[17:32:18] testingb0t1 has joined #selenium
+[17:34:32] nhirata has joined #selenium
+[17:43:18] Bebe_home has joined #selenium
+[17:44:10] Bebe has joined #selenium
+[17:51:32] opapo has joined #selenium
+[17:53:56] Bebe_home has joined #selenium
+[17:54:24] davehunt: Is there a way to prevent Selenium making Firefox focused when it's launched? Was that something you worked on jarib?
+[17:54:51] davehunt: Is can be annoying if your tests don't require focus.
+[17:55:09] t0mcat: ugh I've got a situation where if I'm looking at the browser the test behaves one way, but if I'm not looking at the browser (if it's not having to render because it's behind other windows) it behaves a different way...
+[17:55:32] davehunt: t0mcat: some interactions require focus
+[17:55:55] t0mcat: I don't think any of my tasks require focus
+[17:56:31] t0mcat: oh, maybe it does
+[17:56:46] t0mcat: that's the difference, the focus I think
+[17:56:58] t0mcat: wait now it's not doing it... :(
+[17:57:02] t0mcat: gorammit
+[17:57:19] jimevans: t0mcat: you're not having that issue iwht IE by any chance?
+[17:57:26] t0mcat: chrome on mac
+[17:57:35] jimevans: oh. never mind then.
+[17:57:48] t0mcat: normally I'd just throw in more waits but I've put waits everywhere I can think of heh
+[IRC logfile - Started Fri Jun 22 18:00:26 2012]
+[18:00:26] stackedsax has joined #selenium
+[18:00:34] t0mcat: it's reliably dependent on the position of my IDE
+[18:00:35] t0mcat: :(
+[18:00:55] t0mcat: it'll work a thousand times when my IDE is in a particular position, but if I move it to a different position it will fail a thousand times
+[18:00:59] t0mcat: wtf
+[18:01:29] Dude-X: does chrome support native events?
+[18:01:50] sfbrian has joined #selenium
+[18:02:05] t0mcat: mac support is shaky IIRC
+[18:04:16] awilson820 has joined #selenium
+[18:04:25] santiycr has joined #selenium
+[18:04:41] davehunt: good morning Sauce Labs :)
+[18:05:14] bmulholland has joined #selenium
+[18:06:21] santiycr: morning!
+[18:06:40] awilson820: mornin :-)
+[18:07:17] selbot2: 03david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns on behalf of VarialusEgnatius adding support for Jython 2.7. This fixes issue 3988 | https://code.google.com/p/selenium/source/detail?r=17260 | http://seleniumhq.org/ci.jsp?r=17260
+[18:07:56] AutomatedTester: laters all
+[18:08:16] Archdude: see ya
+[18:09:21] jimevans: awilson820, santiycr: g'day y'all!
+[18:09:41] t0mcat: so
+[18:09:54] t0mcat: the position of my IDE on the screen changes the behavior of selenium
+[18:09:58] t0mcat: wtf
+[18:10:22] t0mcat: if the part of the page selenium is interacting with is visible
+[18:10:25] santiycr: yo jimevans
+[18:10:30] davehunt: jimevans: I don't suppose you know where the code to focus the Firefox window on launch is? I'd like to see if it can be disabled
+[18:10:36] t0mcat: it behaves differently than if the part of the page is not visible (hidden by a window)
+[18:10:38] santiycr: gray rainy day in SF
+[18:10:40] davehunt: I guess capabilities might be a place to start...
+[18:10:47] t0mcat: focus remains constant in this 
+[18:10:56] klrmn: santiycr: what is the world comign to if it's raining in SF in june
+[18:11:12] santiycr: lol
+[18:11:25] jimevans: davehunt: sorry, no. i know very little about the firefox driver code.
+[18:11:25] santiycr: I'd be more worried if it kept being sunny and awesome
+[18:11:40] davehunt: jimevans: nm, it's something I should really know :P
+[18:13:36] Chuckleteeth: oh jim, i had no idea that the getter actually produces that function signature
+[18:13:44] Chuckleteeth: learn something every day
+[18:14:10] Chuckleteeth: so i was thinking of adding 2 things there
+[18:14:46] Chuckleteeth: first would be a way for the findsby attribute to work with List<IWebElement> and using the fineElements instead
+[18:14:50] Chuckleteeth: er find
+[18:16:56] FuegoDog: jimevans:  cheezy said you might be able to help with my IE selenium issues
+[18:17:17] jimevans: Chuckleteeth: okay, that's something others have wanted too, so if you can provide a patch (with tests!) i'll review it
+[18:17:33] jimevans: FuegoDog: maybe. i'll try.
+[18:18:02] Chuckleteeth: not sure how to do it but i'll have a go
+[18:18:11] t0mcat: okay
+[18:18:17] t0mcat: I recognize how stupid what I'm saying sounds
+[18:18:31] t0mcat: I realize that it's very obviously not my IDE's position on my screen 
+[18:18:33] t0mcat: but
+[18:18:44] t0mcat: that's what I'm observing.
+[18:18:50] FuegoDog: jimevans:  Trying to get watir-webdriver running in JRuby on Win7 box.  Just seems to hang on Watir::Browser.new : ie
+[18:18:51] t0mcat: and it's blowing my freaking mind :(
+[18:19:07] Chuckleteeth: where is the solution file in the code? i can only find individual proj files
+[18:19:18] Chuckleteeth: nm
+[18:19:24] Chuckleteeth: its like back 2 levels
+[18:19:39] jimevans: Chuckleteeth: it's at the root.
+[18:20:17] FuegoDog: I downloaded the IEDriverServer.exe and added it to the path.  Not sure what else try.  Firefox doesn't work either, so it may not even be an IE config issue.
+[18:21:43] opapo_ has joined #selenium
+[18:21:45] bmulholland has joined #selenium
+[18:23:57] Dude-X has joined #selenium
+[18:24:25] klrmn: FuegoDog: if FF isn't working, you've definitely got larger problems
+[18:25:31] opapo has joined #selenium
+[18:29:05] t0mcat: so I think I fixed my problem
+[18:29:10] davehunt: r14703
+[18:29:12] selbot2: 03jari.bakken 7 months ago - JariBakken: Pass '-foreground' to the firefox binary. Ensures focus by default on OS X. | https://code.google.com/p/selenium/source/detail?r=14703 | http://seleniumhq.org/ci.jsp?r=14703
+[18:29:14] t0mcat: but I'm fucking baffled
+[18:29:26] t0mcat: as to why the display of the page on my screen would make a difference
+[18:29:47] t0mcat: NOPE
+[18:29:49] t0mcat: didn't solve it
+[18:29:56] t0mcat: why does this fucking matter...
+[18:30:05] brokenthumbs has joined #selenium
+[18:30:41] davehunt: night all
+[18:31:41] t0mcat: so how do I report this as a bug
+[18:31:54] t0mcat: no fucking clue how to repro it
+[18:32:08] t0mcat: "hide your browser with another window" lol
+[18:32:40] jimevans: t0mcat: there's a bug exactly like that for IE. #4104
+[18:32:41] selbot2: 03 open/new C# WebDriver IEDriver silently fails when performing clicks when it has lost focus (reproducible test case attached) - https://code.google.com/p/selenium/issues/detail?id=4104 [Type-Defect Priority-Medium Status-Untriaged Component-WebDriver Browser-IE]
+[18:32:50] t0mcat: it's not focus related
+[18:33:09] t0mcat: as my IDE is fully in-focus during all the different behaviors
+[18:33:33] t0mcat: the element being tested simply has to be visible on the screen for it to behave differently
+[18:33:41] jimevans: i'm not saying it is. i'm simply pointing out that bugs like the one you described to exist. :)
+[18:33:50] t0mcat: well a focus bug makes sense
+[18:34:03] t0mcat: simply being VISIBLE on the screen doesn't...
+[18:34:22] t0mcat: if I made a recording of it happening
+[18:34:43] t0mcat: would that lend credulity to what i'm saying?  I know if someone came to me with a bug like what I'm saying I'd be skeptical
+[18:35:17] t0mcat: I don't even know if it actually is abug
+[18:35:27] t0mcat: or rather, I don't know if it's selenium related
+[18:37:04] t0mcat: I'm getting that "I'm going crazy" feeling :-/
+[18:43:39] opapo has joined #selenium
+[18:43:41] bmulholland: t0mcat: Just read the backlog. That's fucking bizarre. Record it happening?
+[18:44:04] t0mcat: alright
+[18:44:10] t0mcat: thanks for the validation btw
+[18:44:28] t0mcat: because until now no one was agreeing with me that it was bizarre
+[18:44:32] t0mcat: but it is!
+[18:44:32] bmulholland: hahaha
+[18:44:39] bmulholland: yep :)
+[18:45:29] t0mcat: hum actually dunno if I can :( 
+[18:45:41] t0mcat: well I can jsut block out the actual code :d
+[18:45:58] bmulholland: open a blank file?
+[18:46:21] t0mcat: I don't think it'll behave the same way, but I can try
+[18:46:29] t0mcat: honestly I think it's app side
+[18:46:59] t0mcat: it's a search bar, and what I'm trying to do is check result count of the search
+[18:47:20] t0mcat: but if the window isn't visible on the screen, it puts the app in a weird state, where it doesn't matter if you hit enter or not
+[18:47:34] t0mcat: the results won't narrow
+[18:48:07] t0mcat: it'll highlight the result like it's supposed to but it won't narrow the displayed units or decrease the count... and how do I bug that with the UI people? lol
+[18:48:15] t0mcat: "When I'm not looking at the site, it acts funny!"
+[18:48:50] t0mcat: even when you make it visible again and manually manipulate the page it won't care if you hit return until after you change the query text
+[18:49:29] t0mcat: I've got a workaround now
+[18:49:36] t0mcat: but I.. dunno
+[18:49:38] t0mcat: freaked me out
+[18:50:45] bmulholland: yeah, no kidding
+[18:53:03] bmulholland: Are there any outstanding bugs with webdriver/firefox where it won't click on elements?
+[18:53:15] bmulholland: and also scrolls to the wrong place on the page when told to click on an element?
+[18:54:19] JackDandy has joined #selenium
+[IRC logfile - Started Fri Jun 22 19:00:00 2012]
+[19:00:00] bmulholland: works fine in chrome :(
+[19:08:31] baijum has joined #selenium
+[19:09:52] bmulholland: Okay, so I'm trying to click on something that has two links inside it… an image and a title. Clicking the title does not work, and firefox scrolls to (almost) the bottom of the page. Clicking on the image does work, but firefox still scrolls to (almost) the bottom of the page.
+[19:14:59] bburton has joined #selenium
+[19:33:10] jfunk has joined #selenium
+[19:59:35] aimbire has joined #selenium
+[IRC logfile - Started Fri Jun 22 20:00:00 2012]
+[20:00:00] aimbire: Hey guys, hope some1 can give me a piece of advice.
+[20:00:26] aimbire: Im @Overriding in JAVA the method onException, but i want to be able to filter those coming from Expected Conditions.
+[20:00:33] aimbire: Is there a way to overcome this?
+[20:01:08] jfunk has joined #selenium
+[20:01:19] aimbire: Can't find no info that could help with the Throwable element or the WebDriver.
+[20:08:48] Nogem has joined #selenium
+[20:10:28] Nogem: is there an equivalent class for WebDriverWait in RemoteWebDriver?
+[20:11:06] bmulholland has joined #selenium
+[20:11:41] Dude-X: eh?
+[20:11:41] klrmn: Nogem: you can pass any kind of driver to WebDriverWait
+[20:12:20] aimbire: Nogem: i use RemoteWebDriver and instanciate WebDriverWait with no problem.  What is happening?
+[20:12:34] Nogem: it pukes with driver.version unknown when I pass it a custom driver that extends RemoteWebDriver and implements TakeScreenshot
+[20:12:59] Nogem: jar version in grid and in project are the same
+[20:13:01] Chuckleteeth: finally back
+[20:13:23] aimbire: How are you starting the WebDriverWait?
+[20:13:35] Chuckleteeth: so jimevans, should i just make a new ProxiedWebElementInterceptor to work with lists or should i try to coerce the same class into performing both roles?
+[20:13:38] Dude-X: Nogem: you need to use augmenteddriver
+[20:14:01] Nogem: WebDriverWait wait = new WebDriverWait(driver, timeout); where driver is the custom driver
+[20:14:42] jimevans: Chuckleteeth: I'd probably create a new interceptor, but that's just me, unless there's a ton of code that can be reused.
+[20:14:55] Nogem: augmenteddriver didn't solve the screenshot issues, custom's as close as we've gotten to it working (NPE, I suspect size based and we need to byte stream the file, but that's a side issue)
+[20:15:00] jimevans: i'm not sure i really have an opinion about that strongly one way or the other.
+[20:15:11] Dude-X: augmented works for me
+[20:15:55] Dude-X: WebDriver driver = new RemoteWebdriver(remoteAddress, caps); driver = new Augmenter().augmentDriver()
+[20:16:06] Dude-X: err augment(driver)
+[20:17:41] Dude-X: core command to take a screenshot is  ((TakeScreenshot) driver).getScreenShotAs(OutputType.FILE); this will give you a file handle where you can then save it somewhere
+[20:17:55] Nogem: yeah, way past that
+[20:18:26] Dude-X: you're using a regular browser that supports screenshot like Firefox, Opera, IE
+[20:18:29] Dude-X: chrome
+[20:18:39] Nogem: let me pastbin the driver creation I'm using
+[20:18:48] Dude-X: ok
+[20:19:43] Nogem: http://pastebin.com/gKWPcmAD
+[20:20:04] Chuckleteeth: hmm
+[20:20:18] Chuckleteeth: since we support multiple bys
+[20:20:30] Chuckleteeth: does it make more sense that if the first by produced no results that you should move onto the next by?
+[20:20:39] Chuckleteeth: or should it actually combine the results of all bys?
+[20:20:53] jimevans: good question.
+[20:21:25] Nogem: Dude-X: http://pastebin.com/ydvtnuPU <- CustDriver class
+[20:21:41] aimbire: How can i filter ExpectedConditions exceptions in 'onException@WebDriverEventListener' ?
+[20:26:22] Dude-X: Nogem:  why do you implement takescreenshot as throwing an exception
+[20:26:26] Dude-X: err as a try/catch
+[20:26:50] Dude-X: also how come using the augmenter doesn't work
+[20:26:53] emmasoderberg has joined #selenium
+[20:27:31] Nogem: augmenter was coughing up NPE, this was the other solution people have posted online as having used successfully
+[20:27:56] Nogem: and the try catch is fairly ridiculous, I'll give you that
+[20:29:08] Nogem: pretty it's the same NPE and wouldn't matter which I was solution I was actually using. There's a size issue at the core of that (which I'll look at solving much later, right now I'm concerned with this driver version issue when checking for the presence of an element)
+[20:31:06] Nogem: http://pastebin.com/1WR1eHFf is the ElementWaiter in question
+[20:31:32] Nogem: changing the WebDriver to CustDriver is good right up till to the wait.until call
+[20:32:39] Dude-X: why do you use Function instead of ExpectedCondition class?
+[20:34:44] Dude-X: i think you should have done return new WebdriverWait(driver, timeout).until(condition(x))
+[20:35:13] Nogem: I'll give that a shot and get back to you, thanks
+[20:35:20] toabctl has joined #selenium
+[20:35:55] Dude-X: i don't see anything glaringly wrong with code, but I do see an issue with using a fluent wait class a little atypically.
+[20:38:15] Chuckleteeth: i hope you guys aren't anal about coding asthetics
+[20:38:36] lukeis: if it's a patch... it's usually linted
+[20:38:47] Chuckleteeth: what does linted me?
+[20:38:48] Chuckleteeth: mean
+[20:39:22] lukeis: it's like a style check
+[20:39:33] Chuckleteeth: cleaned up to abide by the committers personal belives in curly bracket Etiquette
+[20:39:39] lukeis: spaces not tabs, common formatting etc
+[20:39:48] lukeis: yeah
+[20:39:52] Chuckleteeth: i never understood spaces not tabs
+[20:40:05] lukeis: you would if you looked at diff's as much as i do ;)
+[20:40:22] Chuckleteeth: tabs means the tab spacing can be varied by however much you personally like by your ide
+[20:40:24] lukeis: and in python it matters :)
+[20:40:27] Chuckleteeth: with spaces its like...locked in
+[20:41:18] lukeis: that's a bit of the problem though... what looked good to you can easily look bad to someone else, depending on ide settings
+[20:41:28] Chuckleteeth: ok well im gonna leave it with whatever resharper (with default settings) belives to be a good standard
+[20:41:47] Chuckleteeth: whom ever is reading the diff can determine themselves if they want to fight resharpers standards
+[20:41:58] jimevans: Chuckleteeth: StyleCop is your friend.
+[20:42:17] lukeis: Chuckleteeth: or just reject the patch and ask you to reformat ;)
+[20:42:48] Chuckleteeth: the hell with that, i'll fork the whole project! j/k
+[20:43:04] lukeis: although i haven't seen much of that in this project... but i have elsewhere
+[20:43:05] Chuckleteeth: i'll call it chuckledriver
+[20:43:59] pmow has joined #selenium
+[20:44:53] aimbire: Is there a way to find out if the exceptions thrown are from routine checks of WebDriverWait.until()?
+[20:45:12] pmow: Good friday to you all.  I'll be idling here from now on because I think I'm only getting more into this project ^_^
+[20:45:54] lukeis: welcom pmow... feel free to linger ;) i think many do
+[20:46:15] pmow: that's a nice way of putting it...I'd call it lurking
+[20:46:16] lukeis: aimbire: can't you just look at the stacktrace?
+[20:47:00] aimbire: lukeis: sure, but the problem is...
+[20:47:17] aimbire: i'm working on the onException() from WebDriverEventListener
+[20:47:34] aimbire: and these exceptions are expected, i want to filter only the ones that aren't.
+[20:47:53] lukeis: ahh....
+[20:47:55] aimbire: But i can't just filter out and work only with TimeoutException
+[20:48:32] aimbire: because it is very common the dev team changing the reference to elements, so i cant just filter out NoSuchElement exceptions.
+[20:49:00] lukeis: can you expose a method on your instance of WebDriverEventListener to flag when you're about to do a Wait and then unset it after? (maybe by extending WebDriverWait and having it do that for you)
+[20:49:58] aimbire: If i knew how to do it, yeah maybe.
+[20:50:16] aimbire: I have control over the source code. But im not sure how to do that.
+[20:50:19] lukeis: heh, you'll just have to extend both WebDriverEventListener and WebDriverWait
+[20:50:51] lukeis: (not both into the same class, two separate classes that you use)
+[20:50:53] aimbire: well, im not actually extending WebDriverEventListener
+[20:51:01] lukeis: well, start ;)
+[20:51:12] aimbire: Im using 'implements'.
+[20:51:22] aimbire: So using a custom RemoteWebDriver you mean?
+[20:54:03] jfunk has joined #selenium
+[IRC logfile - Started Fri Jun 22 21:04:00 2012]
+[21:04:00] Dude-X: an ExpectedCondtion for a webdriver wait should sensibly handle the exceptions that it expects
+[21:04:05] Dude-X: and let others propagate
+[21:06:53] lukeis: his problem was with the event listener driver... so exceptions that occur even though they are handled in the wait are propagated to the event listeners onException method
+[21:07:26] *lukeis doesn't use the event listener ;)
+[21:07:53] Dude-X: me neither
+[21:08:11] Dude-X: i thought that was a hidden implementation detail (the eventfiring class)
+[21:14:01] Chuckleteeth: Since i already have to pull out the actual type, should i make InitElements throw an exception if there is a property or field that is not of the supported type?
+[21:14:15] Chuckleteeth: i think previously it would throw an exception later when you attempt to use the object
+[21:14:29] Chuckleteeth: because of the proxy getter
+[21:14:54] santiycr has joined #selenium
+[21:26:20] lukeis has joined #selenium
+[21:27:39] Dude-X: the basic rule is object construction should either succeed completely or fail loudly
+[21:32:38] jimevans: Chuckleteeth: so if the field or property you're decorating with the attribute does not implement IWrapsElement, the assignment will fail, and an exception will be thrown.
+[21:32:59] Chuckleteeth: yeah but what im saying is, should i check this in the init
+[21:33:06] Chuckleteeth: instead of relying on the proxy to fail later 
+[21:33:16] jimevans: this happens in InitElements.
+[21:33:22] Chuckleteeth: oh?
+[21:33:29] Chuckleteeth: well there is another issue
+[21:33:35] Chuckleteeth: i cna't use IWrapsElement interface
+[21:33:51] Chuckleteeth: should i make my own interface for that guy?
+[21:34:00] jimevans: no. you should be using something like IEnumerable<IWrapsElement>
+[21:34:04] jimevans: or some such.
+[21:34:50] Chuckleteeth: i think im confused
+[21:35:17] jimevans: so you'll need another interceptor class, one that implements IInterceptor.
+[21:35:26] Chuckleteeth: yes
+[21:35:27] Chuckleteeth: i made that
+[21:35:45] Chuckleteeth: but how can i get the interceptor to inherit are you saying we should support 
+[21:35:47] Chuckleteeth: er
+[21:35:51] Chuckleteeth: IEnumerable<IWrapsElement>
+[21:35:54] jimevans: but rather than implementing IWrapsElement, it should implement IEnumerable<IWrapsElement>
+[21:36:10] jimevans: look at the declaration of ProxiedWebElementInterceptor
+[21:36:21] jimevans: it implements IInterceptor and IWrapsElement.
+[21:36:23] Chuckleteeth: nm, i had a typo
+[21:36:35] Chuckleteeth: i thought it was giving me crap for using a generic in an interface
+[21:36:41] jimevans: btw, i'm not sure IEnumerable is exactly correct.
+[21:36:51] jimevans: i haven't thought it all the way through.
+[21:37:05] Chuckleteeth: hmm
+[21:37:48] Chuckleteeth: maybe IList
+[21:38:41] jimevans: no, i'm pretty sure IList isn't right.
+[21:39:03] Chuckleteeth: well ienumerable wouldn't let you interact with it like a readonlycollection
+[21:43:55] Chuckleteeth: so im a little confused by this as ive never used these proxy things before
+[21:44:15] Chuckleteeth: this is to intercept calls on the member that would have gone to whatever the member uses to implment that interface
+[21:44:16] Chuckleteeth: to a custom call
+[21:44:22] Chuckleteeth: but this was specific for iWrapsElement
+[21:44:53] jimevans: right, so far.
+[21:45:03] Chuckleteeth: so why does an IWebElement with methods go through that proxy? the methods i use are not part of the IWrapsElement interface
+[21:46:04] Chuckleteeth: does the interceptor intercept everything? not specific to that interface?
+[21:48:10] Chuckleteeth: if so, why do i need to supply an interface at all
+[21:48:14] Chuckleteeth: can't i just give it a null type
+[21:48:48] jimevans: the CreateInterfaceProxyWithoutTarget() method's first parameter for the overload we're using takes the interface to proxy, but the second parameter takes an array of additional interfaces to proxy.
+[21:49:06] Chuckleteeth: oh i see
+[21:49:24] Chuckleteeth: but even then, thats only ILocatable
+[21:49:29] Chuckleteeth: and not the whole of IWebElement
+[21:49:44] Chuckleteeth: doesw that mean there are some methods that the proxy would not catch?
+[21:49:54] jimevans: the actual interfaces we're proxying are IWrapsElement, ILocatable, and whatever the type of the field or property the attribute is on (which is IWebElement)
+[21:50:24] Chuckleteeth: right, so cant i just do the same, but without adding any additional interfaces
+[21:51:08] Chuckleteeth: like this proxyElement = generator.CreateInterfaceProxyWithoutTarget(memberType, interceptor);
+[21:51:32] Chuckleteeth: er nm i need options
+[21:52:00] jimevans: i'd say it'd be better to proxy the interfaces, if for no other reason than memberType is more likely to be a concrete type for a list of elements than an interface, whereas for a single element, it's likely to be an interface (IWebElement)
+[21:52:30] Chuckleteeth: yes but im already doing checking right now for the type
+[21:52:44] Chuckleteeth: im checking that the type is generic type
+[21:53:01] Chuckleteeth: that its generic is of IWebElement
+[21:53:19] Chuckleteeth: but i guess you are saying thats no good
+[21:53:41] jimevans: hey, like i said, i've not thought this all the way through.
+[21:54:10] jimevans: i don't know if that's sufficient or not.
+[21:54:17] jimevans: TDD would be your friend here. :)
+[21:54:26] jimevans: red-green-refactor!
+[21:54:28] Chuckleteeth: well, i guess i should support all the things redonlycollection does
+[21:54:33] Chuckleteeth: like icollection
+[21:54:36] Chuckleteeth: ienumerable
+[21:54:38] Chuckleteeth: ilist
+[21:55:16] Chuckleteeth: the thing is, if they have a property that happens to have that interface
+[21:55:23] Chuckleteeth: it doesn't mean it can store what the readonlycollection can store
+[21:56:11] Chuckleteeth: i think im getting too drunk to be working on this right now
+[21:56:47] jimevans: well, i'm getting ready to leave anyway. if you get some code put together, shoot me a patch, and i'll look it over.
+[21:56:55] jimevans: have a good weekend everybody.
+[21:56:57] jimevans has left #selenium
+[IRC logfile - Started Fri Jun 22 22:03:21 2012]
+[22:03:21] testingb0t1 has joined #selenium
+[22:10:16] Dude-X_ has joined #selenium
+[22:21:02] stackedsax has joined #selenium
+[22:22:08] nirvdrum has joined #selenium
+[22:39:50] jibay has joined #selenium
+[22:47:52] opapo has joined #selenium
+[IRC logfile - Started Fri Jun 22 23:03:54 2012]
+[23:03:54] awilson820 has left #selenium
+[23:17:30] krosenvold has joined #selenium
+[23:21:19] bmulholland: IS there anything like http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html for the python bindings?
+[23:21:30] lukeis: :apidocs
+[23:21:31] selbot2: .NET: http://goo.gl/Fm3cw | Java: http://goo.gl/kKQqM | Ruby: http://goo.gl/cFyyT | Python: http://goo.gl/5yWoR
+[23:21:35] bmulholland: http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html is impossible to navigate
+[23:21:58] lukeis: what's impossible about it?
+[23:22:10] bmulholland: I'm trying to look up the Select class
+[23:22:22] lukeis: scroll down... it's there :)
+[23:22:31] bmulholland: yeah, I guess it is
+[23:22:45] bmulholland: just makes me think too much
+[23:23:07] bmulholland: in particular, I have to know where the class is before I can look up the documentation
+[23:23:20] lukeis: all the classes are listed down there...
+[23:23:51] bmulholland: sure, but I have to scan the end of all of them for select
+[23:24:05] bmulholland: dunno… I just find it unfriendly
+[23:24:08] bmulholland: hard to explain why
+[23:24:08] lukeis: there's really not *that* many ;)
+[23:24:12] bmulholland: :)
+[23:25:13] hourback has left #selenium
+[23:25:19] bmulholland: oh hey, there's links to source in there
+[23:25:24] bmulholland: well that's much better, anyway
+[23:25:32] JakeSays has joined #selenium
+[23:41:19] bmulholland has joined #selenium
+[23:57:37] ner0x has joined #selenium

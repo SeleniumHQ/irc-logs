@@ -1,0 +1,795 @@
+2011-06-28T00:01:55  *** Binken[A] has joined #selenium
+2011-06-28T00:08:46  *** admc has joined #selenium
+2011-06-28T00:10:11  *** zmijunkie has joined #selenium
+2011-06-28T00:12:09  *** bebef_1987 has joined #selenium
+2011-06-28T00:15:35  *** AutomatedTester has quit IRC
+2011-06-28T00:15:49  *** Binken[A] has quit IRC
+2011-06-28T00:16:00  *** Binken has joined #selenium
+2011-06-28T00:19:33  *** soc42 has joined #selenium
+2011-06-28T00:21:35  *** Mayank1 has joined #selenium
+2011-06-28T00:22:06  <baijum> How to get edit access to Selenium wiki ? http://code.google.com/p/selenium/w/list
+2011-06-28T00:23:17  *** Mayank has quit IRC
+2011-06-28T00:25:29  <ksinkar> the code that selenium IDE creates, is webdriver code (at least for ruby)?
+2011-06-28T00:28:03  *** amitev has joined #selenium
+2011-06-28T00:30:03  *** rstrazhnyk1 has joined #selenium
+2011-06-28T00:30:03  *** rstrazhnyk has quit IRC
+2011-06-28T00:30:31  *** rstrazhnyk has joined #selenium
+2011-06-28T00:30:31  *** rstrazhnyk1 has quit IRC
+2011-06-28T00:31:02  *** rstrazhnyk1 has joined #selenium
+2011-06-28T00:31:02  *** rstrazhnyk has quit IRC
+2011-06-28T00:31:35  *** rstrazhnyk has joined #selenium
+2011-06-28T00:31:35  *** rstrazhnyk1 has quit IRC
+2011-06-28T00:32:00  *** amitev2 has quit IRC
+2011-06-28T00:32:23  *** amitev has quit IRC
+2011-06-28T00:32:47  *** amitev has joined #selenium
+2011-06-28T00:33:34  *** rstrazhnyk1 has joined #selenium
+2011-06-28T00:33:34  *** rstrazhnyk has quit IRC
+2011-06-28T00:34:56  *** Mayank1 has quit IRC
+2011-06-28T00:35:26  *** Mayank has joined #selenium
+2011-06-28T00:37:39  *** rstrazhnyk has joined #selenium
+2011-06-28T00:37:40  *** rstrazhnyk1 has quit IRC
+2011-06-28T00:39:39  *** rstrazhnyk1 has joined #selenium
+2011-06-28T00:39:40  *** rstrazhnyk has quit IRC
+2011-06-28T00:43:10  *** rstrazhnyk has joined #selenium
+2011-06-28T00:43:11  *** rstrazhnyk1 has quit IRC
+2011-06-28T00:43:17  *** rstrazhnyk has left #selenium
+2011-06-28T00:43:40  <ato> Is there a way to execute the RemoteWebDriverTestSuite with Chrome (from an IDE?), or should I use crazy fun instead?
+2011-06-28T00:44:29  <Binken> IDE only in firefox
+2011-06-28T00:45:25  <ato> Ah, I see.
+2011-06-28T00:58:19  *** zmijunkie has quit IRC
+2011-06-28T00:59:46  *** zmijunkie has joined #selenium
+2011-06-28T01:06:47  *** admc has quit IRC
+2011-06-28T01:14:30  *** Binken is now known as Binken[A]
+2011-06-28T01:14:30  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-28T01:17:28  <jarib> ksinkar: not yet AFAIK
+2011-06-28T01:17:59  *** lfryc has joined #selenium
+2011-06-28T01:18:26  <jarib> ksinkar: and as you've discovered, there's no Driver#wait
+2011-06-28T01:18:57  <ksinkar> jarib: yes and not a lot of functionality from 1.0
+2011-06-28T01:19:07  <ksinkar> for example selecting links
+2011-06-28T01:19:17  <jarib> selecting links?
+2011-06-28T01:19:35  <ksinkar> driver.click("link=login")
+2011-06-28T01:19:45  <ksinkar> how do you achieve that in webdriver?
+2011-06-28T01:19:57  <jarib> driver.find_element(:id => "login").click
+2011-06-28T01:20:04  <jarib> maybe?
+2011-06-28T01:20:16  <ksinkar> jarib: not the element has no id
+2011-06-28T01:20:20  <jarib> or driver.find_element(:link_text => "login").click
+2011-06-28T01:20:31  <ksinkar> it is just <a href="/login">
+2011-06-28T01:20:52  <ksinkar> let me check in irb
+2011-06-28T01:22:24  <jarib> link = driver.find_elements(:tag_name => "a").find { |e| e.attribute("href").to_s.include? "login" }
+2011-06-28T01:23:16  <jarib> usually an element surrounding the anchor has a class/id you can use to identify it
+2011-06-28T01:24:01  <jarib> so you don't have to find all the anchors on the page every time.
+2011-06-28T01:27:03  *** sburjan has joined #selenium
+2011-06-28T01:35:38  <pngl> My ruby spec suite sometimes exits with no information on a selenium timeout (I'm using selenium/client from selenium-webdriver). Selenium-rc and the browser window are just left to hang there, none of the cleanup method from the specs are called.
+2011-06-28T01:35:56  <pngl> jarib, I had that problem yesterday and you advised that I move to selenium-webdriver, but I did not help.
+2011-06-28T01:36:24  *** vrockai has joined #selenium
+2011-06-28T01:41:49  <jarib> pngl: what version of rspec?
+2011-06-28T01:42:26  <pngl> jarib: 1.3.0
+2011-06-28T01:42:35  <jarib> i think older versions don't catch Timeout::Error; so if that's what selenium-client is throwing, you may have problems
+2011-06-28T01:42:43  <jarib> yeah, that's pretty old
+2011-06-28T01:43:33  <pngl> jarib: wow, that's exactly it, I just ran the specs with $DEBUG on there's an uncaught Timeout.
+2011-06-28T01:44:03  <pngl> jarib: I don't think I am the liberty to ugprade rspec though. I'll see what I can do.
+2011-06-28T01:44:08  <pngl> jarib: thank you.
+2011-06-28T01:44:12  <jarib> np
+2011-06-28T01:49:32  *** jds has joined #selenium
+2011-06-28T01:49:45  <jds> Heya
+2011-06-28T01:50:34  <jds> Anyone know how mature the chrome driver is?  I'm trying to use it with capybara + the ruby selenium webdriver, but keep running into odd issues
+2011-06-28T01:51:03  <Binken[A]> Wait for the new chromedriver
+2011-06-28T01:51:03  *** Binken[A] is now known as Binken
+2011-06-28T01:51:03  * Binken is no longer away : Gone for 1 hour 6 minutes 33 seconds
+2011-06-28T01:51:21  <jds> Binken: Yeah?  The current one has known problems?
+2011-06-28T01:52:01  <Binken> yes
+2011-06-28T01:52:13  <Binken> #1908
+2011-06-28T01:52:13  <selbot2>  open/new ChromeDriver fails to select in Dropdown list - http://code.google.com/p/selenium/issues/detail?id=1908
+2011-06-28T01:52:17  <Binken> #1909
+2011-06-28T01:52:18  <selbot2>  open/new InvalidOperationException on ChromeDriver When using findElements method - http://code.google.com/p/selenium/issues/detail?id=1909
+2011-06-28T01:52:31  <jds> Damn, back to firefox then
+2011-06-28T01:53:20  *** pnitin has quit IRC
+2011-06-28T01:55:28  *** pnitin has joined #selenium
+2011-06-28T01:57:50  <jds> One of the reasons I was trying chrome was due to a firefox security warning which is causing me problems.  My tests load an https iframe from a 3rd party, which contains a form that's submitted back to my server.  In testing, that server isn't running ssl, so Firefox pops up a warning, which I have to manually click on to continue testing
+2011-06-28T01:58:59  <jds> I sort of worked around it by running nginx to proxy all the testing traffic and provide a self signed ssl cert, and tweaking /etc/hosts to add a local server url, but that's making my tests a lot less self contained than I'd like.  Any better suggestions?
+2011-06-28T02:07:59  *** dave_miles has quit IRC
+2011-06-28T02:09:10  <Binken> Anyone uses RC3 run on IE6?
+2011-06-28T02:12:06  <jarib> jds: what sort of warning?
+2011-06-28T02:13:07  <ato> I'm trying to get OperaDriver to use the JS atoms: It's now extending RemoteWebDriver had has DesiredCapabilities functionality.  Would the correct approach simply be to remove the findBy* methods in OperaDriver, and fall back to RemoteWebDriver?  Or am I missing something?
+2011-06-28T02:13:21  <ato> s/had/and
+2011-06-28T02:13:43  *** Binken has quit IRC
+2011-06-28T02:15:00  <jarib> ato: RemoteWebDriver just does RPC, it doesn't touch any JS stuff at all
+2011-06-28T02:16:08  <ato> So how would I go about this then?
+2011-06-28T02:16:20  <jds> jarib: Firefox pops up a modal sheet saying "Although this page is encrypted, the information you have entered is to be sent over an unencrypted connection and could easily be read by a third party.  Are you sure you want to continue sending this information?  <Cancel> <Continue>"
+2011-06-28T02:17:07  <jarib> jds: hmm, ok
+2011-06-28T02:18:04  <jarib> not sure if there's any way to avoid that
+2011-06-28T02:20:08  <jarib> ato: you're the first to do a pure-Java driver based on the atoms, so you probably want to start by compiling the atoms you want to e.g. Atoms.java with a bunch of String constants containing the JS code
+2011-06-28T02:20:45  <jds> jarib: Yeah, it's been a total pain in the ass
+2011-06-28T02:21:59  <ato> jarib: Aha, of course.  Stupid me.  I was trying to figure out where RemoteWebDriver actually did the query… (=
+2011-06-28T02:22:35  *** csanchez has joined #selenium
+2011-06-28T02:23:09  <jarib> ato: the RemoteWebDriver has a CommandExecutor that does the actual queries
+2011-06-28T02:23:31  <ato> What would be the right place to put a generated atoms Java file?  In Selenium or OperaDriver?
+2011-06-28T02:23:32  <jarib> RemoteWebDriver basically just maps the WebDriver API to a list of commands (the SPI)
+2011-06-28T02:24:10  <jarib> the generated file would need to be in OperaDriver
+2011-06-28T02:25:40  <jarib> but generated from the selenium tree, obviously. just like chrome does with their atoms
+2011-06-28T02:25:49  *** Ivog has joined #selenium
+2011-06-28T02:30:51  <Ivog> Hi when i try to build on linux i get 'could not zip build/javascript/firefox-driver/webdriver.xpi_temp => build/javascript/firefox-driver/webdriver.xpi bin/sh: jar: not found anyone knoes what could be going wrong?
+2011-06-28T02:31:21  *** dave_miles has joined #selenium
+2011-06-28T02:33:44  <Ivog> Using ./go //javascript/firefox-driver:webdriver
+2011-06-28T02:34:44  <jarib> Ivog: you need a JDK install
+2011-06-28T02:34:49  <jarib> including the "jar" command
+2011-06-28T02:35:15  <Ivog> Ah ok thx
+2011-06-28T02:36:04  *** csanchez has quit IRC
+2011-06-28T02:53:58  *** cheezy has joined #selenium
+2011-06-28T02:58:09  *** [DeVil-BoY] has joined #selenium
+2011-06-28T03:04:28  *** rbalent has joined #selenium
+2011-06-28T03:10:30  *** iserko has joined #selenium
+2011-06-28T03:20:47  *** Mayank has quit IRC
+2011-06-28T03:21:22  *** Mayank has joined #selenium
+2011-06-28T03:32:14  *** cheezy has quit IRC
+2011-06-28T03:37:58  *** Mayank has quit IRC
+2011-06-28T03:38:28  *** pharvey has joined #selenium
+2011-06-28T03:38:29  *** Mayank has joined #selenium
+2011-06-28T03:51:24  *** bebef_1987 has quit IRC
+2011-06-28T03:52:59  *** nirvdrum has joined #selenium
+2011-06-28T04:00:13  *** bebef_1987 has joined #selenium
+2011-06-28T04:00:57  *** nirvdrum has quit IRC
+2011-06-28T04:02:16  *** Ivog has quit IRC
+2011-06-28T04:02:52  *** Ivog has joined #selenium
+2011-06-28T04:02:58  *** nirvdrum has joined #selenium
+2011-06-28T04:12:19  *** csanchez has joined #selenium
+2011-06-28T04:35:27  *** Spanktar has quit IRC
+2011-06-28T04:45:07  *** soc42 has quit IRC
+2011-06-28T04:46:31  *** curseg has joined #selenium
+2011-06-28T04:46:54  *** jrock20041 has joined #selenium
+2011-06-28T04:51:31  *** iserko has quit IRC
+2011-06-28T04:56:44  *** miker2 has joined #selenium
+2011-06-28T04:59:55  *** Mayank has quit IRC
+2011-06-28T05:00:14  <Ivog> jarib: hmm i have a jdk on my path and java_home set but i still get the same message. Jar is also in my path
+2011-06-28T05:00:29  <jarib> can you run jar from the command line?
+2011-06-28T05:00:42  *** Mayank has joined #selenium
+2011-06-28T05:01:30  *** RossPatterson has joined #selenium
+2011-06-28T05:01:32  <Ivog> Ya
+2011-06-28T05:09:04  *** jimevans has joined #selenium
+2011-06-28T05:13:46  *** cheezy has joined #selenium
+2011-06-28T05:14:46  *** Mayank has quit IRC
+2011-06-28T05:15:18  *** Mayank has joined #selenium
+2011-06-28T05:17:37  *** csanchez has quit IRC
+2011-06-28T05:21:40  *** cburroughs has joined #selenium
+2011-06-28T05:29:29  *** cheezy_ has joined #selenium
+2011-06-28T05:33:14  *** cheezy has quit IRC
+2011-06-28T05:34:13  *** Ivog has quit IRC
+2011-06-28T05:41:34  *** tomh- has joined #selenium
+2011-06-28T05:41:58  <tomh-> hey, is the chrome driver broken if you want to select elements in a select tag?
+2011-06-28T05:42:19  <jarib> yes
+2011-06-28T05:42:49  <jimevans> and it should be pointed out that the onus of fixing it is on the Chromium team, not the Selenium team.
+2011-06-28T05:43:12  *** Ivog has joined #selenium
+2011-06-28T05:43:26  <tomh-> what else is broken?
+2011-06-28T05:43:47  <jarib> file uploads
+2011-06-28T05:43:55  <jarib> apart from that, it's working very well :)
+2011-06-28T05:43:59  <tomh-> ok cool
+2011-06-28T05:44:18  <tomh-> is there a bug report I can follow for the select?
+2011-06-28T05:45:23  <jarib> there should be
+2011-06-28T05:45:40  <jarib> #1908
+2011-06-28T05:45:41  <selbot2>  open/new ChromeDriver fails to select in Dropdown list - http://code.google.com/p/selenium/issues/detail?id=1908
+2011-06-28T05:45:54  <jarib> and http://code.google.com/p/chromium/issues/detail?id=87630
+2011-06-28T05:46:35  <tomh-> hmm they say .select() should still work
+2011-06-28T05:46:39  <tomh-> but it doesn't seem to work
+2011-06-28T05:47:17  <jarib> .select won't work with rc3
+2011-06-28T05:47:27  <jarib> it's been rewritten to use click() under the hood.
+2011-06-28T05:48:12  <tomh-> but click is also broken :>
+2011-06-28T05:48:25  <tomh-> so the only way to get it to work is to switch to rc2?
+2011-06-28T05:49:28  <jarib> for chrome, correct
+2011-06-28T05:49:37  *** Ivog has quit IRC
+2011-06-28T05:52:07  *** cgoldberg has joined #selenium
+2011-06-28T05:52:26  <tomh-> how about safari, any progress on the 2.0 web driver?
+2011-06-28T05:52:33  *** curseg has left #selenium
+2011-06-28T05:52:51  <jarib> not that i've heard
+2011-06-28T05:53:36  <tomh-> meh ;(
+2011-06-28T05:53:42  <tomh-> well thanks for the information
+2011-06-28T05:54:49  *** Nirdosh has quit IRC
+2011-06-28T05:56:30  *** brettporter has quit IRC
+2011-06-28T05:57:19  <tomh-> damn, they dont have the rc2 .net version up anymore
+2011-06-28T05:58:36  <tomh-> anyone here has it?
+2011-06-28T06:00:56  *** baijum1 has joined #selenium
+2011-06-28T06:01:15  *** Mayank has quit IRC
+2011-06-28T06:01:44  *** Mayank has joined #selenium
+2011-06-28T06:01:47  *** Ivog has joined #selenium
+2011-06-28T06:03:37  *** baijum has quit IRC
+2011-06-28T06:07:18  <tomh-> anyone here can make a build ?
+2011-06-28T06:08:09  *** XCulver has joined #selenium
+2011-06-28T06:09:29  *** |izzie has quit IRC
+2011-06-28T06:09:46  <jarib> tomh-: jimevans would know
+2011-06-28T06:10:24  <tomh-> I can also post to the mailing list
+2011-06-28T06:14:02  *** pharvey has quit IRC
+2011-06-28T06:14:46  *** pharvey has joined #selenium
+2011-06-28T06:14:53  *** pharvey has joined #selenium
+2011-06-28T06:22:14  *** Mayank has quit IRC
+2011-06-28T06:22:45  *** Mayank has joined #selenium
+2011-06-28T06:25:34  <jimevans> you could roll back the source enlistment to the label for RC2, and rebuild. i'm unable to do that at the moment.
+2011-06-28T06:26:05  *** pharvey has quit IRC
+2011-06-28T06:30:01  <tomh-> jimevans: I don't have the infrastructure to run the build, its not a typical .net project
+2011-06-28T06:30:29  <tomh-> not sure what they used exactly
+2011-06-28T06:31:26  *** andialbrecht is now known as andialbrecht_
+2011-06-28T06:33:37  *** curseg1 has joined #selenium
+2011-06-28T06:34:52  *** Mayank1 has joined #selenium
+2011-06-28T06:36:15  *** Mayank has quit IRC
+2011-06-28T06:37:58  *** rpk has joined #selenium
+2011-06-28T06:40:01  <jimevans> tomh-: it is a typical .net project at it's heart, but there are some non-.net components that are required to build.
+2011-06-28T06:40:14  <jimevans> what is needed to build is pretty well documented
+2011-06-28T06:40:18  <jimevans> :wiki building webdriver
+2011-06-28T06:40:19  <selbot2> 1: RubyDevelopment: Developing the Ruby bindings - http://code.google.com/p/selenium/wiki/RubyDevelopment
+2011-06-28T06:40:19  <selbot2> 2: CheckOut: Getting hold of the source in order to build WebDriver - http://code.google.com/p/selenium/wiki/CheckOut
+2011-06-28T06:40:19  <selbot2> 3: CrazyFunBuild: What we're doing with the build file - http://code.google.com/p/selenium/wiki/CrazyFunBuild
+2011-06-28T06:40:19  <selbot2> (+ 7 more)
+2011-06-28T06:40:26  *** curseg1 has left #selenium
+2011-06-28T06:41:27  <jimevans> ok, selbot2 didn't give me the link i wanted. here it is: http://code.google.com/p/selenium/wiki/BuildingWebDriver
+2011-06-28T06:41:58  <jimevans> the build target for the build system is 'go //dotnet'
+2011-06-28T06:42:21  <tomh-> ah ok
+2011-06-28T06:42:30  <tomh-> what kind of build system is that?
+2011-06-28T06:44:03  <RossPatterson> simonstewart calls it "CrazyFun".  I call it "HeadExploder" :-)
+2011-06-28T06:45:25  <tomh-> hehe
+2011-06-28T06:45:50  <ato> I'm hacking on CrazyFun now
+2011-06-28T06:45:53  <ato> I'm going mad.
+2011-06-28T06:45:58  <tomh-> well I guess there are some good reasons why it needs its own build system
+2011-06-28T06:54:02  <jarib> :wiki buildingwebdriver
+2011-06-28T06:54:03  <selbot2> 1: CheckOut: Getting hold of the source in order to build WebDriver - http://code.google.com/p/selenium/wiki/CheckOut
+2011-06-28T06:54:03  <selbot2> 2: BuildingWebDriver: Instructions on how to build WebDriver - http://code.google.com/p/selenium/wiki/BuildingWebDriver
+2011-06-28T06:54:34  <jarib> the google code wiki search isn't very intelligent
+2011-06-28T06:55:11  <jarib> a bit surprising.
+2011-06-28T06:55:20  <ato> Yay.
+2011-06-28T06:55:33  <ato> We now haz support for generating Java atoms.
+2011-06-28T06:55:56  <jarib> cool
+2011-06-28T06:56:21  <jarib> where's the code though? are you going to do one massive patch? ;)
+2011-06-28T06:56:32  *** baijum1 has quit IRC
+2011-06-28T06:56:46  <ato> Let me just verify that it actually works in Java before uploading it (-;
+2011-06-28T07:02:30  <nirvdrum> I guess people are continuing to be dicks on the dev list.
+2011-06-28T07:02:32  <nirvdrum> Awesome.
+2011-06-28T07:03:06  <ato> jarib: Is the Watir::Container::XpathSupport#execute_atom approximate to what I should do in OperaDriver?
+2011-06-28T07:04:01  *** csanchez has joined #selenium
+2011-06-28T07:08:43  <rpk> nirvdrum: wow, the mailing list posts are pretty bad
+2011-06-28T07:10:22  *** miker2_ has joined #selenium
+2011-06-28T07:10:48  <RossPatterson> Well, there certainly seems to be a lot of meta-moderation going on.
+2011-06-28T07:11:23  *** miker2 has quit IRC
+2011-06-28T07:11:23  *** miker2_ is now known as miker2
+2011-06-28T07:12:07  *** QAguy has joined #selenium
+2011-06-28T07:13:01  <RossPatterson> And the "don't bite the voluteers" post was obviously warranted.  I looked at it and thought "Yeah, I should have said something like that."
+2011-06-28T07:20:30  <nirvdrum> RossPatterson: Thanks for the term "meta-moderator"
+2011-06-28T07:20:35  <nirvdrum> "meta-moderation" rather.
+2011-06-28T07:20:48  <nirvdrum> For the second time this week I find myself telling people not to be assholes.
+2011-06-28T07:21:52  <RossPatterson> nirvdrum: You're welcome.  And thanks!
+2011-06-28T07:22:37  <rpk> what 'rc3' got pushed?
+2011-06-28T07:22:41  <rpk> the one on the website?
+2011-06-28T07:22:46  <rpk> or was it updated
+2011-06-28T07:35:59  *** andytinkham has joined #selenium
+2011-06-28T07:40:18  <nirvdrum> I'm pretty sure it just took a week for the announcement to be made.
+2011-06-28T07:40:27  <nirvdrum> But the code was already tagged.
+2011-06-28T07:41:34  *** selbot2_ has joined #selenium
+2011-06-28T07:41:42  *** AutomatedTester has joined #selenium
+2011-06-28T07:44:29  <ato> Can someone please point me to a piece where the webdriver-atoms are used?
+2011-06-28T07:44:57  *** selbot2 has quit IRC
+2011-06-28T07:45:00  <ato> piece of code, that is.
+2011-06-28T07:45:26  <rpk> nirvdrum: maybe we can add release notes in the future?
+2011-06-28T07:45:59  <nirvdrum> rpk: I believe we use the blog post for that.
+2011-06-28T07:46:31  <nirvdrum> I'm not against it, but I'm not really sure of everything that goes into a release myself.  There's usually a theme or a few major items.
+2011-06-28T07:46:49  <rpk> I didn't see a mention that grid functionality was broken pretty severely
+2011-06-28T07:47:04  <rpk> I'll go look again though
+2011-06-28T07:47:15  <ato> Where is the ChromeDriver source located?
+2011-06-28T07:47:31  <ato> In the Chromium repo?
+2011-06-28T07:50:05  <nirvdrum> rpk: I doubt the release would have gone out if anyone knew the grid was broken.  That's not usually something you throw in release notes.
+2011-06-28T07:51:29  *** antlong has joined #selenium
+2011-06-28T07:54:02  *** tunabum has joined #selenium
+2011-06-28T07:54:36  *** Ivog has quit IRC
+2011-06-28T07:55:11  *** freynaud has quit IRC
+2011-06-28T07:55:18  <jarib> ato: something similar to execute_atom, yes. obvsiouly you probably have more direct access to opera than driver.execute_script
+2011-06-28T07:55:54  <ato> Not when it comes to locating elements.
+2011-06-28T07:55:54  <jarib> although since execute_script probably deals with serialization of elements etc already, that's probably a good start
+2011-06-28T07:56:28  <samitbadle> AutomatedTester: yt?
+2011-06-28T07:56:37  <AutomatedTester> samitbadle: in a meeting
+2011-06-28T07:56:38  *** stepheneb has joined #selenium
+2011-06-28T07:56:48  <samitbadle> AutomatedTester: ok. let me know when free/
+2011-06-28T07:58:47  <jarib> ato: you'll find examples of usage in the IE driver, Chrome driver (both C++) or the Firefox extension
+2011-06-28T07:59:05  <ato> Where can I find the Chrome driver?
+2011-06-28T07:59:14  *** Mayank1 has quit IRC
+2011-06-28T07:59:50  *** Mayank has joined #selenium
+2011-06-28T08:00:13  <jarib> ato: http://src.chromium.org/viewvc/chrome/trunk/src/chrome/test/webdriver/
+2011-06-28T08:00:38  <ato> Thanks
+2011-06-28T08:03:19  <jrock20041> So using rc3 and when using firefox with linktext it looks for the rendered text. I understand that. But when using htmlunit it looks at the code and not the rendered text. Is this suppose to be?
+2011-06-28T08:03:20  *** RossPatterson has quit IRC
+2011-06-28T08:04:54  *** baijum has joined #selenium
+2011-06-28T08:05:33  *** lfryc has quit IRC
+2011-06-28T08:06:08  *** davehunt|away has quit IRC
+2011-06-28T08:06:59  *** vrockai has quit IRC
+2011-06-28T08:07:46  <tunabum> jrock20041: (smart-alic response--) can you see the renedered text in htmlunit?    (more serious --) if the link is being updated by javascript or css, html unit might not be performing the operations like a normal browser ~ might be a js bug, i don't think htmlunit looks at css
+2011-06-28T08:07:59  <jrock20041> tunabum: I was just htinking about that
+2011-06-28T08:09:20  *** RossPatterson has joined #selenium
+2011-06-28T08:11:25  *** Mayank has quit IRC
+2011-06-28T08:12:16  *** Mayank has joined #selenium
+2011-06-28T08:13:12  *** cheezy has joined #selenium
+2011-06-28T08:13:13  *** cheezy_ has quit IRC
+2011-06-28T08:13:22  *** adamgoucher has joined #selenium
+2011-06-28T08:16:03  <AutomatedTester> samitbadle: yo
+2011-06-28T08:17:11  *** freynaud has joined #selenium
+2011-06-28T08:21:11  *** ksinkar has quit IRC
+2011-06-28T08:24:35  <samitbadle> AutomatedTester: am back now
+2011-06-28T08:24:55  <samitbadle> AutomatedTester: I got things working upto a point.
+2011-06-28T08:24:59  *** zmijunkie has quit IRC
+2011-06-28T08:25:42  <samitbadle> AutomatedTester: I am trying to run go test_firefox_py and the test start executing upto test_ff_rendered_webelement.py
+2011-06-28T08:26:03  <AutomatedTester> oh...
+2011-06-28T08:26:06  <samitbadle> AutomatedTester: and does not proceed.
+2011-06-28T08:26:09  <AutomatedTester> thats wierd
+2011-06-28T08:27:17  *** algard has joined #selenium
+2011-06-28T08:28:53  <samitbadle> AutomatedTester: It a clean checkout from the trunk as well. :-(
+2011-06-28T08:29:04  <AutomatedTester> samitbadle: I dont get that issue
+2011-06-28T08:29:21  <AutomatedTester> my windows tests always complete
+2011-06-28T08:29:24  <AutomatedTester> :/
+2011-06-28T08:31:35  <eranm> AutomatedTester, how good are you with iframes ?
+2011-06-28T08:32:14  <AutomatedTester> eranm: I can create them
+2011-06-28T08:32:33  <AutomatedTester> <iframe id='IAmAnIframe'></iframe>
+2011-06-28T08:32:39  <AutomatedTester> :P
+2011-06-28T08:33:09  <eranm> Hmm. I'm seeing this odd phenomenon where, if I have an element in an iframe and I call setTimeout on that element's ownerDocument.defaultView, it would never happen
+2011-06-28T08:33:23  <eranm> And I'm not sure exactly why.
+2011-06-28T08:33:42  <AutomatedTester> that does sound bizarre
+2011-06-28T08:34:23  *** davehunt has joined #selenium
+2011-06-28T08:38:40  *** lawcab has joined #selenium
+2011-06-28T08:40:17  <samitbadle> AutomatedTester: Is there a log file generated when the py tests are run?
+2011-06-28T08:40:31  <AutomatedTester> samitbadle: no, its output to the console
+2011-06-28T08:40:49  <AutomatedTester> i could push it to a log if people want
+2011-06-28T08:41:56  <samitbadle> AutomatedTester: No, thats fine. I would investigate further.
+2011-06-28T08:42:09  <AutomatedTester> sorry I can't be more help samitbadle
+2011-06-28T08:42:37  *** pngl has quit IRC
+2011-06-28T08:42:52  <samitbadle> AutomatedTester: No worries. Appreciate your help.
+2011-06-28T08:46:36  *** sburjan has quit IRC
+2011-06-28T08:47:23  *** Mayank has quit IRC
+2011-06-28T08:47:59  *** Mayank has joined #selenium
+2011-06-28T08:49:54  *** funcman has joined #selenium
+2011-06-28T08:50:38  *** ivog has joined #selenium
+2011-06-28T08:52:42  *** pnitin has quit IRC
+2011-06-28T08:54:36  <ivog> anyone builds selenium on linux here?
+2011-06-28T08:55:07  <ivog> im getting /bin/sh: jar: not found
+2011-06-28T08:55:19  <ivog> even though jar is on the path and i can call it from the shell
+2011-06-28T08:59:05  *** davehunt_ has joined #selenium
+2011-06-28T09:00:05  *** funcman_ has joined #selenium
+2011-06-28T09:00:29  *** davehunt has quit IRC
+2011-06-28T09:00:44  *** funcman has quit IRC
+2011-06-28T09:00:51  *** davehunt_ is now known as davehunt
+2011-06-28T09:01:02  <funcman_> hey guys, currently using the python bindings for selenium 2. i just wanted to know if there are any best practices around setting up data driven tests.. say from an excel spreadsheet or a csv file
+2011-06-28T09:04:21  *** jonathanrwallace has quit IRC
+2011-06-28T09:08:10  *** red^ is now known as reddeviL
+2011-06-28T09:11:14  *** |izzie has joined #selenium
+2011-06-28T09:12:38  *** rcg has joined #selenium
+2011-06-28T09:13:31  *** dreuxl has joined #selenium
+2011-06-28T09:18:54  *** cakehero has joined #selenium
+2011-06-28T09:23:07  *** bebef_1987 has quit IRC
+2011-06-28T09:39:42  <selbot2_> simon.m.stewart half a minute ago - SimonStewart: A shameful hack for getting click to work reliably on webkit browsers - http://code.google.com/p/selenium/source/detail?r=12647
+2011-06-28T09:41:32  *** rbalent has quit IRC
+2011-06-28T09:45:38  *** sfbrian has joined #selenium
+2011-06-28T09:45:42  *** lfryc has joined #selenium
+2011-06-28T09:51:25  *** tunabum has quit IRC
+2011-06-28T09:53:09  <selbot2_> simon.m.stewart half a minute ago - SimonStewart: Removing debugging code that prevents native events from working - http://code.google.com/p/selenium/source/detail?r=12648
+2011-06-28T09:53:23  *** stephend has joined #selenium
+2011-06-28T09:57:41  *** jonathanrwallace has joined #selenium
+2011-06-28T09:58:28  *** admc1 has joined #selenium
+2011-06-28T10:05:59  <davehunt> AutomatedTester: Found the revision that caused #1845 ?
+2011-06-28T10:06:00  <selbot2_>  open/new Cannot get WebDriver to launch a Firefox profile any longer in an updated environment - http://code.google.com/p/selenium/issues/detail?id=1845
+2011-06-28T10:06:08  <davehunt> oh, that's not the one :)
+2011-06-28T10:06:17  <AutomatedTester> #1854
+2011-06-28T10:06:18  <selbot2_>  open/accepted Selenium 2.0 RC2 gets constantly slower during test suite - http://code.google.com/p/selenium/issues/detail?id=1854
+2011-06-28T10:06:54  <algard> Is there a 'standard' way to handle unexpected JS alerts?   At the moment they're just hanging my tests, which doesn't seem optimal
+2011-06-28T10:06:56  <AutomatedTester> nirvdrum: I found the perf issue
+2011-06-28T10:07:01  <nirvdrum> Oh?
+2011-06-28T10:07:02  <AutomatedTester> r12294
+2011-06-28T10:07:04  <selbot2_> simon.m.stewart 27 days ago - SimonStewart: Fixing Selenium Core to work with Firefox 4 on Win7.  - http://code.google.com/p/selenium/source/detail?r=12294
+2011-06-28T10:07:18  <AutomatedTester> well, the way i replicate it comes down to that revision
+2011-06-28T10:08:19  <nirvdrum> I wonder if it's the same problem I was seeing where open() was causing CPU to hit 100% on IE.  The waitForPageToLoad check was going nuts.
+2011-06-28T10:08:35  <AutomatedTester> maybe...
+2011-06-28T10:09:47  <nirvdrum> I tried tracking that one down, but it's a mess of decorated methods and callbacks.
+2011-06-28T10:11:06  <AutomatedTester> from the commit I can kinda see what could cause the issue
+2011-06-28T10:11:10  *** ivog has quit IRC
+2011-06-28T10:12:09  <selbot2_> simon.m.stewart half a minute ago - SimonStewart: Check visibility of an element after a click event but before calling setSelected - http://code.google.com/p/selenium/source/detail?r=12649
+2011-06-28T10:15:15  *** marlena has joined #selenium
+2011-06-28T10:19:36  *** cakehero has quit IRC
+2011-06-28T10:19:38  *** zmijunkie has joined #selenium
+2011-06-28T10:24:52  *** csanchez has quit IRC
+2011-06-28T10:27:19  *** andytinkham has quit IRC
+2011-06-28T10:27:21  *** algard has quit IRC
+2011-06-28T10:27:27  *** andytinkham has joined #selenium
+2011-06-28T10:32:23  *** andytinkham has quit IRC
+2011-06-28T10:34:04  *** tUrNc04tz has quit IRC
+2011-06-28T10:38:57  *** Mayank has quit IRC
+2011-06-28T10:39:32  *** Mayank has joined #selenium
+2011-06-28T10:39:45  <jimevans> *sigh* here we go again. #1943
+2011-06-28T10:39:46  <selbot2_>  open/new WebElement.getAttribute("href") on <a> element returns different value between browsers  - http://code.google.com/p/selenium/issues/detail?id=1943
+2011-06-28T10:43:09  *** Nirdosh has joined #selenium
+2011-06-28T10:45:43  <samitbadle> jarib: yt?
+2011-06-28T10:45:47  *** Spanktar has joined #selenium
+2011-06-28T10:46:13  *** Mayank has quit IRC
+2011-06-28T10:47:02  *** Mayank has joined #selenium
+2011-06-28T10:49:01  *** Mayank1 has joined #selenium
+2011-06-28T10:49:59  *** algard has joined #selenium
+2011-06-28T10:51:27  *** Mayank has quit IRC
+2011-06-28T10:51:51  *** jxpx777 has joined #selenium
+2011-06-28T10:53:15  *** rcg has quit IRC
+2011-06-28T10:55:35  *** retornam has joined #selenium
+2011-06-28T10:56:12  *** rcg has joined #selenium
+2011-06-28T10:57:34  *** jonathanrwallace has quit IRC
+2011-06-28T10:59:20  <samitbadle> adamgoucher: I just noticed that there was no mention of Selenium IDE v1.0.12 on the official blog. I have put a draft for you to publish.
+2011-06-28T10:59:43  <adamgoucher> i'll look at it this evening
+2011-06-28T11:01:30  *** dmachi has quit IRC
+2011-06-28T11:01:42  *** dmachi has joined #selenium
+2011-06-28T11:02:53  *** andytinkham has joined #selenium
+2011-06-28T11:12:43  *** mattp__ has joined #selenium
+2011-06-28T11:12:56  *** jonathanrwallace has joined #selenium
+2011-06-28T11:13:09  <mattp__> I have a quick question about selenium, browsermob and flex
+2011-06-28T11:13:16  <mattp__> anyone that can help me
+2011-06-28T11:14:00  <antlong> ask away
+2011-06-28T11:14:28  <mattp__> Does selenium support BlazeDS, ASObjects and java 1.6
+2011-06-28T11:14:35  <jarib> samitbadle: hi
+2011-06-28T11:14:38  *** sjmikem has joined #selenium
+2011-06-28T11:16:34  <mattp__> also there is another mattp thats what i am never nameing my kid matt..too many of us already
+2011-06-28T11:16:54  *** dlam has joined #selenium
+2011-06-28T11:17:31  <jarib> jimevans: the inconsistency is just that chrome needs an atoms update, no? so we know what the correct behaviour is
+2011-06-28T11:17:42  <marlena> samitbadle: Hi :), davehunt said he mentioned to you that I'd like to work on tests for the ide.  Thought I'd introduce myself.
+2011-06-28T11:20:11  <mattp__> So does anyone know if selenium supports BlazeDS, ASOBjects and and or maybe java 6?
+2011-06-28T11:21:34  *** kkania has quit IRC
+2011-06-28T11:24:12  <samitbadle> jarib: I am trying to test the ruby bindings, but I am getting one failure Element must toggle: unexpected response 404.
+2011-06-28T11:24:40  <samitbadle> marlena: Hi, good to hear from you:-)
+2011-06-28T11:25:39  *** jxpx777 has quit IRC
+2011-06-28T11:26:09  <selbot2_> jmleyba half a minute ago - Edited wiki page ChromeDriver through web user interface. - http://code.google.com/p/selenium/source/detail?r=12650
+2011-06-28T11:26:47  <samitbadle> marlena: Have you started on the tests already? davehunt said a lot of good things about you. I am looking forward to your stuff.
+2011-06-28T11:27:12  <marlena> samitbadle: Dave helped me get things set up on my computer.  He suggested that I try writing some tests for alert pages so I'll work on writing one of those.
+2011-06-28T11:27:35  *** sjmikem has quit IRC
+2011-06-28T11:27:42  *** sjmikem has joined #selenium
+2011-06-28T11:28:50  <jarib> samitbadle: ah, toggle() may actually have been removed from the underlying driver without me noticing
+2011-06-28T11:29:19  *** soc42 has joined #selenium
+2011-06-28T11:29:22  <samitbadle> marlena: excellent! That is an area that needs tests, so they will be very welcome!
+2011-06-28T11:30:10  <samitbadle> jarib: phew! I was getting worried that a phantom invaded my workstation and was gettting ready for a ritual :-D
+2011-06-28T11:30:59  <marlena> samitbadle:  Thx!  I'll muddle through the first couple either this afternoon or tomorrow.  When are you usually online/available for questions?
+2011-06-28T11:31:33  <jarib> samitbadle: hehe. i'll have a fix in shortly
+2011-06-28T11:32:00  <samitbadle> marlena: ping me any time you see me. I tend to have a lot of meetings some days.
+2011-06-28T11:32:50  <marlena> ok, will do.  davehunt is also around until later tomorrow so I can bug him with n00b questions ;)
+2011-06-28T11:33:39  <selbot2_> jari.bakken half a minute ago - JariBakken: Remove deprecated Element#toggle - http://code.google.com/p/selenium/source/detail?r=12651
+2011-06-28T11:33:50  <samitbadle> jarib: did it already and running tests again
+2011-06-28T11:34:10  <samitbadle> jarib: already committed!!! That was fast!!!
+2011-06-28T11:34:49  <jarib> :)
+2011-06-28T11:34:52  <mattp__> So does anyone know if selenium supports BlazeDS, ASOBjects and and or maybe java 6?
+2011-06-28T11:35:09  <selbot2_> jmleyba half a minute ago - Edited wiki page ChromeDriver through web user interface. - http://code.google.com/p/selenium/source/detail?r=12652
+2011-06-28T11:35:23  *** lfryc has quit IRC
+2011-06-28T11:35:46  <samitbadle> jarib: Success!!!
+2011-06-28T11:35:57  <samitbadle> jarib: I think I love Ruby :-)
+2011-06-28T11:37:15  <jarib> well, matz says he made it optimized for programmer happiness ;)
+2011-06-28T11:37:17  *** dlam has quit IRC
+2011-06-28T11:38:53  <samitbadle> jarib: Thats a great goal to aim for!
+2011-06-28T11:39:19  <antlong> mattp_: http://wiki.openqa.org/display/SRC/Testing+Flash+with+Selenium+RC
+2011-06-28T11:39:34  <samitbadle> jarib: I am planning to port the Select class from Java to Ruby as well. Any suggestions?
+2011-06-28T11:41:33  <RossPatterson> mattp__: I don't even know what those are, let alone if Selenium supports them :-)
+2011-06-28T11:42:08  *** davehunt is now known as davehunt|away
+2011-06-28T11:44:49  <jarib> samitbadle: hmm, should be quite straightforward. keep in mind method name conventions, e.g. boolean methods end with a question mark (e.g. #multiple? over #is_multiple) and no "get" prefixes (e.g. #first_selected_option over #get_first_selected_option)
+2011-06-28T11:46:24  <samitbadle> jarib: Sure. I will emulate the existing conventions. I hope to finish it tonight. I will send you the code with my sample selenese to ruby/webdriver code tomorrow.
+2011-06-28T11:46:40  <jarib> awesome. looking forward to it
+2011-06-28T11:47:08  <samitbadle> jarib: which module should it belong to?
+2011-06-28T11:48:00  <jarib> good question
+2011-06-28T11:49:04  <jarib> it'd be nice to keep things like this in a separate module
+2011-06-28T11:49:20  <jarib> so I guess Selenium::WebDriver::Support::Select
+2011-06-28T11:49:40  <jarib> our module nesting is a bit deep by ruby standards.
+2011-06-28T11:50:23  <jarib> then again people can just include Selenium::WebDriver::Support in their tests/page objects
+2011-06-28T11:50:33  <jarib> so let's do that
+2011-06-28T11:50:54  <samitbadle> jarib: in Java it is in ...support/ui/select, but I guess Selenium::WebDriver::Support::Select  is fine.
+2011-06-28T11:51:05  <jarib> yep
+2011-06-28T11:51:13  <samitbadle> Excellent! Thanks.
+2011-06-28T11:51:21  <samitbadle> See you tomorrow. bye
+2011-06-28T11:51:27  <jarib> ttyl
+2011-06-28T11:53:11  *** baijum has quit IRC
+2011-06-28T11:56:23  *** sjmikem has quit IRC
+2011-06-28T11:56:23  *** csanchez has joined #selenium
+2011-06-28T11:56:26  *** jrock20041 has quit IRC
+2011-06-28T11:56:35  *** sjmikem has joined #selenium
+2011-06-28T11:56:44  *** mattp__ has quit IRC
+2011-06-28T11:59:41  *** freynaud has quit IRC
+2011-06-28T12:05:11  *** nirvdrum has quit IRC
+2011-06-28T12:05:12  *** Mayank1 has quit IRC
+2011-06-28T12:05:30  *** krichards has joined #selenium
+2011-06-28T12:05:46  *** Mayank has joined #selenium
+2011-06-28T12:09:29  <krichards> I'm seeing some flakey behaviour with webdriver where pages have supposedly finished loading but when I get errors which appear to indicate the page is still being loaded (e.g. title is blank or  elements don't exist), I've had to put Thread.sleep in place to make the tests reliable.  This problem only seemed to begin when I went from FF3 to FF4, but this might just that things got quicker and the problem is no obvious.  Any ide
+2011-06-28T12:12:52  *** funcman_ has quit IRC
+2011-06-28T12:13:00  *** admc1 has quit IRC
+2011-06-28T12:17:17  *** freynaud has joined #selenium
+2011-06-28T12:20:31  <algard> krichards, are you using implicit waits?
+2011-06-28T12:22:57  <krichards> I believe so,  I'm using the geb framework so there's a level of abstraction between me and webdriver.
+2011-06-28T12:24:40  *** marlena has quit IRC
+2011-06-28T12:25:12  *** sjmikem has quit IRC
+2011-06-28T12:25:27  *** sjmikem has joined #selenium
+2011-06-28T12:26:08  *** Mayank has quit IRC
+2011-06-28T12:26:46  *** Mayank has joined #selenium
+2011-06-28T12:27:01  *** RossPatterson has quit IRC
+2011-06-28T12:27:22  *** keshureddyp has quit IRC
+2011-06-28T12:34:55  *** cakehero has joined #selenium
+2011-06-28T12:39:52  *** Mayank has quit IRC
+2011-06-28T12:40:22  *** Mayank has joined #selenium
+2011-06-28T12:42:03  *** reddeviL is now known as red^
+2011-06-28T12:44:03  *** marlena has joined #selenium
+2011-06-28T12:49:37  *** Mayank1 has joined #selenium
+2011-06-28T12:50:54  *** Mayank has quit IRC
+2011-06-28T12:51:57  *** krichards has quit IRC
+2011-06-28T12:54:06  *** sjmikem has quit IRC
+2011-06-28T12:54:21  *** sjmikem has joined #selenium
+2011-06-28T12:54:28  *** |izzie has quit IRC
+2011-06-28T12:55:44  *** Mayank1 has quit IRC
+2011-06-28T12:56:06  *** Mayank has joined #selenium
+2011-06-28T13:04:51  *** jleyba has joined #selenium
+2011-06-28T13:10:12  *** soc42 has quit IRC
+2011-06-28T13:12:08  *** cburroughs has quit IRC
+2011-06-28T13:13:37  *** admc1 has joined #selenium
+2011-06-28T13:16:49  *** Mayank has quit IRC
+2011-06-28T13:17:54  *** jxpx777 has joined #selenium
+2011-06-28T13:18:15  *** Mayank1 has joined #selenium
+2011-06-28T13:19:16  *** Mayank1 has joined #selenium
+2011-06-28T13:20:26  *** stephend_ has joined #selenium
+2011-06-28T13:21:28  *** stephend has quit IRC
+2011-06-28T13:21:28  *** stephend_ is now known as stephend
+2011-06-28T13:23:08  *** sjmikem has quit IRC
+2011-06-28T13:23:18  *** sjmikem has joined #selenium
+2011-06-28T13:24:31  *** Mayank has joined #selenium
+2011-06-28T13:25:43  *** Mayank1 has quit IRC
+2011-06-28T13:30:28  *** Mayank has quit IRC
+2011-06-28T13:31:04  *** Mayank has joined #selenium
+2011-06-28T13:45:00  *** admc1 has quit IRC
+2011-06-28T13:45:43  *** freynaud has quit IRC
+2011-06-28T13:45:59  *** samitbadle has quit IRC
+2011-06-28T13:48:41  *** admc1 has joined #selenium
+2011-06-28T13:50:02  *** freynaud has joined #selenium
+2011-06-28T13:51:12  *** cheezy has quit IRC
+2011-06-28T13:51:34  *** admc1 has joined #selenium
+2011-06-28T13:51:53  *** sjmikem has quit IRC
+2011-06-28T13:52:10  *** sjmikem has joined #selenium
+2011-06-28T14:01:58  *** cakehero has quit IRC
+2011-06-28T14:02:19  *** ivog has joined #selenium
+2011-06-28T14:07:26  *** ian_mac has quit IRC
+2011-06-28T14:12:05  <AutomatedTester> jimevans: you there?
+2011-06-28T14:12:25  *** miker2 has quit IRC
+2011-06-28T14:12:59  *** XCulver has quit IRC
+2011-06-28T14:16:22  *** cakehero has joined #selenium
+2011-06-28T14:20:46  *** sjmikem has quit IRC
+2011-06-28T14:21:05  *** sjmikem has joined #selenium
+2011-06-28T14:23:04  *** red^ is now known as reddeviL
+2011-06-28T14:27:08  *** cakehero has quit IRC
+2011-06-28T14:28:06  * AutomatedTester wonders if jarib is still awake
+2011-06-28T14:35:38  *** tunabum has joined #selenium
+2011-06-28T14:37:32  <jarib> AutomatedTester: he is
+2011-06-28T14:37:56  <AutomatedTester> jarib: does IE context menu work?
+2011-06-28T14:38:21  <AutomatedTester> i am assuming jimevans has done his usual stirling job on it
+2011-06-28T14:38:40  <AutomatedTester> <- lacking a windows machine atm
+2011-06-28T14:39:16  <jarib> i don't think it works - the spec is guarded
+2011-06-28T14:39:23  <jarib> i can do a quick check though
+2011-06-28T14:39:29  * jarib boots his VM
+2011-06-28T14:39:39  <AutomatedTester> thanks
+2011-06-28T14:41:23  *** dave_miles has quit IRC
+2011-06-28T14:44:04  *** nirvdrum has joined #selenium
+2011-06-28T14:44:34  *** freynaud has quit IRC
+2011-06-28T14:45:16  <AutomatedTester> woop, I found the 1 line causing the perf issue in #1854
+2011-06-28T14:45:17  <selbot2_>  open/accepted Selenium 2.0 RC2 gets constantly slower during test suite - http://code.google.com/p/selenium/issues/detail?id=1854
+2011-06-28T14:46:41  <AutomatedTester> nirvdrum: how is your Se1 browserbot-fu?
+2011-06-28T14:47:30  *** admc1 has quit IRC
+2011-06-28T14:47:31  <davehunt|away> AutomatedTester: what line?
+2011-06-28T14:47:52  *** davehunt|away is now known as davehunt
+2011-06-28T14:48:15  <AutomatedTester> http://code.google.com/p/selenium/source/browse/trunk/javascript/selenium-core/scripts/selenium-browserbot.js?spec=svn12294&r=12294#344
+2011-06-28T14:49:18  <davehunt> looks innocent enough
+2011-06-28T14:49:21  <davehunt> :)
+2011-06-28T14:49:44  *** sjmikem has quit IRC
+2011-06-28T14:49:57  *** sjmikem has joined #selenium
+2011-06-28T14:50:28  <AutomatedTester> thats what has me confused
+2011-06-28T14:51:06  <AutomatedTester> if only I understood what Simon thought sometimes
+2011-06-28T14:52:18  *** rpk has left #selenium
+2011-06-28T14:52:54  <nirvdrum> AutomatedTester: Not sure.  I'd have to run through it to understand what's going on.
+2011-06-28T14:53:36  <AutomatedTester> nirvdrum: i will go through it, just hoped you would know more about that area than me :)
+2011-06-28T14:53:49  <AutomatedTester> removing it doesnt break tests
+2011-06-28T14:54:08  <nirvdrum> I don't think that's the best tested code in the world.
+2011-06-28T14:54:21  <nirvdrum> My experience has been mostly related to the screenshot stuff though.
+2011-06-28T14:54:24  <jarib> AutomatedTester: can't get context click to work anywhere besides chrome
+2011-06-28T14:54:39  <AutomatedTester> jarib: ahh right, thanks
+2011-06-28T14:55:17  <antlong> is that code used for anything other than human-readability, though
+2011-06-28T14:55:37  *** admc1 has joined #selenium
+2011-06-28T14:55:53  <jarib> AutomatedTester: doesn't break tests on the platform/firefox version mentioned in the commit message either?
+2011-06-28T14:56:15  <AutomatedTester> jarib: dunno, doing linux and mac atm
+2011-06-28T14:56:24  <AutomatedTester> downloading a new vm now for windows
+2011-06-28T14:57:07  <AutomatedTester> thankfully from an internal server
+2011-06-28T14:58:06  *** cgoldberg has quit IRC
+2011-06-28T14:58:29  <AutomatedTester> ffs, I really wish we could lock comments from users
+2011-06-28T14:58:35  <AutomatedTester> I vote for nirvdrum's idea
+2011-06-28T14:59:11  <nirvdrum> Clearly this is slow because of Firefox.
+2011-06-28T14:59:40  <AutomatedTester> spell checking in Firefox
+2011-06-28T15:00:55  <nirvdrum> Right.  That's why it's slow in IE.
+2011-06-28T15:01:03  <nirvdrum> Quite insidious of you folks.
+2011-06-28T15:01:26  <AutomatedTester> gotta knock the competition where we can
+2011-06-28T15:01:47  <nirvdrum> I'm close to the point of just blackholing everything coming in on the dev list and issue notifications.
+2011-06-28T15:01:56  <nirvdrum> I'll come back a month after 2.0 is out the door :-P
+2011-06-28T15:02:35  <AutomatedTester> complaining that FirefoxDriver is making the ChromeDriver slow? :D
+2011-06-28T15:06:04  <antlong> what date about was the last rc cut?
+2011-06-28T15:06:41  <jarib> check :downloads
+2011-06-28T15:06:41  <selbot2_> http://code.google.com/p/selenium/downloads/list
+2011-06-28T15:06:44  <AutomatedTester> antlong: 22nd I *think*
+2011-06-28T15:06:48  <antlong> hmn
+2011-06-28T15:06:48  <jarib> should have the upload dates
+2011-06-28T15:11:40  <antlong> hmnnn
+2011-06-28T15:11:47  <antlong> http://code.google.com/p/selenium/source/diff?spec=svn11697&r=11697&format=side&path=/trunk/javascript/selenium-core/scripts/selenium-browserbot.js
+2011-06-28T15:11:52  <antlong> line 1408, on the right hand side
+2011-06-28T15:12:59  <antlong> only thing ive seen that looks out of place
+2011-06-28T15:13:07  *** jxpx777 has quit IRC
+2011-06-28T15:13:48  *** admc1 has quit IRC
+2011-06-28T15:14:25  <AutomatedTester> antlong: in regards to what?
+2011-06-28T15:14:35  <krosenvold> AutomatedTester: Shame you found the bug, I just had this ready: https://github.com/krosenvold/webdriver-diag-proxy
+2011-06-28T15:14:55  <krosenvold> Produces this kind of report: http://pastebin.com/HbCAkANn
+2011-06-28T15:15:18  <krosenvold> Interesting how getText takes *all* the execution time in my tests
+2011-06-28T15:15:32  <AutomatedTester> krosenvold: that looks awesome
+2011-06-28T15:15:42  <krosenvold> YOu can use it to compare execution profile of 2 different versions of se2
+2011-06-28T15:15:57  <krosenvold> You can even compare chrome vs firefox for the same test run
+2011-06-28T15:16:00  <davehunt> krosenvold: great work!
+2011-06-28T15:16:34  <AutomatedTester> krosenvold: you have proved what many of us thought about getText though
+2011-06-28T15:16:38  * antlong #selenium golf-clap
+2011-06-28T15:17:52  * AutomatedTester wishes he knew what Simon wanted to do with that line that is causing the issue
+2011-06-28T15:17:54  *** [DeVil-BoY] has quit IRC
+2011-06-28T15:17:59  <krosenvold> It dumps to file, so you can probably run twice and bring the stuff into excel if you're into that kind of stuff ;)
+2011-06-28T15:18:04  <antlong> brb
+2011-06-28T15:18:08  *** antlong has quit IRC
+2011-06-28T15:18:39  *** sjmikem has quit IRC
+2011-06-28T15:18:42  <AutomatedTester> krosenvold: nice job, you going to advertise it on the mailing list? *please do*
+2011-06-28T15:18:51  *** sjmikem has joined #selenium
+2011-06-28T15:18:55  <krosenvold> I will ;) I'm tired now.
+2011-06-28T15:19:57  <krosenvold> It's like 100 lines of code or so, fork on github and play around with it. I'll wedge it into server and the standard dirstro once I get the details smoothened out
+2011-06-28T15:20:22  *** Mayank has quit IRC
+2011-06-28T15:20:38  *** Mayank has joined #selenium
+2011-06-28T15:23:16  *** curseg has joined #selenium
+2011-06-28T15:29:11  *** rpk has joined #selenium
+2011-06-28T15:31:58  *** algard has quit IRC
+2011-06-28T15:35:57  *** |izzie has joined #selenium
+2011-06-28T15:38:36  *** andytinkham has quit IRC
+2011-06-28T15:39:09  *** stepheneb has quit IRC
+2011-06-28T15:40:18  *** davehunt is now known as davehunt|away
+2011-06-28T15:44:07  *** kkania has joined #selenium
+2011-06-28T15:44:16  *** Fyrespray has quit IRC
+2011-06-28T15:46:22  *** sfbrian_ has joined #selenium
+2011-06-28T15:47:28  *** sjmikem has quit IRC
+2011-06-28T15:47:43  *** sjmikem has joined #selenium
+2011-06-28T15:50:04  *** sfbrian has quit IRC
+2011-06-28T15:50:04  *** sfbrian_ is now known as sfbrian
+2011-06-28T15:50:47  *** csanchez has quit IRC
+2011-06-28T15:53:12  *** QAguy has quit IRC
+2011-06-28T15:55:17  *** retornam has quit IRC
+2011-06-28T15:57:20  *** Spanktar has quit IRC
+2011-06-28T15:57:57  *** rcg has quit IRC
+2011-06-28T15:58:39  <selbot2_> david.burns@theautomatedtester.co.uk half a minute ago - DavidBurns removing a line that over time causes performance to degrade for issue 1854 - http://code.google.com/p/selenium/source/detail?r=12653
+2011-06-28T16:02:16  <selbot> New news from builds: IDE-IDE-118 was SUCCESSFUL : Dependant of IDE-EDITOR-136 <http://xserve.openqa.org:8085/browse/IDE-IDE-118> || IDE-EDITOR-136 was SUCCESSFUL : Updated by david.burns@theautomatedtester.co.uk <http://xserve.openqa.org:8085/browse/IDE-EDITOR-136>
+2011-06-28T16:02:45  <nirvdrum> AutomatedTester: That's one intriguing commit.
+2011-06-28T16:03:14  <AutomatedTester> nirvdrum: I have sent a message to Simon for a review
+2011-06-28T16:03:29  <AutomatedTester> I can't see why that would cause an issue :/
+2011-06-28T16:03:31  <AutomatedTester> but it does
+2011-06-28T16:03:48  <nirvdrum> Did you find any place where it was previously referenced?
+2011-06-28T16:03:55  <AutomatedTester> no
+2011-06-28T16:04:05  <nirvdrum> Or maybe it's a case of entropy if it needs to be random.
+2011-06-28T16:04:17  <AutomatedTester> *shrug*
+2011-06-28T16:04:17  <nirvdrum> Funky.  Just postulating.
+2011-06-28T16:04:34  <AutomatedTester> i wish I knew, its very bizarre
+2011-06-28T16:06:39  <AutomatedTester> i can add you to the review issue if you want to see what Simon says
+2011-06-28T16:07:24  <nirvdrum> Yes, please.
+2011-06-28T16:07:50  <nirvdrum> I wonder if that line disables firefox's spellchecker.
+2011-06-28T16:08:49  * AutomatedTester will add it as a default for Se2 code and then run krosenvold's code to see if it affects it
+2011-06-28T16:10:20  <AutomatedTester> hmm ok, so google code review wants my code in a separate branch :(
+2011-06-28T16:10:39  <AutomatedTester> star  #1946 to keep track
+2011-06-28T16:10:40  <selbot2_>  open/new Code review for changes made to fix issue 1854 - http://code.google.com/p/selenium/issues/detail?id=1946
+2011-06-28T16:11:10  <nirvdrum> Thanks.
+2011-06-28T16:11:16  <nirvdrum> And thanks for tracking this down.
+2011-06-28T16:11:37  <nirvdrum> Maybe the Internet can relax now.
+2011-06-28T16:13:50  <nirvdrum> Dinner.  bbl
+2011-06-28T16:14:07  *** sjmikem has quit IRC
+2011-06-28T16:20:26  *** sjmikem has joined #selenium
+2011-06-28T16:22:17  *** Mayank has quit IRC
+2011-06-28T16:27:21  *** AutomatedTester has quit IRC
+2011-06-28T16:27:55  *** marlena has quit IRC
+2011-06-28T16:28:51  *** stephend has quit IRC
+2011-06-28T16:29:23  *** davehunt|away has quit IRC
+2011-06-28T16:29:39  *** rpk has left #selenium
+2011-06-28T16:38:00  *** Mayank has joined #selenium
+2011-06-28T16:44:51  *** cakehero has joined #selenium
+2011-06-28T16:46:40  *** admc has joined #selenium
+2011-06-28T16:47:56  *** ian_mac2 has quit IRC
+2011-06-28T16:49:14  *** sjmikem has quit IRC
+2011-06-28T16:49:30  *** sjmikem has joined #selenium
+2011-06-28T17:01:05  *** cburroughs has joined #selenium
+2011-06-28T17:05:27  *** ian_mac has joined #selenium
+2011-06-28T17:14:17  *** nirvdrum has quit IRC
+2011-06-28T17:15:28  *** sjmikem has quit IRC
+2011-06-28T17:15:33  *** cburroughs has quit IRC
+2011-06-28T17:22:38  *** jonathanrwallace has quit IRC
+2011-06-28T17:27:58  *** sfbrian has quit IRC
+2011-06-28T17:30:06  *** jonathanrwallace has joined #selenium
+2011-06-28T17:31:41  *** admc1 has joined #selenium
+2011-06-28T17:32:36  *** ivog has quit IRC
+2011-06-28T17:34:40  *** Binken has joined #selenium
+2011-06-28T17:34:45  *** admc1 has quit IRC
+2011-06-28T17:34:45  *** Mayank has quit IRC
+2011-06-28T17:36:02  *** jleyba has quit IRC
+2011-06-28T17:44:31  *** tunabum has quit IRC
+2011-06-28T18:03:18  *** antlong has joined #selenium
+2011-06-28T18:03:39  *** dreuxl has quit IRC
+2011-06-28T18:04:36  *** Binken is now known as Binken[A]
+2011-06-28T18:04:36  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-28T18:04:41  *** miker2 has joined #selenium
+2011-06-28T18:14:05  *** stepheneb has joined #selenium
+2011-06-28T18:18:34  *** curseg has quit IRC
+2011-06-28T18:19:22  *** ivog has joined #selenium
+2011-06-28T18:30:08  *** ivog has quit IRC
+2011-06-28T18:32:51  *** miker2 has quit IRC
+2011-06-28T18:47:12  *** Binken[A] has quit IRC
+2011-06-28T18:47:18  *** sjmikem has joined #selenium
+2011-06-28T19:06:32  *** stepheneb has quit IRC
+2011-06-28T19:10:40  *** baijum has joined #selenium
+2011-06-28T19:16:53  *** ner0x has joined #selenium
+2011-06-28T19:21:18  *** nirvdrum has joined #selenium
+2011-06-28T19:30:06  *** curseg has joined #selenium
+2011-06-28T19:39:49  *** antlong has left #selenium
+2011-06-28T19:53:11  *** retornam has joined #selenium
+2011-06-28T19:58:42  *** antlong has joined #selenium
+2011-06-28T20:11:01  *** brettporter has joined #selenium
+2011-06-28T20:11:01  *** brettporter has joined #selenium
+2011-06-28T20:30:34  *** trcjr has joined #selenium
+2011-06-28T21:01:43  *** retornam has quit IRC
+2011-06-28T21:03:11  *** ner0x has quit IRC
+2011-06-28T21:05:50  *** Mayank has joined #selenium
+2011-06-28T21:10:14  *** brettporter has quit IRC
+2011-06-28T21:31:39  *** Mayank1 has joined #selenium
+2011-06-28T21:35:26  *** Mayank has quit IRC
+2011-06-28T21:37:09  *** brettporter has joined #selenium
+2011-06-28T21:37:09  *** brettporter has joined #selenium
+2011-06-28T21:38:35  *** baijum has quit IRC
+2011-06-28T21:39:01  *** andytinkham has joined #selenium
+2011-06-28T21:44:59  *** nirvdrum has quit IRC
+2011-06-28T21:49:59  *** pnitin has joined #selenium
+2011-06-28T22:01:40  *** zmijunkie has quit IRC
+2011-06-28T22:04:21  *** reddeviL is now known as red^
+2011-06-28T22:10:11  *** Fyrespray has joined #selenium
+2011-06-28T22:11:33  *** adamgoucher has quit IRC
+2011-06-28T22:15:42  *** red^ is now known as reddeviL
+2011-06-28T22:18:30  *** baijum has joined #selenium
+2011-06-28T22:18:30  *** adamgoucher has joined #selenium
+2011-06-28T22:32:16  *** Mayank1 has quit IRC
+2011-06-28T22:32:56  *** Mayank has joined #selenium
+2011-06-28T22:51:16  *** brettporter has quit IRC
+2011-06-28T22:54:41  *** davehunt|away has joined #selenium
+2011-06-28T22:56:00  *** AutomatedTester has joined #selenium
+2011-06-28T22:56:15  *** cakehero has quit IRC
+2011-06-28T23:01:17  *** pnitin has quit IRC
+2011-06-28T23:01:49  *** dmachi1 has joined #selenium
+2011-06-28T23:01:49  *** dmachi has quit IRC
+2011-06-28T23:04:37  <AutomatedTester> admc: yt?
+2011-06-28T23:08:59  <baijum> AutomatedTester: Hi, any progress on Python API patch ?
+2011-06-28T23:09:11  <AutomatedTester> baijum: on what?
+2011-06-28T23:10:25  <baijum> there was a patch I modified and submitted to create API site: http://code.google.com/p/selenium/issues/detail?id=1651
+2011-06-28T23:10:44  <baijum> out will be something like this: http://184.106.69.139:9999/
+2011-06-28T23:11:18  <baijum> You mentioned that you upload it to packages.python.org/selenium
+2011-06-28T23:11:28  <AutomatedTester> baijum: i am travelling at the moment so working on things my team need
+2011-06-28T23:11:46  <AutomatedTester> later in the week I will be at home and look at it
+2011-06-28T23:12:40  <baijum> AutomatedTester: that's fine :) sorry to bother you.
+2011-06-28T23:12:52  <AutomatedTester> its cool, chase me for it on Friday
+2011-06-28T23:13:22  <AutomatedTester> I spent today working through #1854
+2011-06-28T23:13:23  <selbot2_>  open/started Selenium 2.0 RC2 gets constantly slower during test suite - http://code.google.com/p/selenium/issues/detail?id=1854
+2011-06-28T23:14:33  *** andialbrecht_ is now known as andialbrecht
+2011-06-28T23:14:41  <baijum> wow. that's a challenging issue..
+2011-06-28T23:15:35  <AutomatedTester> the fix doesnt make it look like its challenging
+2011-06-28T23:15:51  <AutomatedTester> but i had to bisect ~1200 revisions
+2011-06-28T23:17:06  <baijum> ah. ok, Did you used something like git-bisect with svn ?
+2011-06-28T23:17:08  <baijum> http://kernel.org/pub/software/scm/git/docs/git-bisect.html
+2011-06-28T23:17:30  <AutomatedTester> no
+2011-06-28T23:17:33  *** Binken has joined #selenium
+2011-06-28T23:18:01  <AutomatedTester> i did a binary search
+2011-06-28T23:18:31  <AutomatedTester> since the commit it was in didnt look like it should cause the issue
+2011-06-28T23:19:04  <AutomatedTester> and that change shouldnt cause a perf issue but does
+2011-06-28T23:19:53  *** Mayank has quit IRC
+2011-06-28T23:20:14  <baijum> if Selenium can constantly monitor performance something like http://speed.pypy.org/ these kind of issues can be spotted early
+2011-06-28T23:21:40  <baijum> they developed a performance test suite which runs with every commit: http://speed.pypy.org/timeline/
+2011-06-28T23:28:20  *** amitev2 has joined #selenium
+2011-06-28T23:31:51  *** amitev has quit IRC
+2011-06-28T23:32:02  *** amitev has joined #selenium
+2011-06-28T23:33:30  *** amitev2 has quit IRC
+2011-06-28T23:38:23  *** curseg has quit IRC
+2011-06-28T23:47:30  *** Binken is now known as Binken[A]
+2011-06-28T23:47:30  * Binken[A] is now away - Reason : Auto-Away after 30 minutes
+2011-06-28T23:57:02  *** lfryc has joined #selenium
+2011-06-28T23:58:57  *** davehunt_ has joined #selenium
+2011-06-28T23:58:57  *** davehunt|away has quit IRC
+2011-06-28T23:59:35  *** davehunt|away has joined #selenium
+2011-06-28T23:59:38  *** davehunt_ has quit IRC

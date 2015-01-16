@@ -1,0 +1,300 @@
+[IRC logfile - Started Sun Mar 10 00:07:26 2013]
+[00:07:26] jschwepp has joined #selenium
+[00:10:33] jschwepp: I have a selenium test case that I'm using python bindings on and using pyvirtualdisplay to run headless.  I'm wanting to use this to download files and save them to a particular directory on my server. I use the following profile prefences and I think it should do what I want it to but files still aren't being saved. profile = webdriver.FirefoxProfile()
+[00:10:33] jschwepp: profile.set_preference("browser.download.folderList",2)
+[00:10:33] jschwepp: profile.set_preference("browser.download.manager.showWhenStarting","false")
+[00:10:33] jschwepp: profile.set_preference("browser.download.dir","/home/jks/")
+[00:10:33] jschwepp: profile.set_preference("browser.helperApps.neverAsk.saveToDisk","text/csv")
+[00:10:34] jschwepp: Any thoughts on what could be causing this?
+[00:19:08] jschwepp` has joined #selenium
+[00:22:04] jschwepp has joined #selenium
+[00:23:02] intchanter: jschwepp: This looks like a case where you'll be better off using curl or a similar library.
+[00:23:16] intchanter: Unless there's a reason beyond downloading files that you need a real browser.
+[00:28:32] jschwepp: intchanter: The link on the site is javascript which calls an asp postback which is why I'm trying to use a real browser.
+[00:29:03] intchanter: That makes sense.  Also, ew!
+[00:29:42] intchanter: Does setting those manually in about_config have the desired effect?
+[00:29:51] intchanter: Er, about:config
+[00:31:19] jschwepp: Yes, on my desktop it works fine, but I'm trying to get the scripts to work on the server so I can scrape the data and populate a postgresql database.
+[00:32:59] intchanter: I think I'd try to run it with a real display to see where it's hanging up.  Those settings may be handled correctly, but not the dialog?  There are several other possibilities, and seeing it run will probably help.
+[00:34:26] jschwepp: Hmmm... I suppose I could port forward X and get a real display.  Then I could even change about:config graphically...  Was hoping for an easier solution though.
+[00:35:20] intchanter: If someone else wakes up and checks the chat, they may be able to provide a better option.
+[00:35:47] intchanter: So far I've been the only one today.
+[00:36:03] jschwepp: Yeah, maybe I'll mess around with port forwarding and check back on Monday if I can't figure it out...
+[00:37:55] intchanter: Hopefully that'll get you to a solution.  Good luck.  :-)
+[00:38:06] jschwepp: Thanks!
+[IRC logfile - Started Sun Mar 10 01:06:57 2013]
+[01:06:57] is_null: intchanter: yes that's exactly the problem, how to know if the javascript has finished loading, excluding timer/timeouts ?
+[01:07:28] is_null: right now i found "ways", but if there's an actual function for that too it would be greate
+[01:31:02] intchanter: is_null: It's not only unsolved for Selenium.  It's unsolved in general.
+[01:31:53] intchanter: The way past is to know what the page is doing well enough to be able to create a check for whether it has finished.
+[01:32:05] intchanter: For whatever value of "finished" you need.
+[01:37:12] is_null: intchanter: when the browser "loading" icon is gone maybe ?
+[01:57:44] jschwepp: Ok, so I'm running it in X with the default profile, but every time I run it it asks me where I want to save the file even if I check the Do this automatically for files like this from now on.  Also, the save files to reverts to Downloads.  Would there be a reason that selenium is reverting to the default profile settings?
+[IRC logfile - Started Sun Mar 10 02:14:22 2013]
+[02:14:22] jschwepp: Eureka! The mime type was wrong! Even though the extension was csv for some reason they set it up with the mime type of text/plain.  Changed it to this profile.set_preference("browser.helperApps.neverAsk.saveToDisk","text/plain") and set it to sleep long enough for the file to finish downloading and we are in business!
+[02:26:37] jschwepp: Nice! Converted back to running under pyvirtualdisplay and xvfb and we are completely headless!  Awesome!  Thanks for your help intchanter! I can finally get this project rolling!
+[02:29:14] jschwepp: Allright, I think I'm going to put this down for the moment.  So glad I was able to make some progress. Good night all.
+[02:29:30] itatitat has joined #selenium
+[02:34:57] intchanter: is_null: One trick I've used is to wait for the presence of an element I know is late in the page.
+[02:35:10] intchanter: After any elements I might want to interact with.
+[02:39:21] stackedsax has joined #selenium
+[02:42:19] intchanter: Where I'm using page objects and page maps, the objects contain a wait function that checks the page map for a wait_for element.
+[02:42:39] intchanter: When that becomes present, it's sufficiently after the rest that I can be reasonably sure enough of the page is loaded to start interacting.
+[02:53:19] ryanpetrello has joined #selenium
+[IRC logfile - Started Sun Mar 10 03:20:05 2013]
+[03:20:05] ThePeach has joined #selenium
+[IRC logfile - Started Sun Mar 10 04:23:27 2013]
+[04:23:27] riotz has joined #selenium
+[IRC logfile - Started Sun Mar 10 05:14:24 2013]
+[05:14:24] SamuraiJack has joined #selenium
+[05:33:37] girija has joined #selenium
+[05:50:50] nirvdrum has joined #selenium
+[IRC logfile - Started Sun Mar 10 06:25:00 2013]
+[06:25:00] jyrkip has joined #selenium
+[06:37:51] keyword has joined #selenium
+[06:50:14] Keavon has joined #selenium
+[06:50:21] Keavon: Hi
+[06:51:23] Keavon: Using WebDriver, it seems that I can only use WebDriverWait once, and the second time it gives me a runtime exception in C#
+[06:52:23] Keavon: WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+[06:52:23] Keavon: wait.Until(d => d.FindElement(By.Id("ELEMENT_ID")));
+[06:58:23] intchanter: Keavon: What is the name of the exception?
+[06:59:39] Keavon: intchanter: "An unhandled exception of type 'System.InvalidOperationException' occurred in WebDriver.Support.dll"
+[IRC logfile - Started Sun Mar 10 07:03:09 2013]
+[07:03:09] intchanter: c# spells lambda =>.  Good to know.
+[07:03:24] intchanter: I'm still looking at docs to see what might be causing the issue.
+[07:06:50] Keavon: intchanter: this is the code, with all caps and _ parts being redacted stuff http://pastebin.com/bcCjrFUS
+[07:07:12] Keavon: (like MY_ID, MY_PASSWORD, etc.)
+[07:08:19] Keavon: Line 17 and 18 contain the first one that works, line 30 and 31 contain the second failing one
+[07:09:33] intchanter: Is "thing.operation()" equivalent to "thing .operation()" in C#?
+[07:09:43] intchanter: Or is that space significant?
+[07:10:35] Keavon: I don't think spaces matter in C#
+[07:10:42] intchanter: k
+[07:10:57] Keavon: do I have a space in my code?
+[07:12:34] intchanter: There's one in the paste.
+[07:12:41] intchanter: In the second call.
+[07:13:57] Keavon: Ah. That's not there in my code, somehow it got in the paste
+[07:16:01] Keavon: This is the exception I'm getting:
+[07:16:02] Keavon: An unhandled exception of type 'System.InvalidOperationException' occurred in WebDriver.Support.dll
+[07:16:02] Keavon: Additional information: '[JavaScript Error: "a is null" {file: "file:///C:/Users/Keavon/AppData/Local/Temp/anonymous1876805505.webdriver-profile/extensions/fxdriver@googlecode.com/components/command_processor.js" line: 7509}]' when calling method: [nsICommandProcessor::execute]
+[07:16:14] dawagner has joined #selenium
+[07:16:22] Keavon: I am using C#, not sure why it says JavaScript Error
+[07:18:17] Keavon: Is this an error in the plugin?
+[07:20:34] intchanter: Not sure.  The variable name sounds like one generated by a minifier.
+[07:22:11] Keavon: intchanter: Which variable name?
+[07:23:23] intchanter: It says "a".
+[07:23:31] Keavon: k
+[07:23:33] intchanter: Which isn't terribly descriptive.
+[07:23:36] Keavon: yeah
+[07:23:43] Keavon: I didn't make that variable
+[07:24:04] Keavon: so this is probably a bug in the firefox plugin?
+[07:24:56] intchanter: Docs seem to say that WebDriverWait should return an object of type IWait.
+[07:25:24] intchanter: And then the Until() should return an IWebElement.
+[07:25:38] intchanter: I'm not sure how much difference that makes though.
+[07:26:26] intchanter: http://selenium.googlecode.com/svn/trunk/docs/api/dotnet/index.html under OpenQA.Selenium.Support.UI, WebDriverWait.
+[07:26:34] Keavon: yeah I was confused by the docs with the difference between IWait and IWebElement
+[07:27:20] intchanter: Does it make a difference if you declare waitToLoad and waitToLoad2 to be IWait?
+[07:27:55] Keavon: That would be fine if that works. I'm sorta new to C# so I'm not sure how this all works exactly.
+[07:28:10] Keavon: What would I need to change to do this?
+[07:28:23] intchanter: 17 and 31.
+[07:28:33] intchanter: WebDriverWait becomes IWait.
+[07:29:00] Keavon: what goes in the <>?
+[07:29:05] intchanter: Maybe a new "using" to get the interface that has IWait.
+[07:29:33] intchanter: I don't see <> anywhere.
+[07:29:58] Keavon: Visual Studio's Intellicense gives <> after IWait
+[07:30:34] intchanter: It may think you're creating a new command.  Leave it blank?
+[07:31:09] intchanter: My experience with IDEs so far indicates that most tend to get in the way as much as they help.
+[07:31:38] intchanter: And attempt to force a particular order of typing that may or may not be optimal.
+[07:32:10] intchanter: IWait should already be loaded, btw.  It's in the UI namespace that you've already specified.
+[07:34:18] SamuraiJack has joined #selenium
+[07:35:07] Keavon: Changing WebDriverWait to IWait so it looks like this: IWait waitToLoad = new IWait(driver, TimeSpan.FromSeconds(60));
+[07:35:33] Keavon: causes everything after the = to be wrong, and the line below it's "Until" to be wrong
+[07:39:58] Keavon: actually let's start from using the C# example from the docs:
+[07:40:04] Keavon: IWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3))
+[07:40:05] Keavon: IWebElement element = wait.Until(driver => driver.FindElement(By.Name("q")));
+[07:40:15] Keavon: but that gives me errors
+[07:40:51] Keavon: Cannot implicitly convert type 'OpenQA.Selenium.Support.UI.WebDriverWait' to 'Selenium.IWait'	D:\Users\Keavon\Desktop\Projects\Programming\C#\Projects\Selenium\Selenium\Bing.cs	26	16	Selenium
+[07:41:08] intchanter: Interesting.
+[07:41:42] Keavon: also
+[07:41:53] intchanter: Looks like the docs may be wrong then?
+[07:41:55] Keavon: A local variable named 'driver' cannot be declared in this scope because it would give a different meaning to 'driver', which is already used in a 'parent or current' scope to denote something else
+[07:42:02] Keavon: yeah, probably
+[07:42:09] Keavon: the docs also forgot a semicolin
+[07:42:21] intchanter: This may require the expertise of someone who uses the C# bindings.
+[07:42:35] intchanter: Maybe check in tomorrow or Monday?
+[07:42:44] Keavon: I guess
+[07:42:47] Keavon: http://docs.seleniumhq.org/docs/03_webdriver.jsp
+[07:42:59] intchanter: Or on the selenium-users mailing list.
+[07:43:03] Keavon: I've been using that page's example
+[07:43:23] Keavon: it shows the wait thing in the example to search for "cheese"
+[07:44:17] dawagner has joined #selenium
+[07:44:41] intchanter: They have "(d)" where you have "d".  That grouping may be optional, but it stands out to me.
+[07:45:22] intchanter: And {} around the body of the lambda.
+[07:45:53] Keavon: sorry, what's a lambda in C#?
+[07:46:02] Keavon: Like I said, I'm pretty new to C#
+[07:46:32] intchanter: It's the part you have as:
+[07:46:40] intchanter: d => d.Until(...)
+[07:46:54] intchanter: Er, not quite that, but it's the right form.
+[07:47:19] intchanter: d => d.FindElement(...)
+[07:47:22] intchanter: That's the one.
+[07:47:24] intchanter: The docs show:
+[07:47:39] intchanter: (d) => { d.FindElement(...) }
+[07:48:00] Keavon: yeah
+[07:48:02] Keavon: I see the differences
+[07:48:08] Keavon: I'm working on fixing them
+[07:48:25] Keavon: But how do you make:
+[07:48:25] Keavon: waitToLoad.Until((d) => { return d.Title.ToLower().StartsWith("cheese"); });
+[07:48:35] Keavon: look for an ID intead of-- oh wait
+[07:48:37] Keavon: I know
+[07:48:39] Keavon: nevermind
+[07:49:28] intchanter: Yeah, the stuff you have where I wrote ... should be correct, I think.
+[07:51:10] intchanter: I also don't know if the "return" keyword will be necessary, but it doesn't look like it'll hurt.
+[07:51:49] Keavon_ has joined #selenium
+[07:52:07] intchanter: What's the last you saw?
+[07:52:21] Keavon_: what do you mean?
+[07:52:45] intchanter: You just reconnected.  I wanted to make sure you didn't miss anything.
+[07:54:12] intchanter: Did you get my mentions of "..." and "return"?
+[07:54:25] intchanter: Right after your "nevermind"?
+[07:55:34] dawagner has joined #selenium
+[07:56:32] dawagner has joined #selenium
+[07:56:44] Keavon_: http://pastebin.com/4kmQXV5u
+[07:56:48] Keavon_: That's the new code
+[07:58:02] intchanter: Those changes pass my visual inspection.  Does it run?
+[07:58:27] Keavon_: yes, but gives the same exception about variable a
+[07:58:50] intchanter: And only the second time?
+[07:58:51] Keavon_: An unhandled exception of type 'System.InvalidOperationException' occurred in WebDriver.dll
+[07:58:51] Keavon_: Additional information: '[JavaScript Error: "a is null" {file: "file:///C:/Users/Keavon/AppData/Local/Temp/anonymous982006710.webdriver-profile/extensions/fxdriver@googlecode.com/components/command_processor.js" line: 7509}]' when calling method: [nsICommandProcessor::execute]
+[07:59:28] intchanter: What if you reuse waitToLoad for the second one on line 33?
+[07:59:46] intchanter: If that works, you can remove the current 32.
+[07:59:47] Keavon_: Yep. It breaks at the line saying IWebElement loginButton = driver.FindElement(By.Id("MY_ID_3"));
+[IRC logfile - Started Sun Mar 10 08:00:26 2013]
+[08:00:26] intchanter: Whoa, that's not what I thought we were debugging.
+[08:00:32] intchanter: I thought it was getting to 33.
+[08:00:50] dawagner has joined #selenium
+[08:01:22] Keavon_: oh wait
+[08:01:23] Keavon_: hmm
+[08:01:31] intchanter: That sounds more like the page may not be loaded yet.  To test, try a longer ms count in the preceding Thread.Sleep().
+[08:01:40] intchanter: Maybe 5000.
+[08:02:12] Keavon_: yeah
+[08:02:16] Keavon_: it dies at line 29
+[08:02:25] Keavon_: sorry for that oversight
+[08:03:08] intchanter: If the increased wait time helps, then you may need another wait like you have on 18 and 33.
+[08:03:43] intchanter: And my gut says that you should be able to reuse the same WebDriverWait object for each as long as the timeout is the same.
+[08:04:01] Keavon_: Ah, so it still gave the exception, but it got time to load the page
+[08:04:22] intchanter: Check the ID then.
+[08:04:33] intchanter: Make sure it's spelled the same in the page.
+[08:05:36] Keavon_: hmm
+[08:05:40] Keavon_: it is spelled correctly.
+[08:05:43] Keavon_: that's odd
+[08:07:12] intchanter: Even down to letter cases?
+[08:07:35] Keavon_: yes
+[08:08:37] intchanter: What is loginPassword.Submit() doing?  Isn't that a password field?
+[08:09:08] intchanter: Is it taking us to a different page to click loginButton.Submit() ?
+[08:09:29] Keavon_: loginButton is different
+[08:09:33] Keavon_: it's not realted
+[08:09:44] Keavon_: I realized I had some more things mixed up too
+[08:09:50] Keavon_: let me post another code sample
+[08:11:37] keyword has left #selenium
+[08:12:41] Keavon_: http://pastebin.com/n56pTkrC
+[08:13:18] Keavon_: err--- I have to go right now-- dang it.
+[08:14:12] testingb0t has joined #selenium
+[08:14:21] intchanter: Alright.  I should probably sleep anyway.
+[08:14:26] Keavon_: yeah
+[08:14:35] Keavon_: did you see any problems with the code real quick?
+[08:15:05] intchanter: Just an optimization.  I think waitToLoad.Until() may return the element if it finds it.
+[08:15:32] intchanter: So you might be able to store that instead of calling FindElement again.
+[08:15:36] Keavon_: it dies on line 35
+[08:16:29] intchanter: Tomorrow, try changing the ID to one you know /doesn't/ appear on the page for comparison.
+[08:16:37] intchanter: That's my best suggestion atm.
+[08:16:51] intchanter: Tell your SO that I'm sorry for keeping you so long.  :-)
+[08:16:51] Keavon_: Okay. Thank you for your help this past hour!
+[08:17:16] intchanter: My pleasure!
+[08:17:41] Keavon_: Bye! :)
+[IRC logfile - Started Sun Mar 10 09:01:59 2013]
+[09:01:59] SamuraiJack_ has joined #selenium
+[09:04:22] alkemist has joined #selenium
+[09:14:04] girija has joined #selenium
+[09:41:07] barancev has joined #selenium
+[09:42:20] Selenium-Git has joined #selenium
+[09:42:20] Selenium-Git: 01[13selenium01] 15selenium-ci 04deleted 06jruby-update at 14ecb6aa3: 02http://git.io/tqbnfQ
+[09:42:20] Selenium-Git has left #selenium
+[IRC logfile - Started Sun Mar 10 10:03:16 2013]
+[10:03:16] alkemist has joined #selenium
+[10:32:22] jibay has joined #selenium
+[10:50:30] stackedsax has joined #selenium
+[IRC logfile - Started Sun Mar 10 11:07:44 2013]
+[11:07:44] jezuz has joined #selenium
+[11:11:49] sahazel has joined #selenium
+[11:12:16] samphippen has joined #selenium
+[11:40:11] admc has joined #selenium
+[11:55:28] samphippen has joined #selenium
+[IRC logfile - Started Sun Mar 10 12:54:09 2013]
+[12:54:09] samphippen has joined #selenium
+[IRC logfile - Started Sun Mar 10 13:24:47 2013]
+[13:24:47] stackedsax has joined #selenium
+[13:33:06] phishy has joined #selenium
+[13:48:01] girija has joined #selenium
+[13:48:05] mreedell has joined #selenium
+[IRC logfile - Started Sun Mar 10 14:57:05 2013]
+[14:57:05] alkemist has joined #selenium
+[IRC logfile - Started Sun Mar 10 15:12:10 2013]
+[15:12:10] phishy has joined #selenium
+[IRC logfile - Started Sun Mar 10 16:13:16 2013]
+[16:13:16] stackedsax has joined #selenium
+[16:13:22] Selenium-Git has joined #selenium
+[16:13:22] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/2kDGTw
+[16:13:22] Selenium-Git: 13selenium/06master 1427b1e31 15Jason Leyba: Push a new prebuilt SafariDriver. Also pre-emptively bumping the version in Info.plist to 2.32.0
+[16:13:22] Selenium-Git has left #selenium
+[16:14:35] testingb0t has joined #selenium
+[16:31:37] samphippen has joined #selenium
+[16:37:14] stackedsax has joined #selenium
+[16:44:14] nirvdrum has joined #selenium
+[16:48:32] SamuraiJack__ has joined #selenium
+[16:50:38] barancev: wtf with cookie tests? they are broken
+[16:51:06] barancev: looks like an environment change
+[IRC logfile - Started Sun Mar 10 17:01:25 2013]
+[17:01:25] smccarthy has joined #selenium
+[17:05:32] stackedsax has joined #selenium
+[17:07:26] detroniz_ has joined #selenium
+[17:17:31] markalanevans has joined #selenium
+[17:22:30] freynaud has joined #selenium
+[17:32:09] itatitat has joined #selenium
+[17:41:09] detroniz_: AutomatedTester: hey Dude!
+[17:48:11] admc has joined #selenium
+[17:56:56] Swadq has joined #selenium
+[IRC logfile - Started Sun Mar 10 18:02:20 2013]
+[18:02:20] fatguylaughing has joined #selenium
+[18:32:53] barancev: :apidocs
+[18:32:54] selbot2: .NET: http://goo.gl/lvxok | Java: http://goo.gl/Wvl4G | Ruby: http://goo.gl/ue5sM | Python: http://goo.gl/TCHQa
+[18:47:47] admc has joined #selenium
+[18:54:52] icio has joined #selenium
+[18:56:43] phishy has joined #selenium
+[IRC logfile - Started Sun Mar 10 20:01:28 2013]
+[20:01:28] tmrhmd has joined #selenium
+[20:18:17] nirvdrum has joined #selenium
+[20:24:25] Selenium-Git has joined #selenium
+[20:24:25] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/zxuPVA
+[20:24:25] Selenium-Git: 13selenium/06master 14d6d2178 15Jason Leyba: Update to the latest version of the Closure compiler. This required a few around changes to account for new checks enforced by the compiler (mostly the syntax of type casts).
+[20:24:25] Selenium-Git has left #selenium
+[20:31:18] Selenium-Git has joined #selenium
+[20:31:18] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 1 new commit to 06master: 02http://git.io/D-KU8A
+[20:31:18] Selenium-Git: 13selenium/06master 141d2da7a 15Alexei Barantsev: Implementing formatters for isAlertPresent and isConfirmationPresent...
+[20:31:18] Selenium-Git has left #selenium
+[20:52:10] testingb0t has joined #selenium
+[20:52:16] admc has joined #selenium
+[20:54:18] Selenium-Git has joined #selenium
+[20:54:18] Selenium-Git: 01[13selenium01] 15selenium-ci pushed 3 new commits to 06master: 02http://git.io/-MjnBg
+[20:54:18] Selenium-Git: 13selenium/06master 141000fe9 15Jason Leyba: For Promises/A+ compatibility, allow rejection reasons to be any value.
+[20:54:18] Selenium-Git: 13selenium/06master 1471da20b 15Jason Leyba: Rename resolve(d) -> fulfill(ed). Deprecated resolve will be deleted in 2.34.0
+[20:54:18] Selenium-Git: 13selenium/06master 1489f1e91 15Jason Leyba: The new Closure compiler allows you collapse @type and @private...
+[20:54:18] Selenium-Git has left #selenium
+[IRC logfile - Started Sun Mar 10 21:58:36 2013]
+[21:58:36] itatitat has joined #selenium
+[21:59:19] Swadq has joined #selenium
+[IRC logfile - Started Sun Mar 10 22:06:47 2013]
+[22:06:47] phishy has joined #selenium
+[22:23:09] samphippen has joined #selenium
+[22:24:47] detroniz_ has joined #selenium
+[IRC logfile - Started Sun Mar 10 23:24:38 2013]
+[23:24:38] mreedell has joined #selenium
+[23:48:12] nirvdrum has joined #selenium
+[23:50:04] bogus_ has joined #selenium
