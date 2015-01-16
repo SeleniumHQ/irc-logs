@@ -1,3 +1,3 @@
 git add */*/*
-git commit --amend
+git commit --amend --no-edit
 git push --force
