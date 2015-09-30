@@ -1,0 +1,764 @@
+[2015-08-18 00:00:17] HowardwLo: is there a easy way to catch browser basic auth for a proxy? I can’t seem to grab the “element” and insert my login
+[2015-08-18 00:02:43] pauluchon, joining. (#selenium)
+[2015-08-18 00:02:50] pauluchon: hi guys
+[2015-08-18 00:04:35] michl68, joining. (#selenium)
+[2015-08-18 00:08:47] binita: hello everyone
+[2015-08-18 00:09:45] binita: Can we use selenium to automate test cases that interact with maps ?
+[2015-08-18 00:14:13] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 00:16:23] ulmi, joining. (#selenium)
+[2015-08-18 00:25:55] fullstack: binita, probably
+[2015-08-18 00:26:03] Rollup, joining. (#selenium)
+[2015-08-18 00:27:06] pmichelberger, joining. (#selenium)
+[2015-08-18 00:30:16] Steve, joining. (#selenium)
+[2015-08-18 00:31:18] Testware, quitting. (Quit: EliteBNC free bnc service - http://elitebnc.org - be a part of the Elite!)
+[2015-08-18 00:37:10] swampdragons, quitting. (Quit: Leaving.)
+[2015-08-18 00:41:56] swampdragons, joining. (#selenium)
+[2015-08-18 00:45:45] Testware, joining. (#selenium)
+[2015-08-18 00:45:53] MrCoder, joining. (#selenium)
+[2015-08-18 00:50:39] bimmelino, joining. (#selenium)
+[2015-08-18 00:52:28] davehunt, joining. (#selenium)
+[2015-08-18 00:54:52] Matthi, joining. (#selenium)
+[2015-08-18 00:55:53] HowardwLo: anyone here that can help?
+[2015-08-18 00:55:57] pmichelberger, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 00:55:59] dubner, joining. (#selenium)
+[2015-08-18 00:56:01] HowardwLo: i’m really lost with proxy basic auth
+[2015-08-18 00:56:11] HowardwLo: i’ve googled around and couldn’t find a workable solution
+[2015-08-18 00:56:27] HowardwLo: most of hte answers on stackoverflow seems to be guesses
+[2015-08-18 00:56:32] HowardwLo: could really use some assistance
+[2015-08-18 00:57:37] HowardwLo: i want to basic auth into a proxy with selenium, but i can’t figure out hwo to setup the driver. I currently use Proxy() to setup the ip and ports, but i don’t see a place to put in my login and password
+[2015-08-18 00:57:59] HowardwLo: the old username:password@host trick doesn’t work when i put it in driver.get
+[2015-08-18 01:00:22] dubner, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 01:05:12] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 01:08:23] Rollup, joining. (#selenium)
+[2015-08-18 01:08:30] dubner, joining. (#selenium)
+[2015-08-18 01:09:05] HowardwLo: http://watirmelon.com/2012/06/27/automatic-firefox-authentication-when-using-selenium-webdriver-with-autoauth/ here’s a good description of my problem, but i don’t want to use watir-webdriver...
+[2015-08-18 01:17:03] swampdragons, quitting. (Quit: Leaving.)
+[2015-08-18 01:23:10] pauluchon: How do you get Firefox driver logs ? I tried to add the -Dwebdriver.log.file and the -Dwebdriver.firefox.logFile options to my node but I can't see any file created..
+[2015-08-18 01:26:44] eteixeira, joining. (#selenium)
+[2015-08-18 01:29:29] HowardwLo: gah. the proxy basic auth appears when i do a driver.get, but the code doesn’t move past driver.get for me to catch the alert
+[2015-08-18 01:29:45] HowardwLo: i think its wiating for the .get to complete, but it’s hung up at .get becuase of the auth
+[2015-08-18 01:29:49] HowardwLo: and i can’t auth without the get? ...
+[2015-08-18 01:35:02] huggie: HowardwLo: I got around basic auth following the principle in the second answer here: http://stackoverflow.com/questions/11522434/how-to-handle-login-pop-up-window-using-selenium-webdriver
+[2015-08-18 01:35:27] huggie: HowardwLo: i.e. create a separate thread that you run just before the click (or in your case the get) that waits then pastes the password in.
+[2015-08-18 01:36:07] huggie: HowardwLo: Though actually if yours is on the first get you might get away with getting: http://username:password@example.com instead of just http://example.com
+[2015-08-18 01:36:51] HowardwLo: huggie: when i use http://username:password@example.com, it just kind of skips it...
+[2015-08-18 01:37:59] huggie: HowardwLo: skips how?  You get through and get the resource you want?
+[2015-08-18 01:39:08] HowardwLo: huggie: ok i noticed when i tried it, it was http://username:password@http://example.com…. that extra http:// was there by accdient.
+[2015-08-18 01:39:16] HowardwLo: and it just goes to resource without any errors
+[2015-08-18 01:39:23] HowardwLo: but when i open a new tab, and check the ip, it’s not the proxy
+[2015-08-18 01:39:28] HowardwLo: let me try without the extra http
+[2015-08-18 01:40:32] Nizumzen, quitting. (Quit: KVIrc 4.2.0 Equilibrium http://www.kvirc.net/)
+[2015-08-18 01:41:34] HowardwLo: huggie: ok, just tried it, i still get the auth prompt
+[2015-08-18 01:41:50] huggie: So you might need the robot technique on that page.
+[2015-08-18 01:42:53] HowardwLo: whats that?
+[2015-08-18 01:44:16] HowardwLo: huggie: robot technique? :)
+[2015-08-18 01:44:22] sgsabbage, leaving. ("Linkinus - http://linkinus.com")
+[2015-08-18 01:46:41] rananda, quitting. (Remote host closed the connection)
+[2015-08-18 01:47:02] rananda, joining. (#selenium)
+[2015-08-18 01:47:25] HowardwLo: huggie: oh, the 2nd soluution
+[2015-08-18 01:49:28] Neo--, joining. (#selenium)
+[2015-08-18 01:56:40] Testware, quitting. (Quit: EliteBNC free bnc service - http://elitebnc.org - be a part of the Elite!)
+[2015-08-18 02:00:28] Machinista, joining. (#selenium)
+[2015-08-18 02:04:21] Testware, joining. (#selenium)
+[2015-08-18 02:21:46] mankoe, joining. (#selenium)
+[2015-08-18 02:23:23] Testware, quitting. (Quit: EliteBNC free bnc service - http://elitebnc.org - be a part of the Elite!)
+[2015-08-18 02:24:54] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 02:26:26] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 02:26:27] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 02:26:27] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 02:26:27] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 02:29:23] Testware, joining. (#selenium)
+[2015-08-18 02:50:12] Ice, joining. (#selenium)
+[2015-08-18 02:50:16] Ice, changing nick to Iceg.
+[2015-08-18 02:50:21] Iceg: hi all
+[2015-08-18 02:53:15] pauluchon: Hi
+[2015-08-18 02:55:48] bakhtiyor, joining. (#selenium)
+[2015-08-18 02:56:32] bakhtiyor: hi everyone
+[2015-08-18 02:57:15] Iceg: I have a little question if anyone out here can help me ... I have successfully installed selenium rc and with this command :
+[2015-08-18 02:57:22] Iceg: (hi bakhtiyor)
+[2015-08-18 02:57:33] Iceg:  export DISPLAY=:0;java -jar /home/basic/Downloads/selenium-server-standalone-2.47.1.jar -htmlSuite"*firefox" "http://10.0.3.13" "/home/jenkins/selenium/test/suite.html""/home/jenkins/selenium/output/firefox-results.html" -log=/tmp/selenium.log -debug=true
+[2015-08-18 02:57:45] Iceg: It will run the suite.html in display 0 I wanted to try Selenium Grid and it's working (grid works / nodes are registered to the hub)... I understand we should write some java code where you set the requirements or where you want to test your application and it will look at selenium grid nodes if something match the config. wanted. My problem is : It is possible to just run in 1 command line my test in selenium grid ? (set in command
+[2015-08-18 02:58:02] Iceg: (sorry for typo mistakes..)
+[2015-08-18 02:58:38] Iceg: *or set the node ip etc...)
+[2015-08-18 02:59:12] spline, joining. (#selenium)
+[2015-08-18 03:01:00] spline: Hi, is there a way with selenium to extract info sent back when a post request is made? Using a calc on Amazon, the returned data is nowhere in the source but I see it returned from a post request (protected by cookies+session key, so I can't automate it outside). I searched source but none of the data is there
+[2015-08-18 03:01:12] CTtpollard, quitting. (Remote host closed the connection)
+[2015-08-18 03:03:34] Iceg: hi spline, when you launch your selenium tests you want to get the post information somewhere everytime a post request is made?
+[2015-08-18 03:04:09] CTtpollard, joining. (#selenium)
+[2015-08-18 03:05:36] p_l: crg: /27
+[2015-08-18 03:05:45] p_l: aaargh
+[2015-08-18 03:06:00] Testware, quitting. (Read error: Connection reset by peer)
+[2015-08-18 03:06:55] spline: Iceg: well, the information comes back on the page. I just don't see it anywhere in the source
+[2015-08-18 03:07:50] spline: im used to regular scraping where when I need to use selenium (can tell amazon does not want this automated), ill just page_source and grab what I need from there. This is the first time I've seen something w/o it. The page looks normal (html/css) but the text values when you post are not in it. I used inspector and saw that they're coming in via a post->json
+[2015-08-18 03:08:02] spline: so maybe I can grab another way?
+[2015-08-18 03:08:55] spline: Iceg: http://i.imgur.com/Id3RUcp.png <- view of the page. under the "Amazon Fulfillment", the text values returned are not in the actual html (as if it were blank). Must be using JS/CSS to hide or display differently?
+[2015-08-18 03:10:41] Iceg: hm, sorry can't help you much on this ;o
+[2015-08-18 03:12:01] spline: just doing scraping for so long, selenium helping a bit for pages like this, I can usually tell when someone doesn't want scraping done
+[2015-08-18 03:12:05] spline: and this is definitely up there
+[2015-08-18 03:13:34] Testware, joining. (#selenium)
+[2015-08-18 03:15:14] Testware, quitting. (Client Quit)
+[2015-08-18 03:15:52] spline: can you grab visible text from the page? not page_source
+[2015-08-18 03:22:18] Iceg: I don't see how selenium can grab the text if he isn't in the source page... maybe isn't the best way but some ajax call with live js function will do the trick
+[2015-08-18 03:25:12] spline: checking if copy/paste works. im doing it headless right now but can fire up it on my linux box
+[2015-08-18 03:25:33] spline: is there a way to have copied text, via selenium, be inserted into a string within python?
+[2015-08-18 03:26:24] spline: like a call into selenium to grab the text in the pasteboard? or does that have to do with the os/environment?
+[2015-08-18 03:26:55] Testware, joining. (#selenium)
+[2015-08-18 03:34:52] Iceg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 03:35:25] Testware, quitting. (Quit: EliteBNC free bnc service - http://elitebnc.org - be a part of the Elite!)
+[2015-08-18 03:40:05] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 03:40:09] rorycb, joining. (#selenium)
+[2015-08-18 03:44:39] rorycb, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 03:45:56] btulchinsky, quitting. (Remote host closed the connection)
+[2015-08-18 03:46:43] bakhtiyor: i've issue for running protractor e2e tests on docker with selenium
+[2015-08-18 03:46:50] bakhtiyor: https://gist.github.com/hbakhtiyor/31a342c11a6185abff8d
+[2015-08-18 03:48:47] bakhtiyor: Using the selenium server at selenium:4444/wd/hub
+[2015-08-18 03:48:48] bakhtiyor: [launcher] Running 1 instances of WebDriver
+[2015-08-18 03:48:48] bakhtiyor: ERROR - Unable to start a WebDriver session.
+[2015-08-18 03:48:52] WhereIsMySpoon: spline: selenium will not support that
+[2015-08-18 03:49:05] Neo--, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2015-08-18 03:49:12] bakhtiyor: any suggestions?
+[2015-08-18 03:49:49] WhereIsMySpoon: spline: you'll need to find some other programmatical way to manipulate the clipboard
+[2015-08-18 03:56:55] Testware, joining. (#selenium)
+[2015-08-18 03:57:25] davehunt, quitting. (Quit: Leaving...)
+[2015-08-18 04:01:35] rplevka: spline: can't you simply grab the json? It obviously contains the data you're after
+[2015-08-18 04:08:56] Rollup, joining. (#selenium)
+[2015-08-18 04:10:14] pmichelberger, joining. (#selenium)
+[2015-08-18 04:13:02] errant_rider, joining. (#selenium)
+[2015-08-18 04:30:40] zeljkof, changing nick to zeljkof-lunch.
+[2015-08-18 04:38:56] kutenai, quitting. (Ping timeout: 252 seconds)
+[2015-08-18 04:39:21] sahazel, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 04:39:55] mkaufman, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 04:44:00] bakhtiyor, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 04:48:51] bakhtiyor, joining. (#selenium)
+[2015-08-18 04:54:04] bakhtiyor: ?
+[2015-08-18 04:54:31] rorycb, joining. (#selenium)
+[2015-08-18 04:56:11] gabel, joining. (#selenium)
+[2015-08-18 05:09:28] bakhtiyor, quitting. (Ping timeout: 264 seconds)
+[2015-08-18 05:11:47] mankoe, quitting. (Remote host closed the connection)
+[2015-08-18 05:13:18] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 05:14:05] bakhtiyor, joining. (#selenium)
+[2015-08-18 05:14:39] ss_much, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 05:16:34] ss_much, joining. (#selenium)
+[2015-08-18 05:17:03] moo-_-, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 05:17:45] Iceg, joining. (#selenium)
+[2015-08-18 05:18:16] moo-_-, joining. (#selenium)
+[2015-08-18 05:23:32] trentp, joining. (#selenium)
+[2015-08-18 05:24:45] Rollup, joining. (#selenium)
+[2015-08-18 05:28:14] sahazel, joining. (#selenium)
+[2015-08-18 05:31:51] dimacus, joining. (#selenium)
+[2015-08-18 05:34:25] nirvdrum, joining. (#selenium)
+[2015-08-18 05:35:23] WE1LS, joining. (#selenium)
+[2015-08-18 05:39:30] knownasilya, joining. (#selenium)
+[2015-08-18 05:41:03] Nizumzen, joining. (#selenium)
+[2015-08-18 05:41:39] davehunt, joining. (#selenium)
+[2015-08-18 05:42:11] rananda, quitting. (Quit: Leaving)
+[2015-08-18 05:46:49] bakhtiyor, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 05:47:51] WhereIsMySpoon, quitting. (Quit: http://www.kiwiirc.com/ - A hand crafted IRC client)
+[2015-08-18 05:49:05] sahazel, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 05:49:11] bakhtiyor, joining. (#selenium)
+[2015-08-18 05:51:41] Neo--, joining. (#selenium)
+[2015-08-18 05:57:20] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 05:57:52] dimacus: someone remind me, SO_TIMEOUT in the grid is due to page loading too long?
+[2015-08-18 05:58:08] Rollup, joining. (#selenium)
+[2015-08-18 06:02:30] Rollup, quitting. (Client Quit)
+[2015-08-18 06:04:57] sircapsalot, joining. (#selenium)
+[2015-08-18 06:05:04] rplevka, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 06:05:21] rplevka, joining. (#selenium)
+[2015-08-18 06:17:03] pauluchon: dimacus: https://github.com/SeleniumHQ/selenium/wiki/Grid2#hub-diagnostic-messages
+[2015-08-18 06:18:04] bakhtiyor: does the docker selenium/standalone-chrome:2.46.0 images work with lxc driver?
+[2015-08-18 06:18:30] bakhtiyor: because i got lxc-start: The container failed to start.
+[2015-08-18 06:18:30] bakhtiyor: lxc-start: Additional information can be obtained by setting the --logfile and --logpriority options.
+[2015-08-18 06:31:07] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 06:31:40] bakhtiyor, quitting. (Ping timeout: 264 seconds)
+[2015-08-18 06:32:41] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 06:32:42] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 06:32:42] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 06:32:42] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 06:33:16] jimevans, joining. (#selenium)
+[2015-08-18 06:33:59] mcrmfc, joining. (#selenium)
+[2015-08-18 06:36:15] bakhtiyor, joining. (#selenium)
+[2015-08-18 06:36:43] sahazel, joining. (#selenium)
+[2015-08-18 06:38:22] MrCoder, quitting. (Remote host closed the connection)
+[2015-08-18 06:47:37] tony2, joining. (#selenium)
+[2015-08-18 06:48:16] tony2, quitting. (Client Quit)
+[2015-08-18 06:48:31] tony2, joining. (#selenium)
+[2015-08-18 06:49:29] Mozart_, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 06:50:25] Dave_B_, joining. (#selenium)
+[2015-08-18 07:02:10] ato, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 07:02:37] ato, joining. (#selenium)
+[2015-08-18 07:05:33] moo-_-, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 07:06:17] AnConio, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 07:14:39] bakhtiyor, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 07:15:42] mkaufman, joining. (#selenium)
+[2015-08-18 07:17:23] bakhtiyor, joining. (#selenium)
+[2015-08-18 07:17:48] kutenai, joining. (#selenium)
+[2015-08-18 07:18:04] eteixeira_, joining. (#selenium)
+[2015-08-18 07:18:49] warfront1, joining. (#selenium)
+[2015-08-18 07:19:33] SitamJana, quitting. (Quit: SitamJana)
+[2015-08-18 07:19:57] moo-_-, joining. (#selenium)
+[2015-08-18 07:21:00] eteixeira, quitting. (Ping timeout: 252 seconds)
+[2015-08-18 07:22:37] pmichelberger, quitting. (Quit: Page closed)
+[2015-08-18 07:23:58] warfront1, quitting. (Read error: Connection reset by peer)
+[2015-08-18 07:24:17] warfront1, joining. (#selenium)
+[2015-08-18 07:24:18] bbarke, quitting. (Read error: No route to host)
+[2015-08-18 07:24:30] bbarke, joining. (#selenium)
+[2015-08-18 07:24:53] fatguylaughing, joining. (#selenium)
+[2015-08-18 07:30:12] auto_sam, joining. (#selenium)
+[2015-08-18 07:33:24] bakhtiyor, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 07:38:04] tourdedave: Did GoogleCode shutter without offering an option to 301 to a new destination?
+[2015-08-18 07:38:16] bakhtiyor, joining. (#selenium)
+[2015-08-18 07:38:38] tourdedave: Or is there a way for us to add that?
+[2015-08-18 07:38:56] pmichelberger, joining. (#selenium)
+[2015-08-18 07:39:25] tourdedave: Or rather, will GoogleCode shutter without a way to 301 to a new destination?
+[2015-08-18 07:39:41] tourdedave: https://twitter.com/shufgy/status/633629048107831296
+[2015-08-18 07:41:05] pmichelberger: Hi, I try to use a selenium grid with docker containers on different EC2 hosts. I make use of an ambassador container (see stackoverflow). But unfortunately the linking fails: "Not linked with a running Hub container"  My setup is described here http://stackoverflow.com/questions/32074836/sel...
+[2015-08-18 07:41:50] pmichelberger, quitting. (Client Quit)
+[2015-08-18 07:42:45] HowardwLo, quitting. (Quit: HowardwLo)
+[2015-08-18 07:45:00] perfectsine, joining. (#selenium)
+[2015-08-18 07:45:22] errant_rider, quitting. (Quit: Leaving.)
+[2015-08-18 07:46:38] pauluchon: Just a little thing, the link for native events on Linux here : https://github.com/SeleniumHQ/selenium/wiki/Advanced-User-Interactions#native-events-versus-synthetic-events is wrong..
+[2015-08-18 07:46:40] AutomatedTester: tourdedave: good question for the dev mailing list
+[2015-08-18 07:46:53] tourdedave: Cool, I'll kick it over there
+[2015-08-18 07:50:35] dubner_, joining. (#selenium)
+[2015-08-18 07:50:42] dude-x, joining. (#selenium)
+[2015-08-18 07:50:55] dude-x_, joining. (#selenium)
+[2015-08-18 07:53:40] zeljkof-lunch, changing nick to zeljkof.
+[2015-08-18 07:55:56] dimacus, quitting. (Quit: Leaving.)
+[2015-08-18 07:56:15] bakhtiyor: pmichelberger: hi
+[2015-08-18 07:57:35] Machinista, quitting. (Quit: Cheerio)
+[2015-08-18 07:58:30] felixn_, joining. (#selenium)
+[2015-08-18 07:59:33] bakhtiyor, quitting. (Remote host closed the connection)
+[2015-08-18 07:59:45] mcrmfc, quitting. (*.net *.split)
+[2015-08-18 07:59:45] WhereIsMySpoon, quitting. (*.net *.split)
+[2015-08-18 07:59:45] dubner, quitting. (*.net *.split)
+[2015-08-18 07:59:45] djinni, quitting. (*.net *.split)
+[2015-08-18 07:59:45] ghormoon, quitting. (*.net *.split)
+[2015-08-18 07:59:46] dude-x__, quitting. (*.net *.split)
+[2015-08-18 07:59:46] bbarke, quitting. (*.net *.split)
+[2015-08-18 07:59:46] bassface, quitting. (*.net *.split)
+[2015-08-18 07:59:46] felixn, quitting. (*.net *.split)
+[2015-08-18 08:03:01] pauluchon, quitting. (Quit: ChatZilla 0.9.92 [Firefox 40.0/20150807085045])
+[2015-08-18 08:03:49] eplteixeira, joining. (#selenium)
+[2015-08-18 08:04:39] dimacus, joining. (#selenium)
+[2015-08-18 08:05:14] djinni, joining. (#selenium)
+[2015-08-18 08:05:37] ghormoon, joining. (#selenium)
+[2015-08-18 08:06:56] eteixeira_, quitting. (Ping timeout: 255 seconds)
+[2015-08-18 08:07:03] Steve, quitting. (Killed (wilhelm.freenode.net (Nickname regained by services)))
+[2015-08-18 08:07:28] bbarke, joining. (#selenium)
+[2015-08-18 08:12:22] errant_rider, joining. (#selenium)
+[2015-08-18 08:13:32] kggr, quitting. (Remote host closed the connection)
+[2015-08-18 08:16:52] swampdragons, joining. (#selenium)
+[2015-08-18 08:17:49] kggr, joining. (#selenium)
+[2015-08-18 08:19:05] yenaemj, joining. (#selenium)
+[2015-08-18 08:20:39] swampdragons, quitting. (Client Quit)
+[2015-08-18 08:22:09] Matthi, quitting. (Read error: Connection reset by peer)
+[2015-08-18 08:26:32] dolu, joining. (#selenium)
+[2015-08-18 08:30:12] zeljkof, changing nick to zeljkof-away.
+[2015-08-18 08:31:35] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 08:31:35] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 08:31:36] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 08:31:36] WhereIsMySpoon, quitting. (Changing host)
+[2015-08-18 08:31:36] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 08:33:06] perfectsine, quitting. (Quit: perfectsine)
+[2015-08-18 08:33:13] dolu1, joining. (#selenium)
+[2015-08-18 08:34:07] smccarthy, joining. (#selenium)
+[2015-08-18 08:34:33] kggr, quitting. (Remote host closed the connection)
+[2015-08-18 08:35:35] dolu, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 08:36:43] kutenai, quitting. (Remote host closed the connection)
+[2015-08-18 08:36:44] mkaufman, quitting. (Remote host closed the connection)
+[2015-08-18 08:36:44] sahazel, quitting. (Remote host closed the connection)
+[2015-08-18 08:39:18] perfectsine, joining. (#selenium)
+[2015-08-18 08:40:52] lukeis, joining. (#selenium)
+[2015-08-18 08:46:59] sahazel, joining. (#selenium)
+[2015-08-18 08:58:27] spline: rplevka: can't. they seem to lock it on the session.
+[2015-08-18 08:59:20] spline: I have a partial solution... clicking a text field, where I can enter text. Once it returns, I "find" it again, click(), and on my browser (human, me) I can press tab and go through the fields but doing this on selenium doesn't work. Hit tab and it doesn't select the next input field?
+[2015-08-18 09:00:56] michl68, quitting. (Ping timeout: 255 seconds)
+[2015-08-18 09:01:11] perfectsine, quitting. (Quit: perfectsine)
+[2015-08-18 09:02:50] Iceg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 09:11:02] titusfortner, joining. (#selenium)
+[2015-08-18 09:11:23] swampdragons, joining. (#selenium)
+[2015-08-18 09:11:54] lukeis: AutomatedTester: have you (or anyone else) attempted to get FirefoxDriver xpi signed through AMO? and this is going to be a huge PITA with crazy-fun
+[2015-08-18 09:12:21] swampdragons, quitting. (Client Quit)
+[2015-08-18 09:13:31] lukeis: is WebDriver.xpi considered to be 'side-loaded'?
+[2015-08-18 09:19:37] lukeis: oh fuck you AMO… highest version level i can put in my xpi is 43? guaranteeing us to need to bump the firefox max version every release… sigh
+[2015-08-18 09:20:14] WhereIsMySpoon: \o/
+[2015-08-18 09:21:26] davehunt, quitting. (Quit: Leaving...)
+[2015-08-18 09:23:00] Ardesco, joining. (#selenium)
+[2015-08-18 09:23:04] mkaufman, joining. (#selenium)
+[2015-08-18 09:24:27] lukeis: "If your add-on contains binary or obfuscated code other than known libraries, upload its sources for review." …. I'm just going to upload the zip of the selenium repo
+[2015-08-18 09:24:56] kutenai, joining. (#selenium)
+[2015-08-18 09:25:58] Selenium-Github: [13selenium] 15lukeis pushed 1 new commit to 06master: 02http://git.io/vsTNC
+[2015-08-18 09:25:58] Selenium-Github: 13selenium/06master 14c8bc2ad 15Luke Inman-Semerau: AMO requires the max version be an actual release version number
+[2015-08-18 09:28:19] jeffmjack, joining. (#selenium)
+[2015-08-18 09:30:43] lukeis: and the add-on requires manual review… so, I'm going to go waste some Mozillians time doing that… with the entire source tree of selenium uploaded.
+[2015-08-18 09:31:22] Ardesco, quitting. (Quit: Ardesco)
+[2015-08-18 09:31:29] lukeis: "Oops! We had an error.
+[2015-08-18 09:31:30] lukeis: We'll get to fixing that soon."  …..
+[2015-08-18 09:31:51] yenaemj, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 09:31:56] AnConio, joining. (#selenium)
+[2015-08-18 09:32:01] dubner, joining. (#selenium)
+[2015-08-18 09:32:27] lukeis: ato AutomatedTester stephend: do you want to help me hunt down who I can strangle? :)
+[2015-08-18 09:33:21] ato: I don’t know anyone who does add-on review, but last I heard the queue is very long.
+[2015-08-18 09:33:36] ato: Also I’m not sure about the requirements imposed on add-ons.
+[2015-08-18 09:33:41] lukeis: well, i don't even know if my add-on review was submitted!!
+[2015-08-18 09:33:51] ato: Sounds suboptimal.
+[2015-08-18 09:33:53] lukeis: submit button responds with oops, error
+[2015-08-18 09:34:02] lukeis: fuck you very much ;)
+[2015-08-18 09:34:51] dubner_, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 09:35:13] lukeis: and from what I can tell the only reason we require a manual review is because of our native events library (oh and the no focus one for linux)
+[2015-08-18 09:35:56] ulmi, quitting. (Quit: Leaving.)
+[2015-08-18 09:37:10] lukeis: they apparently want me to upload the source code…. so i just downloaded the zip from github of selenium…. i think it may be barfing on that, since it's 126 MB
+[2015-08-18 09:37:35] lukeis: where's my option to link to the open source repo instead!
+[2015-08-18 09:38:20] jimevans: tourdedave: yt?
+[2015-08-18 09:38:43] ato: lukeis: I’ve asked in #addons, but not reply yet.
+[2015-08-18 09:38:56] ato: lukeis: I’ll get back to you when I know more.
+[2015-08-18 09:39:42] ato: lukeis: Well it’s shitty error handling regardless. (-:
+[2015-08-18 09:40:47] ato: s/not/no/
+[2015-08-18 09:41:52] titusfortner, quitting. (Quit: My Mac has gone to sleep. ZZZzzz…)
+[2015-08-18 09:41:52] spline: Can selenium (python) tab through input elements like I can using firefox browser? so tab moves to the next element?
+[2015-08-18 09:42:57] jleyba, joining. (#selenium)
+[2015-08-18 09:43:16] CTtpollard: yes
+[2015-08-18 09:43:56] ato: spline: Actions(driver).send_key(Keys.TAB).perform() or something similar.
+[2015-08-18 09:44:32] spline: was using regular send keys like if im typing in a field. lets see
+[2015-08-18 09:45:09] davehunt, joining. (#selenium)
+[2015-08-18 09:45:12] notthemessiah, joining. (#selenium)
+[2015-08-18 09:51:16] ato: lukeis: Do you mind filing a simple bug report, including a link to the .zip you tried to upload? https://bugzilla.mozilla.org/enter_bug.cgi?product=addons.mozilla.org
+[2015-08-18 09:51:31] ato: lukeis: 17:50 <eviljeff> ato: log a bug.  Its probably related to the size, or the amount of js that needs to be parsed.
+[2015-08-18 09:54:06] spline: ato: http://i.imgur.com/2Ls38rg.png <- code there . Still not seeing it select the field :\
+[2015-08-18 09:54:22] WhereIsMySpoon: spline: why aer you using tab anyway
+[2015-08-18 09:55:34] spline: long story short: the form im automating from amazon has a ton of "antiautomation" in it. the text isn't in source/fields
+[2015-08-18 09:55:54] spline: so I found if I click on the field above the ones im looking to extract, hit tab, I can control + a in selenium, control + c, then use xsel and dump the buffer
+[2015-08-18 09:55:57] spline: it's dirty but works
+[2015-08-18 09:55:59] WhereIsMySpoon: spline: why are you pasting code as an image
+[2015-08-18 09:56:02] WhereIsMySpoon: X_X
+[2015-08-18 09:56:09] spline: ill gist the excerpt
+[2015-08-18 09:56:48] spline: https://gist.github.com/reticulatingspline/1894383bcfd7ef609d01
+[2015-08-18 09:57:38] WhereIsMySpoon: ha
+[2015-08-18 09:57:45] WhereIsMySpoon: spline: builder.perform
+[2015-08-18 09:57:50] WhereIsMySpoon: build as much as you want
+[2015-08-18 09:57:53] WhereIsMySpoon: u need to perform it
+[2015-08-18 09:57:54] WhereIsMySpoon: :p
+[2015-08-18 09:58:17] WhereIsMySpoon: i make that mistake a lot
+[2015-08-18 09:58:23] spline: im not sure what you mean?
+[2015-08-18 09:58:29] swampdragons, joining. (#selenium)
+[2015-08-18 09:58:30] spline: I had never used actionchains before today
+[2015-08-18 09:58:37] spline: so I was using examples I found
+[2015-08-18 09:59:15] WhereIsMySpoon: in java you do new Actions(driver).blah().foo().perform() always
+[2015-08-18 09:59:25] WhereIsMySpoon: you need the perform() so that it builds the chain and executes it
+[2015-08-18 09:59:35] spline: on each action?
+[2015-08-18 09:59:36] WhereIsMySpoon: i assume python has the same thing
+[2015-08-18 09:59:41] Testware, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 09:59:44] WhereIsMySpoon: just at the end
+[2015-08-18 09:59:45] spline: saw different things
+[2015-08-18 09:59:52] spline: even though I do it after each line?
+[2015-08-18 09:59:52] WhereIsMySpoon: oh i see
+[2015-08-18 09:59:59] WhereIsMySpoon: you arent
+[2015-08-18 10:00:05] WhereIsMySpoon: builder.click(afnfees)
+[2015-08-18 10:00:10] WhereIsMySpoon: no perform
+[2015-08-18 10:00:25] spline: trying now
+[2015-08-18 10:00:50] spline: yeah this form is really annoying. I've already seen countermeasures in certain things from amazon. This is the worst I've encountered. It's really clear they don't want this automated
+[2015-08-18 10:00:57] WhereIsMySpoon: but in the future you can just do builder.blah().foo().baz().perform(*)
+[2015-08-18 10:01:00] WhereIsMySpoon: er, minus the *
+[2015-08-18 10:01:13] spline: watching the screen and still nothing
+[2015-08-18 10:01:23] spline: sits at the form but don't see a click nor control + a for select all
+[2015-08-18 10:02:15] WhereIsMySpoon: spline: im not sure that sending ctrl-a with selenium works
+[2015-08-18 10:02:18] spline: I can click the field myself, and hit tab, and it'll move
+[2015-08-18 10:02:21] brma, quitting. (Quit: Leaving.)
+[2015-08-18 10:02:29] WhereIsMySpoon: oh so that bit works
+[2015-08-18 10:02:30] spline: I was wondering if it's a different type of "input" though
+[2015-08-18 10:02:31] spline: yeah
+[2015-08-18 10:02:36] swampdragons, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 10:02:38] spline: it's not like they have a js lib disabling anything
+[2015-08-18 10:02:46] WhereIsMySpoon: find_element_by_id('afn-fees-price')
+[2015-08-18 10:02:50] WhereIsMySpoon: is this unique?
+[2015-08-18 10:02:53] spline: http://i.imgur.com/pKD1L0U.png
+[2015-08-18 10:02:53] spline: yeap
+[2015-08-18 10:02:56] WhereIsMySpoon: i cant view imgur
+[2015-08-18 10:02:58] spline: I enter it in once before
+[2015-08-18 10:02:59] spline: oh
+[2015-08-18 10:03:10] Testware, joining. (#selenium)
+[2015-08-18 10:03:18] brma, joining. (#selenium)
+[2015-08-18 10:03:20] spline: I can show you the form somewhere. You can't use it w/o an amazon login that's got a seller account on it
+[2015-08-18 10:03:21] swampdragons, joining. (#selenium)
+[2015-08-18 10:03:42] WhereIsMySpoon: its 6pm here
+[2015-08-18 10:03:44] WhereIsMySpoon: sorry but im going home
+[2015-08-18 10:03:49] spline: the values it returns are on my screen but not in the source. im assuming it's some javascript obfuscation. I cannot also script the post it does for that json
+[2015-08-18 10:04:01] WhereIsMySpoon: good luck though
+[2015-08-18 10:06:06] perfectsine, joining. (#selenium)
+[2015-08-18 10:06:38] spline: thanks
+[2015-08-18 10:06:45] spline: it's a really odd form
+[2015-08-18 10:07:38] Testware, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 10:08:35] santiycr, joining. (#selenium)
+[2015-08-18 10:11:06] jimevans: santiycr: hey. got a question for you when you get a second
+[2015-08-18 12:56:42] selbot2, joining. (#selenium)
+[2015-08-18 12:56:42] selbot2, joining. (#seleniumide)
+[2015-08-18 12:56:45] juangj: well that's annoying
+[2015-08-18 12:56:50] lukeis: :latest
+[2015-08-18 12:57:33] juangj: oh yeah i guess i remember getting the mail from apple about how they were unifying the developer experience and how this is good for developers and btw it will be $99 please
+[2015-08-18 12:57:49] kggr, joining. (#selenium)
+[2015-08-18 12:57:54] sircapsalot: well this exacerbates things…
+[2015-08-18 12:58:43] tony4, joining. (#selenium)
+[2015-08-18 12:58:51] tony2, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 12:58:59] warfront1: send them an email stating your case, maybe they will give it to you for free.
+[2015-08-18 12:59:19] jleyba: way back when simon and i tried getting a cert for selenium
+[2015-08-18 12:59:26] jleyba: apple didn't know what to do with us since we are an oss project
+[2015-08-18 12:59:49] jimevans: i wonder if the sfc could help here.
+[2015-08-18 13:01:17] brma, quitting. (Quit: Leaving.)
+[2015-08-18 13:01:23] lukeis: we could potentially use sfc funds to purchase a selenium developer account / organization….. (although work has pays for the one i use)
+[2015-08-18 13:01:40] korg, quitting. (Ping timeout: 265 seconds)
+[2015-08-18 13:01:40] brma, joining. (#selenium)
+[2015-08-18 13:02:11] zeljkof-meeting, changing nick to zeljkof.
+[2015-08-18 13:02:49] korg, joining. (#selenium)
+[2015-08-18 13:03:15] AutomatedTester: lukeis: I also got the impression it might get rejected because it does use elevated privledges
+[2015-08-18 13:03:34] lukeis: well then… ummm… what the actual fuck
+[2015-08-18 13:03:54] lukeis: how can mozilla decline addons that aren't listed in AMO?!
+[2015-08-18 13:04:22] lukeis: if I had an internal addon for internal business use… I would be screaming at someone by now ;)
+[2015-08-18 13:04:27] AutomatedTester: I have asked the PM for a video chat
+[2015-08-18 13:05:51] santiycr, joining. (#selenium)
+[2015-08-18 13:05:54] AutomatedTester: getting us to pay for a cert would be better
+[2015-08-18 13:06:14] lukeis: is that a change of topic to safari? ;)
+[2015-08-18 13:06:27] kggr, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 13:06:28] AutomatedTester: no, thats how Chrome and Safari do it
+[2015-08-18 13:06:29] sircapsalot: yea i was thrown by that too
+[2015-08-18 13:06:59] lukeis: chrome doesn't charge for the cert though?
+[2015-08-18 13:07:04] kggr, joining. (#selenium)
+[2015-08-18 13:07:16] AutomatedTester: you need to pay $25 to create extensions
+[2015-08-18 13:07:20] AutomatedTester: unless that has changed
+[2015-08-18 13:07:23] lukeis: (or do they… i didn't think so… i wrote an extension once for free)
+[2015-08-18 13:07:35] sircapsalot: i've written and published chrome extensions.
+[2015-08-18 13:07:39] sircapsalot: $5 one time fee
+[2015-08-18 13:07:52] sircapsalot: but you could develop for free
+[2015-08-18 13:07:53] *lukeis doesn't recall any fee…  ¯\_(ツ)_/¯ '
+[2015-08-18 13:07:54] jleyba: guess the firefox driver has died. long live marionette
+[2015-08-18 13:07:56] lukeis: ahh
+[2015-08-18 13:08:35] lukeis: i would love to kill FirefoxDriver and only use marionette
+[2015-08-18 13:08:40] Neo--, quitting. (Quit: My MacBook Pro has gone to sleep. ZZZzzz…)
+[2015-08-18 13:08:42] jimevans: +1
+[2015-08-18 13:09:06] korg, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 13:09:10] jimevans: which version of firefox requires the signed extention? 41? 42?
+[2015-08-18 13:09:12] errant_rider: i am sure the SFC can front the 25$
+[2015-08-18 13:09:26] lukeis: errant_rider: $99 for safari
+[2015-08-18 13:09:31] AutomatedTester: 43 (I think(
+[2015-08-18 13:09:39] lukeis: 42
+[2015-08-18 13:09:49] errant_rider: lukeis: send an email to tony
+[2015-08-18 13:09:49] lukeis: https://wiki.mozilla.org/Addons/Extension_Signing
+[2015-08-18 13:09:53] errant_rider: cc simon
+[2015-08-18 13:09:53] korg, joining. (#selenium)
+[2015-08-18 13:09:56] errant_rider: i bet u will get signon
+[2015-08-18 13:09:58] lukeis: errant_rider: will do when / if need to
+[2015-08-18 13:12:50] jimevans: next question. with what firefox version does the current marionette http shim work?
+[2015-08-18 13:12:59] kggr, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 13:13:14] AutomatedTester: jimevans: nightly, dev edition and maybe beta
+[2015-08-18 13:13:28] jimevans: i was rather hoping for a version number...
+[2015-08-18 13:13:47] AutomatedTester: LOL... like I know what version that is on
+[2015-08-18 13:13:54] kggr, joining. (#selenium)
+[2015-08-18 13:13:56] AutomatedTester: I am not at MS that ships once a year
+[2015-08-18 13:14:06] *AutomatedTester goes and looks'
+[2015-08-18 13:14:15] lukeis: beta is 41
+[2015-08-18 13:14:28] lukeis: nightly 42
+[2015-08-18 13:14:40] AutomatedTester: if Beta is 41 nightly is 43
+[2015-08-18 13:14:46] lukeis: ah
+[2015-08-18 13:14:49] AutomatedTester: dev edition is 42
+[2015-08-18 13:14:58] lukeis: ok
+[2015-08-18 13:15:10] lukeis: 40 is the current release
+[2015-08-18 13:16:38] jleyba: AutomatedTester, is there a tool for Firefox that maps commit/revision number to release number?
+[2015-08-18 13:17:03] AutomatedTester: jleyba: bugzilla
+[2015-08-18 13:17:22] AutomatedTester: well... it maps where it was landed first
+[2015-08-18 13:17:36] korg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 13:17:44] perfectsine, quitting. (Remote host closed the connection)
+[2015-08-18 13:17:53] korg, joining. (#selenium)
+[2015-08-18 13:18:36] brma, quitting. (Quit: Leaving.)
+[2015-08-18 13:20:05] perfectsine, joining. (#selenium)
+[2015-08-18 13:20:31] kggr, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 13:21:05] errant_rider, quitting. (Quit: Leaving.)
+[2015-08-18 13:21:49] lukeis: AutomatedTester: the comments on this post are fantastic… https://blog.mozilla.org/addons/2015/02/10/extension-signing-safer-experience/   I hope the PM has read EVERY. LAST. ONE.
+[2015-08-18 13:21:53] kggr, joining. (#selenium)
+[2015-08-18 13:22:42] sircapsalot: "I am getting sick of the Internet police stopping technical people from doing what they know and understand is safe."
+[2015-08-18 13:23:35] AutomatedTester: lukeis: "That’s what the unbranded version is for."
+[2015-08-18 13:23:46] korg, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 13:23:48] AutomatedTester: that's going to be the default response I fear
+[2015-08-18 13:24:00] lukeis: how the fuck do we get that installed?
+[2015-08-18 13:24:12] AutomatedTester: good question
+[2015-08-18 13:25:08] lukeis: and what's the differences between them… if we run tests against one or the other, is there any slight chance that one will behave differently?
+[2015-08-18 13:25:19] *lukeis weeps a little'
+[2015-08-18 13:25:31] AutomatedTester: Gecko != Firefox
+[2015-08-18 13:25:39] AutomatedTester: and that will be the same
+[2015-08-18 13:25:45] perfectsine, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 13:25:49] AutomatedTester: Gecko will not be split
+[2015-08-18 13:25:55] AutomatedTester: but what the UI looks like will
+[2015-08-18 13:26:06] lukeis: >.>
+[2015-08-18 13:26:08] AutomatedTester: and we use gecko for rendering and javascript
+[2015-08-18 13:26:18] AutomatedTester: so from a test point of view they are the same
+[2015-08-18 13:26:24] korg, joining. (#selenium)
+[2015-08-18 13:26:31] lukeis: that's like apple telling me WebViews and Mobile Safari *are exactly the same*...
+[2015-08-18 13:26:55] AutomatedTester: well... they did say webviews didnt have JIT
+[2015-08-18 13:27:24] lukeis: how different will the user agent strings be?
+[2015-08-18 13:27:48] AutomatedTester: I dont know
+[2015-08-18 13:28:18] *lukeis doesn't like not being able to replicate the exact end user'
+[2015-08-18 13:29:08] lukeis: i fear we're going to be stuck on FF 41 until Marionette is G.A. here
+[2015-08-18 13:30:10] kggr, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 13:31:00] kggr, joining. (#selenium)
+[2015-08-18 13:32:03] AutomatedTester: oh... it's got interesting
+[2015-08-18 13:32:09] AutomatedTester: please hold caller
+[2015-08-18 13:32:17] *lukeis holds'
+[2015-08-18 13:32:35] AutomatedTester: the Mozilla Chairperson has taken my side
+[2015-08-18 13:32:47] korg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 13:33:23] korg, joining. (#selenium)
+[2015-08-18 13:34:27] brma, joining. (#selenium)
+[2015-08-18 13:35:40] AutomatedTester: where can I see the download numbers quickly?
+[2015-08-18 13:35:43] AutomatedTester: lukeis: ^
+[2015-08-18 13:35:47] jimevans: AutomatedTester: so dev edition *should* work with jgraham's shim, right?
+[2015-08-18 13:35:57] AutomatedTester: jimevans: should
+[2015-08-18 13:36:04] notthemessiah, joining. (#selenium)
+[2015-08-18 13:36:09] jimevans: right. thanks. i've got a language binding to update.
+[2015-08-18 13:36:19] jimevans: and need a server component to test against.
+[2015-08-18 13:36:30] kggr, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 13:36:38] AutomatedTester: server component?
+[2015-08-18 13:36:44] jimevans: sorry. remote end.
+[2015-08-18 13:37:06] jimevans: and then, i have a remote end of my own to update.
+[2015-08-18 13:37:07] AutomatedTester: jimevans: use my python code as a starting point
+[2015-08-18 13:37:09] kggr, joining. (#selenium)
+[2015-08-18 13:37:22] jimevans: i fully intend to (as much as can be done)
+[2015-08-18 13:37:32] AutomatedTester: obviosuly :)
+[2015-08-18 13:37:44] lukeis: AutomatedTester: http://selenium-release.storage.googleapis.com/2.47/selenium-server-standalone-2.47.1.jar
+[2015-08-18 13:37:46] lukeis: https://gist.github.com/lukeis/b15d1ee72cb621973566
+[2015-08-18 13:37:54] lukeis: sorry, that gist
+[2015-08-18 13:38:18] lukeis: you might also want to grab download counts from pypi
+[2015-08-18 13:38:34] AutomatedTester: the pypi downloads look more impressive :)
+[2015-08-18 13:38:40] lukeis: my gist is only of people clicking the download button from seleniumhq
+[2015-08-18 13:38:51] lukeis: i can also grab maven download numbers in a bit...
+[2015-08-18 13:39:00] jimevans: python has some niceties that make it much easier to be flexible in dealing with the protocol differences. .NET will need a much more thorough refactor because of its use of json.net.
+[2015-08-18 13:39:26] AutomatedTester: not having a decent JSON library in .NET has always been weird to me
+[2015-08-18 13:39:45] AutomatedTester: json.net is good but core should have had it a long time ago
+[2015-08-18 13:39:51] korg, quitting. (Ping timeout: 265 seconds)
+[2015-08-18 13:39:57] AutomatedTester: my 2p/3.2c
+[2015-08-18 13:40:26] korg, joining. (#selenium)
+[2015-08-18 13:40:30] jimevans: no argument from me.
+[2015-08-18 13:40:59] jimevans: but that's all i can do for today. gotta get home and get supper started.
+[2015-08-18 13:41:06] jimevans: g'night everyone!
+[2015-08-18 13:41:08] jimevans, quitting. (Quit: Leaving.)
+[2015-08-18 13:41:18] dude-x: o/
+[2015-08-18 13:41:48] jleyba, quitting. (Quit: Leaving)
+[2015-08-18 13:42:13] rorycb, quitting. (Remote host closed the connection)
+[2015-08-18 13:42:32] lukeis: AutomatedTester: https://gist.github.com/lukeis/b15d1ee72cb621973566  updated with maven download counts
+[2015-08-18 13:43:01] lukeis: averaging 2million / month
+[2015-08-18 13:43:08] AutomatedTester: that's better
+[2015-08-18 13:43:29] lukeis: heh… and simon doesn't like maven ;)
+[2015-08-18 13:43:51] kggr, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 13:44:07] kggr, joining. (#selenium)
+[2015-08-18 13:44:15] AutomatedTester: it's not about liking it
+[2015-08-18 13:44:24] AutomatedTester: it's about being impressive
+[2015-08-18 13:44:36] lukeis: indeed
+[2015-08-18 13:45:32] AutomatedTester: hmm...
+[2015-08-18 13:45:39] lukeis: throw big name companies around that use Selenium's firefox driver…. Google, Microsoft, Apple… and even MOZILLA :)
+[2015-08-18 13:45:45] AutomatedTester: I have
+[2015-08-18 13:45:53] AutomatedTester: and Mitchell has sided with me
+[2015-08-18 13:46:57] korg, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 13:47:04] sircapsalot: fyi - added a D-edge label to the selenium repo
+[2015-08-18 13:47:15] korg, joining. (#selenium)
+[2015-08-18 13:47:32] lukeis: sircapsalot: hopefully that gets no use… since bugs should be logged with microsoft
+[2015-08-18 13:47:53] AutomatedTester: lukeis: I think I have kicked up enough of a stink
+[2015-08-18 13:47:57] lukeis: i'll accept a client binding bug, (but those are rare and usually easy to fix)
+[2015-08-18 13:48:04] sircapsalot: oh right.. forgot they are maintaining it :)
+[2015-08-18 13:48:05] lukeis: AutomatedTester: excellent :)
+[2015-08-18 13:48:27] AutomatedTester: this is being escalated to the signing team to see how we can solve it
+[2015-08-18 13:48:34] *AutomatedTester now awaits an email'
+[2015-08-18 13:49:16] dude-x: simon stewart is coming to NYC as a tourist
+[2015-08-18 13:49:29] *lukeis saw the twitterings ;)'
+[2015-08-18 13:49:41] dude-x: lots of recommendations for touristy places
+[2015-08-18 13:49:43] dude-x: highline is good though
+[2015-08-18 13:50:25] Neo--, joining. (#selenium)
+[2015-08-18 13:50:46] kggr, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 13:51:19] titusfortner: wow 2-3 million a month? Any idea why the drastic increase since beginning of the year?
+[2015-08-18 13:51:37] lukeis: more people using it? ;)
+[2015-08-18 13:51:42] sircapsalot: because people are using selenium to download selenium titusfortner
+[2015-08-18 13:52:00] dude-x: ha
+[2015-08-18 13:52:01] lukeis: the maven downloads aren't being done (mostly) with selenium....
+[2015-08-18 13:52:12] lukeis: maven downloads the internet a lot ;)
+[2015-08-18 13:52:28] titusfortner: :-D
+[2015-08-18 13:52:38] lukeis: and if someone isn't caching with an intermediary repo… then even more hits to maven central!
+[2015-08-18 13:52:58] lukeis: (we have a nexus server here… so mostly people shouldn't be hitting maven central)
+[2015-08-18 13:53:12] errant_rider, joining. (#selenium)
+[2015-08-18 13:53:37] errant_rider, quitting. (Client Quit)
+[2015-08-18 13:53:38] kggr, joining. (#selenium)
+[2015-08-18 13:54:04] titusfortner: Rubygems hasn't had as many downloads over the summer as the beginning of the year: https://rubygems.org/gems/selenium-webdriver/
+[2015-08-18 13:54:07] errant_rider, joining. (#selenium)
+[2015-08-18 13:55:43] lukeis: i don't get to see a breakdown… only total downloads (> 12M which is awesome… I recall 'celebrating' 1 Million)
+[2015-08-18 13:55:56] sircapsalot: so cool
+[2015-08-18 13:56:15] titusfortner: you can click on a version to see 'just this version' numbers - https://rubygems.org/gems/selenium-webdriver/versions/2.45.0
+[2015-08-18 13:56:20] titusfortner: not easy to graph or anything
+[2015-08-18 13:56:24] titusfortner: but an idea
+[2015-08-18 13:56:36] lukeis: ah
+[2015-08-18 13:56:36] titusfortner: March/Apr/May 600k users
+[2015-08-18 13:56:39] titusfortner: err downloads
+[2015-08-18 13:56:44] titusfortner: users is much fewer I'm sure
+[2015-08-18 13:56:54] lukeis: well same with maven…
+[2015-08-18 13:57:03] titusfortner: right
+[2015-08-18 13:57:15] lukeis: if they aren't caching, it's potentially one download per machine
+[2015-08-18 13:57:16] korg, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 13:57:34] titusfortner: well, any change in ruby version will bundle update a new gem
+[2015-08-18 13:57:46] titusfortner: any fresh load on a CI machine...
+[2015-08-18 13:57:55] lukeis: yep, that too…
+[2015-08-18 13:58:01] *lukeis thinks of the travis-es'
+[2015-08-18 13:58:07] korg, joining. (#selenium)
+[2015-08-18 13:58:30] titusfortner: but "over a million users" I think is a safe bet
+[2015-08-18 13:58:45] lukeis: i would hope travis would use a nexus repo or some other caching server though… instead of hitting central
+[2015-08-18 14:00:18] sircapsalot: take care everyone.
+[2015-08-18 14:00:20] sircapsalot, leaving. (#selenium)
+[2015-08-18 14:00:21] kggr, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 14:00:30] kggr, joining. (#selenium)
+[2015-08-18 14:01:34] trentp, quitting. (Remote host closed the connection)
+[2015-08-18 14:01:39] titusfortner: So, is marionette ready to be included in the language bindings or is it still super alpha?
+[2015-08-18 14:02:35] AutomatedTester: titusfortner: I guess its the same as EdgeDriver
+[2015-08-18 14:03:25] korg, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 14:03:27] titusfortner: That's kind of exciting. Figuring out the Edge support was fun.
+[2015-08-18 14:03:36] korg, joining. (#selenium)
+[2015-08-18 14:04:24] yenaemj, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 14:05:47] dimacus, quitting. (Quit: Leaving.)
+[2015-08-18 14:05:49] titusfortner: Really the first step is getting the Ruby tests into some kind of CI, so I don't have to run them all manually :)
+[2015-08-18 14:06:21] bbarke, quitting. (Ping timeout: 272 seconds)
+[2015-08-18 14:06:39] kggr, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 14:07:38] kggr, joining. (#selenium)
+[2015-08-18 14:11:17] korg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 14:11:51] korg, joining. (#selenium)
+[2015-08-18 14:12:03] tony4, quitting. (Quit: Leaving.)
+[2015-08-18 14:13:34] bbarke, joining. (#selenium)
+[2015-08-18 14:14:19] kggr, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 14:15:06] kggr, joining. (#selenium)
+[2015-08-18 14:17:48] korg, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 14:18:09] AutomatedTester: right... this battle has moved to email
+[2015-08-18 14:18:20] lukeis: yay email battles!
+[2015-08-18 14:18:35] korg, joining. (#selenium)
+[2015-08-18 14:18:36] lukeis: need me to go visit mountain view tomorrow? ;)
+[2015-08-18 14:18:50] *dude-x plays Final Fantasy Battle music'
+[2015-08-18 14:19:18] AutomatedTester: lukeis: nah... the PM lives in LA (weirdo)
+[2015-08-18 14:19:44] lukeis: heh… i could easily make it down there too… unless you mean the state, not the city
+[2015-08-18 14:20:18] AutomatedTester: no the city (which is as big as some states (NE USA)
+[2015-08-18 14:20:20] AutomatedTester: )
+[2015-08-18 14:20:48] *lukeis knows too well… grew up there :)'
+[2015-08-18 14:21:05] kggr, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 14:21:53] kggr, joining. (#selenium)
+[2015-08-18 14:24:18] korg, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 14:24:28] korg, joining. (#selenium)
+[2015-08-18 14:26:03] Milencho, joining. (#selenium)
+[2015-08-18 14:26:19] *AutomatedTester files PTO for Thursday before he forgets'
+[2015-08-18 14:27:30] kggr, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 14:28:20] kggr, joining. (#selenium)
+[2015-08-18 14:30:21] perfectsine, joining. (#selenium)
+[2015-08-18 14:31:47] korg, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 14:32:26] korg, joining. (#selenium)
+[2015-08-18 14:34:57] brma, quitting. (Quit: Leaving.)
+[2015-08-18 14:35:30] kggr, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 14:36:02] kggr, joining. (#selenium)
+[2015-08-18 14:39:27] korg, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 14:40:21] brma, joining. (#selenium)
+[2015-08-18 14:41:02] korg, joining. (#selenium)
+[2015-08-18 14:43:11] rplevka, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 14:45:01] kggr, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 14:45:52] zeljkof, changing nick to zeljkof-away.
+[2015-08-18 14:46:34] kggr, joining. (#selenium)
+[2015-08-18 14:48:14] jleyba, joining. (#selenium)
+[2015-08-18 14:48:59] titusfortner, quitting. (Quit: My Mac has gone to sleep. ZZZzzz…)
+[2015-08-18 14:50:10] korg, quitting. (Ping timeout: 256 seconds)
+[2015-08-18 14:51:31] kggr, quitting. (Ping timeout: 250 seconds)
+[2015-08-18 14:52:40] yenaemj, joining. (#selenium)
+[2015-08-18 14:58:17] titusfortner, joining. (#selenium)
+[2015-08-18 14:58:32] bbarke1, joining. (#selenium)
+[2015-08-18 15:00:18] dude-x, quitting. (Remote host closed the connection)
+[2015-08-18 15:00:27] bbarke, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 15:01:15] brma, quitting. (Quit: Leaving.)
+[2015-08-18 15:01:34] brma, joining. (#selenium)
+[2015-08-18 15:03:56] bbarke1, quitting. (Quit: Leaving.)
+[2015-08-18 15:04:04] bbarke, joining. (#selenium)
+[2015-08-18 15:04:42] fatguylaughing, quitting. (Quit: fatguylaughing)
+[2015-08-18 15:05:23] yenaemj, quitting. (Ping timeout: 260 seconds)
+[2015-08-18 15:08:09] gabel, quitting. (Quit: Leaving.)
+[2015-08-18 15:15:17] jleyba, quitting. (Quit: Leaving)
+[2015-08-18 15:20:57] brma, quitting. (Quit: Leaving.)
+[2015-08-18 15:21:54] brma, joining. (#selenium)
+[2015-08-18 15:22:46] yenaemj, joining. (#selenium)
+[2015-08-18 15:32:47] notthemessiah, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 15:40:03] jatb, quitting. (Remote host closed the connection)
+[2015-08-18 15:40:12] Ardesco, quitting. (Quit: Ardesco)
+[2015-08-18 15:40:51] perfectsine, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 15:47:30] swampdragons2, leaving. (#selenium)
+[2015-08-18 15:48:44] auto_sam, quitting. (Quit: Page closed)
+[2015-08-18 15:50:13] lukeis, quitting. (Ping timeout: 272 seconds)
+[2015-08-18 15:55:42] swampdragons, joining. (#selenium)
+[2015-08-18 15:59:44] titusfortner, quitting. (Read error: Connection reset by peer)
+[2015-08-18 16:02:28] michl68, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 16:07:22] swampdragons1, joining. (#selenium)
+[2015-08-18 16:08:46] swampdragons, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 16:18:35] jatb, joining. (#selenium)
+[2015-08-18 16:24:08] swampdragons1, leaving. (#selenium)
+[2015-08-18 16:25:26] titusfortner, joining. (#selenium)
+[2015-08-18 16:37:01] leandroal_, quitting. (Quit: This computer has gone to sleep)
+[2015-08-18 16:47:02] errant_rider, quitting. (Quit: Leaving.)
+[2015-08-18 16:47:16] errant_rider, joining. (#selenium)
+[2015-08-18 16:50:21] titusfortner, quitting. (Read error: Connection reset by peer)
+[2015-08-18 16:51:03] btulchinsky, joining. (#selenium)
+[2015-08-18 17:15:23] knownasilya, quitting. (Quit: Connection closed for inactivity)
+[2015-08-18 17:15:27] yenaemj, quitting. (Ping timeout: 245 seconds)
+[2015-08-18 17:17:55] santiycr: :ci
+[2015-08-18 17:29:44] jeffmjack, quitting. (Quit: Connection closed for inactivity)
+[2015-08-18 17:29:56] tony4, joining. (#selenium)
+[2015-08-18 17:31:39] titusfortner, joining. (#selenium)
+[2015-08-18 17:37:45] notthemessiah, joining. (#selenium)
+[2015-08-18 17:37:47] sbogg, quitting. (Quit: Textual IRC Client: www.textualapp.com)
+[2015-08-18 17:40:31] santiycr, quitting. (Quit: Leaving.)
+[2015-08-18 17:47:59] btulchinsky, quitting. (Remote host closed the connection)
+[2015-08-18 17:59:32] sevaseva, joining. (#selenium)
+[2015-08-18 18:03:24] sevaseva, quitting. (Client Quit)
+[2015-08-18 18:12:53] fullstack, quitting. (Changing host)
+[2015-08-18 18:12:53] fullstack, joining. (#selenium)
+[2015-08-18 18:13:23] fullstack: ElementNotVisibleError: element not visible
+[2015-08-18 18:13:55] fullstack: but I tried checking isPresent() (it is) and isDisplayed() it isn't. Then when I do it on a REPL, isDisplayed returns false
+[2015-08-18 18:14:02] fullstack: but why would it display true when the code runs
+[2015-08-18 18:35:29] errant_rider, quitting. (Quit: Leaving.)
+[2015-08-18 18:36:12] notthemessiah, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 18:37:22] errant_rider, joining. (#selenium)
+[2015-08-18 18:38:20] notthemessiah, joining. (#selenium)
+[2015-08-18 18:39:50] titusfortner, quitting. (Quit: My Mac has gone to sleep. ZZZzzz…)
+[2015-08-18 18:40:08] titusfortner, joining. (#selenium)
+[2015-08-18 18:43:57] titusfortner, quitting. (Client Quit)
+[2015-08-18 18:54:02] errant_rider, quitting. (Read error: Connection reset by peer)
+[2015-08-18 18:54:23] errant_rider, joining. (#selenium)
+[2015-08-18 18:54:56] titusfortner, joining. (#selenium)
+[2015-08-18 19:24:25] btulchinsky, joining. (#selenium)
+[2015-08-18 19:28:20] titusfortner, quitting. (Quit: My Mac has gone to sleep. ZZZzzz…)
+[2015-08-18 19:39:28] nirvdrum, quitting. (Ping timeout: 265 seconds)
+[2015-08-18 19:49:05] tony4, quitting. (Quit: Leaving.)
+[2015-08-18 19:54:16] rananda, joining. (#selenium)
+[2015-08-18 19:59:41] yenaemj, joining. (#selenium)
+[2015-08-18 20:16:53] yenaemj, quitting. (Read error: Connection reset by peer)
+[2015-08-18 20:29:58] dolu1, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 20:40:20] marmotworks, joining. (#selenium)
+[2015-08-18 20:43:48] errant_rider, quitting. (Quit: Leaving.)
+[2015-08-18 20:45:49] dolu, joining. (#selenium)
+[2015-08-18 21:10:40] Sudhansu, joining. (#selenium)
+[2015-08-18 21:18:54] Sudhansu1, joining. (#selenium)
+[2015-08-18 21:20:13] Sudhansu, quitting. (Ping timeout: 272 seconds)
+[2015-08-18 21:21:02] dude-x, joining. (#selenium)
+[2015-08-18 21:24:28] dude-x, quitting. (Remote host closed the connection)
+[2015-08-18 21:25:03] dude-x, joining. (#selenium)
+[2015-08-18 21:29:13] dude-x, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 21:51:14] WhereIsMySpoon, joining. (#selenium)
+[2015-08-18 22:02:40] smccarthy, quitting. (Quit: Leaving...)
+[2015-08-18 22:10:09] felixn_, changing nick to felixn.
+[2015-08-18 22:14:45] santiycr, joining. (#selenium)
+[2015-08-18 22:15:52] notthemessiah, quitting. (Ping timeout: 244 seconds)
+[2015-08-18 22:23:47] WhereIsMySpoon, quitting. (Quit: http://www.kiwiirc.com/ - A hand crafted IRC client)
+[2015-08-18 22:27:59] Sudhansu1, quitting. (Ping timeout: 272 seconds)
+[2015-08-18 22:28:37] notthemessiah, joining. (#selenium)
+[2015-08-18 22:44:30] Rollup, joining. (#selenium)
+[2015-08-18 22:48:13] bakhtiyor, joining. (#selenium)
+[2015-08-18 22:50:41] bakhtiyor, quitting. (Remote host closed the connection)
+[2015-08-18 23:00:09] notthemessiah, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 23:00:40] notthemessiah, joining. (#selenium)
+[2015-08-18 23:03:39] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 23:03:45] santiycr, quitting. (Quit: Leaving.)
+[2015-08-18 23:07:13] Rollup, joining. (#selenium)
+[2015-08-18 23:13:09] notthemessiah, quitting. (Ping timeout: 240 seconds)
+[2015-08-18 23:24:54] dolu, quitting. (Ping timeout: 246 seconds)
+[2015-08-18 23:34:08] Rollup, quitting. (Quit: Leaving.)
+[2015-08-18 23:39:06] Rollup, joining. (#selenium)
